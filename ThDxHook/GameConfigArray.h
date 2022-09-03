@@ -8,32 +8,32 @@ enum PointDataType {
     Int_DataType, Float_DataType, Short_DataType
 };
 
-typedef struct tagIntPoint {
+struct IntPoint {
     int X;
     int Y;
-} IntPoint;
+};
 
-typedef struct tagShortPoint {
+struct ShortPoint {
     short X;
     short Y;
-} ShortPoint;
+};
 
-typedef struct tagFloatPoint {
+struct FloatPoint {
     float X;
     float Y;
-} FloatPoint;
+};
 
-typedef union tagTypedPoint {
+union TypedPoint {
     IntPoint IntData;
     FloatPoint FloatData;
-} TypedPoint;
+};
 
-typedef struct tagAddressChain {
+struct AddressChain {
     int Length;
     DWORD Chain[ADDRESS_CHAIN_MAX_LEN];
-} AddressChain;
+};
 
-typedef struct tagGameConfig {
+struct GameConfig {
     char ProcessName[PROCESS_NAME_MAX_LEN];
     AddressChain Posistion;
     PointDataType PosDataType;
@@ -43,9 +43,9 @@ typedef struct tagGameConfig {
     UINT BaseResolutionX;
     bool OffsetIsRelative;
     char BaseName[16];
-} GameConfig;
+};
 
-typedef struct tagGameConfigArray {
+struct GameConfigArray {
     int Length;
     GameConfig Configs[GAME_CONFIG_MAX_LEN];
-} GameConfigArray;
+};

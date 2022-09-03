@@ -1,5 +1,4 @@
 // ThDxHook.cpp : Defines the exported functions for the DLL application.
-//
 
 #include "stdafx.h"
 #include "ThDxHook.h"
@@ -7,21 +6,24 @@
 #include "apihijack.h"
 #include "../DX8Hook/subGlobal.h"
 
-#pragma data_seg(".HOOKDATA")//Shared data among all instances.
+#pragma data_seg(".HOOKDATA") // Shared data among all instances.
 HHOOK hHookW = NULL;
 #pragma data_seg()
-#pragma comment(linker, "/SECTION:.HOOKDATA,RWS")//linker directive
+#pragma comment(linker, "/SECTION:.HOOKDATA,RWS") // linker directive
 
 extern HINSTANCE hinstance;
+
+int ReportLastError();
+LRESULT CALLBACK hookprocW(int ncode, WPARAM wparam, LPARAM lparam);
+void EncodeJoyButton(int buttonNumber, DWORD& joyButton, int defaultValue);
 
 bool hooked = false;
 LRESULT CALLBACK hookprocW(int ncode, WPARAM wparam, LPARAM lparam) {
     if (hooked == false && ncode == HCBT_CREATEWND) {
-        HWND hwnd = (HWND)wparam;
+        auto hwnd = (HWND)wparam;
         WCHAR buf[256];
         GetClassNameW(hwnd, buf, 256);
-        if (wcscmp(L"NP2-MainWindow", buf) == 0
-            || wcscmp(L"BASE", buf) == 0) {
+        if (wcscmp(L"NP2-MainWindow", buf) == 0 || wcscmp(L"BASE", buf) == 0) {
             g_hFocusWindow = hwnd;
             g_hFocusWindow2 = hwnd;
             hooked = true;
@@ -30,17 +32,16 @@ LRESULT CALLBACK hookprocW(int ncode, WPARAM wparam, LPARAM lparam) {
     return CallNextHookEx(hHookW, ncode, wparam, lparam); // pass control to next hook in the hook chain.
 }
 
-int ReportLastError();
 void EncodeJoyButton(int buttonNumber, DWORD& joyButton, int defaultValue) {
     if (buttonNumber >= 0 && buttonNumber < 32)
         joyButton = 1 << buttonNumber;
     else
         joyButton = defaultValue;
 }
-THDXHOOK_API int installThDxHook(const GameConfigArray* config,
-    int leftButton,
-    int midButton,
-    const char* pTextureFilePath) {
+
+THDXHOOK_API int installThDxHook(
+    const GameConfigArray* config, int leftButton, int midButton, const char* pTextureFilePath
+) {
     strcpy_s<TEXTURE_FILE_PATH_LEN>(gs_textureFilePath, pTextureFilePath);
 
     gs_gameConfigArray = *config;
@@ -48,7 +49,8 @@ THDXHOOK_API int installThDxHook(const GameConfigArray* config,
     EncodeJoyButton(midButton, _ref gs_extraButton, 0x00000003);
 
     hHookW = SetWindowsHookExW(WH_CBT, hookprocW, hinstance, NULL);
-    if (hHookW == NULL) return ReportLastError();
+    if (hHookW == NULL)
+        return ReportLastError();
     return 1;
 }
 
@@ -56,9 +58,8 @@ int ReportLastError() {
     DWORD dwErr = GetLastError();
     // lookup error code and display it
     LPVOID lpMsgBuf;
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
         dwErr,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language

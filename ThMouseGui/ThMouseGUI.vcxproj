@@ -45,6 +45,9 @@
   <ItemGroup>
     <Text Include="games.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ThMouse.ini" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0FA9DE0E-B696-468D-9178-E85B228CAB70}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -123,7 +126,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)games.txt" "$(OutDir)"</Command>
+      <Command>xcopy /y "$(ProjectDir)games.txt" "$(OutDir)"
+xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)"
+xcopy /y "$(ProjectDir)ThMouse.ini" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -162,7 +167,9 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)games.txt" "$(OutDir)"</Command>
+      <Command>xcopy /y "$(ProjectDir)games.txt" "$(OutDir)"
+xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)"
+xcopy /y "$(ProjectDir)ThMouse.ini" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

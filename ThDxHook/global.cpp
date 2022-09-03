@@ -18,11 +18,11 @@ DWORD baseOfCode = 0;
 DWORD firstOffsetDirection = 1;
 
 
-#pragma data_seg(".CONFIGDATA") //Shared data among all instances.
+#pragma data_seg(".CONFIGDATA") // Shared data among all instances.
 GameConfigArray gs_gameConfigArray = {0};
 DWORD gs_boomButton = 0;
 DWORD gs_extraButton = 0;
 char gs_textureFilePath[TEXTURE_FILE_PATH_LEN] = {0};
 #pragma data_seg()
-#pragma comment(linker, "/SECTION:.CONFIGDATA,RWS") //linker directive
+#pragma comment(linker, "/SECTION:.CONFIGDATA,RWS") // linker directive
 

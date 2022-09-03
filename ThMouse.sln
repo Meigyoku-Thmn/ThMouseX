@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32802.440
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "THMouseGUI", "ThMouseFork\ThMouseFork.vcxproj", "{0FA9DE0E-B696-468D-9178-E85B228CAB70}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "THMouseGUI", "ThMouseGUI\ThMouseGUI.vcxproj", "{0FA9DE0E-B696-468D-9178-E85B228CAB70}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThDxHook", "ThDxHook\ThDxHook.vcxproj", "{256B0D2C-0296-4D8F-ADE8-79E544649D69}"
 EndProject
@@ -44,5 +44,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B04EB577-D4A9-409A-8E97-AC2E350FEE6B}
 	EndGlobalSection
 EndGlobal

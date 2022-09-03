@@ -23,7 +23,6 @@ inline MH_STATUS MH_CreateHookApiEx(LPCWSTR pszModule, LPCSTR pszProcName, LPVOI
     return MH_CreateHookApi(pszModule, pszProcName, pDetour, reinterpret_cast<LPVOID*>(ppOriginal));
 }
 
-
 BOOL APIENTRY DllMain(HMODULE hModule,
     DWORD  ul_reason_for_call,
     LPVOID lpReserved
@@ -43,17 +42,17 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
             PathStripPath(buffer);
             // Nếu là cái GUI Loader thì không hook gì hết
-            if (strcmp(buffer, "THMouseGUI.exe") == 0) return TRUE;
+            if (strcmp(buffer, "THMouseGUI.exe") == 0)
+                return TRUE;
 
-            //sprintf_s(dbBuff, sizeof(dbBuff), "attach to %s", buffer);
-            //WriteToLog(dbBuff);
+            // sprintf_s(dbBuff, sizeof(dbBuff), "attach to %s", buffer);
+            // WriteToLog(dbBuff);
             for (int i = 0; i < gs_gameConfigArray.Length; i++) {
                 // so sánh current process name với names trong data structure
                 if (strcmp(buffer, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
                     // TODO: - kiểm tra xem hook có thành công hay không
                     //        (không có API để hook thì tính là thất bại)
                     //       - sử dụng OutputDebugString để kiểm tra trạng thái (output của nó là Immediate Window)
-                    //       - sử dụng thuật toán Bresenham để cải tiến di chuyển (tuyệt đối không dùng phép chia)
 
                     // lấy gameConfig tương ứng
                     g_currentGameConfig = gs_gameConfigArray.Configs[i];
@@ -65,7 +64,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
                     if (offsetIsRelative == true) {
                         baseOfCode = ResolveBaseName(g_currentGameConfig.BaseName, _ref firstOffsetDirection);
-                        if (baseOfCode == 0) break;
+                        if (baseOfCode == 0)
+                            break;
                     }
 
                     // chuột trái có tác dụng bắn bomb
@@ -75,8 +75,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
                     g_boomButton = gs_boomButton;
                     g_extraButton = gs_extraButton;
 
-                    //sprintf_s(dbBuff, sizeof(dbBuff), "found %s. Let's hook it.\n", buffer);
-                    //WriteToLog(dbBuff);
+                    // sprintf_s(dbBuff, sizeof(dbBuff), "found %s. Let's hook it.\n", buffer);
+                    // WriteToLog(dbBuff);
 
                     gs_textureFilePath2 = gs_textureFilePath;
 
@@ -108,7 +108,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
                     MH_CreateHookApiEx(L"WINMM.dll", "joyGetPos", &MyJoyGetPos, &WinmmHook.Functions[2].OrigFn);
 
                     // hook Message Loop (đọc trạng thái của chuột)
-                    //HookAPICalls(&PeekMessageAHook);
+                    // HookAPICalls(&PeekMessageAHook);
                     MH_CreateHookApiEx(L"USER32.dll", "PeekMessageA", &MyPeekMessageA, &PeekMessageAHook.Functions[0].OrigFn);
                     MH_CreateHookApiEx(L"USER32.dll", "PeekMessageW", &MyPeekMessageW, &PeekMessageAHook.Functions[1].OrigFn);
 

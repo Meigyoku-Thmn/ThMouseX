@@ -3,10 +3,10 @@
 #include <Windows.h>
 #include "ExportMacro.h"
 
-typedef struct tagFloatPoint2 {
+struct FloatPoint2 {
     float X;
     float Y;
-} FloatPoint2;
+};
 
 DLLEXPORT extern HMODULE _hModule;
 DLLEXPORT extern HWND g_hFocusWindow2;

@@ -11,10 +11,10 @@
 #define CURSOR_SIZE3 0.5f
 #define COLOR_COUNT 32
 
-typedef struct tagTLVertex {
+struct TLVertex {
     float x, y, z, rhw;
     DWORD color;
-} TLVertex;
+};
 
 class MyDirect3DDevice8: public IDirect3DDevice8 {
 public:

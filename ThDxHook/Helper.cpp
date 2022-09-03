@@ -6,6 +6,7 @@
 DWORD GetThreadStartAddress(HANDLE, HANDLE);
 void* GetThreadStackTopAddress_x86(HANDLE, HANDLE);
 std::vector<DWORD> threadList(DWORD);
+
 DWORD ResolveBaseName(char* baseName, DWORD &direction) {
     strlwr(baseName);
     if (strcmp(baseName, "threadstack0") == 0) {
@@ -20,6 +21,7 @@ DWORD ResolveBaseName(char* baseName, DWORD &direction) {
         return 0;
     }
 }
+
 std::vector<DWORD> threadList(DWORD pid) {
     /* solution from http://stackoverflow.com/questions/1206878/enumerating-threads-in-windows */
     std::vector<DWORD> vect = std::vector<DWORD>();
@@ -43,6 +45,7 @@ std::vector<DWORD> threadList(DWORD pid) {
 
     return vect;
 }
+
 DWORD GetThreadStartAddress(HANDLE processHandle, HANDLE hThread) {
     /* rewritten from https://github.com/cheat-engine/cheat-engine/blob/master/Cheat%20Engine/CEFuncProc.pas#L3080 */
     DWORD used = 0, ret = 0;
@@ -100,6 +103,7 @@ DWORD GetThreadStartAddress(HANDLE processHandle, HANDLE hThread) {
 
     return result;
 }
+
 typedef struct _CLIENT_ID {
     PVOID UniqueProcess;
     PVOID UniqueThread;

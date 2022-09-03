@@ -58,4 +58,7 @@
   <ItemGroup>
     <Text Include="games.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ThMouse.ini" />
+  </ItemGroup>
 </Project>
