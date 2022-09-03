@@ -12,5 +12,11 @@
 
 #include "GameConfigArray.h"
 
-THDXHOOK_API int installThDxHook(const GameConfigArray * config, int leftButton, const char * pTextureFilePath);
+THDXHOOK_API int installThDxHook(
+    const GameConfigArray* config,
+    int leftButton,
+    int midButton,
+    const char* pTextureFilePath
+);
+
 THDXHOOK_API int removeThDxHook(void);

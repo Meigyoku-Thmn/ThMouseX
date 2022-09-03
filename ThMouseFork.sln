@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "THMouseGUI", "ThMouseFork\ThMouseFork.vcxproj", "{0FA9DE0E-B696-468D-9178-E85B228CAB70}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThDxHook", "ThDxHook\ThDxHook.vcxproj", "{256B0D2C-0296-4D8F-ADE8-79E544649D69}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX8Hook", "DX8Hook\DX8Hook.vcxproj", "{DC5FE77D-43D4-4CC6-9AD2-409716483DBF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FA9DE0E-B696-468D-9178-E85B228CAB70}.Debug|x64.ActiveCfg = Debug|x64
+		{0FA9DE0E-B696-468D-9178-E85B228CAB70}.Debug|x64.Build.0 = Debug|x64
+		{0FA9DE0E-B696-468D-9178-E85B228CAB70}.Debug|x86.ActiveCfg = Debug|Win32
+		{0FA9DE0E-B696-468D-9178-E85B228CAB70}.Debug|x86.Build.0 = Debug|Win32
+		{0FA9DE0E-B696-468D-9178-E85B228CAB70}.Release|x64.ActiveCfg = Release|x64
+		{0FA9DE0E-B696-468D-9178-E85B228CAB70}.Release|x64.Build.0 = Release|x64
+		{0FA9DE0E-B696-468D-9178-E85B228CAB70}.Release|x86.ActiveCfg = Release|Win32
+		{0FA9DE0E-B696-468D-9178-E85B228CAB70}.Release|x86.Build.0 = Release|Win32
+		{256B0D2C-0296-4D8F-ADE8-79E544649D69}.Debug|x64.ActiveCfg = Debug|x64
+		{256B0D2C-0296-4D8F-ADE8-79E544649D69}.Debug|x64.Build.0 = Debug|x64
+		{256B0D2C-0296-4D8F-ADE8-79E544649D69}.Debug|x86.ActiveCfg = Debug|Win32
+		{256B0D2C-0296-4D8F-ADE8-79E544649D69}.Debug|x86.Build.0 = Debug|Win32
+		{256B0D2C-0296-4D8F-ADE8-79E544649D69}.Release|x64.ActiveCfg = Release|x64
+		{256B0D2C-0296-4D8F-ADE8-79E544649D69}.Release|x64.Build.0 = Release|x64
+		{256B0D2C-0296-4D8F-ADE8-79E544649D69}.Release|x86.ActiveCfg = Release|Win32
+		{256B0D2C-0296-4D8F-ADE8-79E544649D69}.Release|x86.Build.0 = Release|Win32
+		{DC5FE77D-43D4-4CC6-9AD2-409716483DBF}.Debug|x64.ActiveCfg = Debug|x64
+		{DC5FE77D-43D4-4CC6-9AD2-409716483DBF}.Debug|x64.Build.0 = Debug|x64
+		{DC5FE77D-43D4-4CC6-9AD2-409716483DBF}.Debug|x86.ActiveCfg = Debug|Win32
+		{DC5FE77D-43D4-4CC6-9AD2-409716483DBF}.Debug|x86.Build.0 = Debug|Win32
+		{DC5FE77D-43D4-4CC6-9AD2-409716483DBF}.Release|x64.ActiveCfg = Release|x64
+		{DC5FE77D-43D4-4CC6-9AD2-409716483DBF}.Release|x64.Build.0 = Release|x64
+		{DC5FE77D-43D4-4CC6-9AD2-409716483DBF}.Release|x86.ActiveCfg = Release|Win32
+		{DC5FE77D-43D4-4CC6-9AD2-409716483DBF}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

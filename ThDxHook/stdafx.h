@@ -11,10 +11,35 @@
 // Windows Header Files:
 #include <windows.h>
 #include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
+#include <iostream>
 #include <shlwapi.h>
-#include <d3d9.h>
-#include <D3dx9core.h>
-#include <dinput.h>
+#pragma comment(lib, "shlwapi.lib")
+#include <Psapi.h>
+#pragma comment( lib, "psapi.lib" )
+#include <tlhelp32.h>
+//#include <d3d9.h>
+#include "Include/d3d9.h"
+#pragma comment(lib, "Lib/x86/d3d9.lib")
+//#include <D3dx9core.h>
+#include "Include/d3dx9core.h"
+#pragma comment(lib, "Lib/x86/D3dx9.lib")
+#include "Include/dinput.h"
+#pragma comment(lib, "Lib/x86/dinput8.lib")
 #include <mmsystem.h>
 
+#pragma comment(lib, "Lib/x86/dxguid.lib")
+
 // TODO: reference additional headers your program requires here
+
+#include "MinHook.h"
+#ifdef _DEBUG
+#pragma comment(lib, "libMinHook-x86-v140-mtd.lib")
+#else
+#pragma comment(lib, "libMinHook-x86-v140-mt.lib")
+#endif
+
+#include "CustomType.h"
+
+#define _ref

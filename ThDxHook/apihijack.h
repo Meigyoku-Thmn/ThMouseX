@@ -16,8 +16,7 @@
 // Default Hook Stub Structure: Contains data about the original function, Name/Ordinal, Address 
 // and a Count field.  This is actually a block of assembly code.
 #pragma pack( push, 1 )
-struct DLPD_IAT_STUB
-{
+struct DLPD_IAT_STUB {
     BYTE    instr_CALL;
     DWORD   data_call;
     BYTE    instr_JMP;
@@ -25,24 +24,22 @@ struct DLPD_IAT_STUB
     DWORD   count;
     DWORD   pszNameOrOrdinal;
 
-    DLPD_IAT_STUB() : instr_CALL( 0xE8 ), instr_JMP( 0xE9 ), count( 0 ) {}
+    DLPD_IAT_STUB(): instr_CALL(0xE8), instr_JMP(0xE9), count(0) {}
 };
 #pragma pack( pop )
 
 // Example DefaultHook procedure, called from the DLPD_IAT_STUB stubs.  
 // Increments "count" field of the stub.
 // See the implementation for more information.
-void __cdecl DefaultHook( PVOID dummy );
+void __cdecl DefaultHook(PVOID dummy);
 
-struct SFunctionHook
-{
+struct SFunctionHook {
     char* Name;         // Function name, e.g. "DirectInput8Create".
     DWORD* HookFn;       // Address of your function.
     DWORD* OrigFn;       // Stored by HookAPICalls, the address of the original function.
 };
 
-struct SDLLHook
-{
+struct SDLLHook {
     // Name of the DLL, e.g. "DDRAW.DLL"
     char* Name;
 
@@ -55,6 +52,6 @@ struct SDLLHook
 };
 
 // Hook functions one or more DLLs.
-bool HookAPICalls( SDLLHook* Hook );
+bool HookAPICalls(SDLLHook* Hook);
 int WriteToLog(char* str);
 #endif
