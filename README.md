@@ -44,7 +44,7 @@ You can edit the games.txt file to add more games, even PC-98 emulator to play T
 FAQ
 ---
 ### Download link
-(TODO)
+https://github.com/Meigyoku-Thmn/ThMouseX/releases
 
 ### How to compile?
 This project can be compiled via Visual Studio, or just Visual Studio Build Tools:
