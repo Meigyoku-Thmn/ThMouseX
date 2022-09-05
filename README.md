@@ -39,6 +39,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 16 ~ Hidden Star in Four Seasons
 * Touhou 18 ~ Unconnected Marketeers
 * Touhou 18.5 ~ 100th Black Market
+
 You can edit the games.txt file to add more games, even PC-98 emulator to play Touhou 1 to Touhou 5 (cursor will not show up).
 
 FAQ
@@ -85,5 +86,7 @@ The crosshair/cursor sprite may be changed:
 
 ### "games.txt" file
 You can extend ThMouse to support more Shoot 'em ups games by modifying the "games.txt" file.
+
 Open the file with any text editor and try yourself.
+
 (To document more)
