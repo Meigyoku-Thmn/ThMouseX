@@ -13,15 +13,8 @@
 #include "Helper.h"
 #include "../DX8Hook/subGlobal.h"
 
-#include "MyKeyboardState.h"
-
 HINSTANCE hinstance = NULL;
 static char buffer[256];
-
-template <typename T>
-inline MH_STATUS MH_CreateHookApiEx(LPCWSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, T** ppOriginal) {
-    return MH_CreateHookApi(pszModule, pszProcName, pDetour, reinterpret_cast<LPVOID*>(ppOriginal));
-}
 
 BOOL APIENTRY DllMain(HMODULE hModule,
     DWORD  ul_reason_for_call,
@@ -80,43 +73,28 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
                     gs_textureFilePath2 = gs_textureFilePath;
 
-                    if (MH_Initialize() != MH_OK) {
-                        break;
-                    }
-
                     // có thể lấy được windows handle từ directx object
                     // hook DirectX chủ yếu để hiển thị cursor đồ họa hỗ trợ di chuyển
 
                     // hook DirectX 9 
-                    // HookAPICalls(&D3DHook);
-                    MH_CreateHookApiEx(L"d3d9.dll", "Direct3DCreate9",
-                        &MyDirect3DCreate9, &D3DHook.Functions[0].OrigFn);
+                    HookAPICalls(&D3DHook);
 
                     // hook DirectX 8 
-                    // HookAPICalls(&D3D8Hook);
-                    MH_CreateHookApiEx(L"d3d8.dll", "Direct3DCreate8", &MyDirect3DCreate8, &D3D8Hook.Functions[0].OrigFn);
+                    HookAPICalls(&D3D8Hook);
 
                     // hook DirectInput8 (ánh xạ input chuột lên bàn phím)
-                    // HookAPICalls(&DInput8Hook);
-                    MH_CreateHookApiEx(L"DINPUT8.dll", "DirectInput8Create", &MyDirectInput8Create, &DInput8Hook.Functions[0].OrigFn);
-                    MH_CreateHookApiEx(L"DINPUT.dll", "DirectInputCreateW", &MyDirectInputCreateW, &DInputHook.Functions[0].OrigFn);
+                    HookAPICalls(&DInput8Hook);
+                    HookAPICalls(&DInputHook);
 
                     // hook JoyStick (ánh xạ input chuột lên DirectInput)
-                    // HookAPICalls(&WinmmHook);
-                    MH_CreateHookApiEx(L"WINMM.dll", "joyGetDevCapsA", &MyJoyGetDevCapsA, (void**)0);
-                    MH_CreateHookApiEx(L"WINMM.dll", "joyGetPosEx", &MyJoyGetPosEx, (void**)0);
-                    MH_CreateHookApiEx(L"WINMM.dll", "joyGetPos", &MyJoyGetPos, &WinmmHook.Functions[2].OrigFn);
+                    HookAPICalls(&WinmmHook);
 
                     // hook Message Loop (đọc trạng thái của chuột)
-                    // HookAPICalls(&PeekMessageAHook);
-                    MH_CreateHookApiEx(L"USER32.dll", "PeekMessageA", &MyPeekMessageA, &PeekMessageAHook.Functions[0].OrigFn);
-                    MH_CreateHookApiEx(L"USER32.dll", "PeekMessageW", &MyPeekMessageW, &PeekMessageAHook.Functions[1].OrigFn);
+                    HookAPICalls(&PeekMessageAHook);
 
+                    // ẩn hiện chuột
                     HookAPICalls(&SetCursorHook);
 
-                    MH_CreateHookApiEx(L"USER32.dll", "GetKeyboardState", &MyGetKeyboardState, &getKeyboardState);
-
-                    MH_EnableHook(MH_ALL_HOOKS);
                     break;
                 }
             }
@@ -127,7 +105,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
         case DLL_THREAD_DETACH:
             break;
         case DLL_PROCESS_DETACH:
-            MH_Uninitialize();
             break;
     }
     return TRUE;

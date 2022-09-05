@@ -33,13 +33,6 @@
 
 // TODO: reference additional headers your program requires here
 
-#include "MinHook.h"
-#ifdef _DEBUG
-#pragma comment(lib, "libMinHook-x86-v140-mtd.lib")
-#else
-#pragma comment(lib, "libMinHook-x86-v140-mt.lib")
-#endif
-
 #include "CustomType.h"
 
 #define _ref

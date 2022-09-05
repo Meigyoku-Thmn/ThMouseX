@@ -51,9 +51,6 @@
     <ClCompile Include="MySetCursor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyKeyboardState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CustomType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,9 +108,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MySetCursor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyKeyboardState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyDirectInputDeviceW.h">
