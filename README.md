@@ -3,7 +3,7 @@ ThMouseX
 
 Introduction
 ------------
-ThMouseX is a fork from ThMouse made by hwei.
+ThMouseX is a fork from [ThMouse](https://github.com/hwei/ThMouse) made by hwei.
 
 This is a tool that enables mouse control for Shoot 'em ups games, intended for Touhou Project series, allowing player character to move towards wherever the cursor points.
 
