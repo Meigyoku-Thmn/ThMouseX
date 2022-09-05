@@ -16,10 +16,7 @@
 HINSTANCE hinstance = NULL;
 static char buffer[256];
 
-BOOL APIENTRY DllMain(HMODULE hModule,
-    DWORD  ul_reason_for_call,
-    LPVOID lpReserved
-) {
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {
     char dbBuff[128];
 
     switch (ul_reason_for_call) {
@@ -88,6 +85,9 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
                     // hook JoyStick (ánh xạ input chuột lên DirectInput)
                     HookAPICalls(&WinmmHook);
+
+                    // hook GetKeyboardState
+                    HookAPICalls(&User32Hook);
 
                     // hook Message Loop (đọc trạng thái của chuột)
                     HookAPICalls(&PeekMessageAHook);

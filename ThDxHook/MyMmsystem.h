@@ -15,10 +15,12 @@ MMRESULT WINAPI MyJoyGetPosEx(
 MMRESULT WINAPI MyJoyGetPos(
     UINT uJoyID,
     LPJOYINFO pji
-
 );
+BOOL WINAPI MyGetKeyboardState(_Out_ PBYTE lpKeyState);
+
 //MMRESULT WINAPI MyTimeBeginPeriod( __in UINT uPeriod);
 //MMRESULT WINAPI MyTimeEndPeriod( __in UINT uPeriod);
 //DWORD WINAPI MyTimeGetTime(void);
 
 extern SDLLHook WinmmHook;
+extern SDLLHook User32Hook;
