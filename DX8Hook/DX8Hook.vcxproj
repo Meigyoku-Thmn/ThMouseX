@@ -144,7 +144,7 @@
       <AdditionalLibraryDirectories>$(ProjectDir)\DX8.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>D:\Meigyoku Thmn\Code %28Programming%29\ThMouse-master\ThMouseFork\DX8Hook\DX8.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\DX8.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

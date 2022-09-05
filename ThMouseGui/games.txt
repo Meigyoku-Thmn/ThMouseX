@@ -37,6 +37,8 @@ th143.exe [004E6B88][000005ec]  int 1 (41088,2176) 81920 0
 th15.exe [004E9BB8][00000624]  int 1 (28800,2176)  81920 0
 ; Touhou 16
 th16.exe [0049FAFC][0000061C]  int 1 (28800,2176)  81920 0
+; Touhou 18
+th18.exe [004CF410][0000062C]  int 1 (28800,2176)  81920 0
 ; Touhou 18.5
 th185.exe [004D7C3C][0000062C]  int 1 (41088,2176)  81920 0
 ; Touhou Gold Rush (Replica)

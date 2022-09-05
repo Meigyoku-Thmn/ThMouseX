@@ -26,7 +26,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
     HANDLE hMutex = CreateMutex(NULL, TRUE, "ThMouse");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
-        MessageBox(NULL, "ThMouse is already running.", "ThMouse", MB_OK | MB_ICONINFORMATION);
+        MessageBox(NULL, "ThMouseX is already running.", "ThMouseX", MB_OK | MB_ICONINFORMATION);
         return 1;
     }
 

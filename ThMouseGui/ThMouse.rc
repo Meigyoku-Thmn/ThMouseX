@@ -18,13 +18,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 英语(美国) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -34,7 +32,9 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_THMOUSE             ICON                    "ThMouse.ico"
+
 IDI_SMALL               ICON                    "small.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -44,14 +44,14 @@ IDI_SMALL               ICON                    "small.ico"
 IDD_ABOUTBOX DIALOGEX 0, 0, 213, 142
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "About ThMouse"
+CAPTION "About ThMouseX"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_THMOUSE,IDC_STATIC,14,14,20,20
-    LTEXT           "ThMouse, Version 0.31, By HWei",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "ThMouseX Version 1.0 by Meigyoku Thmn\nA fork from ThMouse Version 0.31 of HWei",IDC_STATIC,42,14,164,19,SS_NOPREFIX
+    LTEXT           "How to use:\nRun a game. If it is supported by ThMouseX, a cross cursor will show.\n\nMouse move = move\nMouse left button = bomb\nMouse right button = turn on/off mouse control\n\nPress A to hide the Windows' cursor.\nPress D to unhide it.",IDC_STATIC,7,42,199,93
     DEFPUSHBUTTON   "OK",IDOK,156,106,50,14,WS_GROUP
     PUSHBUTTON      "Quit",IDC_ExitButton,156,121,50,14
-    LTEXT           "Please run thXX game. If it is supported by ThMouse, a cross cursor will show.\n\nMouse move = move\nMouse left button = bomb\nMouse right button = turn on/off mouse control",IDC_STATIC,7,42,199,48
 END
 
 
@@ -61,7 +61,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -110,14 +110,14 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
-    IDS_APP_TITLE           "ThMouse"
-    IDS_BALLOON_INFO        "ThMouse is activated."
+    IDS_APP_TITLE           "ThMouseX"
+    IDS_BALLOON_INFO        "ThMouseX is activated."
     IDC_THMOUSE             "THMOUSE"
 END
 
-#endif    // 英语(美国) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
