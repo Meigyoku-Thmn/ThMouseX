@@ -50,9 +50,7 @@ FAQ
 This project can be compiled via Visual Studio, or just Visual Studio Build Tools:
 * [Visual Studio](https://visualstudio.microsoft.com/), select "Desktop development with C++" during installation.
 * [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools), select "Visual C++ build tools" during installation.
-
-### How to install?
-Put cursor.png, ThDxHook.dll, DX8Hook.dll, ThMouse.exe, ThMouse.ini in the same folder.
+Remember to put cursor.png, ThDxHook.dll, DX8Hook.dll, ThMouse.exe, ThMouse.ini in the same folder.
 
 ### How to use ThMouse?
 1. Run ThMouse.exe before entering a game.
