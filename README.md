@@ -18,7 +18,7 @@ Drawbacks
 --------
 * Doesn't work with games that use [JIT compilation](https://en.wikipedia.org/wiki/Just-in-time_compilation), such as .NET or JVM. I would port this tool to .NET someday.
 * Only works with 32-bit games (all games in Touhou Project are 32-bit).
-* Require the game to display a winform dialog first for the tool to be fully functional. Therefor you have to patch Touhou 6-9 to make them display a random dialog before opening to menu. I will find a way to work around this.
+* Require the game to display a winform dialog first for the tool to be fully functional. Therefore you have to patch Touhou 6-9 to make them display a random dialog before opening to menu. I will find a way to work around this.
 * Configuration is difficult and requires knowledge about computer science. If you are familiar with Cheat Engine then maybe you can do it.
 
 Compatibility
