@@ -6,15 +6,15 @@ module;
 #include "d3d8.h"
 #include "d3dx8core.h"
 
-int (WINAPIV *__vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
-int (WINAPIV *__snprintf)(char*, size_t, const char*, ...) = _snprintf;
-int (WINAPIV *_sscanf)(const char*, const char*, ...) = sscanf;
-int (WINAPIV *_sprintf)(char*, const char*, ...) = sprintf;
-
 export module dx8.hook;
 
 import common.datatype;
 import common.var;
+
+int (WINAPIV *__vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
+int (WINAPIV *__snprintf)(char*, size_t, const char*, ...) = _snprintf;
+int (WINAPIV *_sscanf)(const char*, const char*, ...) = sscanf;
+int (WINAPIV *_sprintf)(char*, const char*, ...) = sprintf;
 
 export DLLEXPORT DWORD* WINAPI CreateDirect3D8Detour(DWORD *d3d);
 
@@ -106,16 +106,16 @@ public:
 
 class MyDirect3DDevice8: public IDirect3DDevice8 {
 private:
-    BOOL init = FALSE;
+    bool init = false;
     IDirect3DDevice8* m_device;
     IDirect3D8* m_d3d;
     HWND m_hFocusWindow;
-    BOOL allowGetRenderData = true;
+    bool allowGetRenderData = true;
     UINTSIZE backBufferSize = {};
     UINTSIZE frontBufferSize = {};
-    FLOAT currentScale = 1.0f;
-    FLOAT cursorWidthCenter = 0;
-    FLOAT cursorHeightCenter = 0;
+    float currentScale = 1.0f;
+    float cursorWidthCenter = 0;
+    float cursorHeightCenter = 0;
     LPD3DXSPRITE m_sprite;
     LPDIRECT3DTEXTURE8 m_texture = NULL;
 
@@ -219,7 +219,7 @@ public:
             this->m_hFocusWindow = pPresentationParameters->hDeviceWindow;
         g_hFocusWindow2 = this->m_hFocusWindow;
         this->allowGetRenderData = true;
-        this->init = FALSE;
+        this->init = false;
         return m_device->Reset(pPresentationParameters);
     }
 
@@ -294,9 +294,9 @@ public:
     STDMETHOD(EndScene)(THIS) {
         POINT mousePos = {0, 0};
         GetCursorPos(&mousePos);
-        if (this->init == FALSE) {
-            g_windowed2 = TRUE;
-            this->init = TRUE;
+        if (this->init == false) {
+            g_windowed2 = true;
+            this->init = true;
             do {
                 RECT hwndClientRect;
                 if (GetClientRect(this->m_hFocusWindow, &hwndClientRect) == 0)
@@ -312,7 +312,7 @@ public:
                     break;
                 // guess "windowed or fullscreen"
                 if (SurfaceDesc.Width > hwndClientRect.right || SurfaceDesc.Height > hwndClientRect.bottom) {
-                    g_windowed2 = FALSE;
+                    g_windowed2 = false;
                     // clear border to avoid "click-out-of-bound"
                     auto style = GetWindowLongPtrW(this->m_hFocusWindow, GWL_STYLE);
                     if (style == 0)
@@ -337,7 +337,7 @@ public:
                 g_pixelOffset->Y = g_basePixelOffset->Y / (*g_pixelRate);
             } while (0);
         }
-        if (g_windowed2 == TRUE)
+        if (g_windowed2 == true)
             ScreenToClient(this->m_hFocusWindow, &mousePos);
 
         if (!m_texture)
@@ -345,7 +345,7 @@ public:
 
         if (this->allowGetRenderData == true) {
             this->allowGetRenderData = false;
-            if (g_windowed2 == TRUE) {
+            if (g_windowed2 == true) {
                 do // this is not a loop, I do this instead of goto statement
                 {
                     IDirect3DSurface8* pSurface;
@@ -385,7 +385,7 @@ public:
         }
 
         D3DXVECTOR2 position((float)(mousePos.x), (float)(mousePos.y));
-        if (g_windowed2 == TRUE && this->currentScale != 0.0f && this->currentScale != 1.0f) {
+        if (g_windowed2 == true && this->currentScale != 0.0f && this->currentScale != 1.0f) {
             position /= this->currentScale;
         }
         position.x -= this->cursorWidthCenter;

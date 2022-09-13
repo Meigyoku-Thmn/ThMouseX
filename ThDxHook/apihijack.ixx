@@ -21,6 +21,8 @@ export struct SFunctionHook {
     DWORD *OrigFn;      // Stored by HookAPICalls, the address of the original function.
 };
 
+
+#pragma warning(suppress: 4200) // Trailing Array Idiom
 export struct SDLLHook {
     // Name of the DLL, e.g. "DDRAW.DLL"
     const char *Name;
@@ -29,7 +31,7 @@ export struct SDLLHook {
     bool UseDefault;
     void *DefaultFn;
 
-    // Function hook array.  Terminated with a NULL Name field.
+    // Function hook array. Terminated with a NULL Name field.
     SFunctionHook Functions[];
 };
 #pragma endregion
@@ -58,7 +60,6 @@ struct DLPD_IAT_STUB {
 //===========================================================================
 // Called from the DLPD_IAT_STUB stubs.  Increments "count" field of the stub
 void __cdecl DefaultHook(PVOID dummy) {
-    char dbBuffer[MAX_PATH];
     __asm   pushad  // Save all general purpose registers
 
     // Get return address, then subtract 5 (size of a CALL X instruction)
@@ -100,13 +101,12 @@ PIMAGE_NT_HEADERS PEHeaderFromHModule(HMODULE hModule) {
 //===========================================================================
 // Builds stubs for and redirects the IAT for one DLL (pImportDesc)
 bool RedirectIAT(SDLLHook *DLLHook, PIMAGE_IMPORT_DESCRIPTOR pImportDesc, PVOID pBaseLoadAddr) {
-    char dbBuffer[MAX_PATH];
     PIMAGE_THUNK_DATA pIAT;     // Ptr to import address table
     PIMAGE_THUNK_DATA pINT;     // Ptr to import names table
     PIMAGE_THUNK_DATA pIteratingIAT;
 
     // Figure out which OS platform we're on
-    OSVERSIONINFO osvi;
+    OSVERSIONINFO osvi{};
     osvi.dwOSVersionInfoSize = sizeof(osvi);
     GetVersionEx(&osvi);
 
@@ -234,7 +234,6 @@ bool RedirectIAT(SDLLHook *DLLHook, PIMAGE_IMPORT_DESCRIPTOR pImportDesc, PVOID 
 //===========================================================================
 // Top level routine to find the EXE's imports, and redirect them
 bool HookAPICalls(SDLLHook *Hook) {
-    char dbBuffer[MAX_PATH];
     if (!Hook)
         return false;
 

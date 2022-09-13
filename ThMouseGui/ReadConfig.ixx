@@ -10,14 +10,14 @@ import common.datatype;
 
 using namespace std;
 
-export BOOL readGamesFile(GameConfigArray *pConfig);
-export BOOL readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath);
+export bool readGamesFile(GameConfigArray *pConfig);
+export bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath);
 
-BOOL readGamesFile(GameConfigArray *pConfig) {
+bool readGamesFile(GameConfigArray *pConfig) {
     ifstream gamesFile("games.txt");
     if (!gamesFile) {
         MessageBox(NULL, "Can not find games file.", "Launcher", MB_OK);
-        return FALSE;
+        return false;
     }
     int configIdx;
     // read each line of config file
@@ -131,14 +131,14 @@ BOOL readGamesFile(GameConfigArray *pConfig) {
 
     if (configIdx == 0) {
         MessageBox(NULL, "No valid data in config file.", "Launcher", MB_OK);
-        return FALSE;
+        return false;
     }
     pConfig->Length = configIdx;
 
-    return TRUE;
+    return true;
 }
 
-BOOL readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath) {
+bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath) {
     ifstream iniFile("ThMouse.ini");
     if (!iniFile) {
         MessageBox(NULL, "Can not find ThMouse.ini file.", "Launcher", MB_OK);

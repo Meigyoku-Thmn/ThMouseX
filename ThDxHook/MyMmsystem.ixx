@@ -65,7 +65,7 @@ MMRESULT WINAPI MyJoyGetPos(UINT uJoyID, LPJOYINFO pji) {
     pji->wXpos = X_MID;
     pji->wYpos = Y_MID;
     pji->wButtons = 0x00000000;
-    if (g_handledByDirectInput != TRUE) {
+    if (g_handledByDirectInput != true) {
         auto gameInput = DetermineGameInput();
         if (gameInput & USE_BOMB)
             pji->wButtons |= g_boomButton;
@@ -105,7 +105,7 @@ MMRESULT WINAPI MyJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji) {
     pji->dwXpos = X_MID;
     pji->dwYpos = Y_MID;
     pji->dwButtons = 0x00000000;
-    if (g_handledByDirectInput == TRUE) {
+    if (g_handledByDirectInput == true) {
         auto gameInput = DetermineGameInput();
         if (gameInput & USE_BOMB)
             pji->dwButtons |= g_boomButton;
@@ -127,7 +127,7 @@ BOOL WINAPI MyGetKeyboardState(PBYTE lpKeyState) {
     ConsoleLog("GetKeyboardState\n");
     auto old_func = (OriGetKeyboardState)User32Hook.Functions[User32FN_GetKeyboardState].OrigFn;
     auto rs = old_func(lpKeyState);
-    if (g_handledByDirectInput != TRUE && rs != 0) {
+    if (g_handledByDirectInput != true && rs != 0) {
         auto gameInput = DetermineGameInput();
         if (gameInput & USE_BOMB)
             lpKeyState[VK_X] |= 0x80;

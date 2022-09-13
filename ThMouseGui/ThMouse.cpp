@@ -16,7 +16,7 @@ UINT WM_TASKBARCREATED;
 
 // Forward declarations of functions included in this code module:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
-BOOL				InitInstance(HINSTANCE, int);
+bool				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
@@ -61,7 +61,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
     // Perform application initialization:
     if (!InitInstance(hInstance, nCmdShow)) {
-        return FALSE;
+        return 0;
     }
 
     MSG msg;
@@ -119,7 +119,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 //        In this function, we save the instance handle in a global variable and
 //        create and display the main program window.
 //
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
+bool InitInstance(HINSTANCE hInstance, int nCmdShow) {
     HWND hWnd;
 
     hInst = hInstance; // Store instance handle in our global variable
@@ -129,13 +129,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     hWnd = CreateWindowEx(WS_EX_TOOLWINDOW, szWindowClass, szTitle, WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
 
     if (!hWnd) {
-        return FALSE;
+        return false;
     }
 
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
-    return TRUE;
+    return true;
 }
 
 //

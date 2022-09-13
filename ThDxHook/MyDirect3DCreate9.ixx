@@ -220,7 +220,7 @@ public:
             this->m_hFocusWindow = pPresentationParameters->hDeviceWindow;
         g_hFocusWindow = this->m_hFocusWindow;
         this->allowGetRenderData = true;
-        this->init = FALSE;
+        this->init = false;
         return m_device->Reset(pPresentationParameters);
     }
 #pragma region Scaffolding
@@ -327,9 +327,9 @@ public:
     STDMETHOD(EndScene)(THIS) {
         POINT pos = {0, 0};
         GetCursorPos(&pos);
-        if (this->init == FALSE) {
-            g_windowed = TRUE;
-            this->init = TRUE;
+        if (this->init == false) {
+            g_windowed = true;
+            this->init = true;
             do {
                 RECT hwndClientRect;
                 if (GetClientRect(this->m_hFocusWindow, &hwndClientRect) == 0)
@@ -341,9 +341,8 @@ public:
                 D3DSURFACE_DESC SurfaceDesc;
                 rs = pSurface->GetDesc(&SurfaceDesc);
                 if (rs != D3D_OK) break;
-                if (SurfaceDesc.Width > hwndClientRect.right ||
-                    SurfaceDesc.Height > hwndClientRect.bottom) {
-                    g_windowed = FALSE; // so-so way to determine "windowed or fullscreen"
+                if (SurfaceDesc.Width > hwndClientRect.right || SurfaceDesc.Height > hwndClientRect.bottom) {
+                    g_windowed = false; // so-so way to determine "windowed or fullscreen"
                     // clear border to avoid "click-out-of-bound"
                     LONG style = GetWindowLongPtrW(this->m_hFocusWindow, GWL_STYLE);
                     if (style == 0) break;
@@ -364,7 +363,7 @@ public:
                 g_currentGameConfig.PixelOffset.Y = g_currentGameConfig.BasePixelOffset.Y / g_currentGameConfig.PixelRate;
             } while (0);
         }
-        if (g_windowed == TRUE)
+        if (g_windowed == true)
             ScreenToClient(this->m_hFocusWindow, &pos);
 
         if (!m_texture)
@@ -372,7 +371,7 @@ public:
 
         if (this->allowGetRenderData == true) {
             this->allowGetRenderData = false;
-            if (g_windowed == TRUE) {
+            if (g_windowed == true) {
                 do // this is not a loop, I do this instead of goto statement
                 {
                     IDirect3DSurface9* pSurface;
@@ -414,7 +413,7 @@ public:
         }
 
         D3DXVECTOR3 position((float)pos.x, (float)pos.y, 0.0);
-        if (g_windowed == TRUE && this->currentScale != 0.0f && this->currentScale != 1.0f) {
+        if (g_windowed == true && this->currentScale != 0.0f && this->currentScale != 1.0f) {
             position /= this->currentScale;
         }
         D3DXVECTOR3 center(this->cursorWidthCenter, this->cursorHeightCenter, 0.0);
@@ -802,16 +801,16 @@ public:
 #pragma endregion
 
 private:
-    BOOL init = FALSE;
+    bool init = false;
     IDirect3DDevice9* m_device;
     IDirect3D9* m_d3d;
     HWND m_hFocusWindow;
-    BOOL allowGetRenderData = true;
+    bool allowGetRenderData = true;
     UINTSIZE backBufferSize;
     UINTSIZE frontBufferSize;
-    FLOAT currentScale = 1.0f;
-    FLOAT cursorWidthCenter = 0;
-    FLOAT cursorHeightCenter = 0;
+    float currentScale = 1.0f;
+    float cursorWidthCenter = 0;
+    float cursorHeightCenter = 0;
     D3DXMATRIX spriteMatrix;
     D3DXVECTOR2 scalingFactor;
     LPD3DXFONT m_pFont;

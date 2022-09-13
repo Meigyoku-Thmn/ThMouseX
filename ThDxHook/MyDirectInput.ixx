@@ -174,7 +174,7 @@ public:
         ConsoleLog("DirectInputDevice8\n");
         auto hr = m_device->GetDeviceState(cbData, lpvData);
         if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
-            g_handledByDirectInput = TRUE;
+            g_handledByDirectInput = true;
             auto keys = static_cast<BYTE*>(lpvData);
             auto gameInput = DetermineGameInput();
             if (gameInput & USE_BOMB)
@@ -305,7 +305,7 @@ public:
         ConsoleLog("DirectInputDeviceW\n");
         auto hr = m_device->GetDeviceState(cbData, lpvData);
         if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
-            g_handledByDirectInput = TRUE;
+            g_handledByDirectInput = true;
             BYTE* keys = static_cast<BYTE*>(lpvData);
             auto gameInput = DetermineGameInput();
             if (gameInput & USE_BOMB)
