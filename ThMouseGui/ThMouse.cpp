@@ -1,11 +1,11 @@
-﻿// ThMouse.cpp : Defines the entry point for the application.
-//
+﻿#include "framework.h"
+#include "resource.h"
 
-#include "stdafx.h"
-#include "ThMouse.h"
-#include "ReadConfig.h"
+import common.datatype;
+import main.readconfig;
+import core.windowshook;
 
-#define MAX_LOADSTRING 100
+constexpr auto MAX_LOADSTRING = 100;
 
 // Global Variables:
 HINSTANCE hInst;								// current instance
@@ -20,11 +20,11 @@ BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    HANDLE hMutex = CreateMutex(NULL, TRUE, "ThMouse");
+    auto hMutex = CreateMutex(NULL, TRUE, "ThMouse");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         MessageBox(NULL, "ThMouseX is already running.", "ThMouseX", MB_OK | MB_ICONINFORMATION);
         return 1;

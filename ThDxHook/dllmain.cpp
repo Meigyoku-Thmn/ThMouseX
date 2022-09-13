@@ -1,98 +1,80 @@
-﻿// dllmain.cpp : Defines the entry point for the DLL application.
-#include "stdafx.h"
+﻿#include "framework.h"
+#include "macro.h"
 
-#include "apihijack.h"
-#include "MyDirect3DCreate9.h"
-#include "MyDirect3DCreate8.h"
-#include "MyDirectInput8Create.h"
-#include "MyMmsystem.h"
-#include "MyPeekMessageA.h"
-#include "global.h"
+import core.apihijack;
+import common.var;
+import common.datatype;
+import core.helper;
+import core.mmsystemhook;
+import core.peekmesssagehook;
+import core.setcursorhook;
+import core.directinputhook;
+import core.windowshook;
+import core.directx8hook;
+import core.directx9hook;
 
-#include "MySetCursor.h"
-#include "Helper.h"
-#include "../DX8Hook/subGlobal.h"
-
-HINSTANCE hinstance = NULL;
 static char buffer[256];
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {
-    char dbBuff[128];
-
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
-        case DLL_PROCESS_ATTACH:
-        {
+        case DLL_PROCESS_ATTACH: {
             hinstance = hModule;
-            // We don't need thread notifications for what we're doing.  Thus, get
-            // rid of them, thereby eliminating some of the overhead of this DLL
+            // We don't need thread notifications for what we're doing.
+            // Thus, get rid of them, thereby eliminating some of the overhead of this DLL.
             DisableThreadLibraryCalls(hModule);
 
-            // Only hook the APIs if this is the process of the thxx.exe.
+            // Only hook the APIs if we have a configuation of the process.
+            // If the process is not what we have anything to do with, just return TRUE, no need to eagerly unload.
+            // The DLL will be forcefully unloaded from all processes when ThMouseGUI closes.
             GetModuleFileName(GetModuleHandle(NULL), buffer, sizeof(buffer));
-
             PathStripPath(buffer);
-            // Nếu là cái GUI Loader thì không hook gì hết
+
+            // Of course we ignore the mother.
             if (strcmp(buffer, "THMouseGUI.exe") == 0)
                 return TRUE;
 
-            // sprintf_s(dbBuff, sizeof(dbBuff), "attach to %s", buffer);
-            // WriteToLog(dbBuff);
             for (int i = 0; i < gs_gameConfigArray.Length; i++) {
-                // so sánh current process name với names trong data structure
-                if (strcmp(buffer, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
-                    // TODO: - kiểm tra xem hook có thành công hay không
-                    //        (không có API để hook thì tính là thất bại)
-                    //       - sử dụng OutputDebugString để kiểm tra trạng thái (output của nó là Immediate Window)
-
-                    // lấy gameConfig tương ứng
+                // search the current process's name in our configuration, case-insensitively
+                if (_stricmp(buffer, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
+                    // extract some fields in the matching configuation item into the global variables.
                     g_currentGameConfig = gs_gameConfigArray.Configs[i];
-                    pixelRate = &g_currentGameConfig.PixelRate;
-                    pixelOffset = (FloatPoint2*)&g_currentGameConfig.PixelOffset;
-                    basePixelOffset = (FloatPoint2*)&g_currentGameConfig.BasePixelOffset;
-                    baseResolutionX = g_currentGameConfig.BaseResolutionX;
-                    offsetIsRelative = g_currentGameConfig.OffsetIsRelative;
+                    g_pixelRate = &g_currentGameConfig.PixelRate;
+                    g_pixelOffset = (FloatPoint*)&g_currentGameConfig.PixelOffset;
+                    g_basePixelOffset = (FloatPoint*)&g_currentGameConfig.BasePixelOffset;
+                    g_baseResolutionX = g_currentGameConfig.BaseResolutionX;
+                    g_offsetIsRelative = g_currentGameConfig.OffsetIsRelative;
 
-                    if (offsetIsRelative == true) {
-                        baseOfCode = ResolveBaseName(g_currentGameConfig.BaseName, _ref firstOffsetDirection);
-                        if (baseOfCode == 0)
+                    // this is used for pointer chains that start from a thread stack,
+                    // for now only threadstack0 is supported
+                    if (g_offsetIsRelative == true) {
+                        g_baseOfCode = ResolveBaseName(g_currentGameConfig.BaseName, _ref g_firstOffsetDirection);
+                        if (g_baseOfCode == 0)
                             break;
                     }
 
-                    // chuột trái có tác dụng bắn bomb
-                    // biến này quyết định chuột trái ánh xạ đến nút nào (của DirectInput)
-                    // biến này do loader cung cấp
-                    // sử dụng trong WinmmHook
+                    // store joypad's button numbers for BOMB and SPECIAL
                     g_boomButton = gs_boomButton;
                     g_extraButton = gs_extraButton;
 
-                    // sprintf_s(dbBuff, sizeof(dbBuff), "found %s. Let's hook it.\n", buffer);
-                    // WriteToLog(dbBuff);
-
+                    // store image path for crosshair
                     gs_textureFilePath2 = gs_textureFilePath;
 
-                    // có thể lấy được windows handle từ directx object
-                    // hook DirectX chủ yếu để hiển thị cursor đồ họa hỗ trợ di chuyển
-
-                    // hook DirectX 9 
+                    // hook DirectX 9 for crosshair
                     HookAPICalls(&D3DHook);
-
-                    // hook DirectX 8 
+                    // hook DirectX 8 for crosshair
                     HookAPICalls(&D3D8Hook);
 
-                    // hook DirectInput8 (ánh xạ input chuột lên bàn phím)
+                    // hook DirectInput8 for input manipulation
                     HookAPICalls(&DInput8Hook);
                     HookAPICalls(&DInputHook);
-
-                    // hook JoyStick (ánh xạ input chuột lên DirectInput)
+                    // hook Joypad for input manipulation
                     HookAPICalls(&WinmmHook);
-
-                    // hook GetKeyboardState
+                    // hook GetKeyboardState for input manipulation
                     HookAPICalls(&User32Hook);
 
-                    // hook Message Loop (đọc trạng thái của chuột)
+                    // hook Message Loop for additional runtime configuration
                     HookAPICalls(&PeekMessageAHook);
-
-                    // ẩn hiện chuột
+                    // hook some cursor API for cursor visibility toggling, must follows the Message Loop hook
                     HookAPICalls(&SetCursorHook);
 
                     break;
@@ -105,6 +87,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
         case DLL_THREAD_DETACH:
             break;
         case DLL_PROCESS_DETACH:
+            // TODO: implement a clean-up step here
             break;
     }
     return TRUE;

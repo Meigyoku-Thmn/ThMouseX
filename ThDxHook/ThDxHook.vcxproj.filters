@@ -15,108 +15,51 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="apihijack.cpp">
+    <ClCompile Include="apihijack.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="global.cpp">
+    <ClCompile Include="MyDirect3DCreate9.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyDirect3DCreate9.cpp">
+    <ClCompile Include="MyDirectInput.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyDirectInput8Create.cpp">
+    <ClCompile Include="MyMmsystem.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyMmsystem.cpp">
+    <ClCompile Include="MyPeekMessageA.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyPeekMessageA.cpp">
+    <ClCompile Include="ThDxHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="MyDirect3DCreate8.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThDxHook.cpp">
+    <ClCompile Include="MySetCursor.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyDirect3DCreate8.cpp">
+    <ClCompile Include="Helper.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Line.cpp">
+    <ClCompile Include="InputDetermine.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MySetCursor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CustomType.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Helper.cpp">
+    <ClCompile Include="linkerConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="apihijack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameConfigArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="global.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyDirect3D9.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyDirect3DCreate9.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyDirect3DDevice9.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyDirectInput8.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyDirectInput8Create.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyDirectInputDevice8.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyMmsystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyPeekMessageA.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ThDxHook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyDirect3DCreate8.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Line.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MySetCursor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyDirectInputDeviceW.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CustomType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Helper.h">
+    <ClInclude Include="macro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
