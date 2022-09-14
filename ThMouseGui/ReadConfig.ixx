@@ -16,7 +16,7 @@ export bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePat
 bool readGamesFile(GameConfigArray *pConfig) {
     ifstream gamesFile("games.txt");
     if (!gamesFile) {
-        MessageBox(NULL, "Can not find games file.", "Launcher", MB_OK);
+        MessageBox(NULL, "Can not find games file.", "Launcher", MB_OK | MB_ICONERROR);
         return false;
     }
     int configIdx;
@@ -130,7 +130,7 @@ bool readGamesFile(GameConfigArray *pConfig) {
     }
 
     if (configIdx == 0) {
-        MessageBox(NULL, "No valid data in config file.", "Launcher", MB_OK);
+        MessageBox(NULL, "No valid data in config file.", "Launcher", MB_OK | MB_ICONERROR);
         return false;
     }
     pConfig->Length = configIdx;
@@ -141,14 +141,14 @@ bool readGamesFile(GameConfigArray *pConfig) {
 bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath) {
     ifstream iniFile("ThMouse.ini");
     if (!iniFile) {
-        MessageBox(NULL, "Can not find ThMouse.ini file.", "Launcher", MB_OK);
-        return 0;
+        MessageBox(NULL, "Can not find ThMouse.ini file.", "Launcher", MB_OK | MB_ICONERROR);
+        return false;
     }
     string line;
     getline(iniFile, line);
     if (line.compare("[ThMouse]") != 0) {
-        MessageBox(NULL, "ThMouse.ini file error.", "Launcher", MB_OK);
-        return 0;
+        MessageBox(NULL, "ThMouse.ini file error.", "Launcher", MB_OK | MB_ICONERROR);
+        return false;
     }
     while (!iniFile.eof()) {
         getline(iniFile, line);
@@ -175,5 +175,5 @@ bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath) {
             ss >> *pMidButton;
         }
     }
-    return 1;
+    return true;
 }

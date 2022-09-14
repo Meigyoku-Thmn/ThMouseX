@@ -21,7 +21,7 @@
     <ClCompile Include="ThMouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="linkerConfig.cpp">
+    <ClCompile Include="compilerConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

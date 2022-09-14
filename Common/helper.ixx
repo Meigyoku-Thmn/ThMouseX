@@ -1,16 +1,38 @@
 module;
 
 #include "framework.h"
+#include "macro.h"
 #include <vector>
+#include <Psapi.h>
+#include <tlhelp32.h>
 
-export module core.helper;
+export module common.helper;
+
+export DLLEXPORT void ReportLastError(const char *title) {
+    auto dwErr = GetLastError();
+    // lookup error code and display it
+    LPVOID lpMsgBuf{};
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dwErr,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+        (LPTSTR)&lpMsgBuf,
+        0,
+        NULL
+    );
+    MessageBox(NULL, (LPCTSTR)lpMsgBuf, title, MB_OK | MB_ICONERROR);
+    // Free the buffer.
+    LocalFree(lpMsgBuf);
+}
+
 
 // https://github.com/makemek/cheatengine-threadstack-finder
 DWORD GetThreadStartAddress(HANDLE, HANDLE);
 void* GetThreadStackTopAddress_x86(HANDLE, HANDLE);
 std::vector<DWORD> threadList(DWORD);
 
-export DWORD ResolveBaseName(char* baseName, DWORD &direction) {
+export DLLEXPORT DWORD ResolveBaseName(char* baseName, DWORD &direction) {
     strlwr(baseName);
     if (strcmp(baseName, "threadstack0") == 0) {
         std::vector<DWORD> threadId = threadList(GetCurrentProcessId());

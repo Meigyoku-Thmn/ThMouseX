@@ -189,8 +189,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="DirectX8Hook.ixx" />
-    <ClCompile Include="linkerConfig.cpp" />
+    <ClCompile Include="Direct3D8Hook.ixx" />
+    <ClCompile Include="compilerConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

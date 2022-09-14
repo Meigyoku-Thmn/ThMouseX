@@ -21,34 +21,28 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyDirect3DCreate9.ixx">
+    <ClCompile Include="Direct3D9Hook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyDirectInput.ixx">
+    <ClCompile Include="DirectInput.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyMmsystem.ixx">
+    <ClCompile Include="MMSystemHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyPeekMessageA.ixx">
+    <ClCompile Include="PeekMessageHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ThDxHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyDirect3DCreate8.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MySetCursor.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Helper.ixx">
+    <ClCompile Include="SetCursorHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputDetermine.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="linkerConfig.cpp">
+    <ClCompile Include="compilerConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

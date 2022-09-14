@@ -161,15 +161,13 @@
   <ItemGroup>
     <ClCompile Include="apihijack.ixx" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Helper.ixx" />
     <ClCompile Include="InputDetermine.ixx" />
-    <ClCompile Include="linkerConfig.cpp" />
-    <ClCompile Include="MyDirect3DCreate8.ixx" />
-    <ClCompile Include="MyDirect3DCreate9.ixx" />
-    <ClCompile Include="MyDirectInput.ixx" />
-    <ClCompile Include="MyMmsystem.ixx" />
-    <ClCompile Include="MyPeekMessageA.ixx" />
-    <ClCompile Include="MySetCursor.ixx" />
+    <ClCompile Include="compilerConfig.cpp" />
+    <ClCompile Include="Direct3D9Hook.ixx" />
+    <ClCompile Include="DirectInput.ixx" />
+    <ClCompile Include="MMSystemHook.ixx" />
+    <ClCompile Include="PeekMessageHook.ixx" />
+    <ClCompile Include="SetCursorHook.ixx" />
     <ClCompile Include="ThDxHook.ixx" />
   </ItemGroup>
   <ItemGroup>

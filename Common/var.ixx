@@ -39,6 +39,16 @@ export DLLEXPORT GameConfigArray  gs_gameConfigArray{};
 export DLLEXPORT DWORD            gs_boomButton{};
 export DLLEXPORT DWORD            gs_extraButton{};
 export DLLEXPORT char             gs_textureFilePath[TEXTURE_FILE_PATH_LEN]{};
+
+export DLLEXPORT DWORD            gs_d3d9_Reset_RVA{};
+export DLLEXPORT DWORD            gs_d3d9_EndScene_RVA{};
+
+export DLLEXPORT DWORD            gs_d3d8_Reset_RVA{};
+export DLLEXPORT DWORD            gs_d3d8_EndScene_RVA{};
+
+export DLLEXPORT DWORD            gs_dinput8_GetDeviceState_RVA{};
+
+export DLLEXPORT DWORD            gs_dinputw_GetDeviceState_RVA{};
 #pragma data_seg()
 // make the above segment shared across processes
 #pragma comment(linker, "/SECTION:.CONFIG,RWS")

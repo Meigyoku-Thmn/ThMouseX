@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="linkerConfig.cpp" />
+    <ClCompile Include="compilerConfig.cpp" />
     <ClCompile Include="ReadConfig.ixx" />
     <ClCompile Include="ThMouse.cpp" />
   </ItemGroup>

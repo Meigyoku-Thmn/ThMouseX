@@ -1,16 +1,18 @@
 ﻿#include "framework.h"
 #include "macro.h"
+#include <shlwapi.h>
 
 import core.apihijack;
+import common.minhook;
 import common.var;
 import common.datatype;
-import core.helper;
+import common.helper;
 import core.mmsystemhook;
 import core.peekmesssagehook;
 import core.setcursorhook;
 import core.directinputhook;
-import core.windowshook;
-import core.directx8hook;
+import core.thdxhook;
+import dx8.hook;
 import core.directx9hook;
 
 static char buffer[256];
@@ -59,10 +61,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                     // store image path for crosshair
                     gs_textureFilePath2 = gs_textureFilePath;
 
+                    MHook_Initialize();
+
                     // hook DirectX 9 for crosshair
-                    HookAPICalls(&D3DHook);
+                    MHook_CreateHook(D3D9HookConfig());
                     // hook DirectX 8 for crosshair
-                    HookAPICalls(&D3D8Hook);
+                    MHook_CreateHook(D3D8HookConfig());
 
                     // hook DirectInput8 for input manipulation
                     HookAPICalls(&DInput8Hook);
@@ -76,6 +80,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                     HookAPICalls(&PeekMessageAHook);
                     // hook some cursor API for cursor visibility toggling, must follows the Message Loop hook
                     HookAPICalls(&SetCursorHook);
+
+                    MHook_EnableAll();
 
                     break;
                 }

@@ -3,10 +3,13 @@ module;
 #include "framework.h"
 #include "macro.h"
 
-export module core.windowshook;
+export module core.thdxhook;
 
 import common.datatype;
+import common.helper;
 import common.var;
+import core.directx9hook;
+import dx8.hook;
 
 #pragma data_seg(".HOOKDATA") // Shared data among all instances.
 HHOOK hHookW = NULL;
@@ -15,13 +18,13 @@ HHOOK hHookW = NULL;
 
 export HINSTANCE hinstance;
 
-int ReportLastError();
 LRESULT CALLBACK hookprocW(int ncode, WPARAM wparam, LPARAM lparam);
 DWORD ReadJoyButtonNumber(int buttonNumber, int defaultValue);
 
-export DLLEXPORT int installThDxHook(
+export DLLEXPORT bool installThDxHook(
     const GameConfigArray *config, int leftButton, int midButton, const char* pTextureFilePath);
-export DLLEXPORT int removeThDxHook(void);
+export DLLEXPORT void removeThDxHook(void);
+export DLLEXPORT bool populateMethodRVAs(void);
 
 bool hooked = false;
 LRESULT CALLBACK hookprocW(int ncode, WPARAM wparam, LPARAM lparam) {
@@ -45,7 +48,7 @@ DWORD ReadJoyButtonNumber(int buttonNumber, int defaultValue) {
         return defaultValue;
 }
 
-int installThDxHook(
+bool installThDxHook(
     const GameConfigArray* config, int leftButton, int midButton, const char* pTextureFilePath
 ) {
     strcpy_s<TEXTURE_FILE_PATH_LEN>(gs_textureFilePath, pTextureFilePath);
@@ -56,34 +59,25 @@ int installThDxHook(
     gs_extraButton = ReadJoyButtonNumber(midButton, 3);
 
     hHookW = SetWindowsHookExW(WH_CBT, hookprocW, hinstance, NULL);
-    if (hHookW == NULL)
-        return ReportLastError();
-    return 1;
+    if (hHookW == NULL) {
+        ReportLastError("Install ThDxHook.dll: Error");
+        return false;
+    }
+    return true;
 }
 
-int ReportLastError() {
-    DWORD dwErr = GetLastError();
-    // lookup error code and display it
-    LPVOID lpMsgBuf;
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        dwErr,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-        (LPTSTR)&lpMsgBuf,
-        0,
-        NULL);
-    MessageBox(NULL, (LPCTSTR)lpMsgBuf, "Install ThDxHook.dll: Error", MB_OK | MB_ICONINFORMATION);
-    // Free the buffer.
-    LocalFree(lpMsgBuf);
-
-    return 0;
-}
-
-int removeThDxHook(void) {
-    auto rs = UnhookWindowsHookEx(hHookW);
+void removeThDxHook(void) {
+    UnhookWindowsHookEx(hHookW);
     DWORD dwResult;
     // force all top-level windows to process a message, therefore force all processes to unload the DLL.
     SendMessageTimeout(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &dwResult);
-    return rs;
+}
+
+
+bool populateMethodRVAs(void) {
+    if (!PopulateD3D9MethodRVAs())
+        return false;
+    if (!PopulateD3D8MethodRVAs())
+        return false;
+    return true;
 }

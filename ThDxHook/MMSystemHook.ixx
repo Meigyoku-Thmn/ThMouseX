@@ -1,13 +1,13 @@
 module;
 
 #include "framework.h"
+#include <mmsystem.h>
 
 export module core.mmsystemhook;
 
 import core.apihijack;
 import core.inputdeterminte;
 import common.var;
-import common.log;
 
 MMRESULT WINAPI MyJoyGetDevCapsA(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc);
 MMRESULT WINAPI MyJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji);
@@ -59,7 +59,6 @@ typedef BOOL(WINAPI * OriGetKeyboardState)(_Out_ PBYTE lpKeyState);
 bool joyPadInitialized = false;
 
 MMRESULT WINAPI MyJoyGetPos(UINT uJoyID, LPJOYINFO pji) {
-    ConsoleLog("JoyGetPos\n");
     if (joyPadInitialized == false)
         return JOYERR_NOERROR;
     pji->wXpos = X_MID;
@@ -84,7 +83,6 @@ MMRESULT WINAPI MyJoyGetPos(UINT uJoyID, LPJOYINFO pji) {
 }
 
 MMRESULT WINAPI MyJoyGetDevCapsA(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc) {
-    ConsoleLog("JoyGetDevCapsA\n");
     joyPadInitialized = true;
     strcpy(pjc->szPname, "ThMouse");
     pjc->wNumButtons = 32;
@@ -99,7 +97,6 @@ MMRESULT WINAPI MyJoyGetDevCapsA(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc) {
 }
 
 MMRESULT WINAPI MyJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji) {
-    ConsoleLog("JoyGetPosEx\n");
     if (joyPadInitialized == false)
         return JOYERR_NOERROR;
     pji->dwXpos = X_MID;
@@ -124,7 +121,6 @@ MMRESULT WINAPI MyJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji) {
 }
 
 BOOL WINAPI MyGetKeyboardState(PBYTE lpKeyState) {
-    ConsoleLog("GetKeyboardState\n");
     auto old_func = (OriGetKeyboardState)User32Hook.Functions[User32FN_GetKeyboardState].OrigFn;
     auto rs = old_func(lpKeyState);
     if (g_handledByDirectInput != true && rs != 0) {

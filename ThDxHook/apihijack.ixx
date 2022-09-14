@@ -22,7 +22,6 @@ export struct SFunctionHook {
 };
 
 
-#pragma warning(suppress: 4200) // Trailing Array Idiom
 export struct SDLLHook {
     // Name of the DLL, e.g. "DDRAW.DLL"
     const char *Name;

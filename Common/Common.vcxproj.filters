@@ -35,5 +35,11 @@
     <ClCompile Include="datatype.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="helper.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

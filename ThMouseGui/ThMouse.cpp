@@ -3,7 +3,7 @@
 
 import common.datatype;
 import main.readconfig;
-import core.windowshook;
+import core.thdxhook;
 
 constexpr auto MAX_LOADSTRING = 100;
 
@@ -30,6 +30,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
         return 1;
     }
 
+    if (!populateMethodRVAs())
+        return 1;
+
     auto *pConfig = new GameConfigArray{};
     if (!readGamesFile(pConfig))
         return 1;
@@ -45,7 +48,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
     delete[] pTextureFilePath;
 
     if (!installThDxHook(pConfig, leftButton, midButton, pTextureFileFullPath))
-        return 0;
+        return 1;
 
     delete[] pTextureFileFullPath;
     delete pConfig;
@@ -61,7 +64,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
     // Perform application initialization:
     if (!InitInstance(hInstance, nCmdShow)) {
-        return 0;
+        return 1;
     }
 
     MSG msg;
@@ -73,7 +76,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
     removeThDxHook();
 
-    return (int)msg.wParam;
+    return 0;
 }
 
 //

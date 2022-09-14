@@ -8,7 +8,6 @@ export module core.directinputhook;
 import core.apihijack;
 import common.var;
 import core.inputdeterminte;
-import common.log;
 
 typedef HRESULT(WINAPI * DirectInput8Create_t)(
     HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter);
@@ -171,7 +170,6 @@ public:
     }
 #pragma endregion
     HRESULT STDMETHODCALLTYPE GetDeviceState(DWORD cbData, LPVOID lpvData) {
-        ConsoleLog("DirectInputDevice8\n");
         auto hr = m_device->GetDeviceState(cbData, lpvData);
         if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
             g_handledByDirectInput = true;
@@ -302,7 +300,6 @@ public:
     }
 #pragma endregion
     HRESULT STDMETHODCALLTYPE GetDeviceState(DWORD cbData, LPVOID lpvData) {
-        ConsoleLog("DirectInputDeviceW\n");
         auto hr = m_device->GetDeviceState(cbData, lpvData);
         if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
             g_handledByDirectInput = true;
