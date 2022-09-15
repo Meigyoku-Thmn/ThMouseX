@@ -1,6 +1,7 @@
 module;
 
 #include "framework.h"
+#include "macro.h"
 
 export module common.datatype;
 
@@ -38,21 +39,27 @@ export union TypedPoint {
     FloatPoint  FloatData;
 };
 
-export struct AddressChain {
+export struct DLLEXPORT AddressChain {
     int     Length;
-    DWORD   Chain[ADDRESS_CHAIN_MAX_LEN];
+    DWORD   Level[ADDRESS_CHAIN_MAX_LEN];
+    DWORD   value() {
+        auto address = Level[0];
+        for (int i = 1; i < Length; i++) {
+            address = *(DWORD*)address;
+            if (address == NULL)
+                break;
+            address += Level[i];
+        }
+        return address;
+    }
 };
 
 export struct GameConfig {
     char            ProcessName[PROCESS_NAME_MAX_LEN];
-    AddressChain    Posistion;
+    AddressChain    Address;
     PointDataType   PosDataType;
-    float           PixelRate;
-    FloatPoint      PixelOffset;
     FloatPoint      BasePixelOffset;
     unsigned int    BaseResolutionX;
-    bool            OffsetIsRelative;
-    char            BaseName[16];
 };
 
 export struct GameConfigArray {

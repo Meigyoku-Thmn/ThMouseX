@@ -1,6 +1,7 @@
 module;
 
 #include "framework.h"
+#include "macro.h"
 #include "Include/d3d9.h"
 #include "Include/d3dx9core.h"
 #include <vector>
@@ -24,7 +25,7 @@ decltype(&MyReset) OriReset;
 HRESULT WINAPI MyEndScene(IDirect3DDevice9 *pDevice);
 decltype(&MyEndScene) OriEndScene;
 
-constexpr const char* GetD3dErrStr(int errorCode) {
+constexpr const char* GetD3dErrStr(const int errorCode) {
     if (errorCode == D3DERR_DEVICELOST)
         return "D3DERR_DEVICELOST";
     if (errorCode == D3DERR_INVALIDCALL)
@@ -36,7 +37,7 @@ constexpr const char* GetD3dErrStr(int errorCode) {
     return "Unknown error.";
 }
 
-export bool PopulateD3D9MethodRVAs() {
+export DLLEXPORT bool PopulateD3D9MethodRVAs() {
     bool result = false;
     DWORD *vtable{};
     HRESULT rs{};
@@ -143,7 +144,7 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice9 *pDevice) {
     POINT pos{};
     GetCursorPos(&pos);
     if (prepared == false) {
-        g_windowed = true;
+        g_isWindowMode = true;
         prepared = true;
         do {
             RECT hwndClientRect;
@@ -159,7 +160,7 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice9 *pDevice) {
             if (rs != D3D_OK)
                 break;
             if (SurfaceDesc.Width > hwndClientRect.right || SurfaceDesc.Height > hwndClientRect.bottom) {
-                g_windowed = false; // so-so way to determine "windowed or fullscreen"
+                g_isWindowMode = false; // so-so way to determine "windowed or fullscreen"
                 // clear border to avoid "click-out-of-bound"
                 LONG style = GetWindowLongPtrW(m_hFocusWindow, GWL_STYLE);
                 if (style == 0)
@@ -179,12 +180,12 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice9 *pDevice) {
             }
             if (GetClientRect(m_hFocusWindow, &hwndClientRect) == 0)
                 break;
-            g_currentGameConfig.PixelRate = (float)g_currentGameConfig.BaseResolutionX / hwndClientRect.right;
-            g_currentGameConfig.PixelOffset.X = g_currentGameConfig.BasePixelOffset.X / g_currentGameConfig.PixelRate;
-            g_currentGameConfig.PixelOffset.Y = g_currentGameConfig.BasePixelOffset.Y / g_currentGameConfig.PixelRate;
+            g_pixelRate = (float)g_currentConfig.BaseResolutionX / hwndClientRect.right;
+            g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
+            g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
         } while (0);
     }
-    if (g_windowed == true)
+    if (g_isWindowMode == true)
         ScreenToClient(m_hFocusWindow, &pos);
 
     if (!m_texture)
@@ -192,21 +193,19 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice9 *pDevice) {
 
     if (allowGetRenderData == true) {
         allowGetRenderData = false;
-        if (g_windowed == true) {
+        if (g_isWindowMode == true) {
             do // this is not a loop, I do this instead of goto statement
             {
                 IDirect3DSurface9* pSurface;
                 HRESULT rs = pDevice->GetRenderTarget(0, &pSurface);
                 if (rs != D3D_OK) {
                     currentScale = 0.0f;
-                    g_currentScale = currentScale;
                     break;
                 }
                 D3DSURFACE_DESC SurfaceDesc;
                 rs = pSurface->GetDesc(&SurfaceDesc);
                 if (rs != D3D_OK) {
                     currentScale = 0.0f;
-                    g_currentScale = currentScale;
                     break;
                 }
                 backBufferSize.width = SurfaceDesc.Width;
@@ -218,23 +217,20 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice9 *pDevice) {
                 BOOL rs2 = GetClientRect(m_hFocusWindow, &rect);
                 if (rs2 == 0) {
                     currentScale = 0.0f;
-                    g_currentScale = currentScale;
                     break;
                 }
                 frontBufferSize.width = rect.right - rect.left;
                 frontBufferSize.height = rect.bottom - rect.top;
 
                 currentScale = (float)frontBufferSize.width / backBufferSize.width;
-                g_currentScale = currentScale;
             } while (0);
         } else {
             currentScale = 1.0f;
-            g_currentScale = currentScale;
         }
     }
 
     D3DXVECTOR3 position((float)pos.x, (float)pos.y, 0.0);
-    if (g_windowed == true && currentScale != 0.0f && currentScale != 1.0f) {
+    if (g_isWindowMode == true && currentScale != 0.0f && currentScale != 1.0f) {
         position /= currentScale;
     }
     D3DXVECTOR3 center(cursorWidthCenter, cursorHeightCenter, 0.0);
@@ -299,7 +295,7 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice9 *pDevice) {
         m_sprite->SetTransform(&spriteMatrix);
     }
 
-    if (g_working) {
+    if (g_inputEnabled) {
         if (white) {
             pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_ADD);
             pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);

@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="apihijack.ixx">
@@ -24,16 +20,16 @@
     <ClCompile Include="Direct3D9Hook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DirectInput.ixx">
+    <ClCompile Include="DirectInputHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MMSystemHook.ixx">
+    <ClCompile Include="LowLevelInputHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PeekMessageHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThDxHook.ixx">
+    <ClCompile Include="WindowsHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SetCursorHook.ixx">

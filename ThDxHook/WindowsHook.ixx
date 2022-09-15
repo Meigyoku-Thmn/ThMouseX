@@ -3,7 +3,7 @@ module;
 #include "framework.h"
 #include "macro.h"
 
-export module core.thdxhook;
+export module core.windowshook;
 
 import common.datatype;
 import common.helper;
@@ -24,19 +24,15 @@ DWORD ReadJoyButtonNumber(int buttonNumber, int defaultValue);
 export DLLEXPORT bool installThDxHook(
     const GameConfigArray *config, int leftButton, int midButton, const char* pTextureFilePath);
 export DLLEXPORT void removeThDxHook(void);
-export DLLEXPORT bool populateMethodRVAs(void);
 
-bool hooked = false;
 LRESULT CALLBACK hookprocW(int ncode, WPARAM wparam, LPARAM lparam) {
-    if (hooked == false && ncode == HCBT_CREATEWND) {
+    // TODO: add a way for user to specify window class name
+    if (g_hFocusWindow == NULL && ncode == HCBT_CREATEWND) {
         auto hwnd = (HWND)wparam;
         WCHAR buf[256];
-        GetClassNameW(hwnd, buf, 256);
-        if (wcscmp(L"NP2-MainWindow", buf) == 0 || wcscmp(L"BASE", buf) == 0) {
+        GetClassNameW(hwnd, buf, sizeof(buf) / sizeof(buf[0]));
+        if (wcscmp(L"BASE", buf) == 0)
             g_hFocusWindow = hwnd;
-            g_hFocusWindow2 = hwnd;
-            hooked = true;
-        }
     }
     return CallNextHookEx(hHookW, ncode, wparam, lparam); // pass control to next hook in the hook chain.
 }
@@ -71,13 +67,4 @@ void removeThDxHook(void) {
     DWORD dwResult;
     // force all top-level windows to process a message, therefore force all processes to unload the DLL.
     SendMessageTimeout(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &dwResult);
-}
-
-
-bool populateMethodRVAs(void) {
-    if (!PopulateD3D9MethodRVAs())
-        return false;
-    if (!PopulateD3D8MethodRVAs())
-        return false;
-    return true;
 }

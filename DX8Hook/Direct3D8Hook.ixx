@@ -31,7 +31,7 @@ decltype(&MyReset) OriReset;
 HRESULT WINAPI MyEndScene(IDirect3DDevice8 *pDevice);
 decltype(&MyEndScene) OriEndScene;
 
-constexpr const char* GetD3dErrStr(int errorCode) {
+constexpr const char* GetD3dErrStr(const int errorCode) {
     if (errorCode == D3DERR_INVALIDCALL)
         return "D3DERR_INVALIDCALL";
     if (errorCode == D3DERR_NOTAVAILABLE)
@@ -119,8 +119,8 @@ void Initialize(IDirect3DDevice8 *device) {
     device->GetCreationParameters(&params);
     m_hFocusWindow = g_hFocusWindow = params.hFocusWindow;
     D3DXCreateSprite(device, &m_sprite);
-    if (gs_textureFilePath2[0]) {
-        auto rs = D3DXCreateTextureFromFile(device, gs_textureFilePath2, &m_texture);
+    if (gs_textureFilePath[0]) {
+        auto rs = D3DXCreateTextureFromFile(device, gs_textureFilePath, &m_texture);
         if (rs == D3D_OK) {
             D3DSURFACE_DESC desc;
             m_texture->GetLevelDesc(0, &desc);
@@ -135,7 +135,7 @@ HRESULT WINAPI MyReset(IDirect3DDevice8 *pDevice, D3DPRESENT_PARAMETERS *pPresen
     Initialize(pDevice);
     if (pPresentationParameters->hDeviceWindow != NULL)
         m_hFocusWindow = pPresentationParameters->hDeviceWindow;
-    g_hFocusWindow2 = m_hFocusWindow;
+    g_hFocusWindow = m_hFocusWindow;
     allowGetRenderData = true;
     prepared = false;
     return OriReset(pDevice, pPresentationParameters);
@@ -146,7 +146,7 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice8 *pDevice) {
     POINT mousePos{};
     GetCursorPos(&mousePos);
     if (prepared == false) {
-        g_windowed2 = true;
+        g_isWindowMode = true;
         prepared = true;
         do {
             RECT hwndClientRect;
@@ -163,7 +163,7 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice8 *pDevice) {
                 break;
             // guess "windowed or fullscreen"
             if (SurfaceDesc.Width > hwndClientRect.right || SurfaceDesc.Height > hwndClientRect.bottom) {
-                g_windowed2 = false;
+                g_isWindowMode = false;
                 // clear border to avoid "click-out-of-bound"
                 auto style = GetWindowLongPtrW(m_hFocusWindow, GWL_STYLE);
                 if (style == 0)
@@ -183,12 +183,12 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice8 *pDevice) {
             }
             if (GetClientRect(m_hFocusWindow, &hwndClientRect) == 0)
                 break;
-            *g_pixelRate = (float)g_baseResolutionX / hwndClientRect.right;
-            g_pixelOffset->X = g_basePixelOffset->X / (*g_pixelRate);
-            g_pixelOffset->Y = g_basePixelOffset->Y / (*g_pixelRate);
+            g_pixelRate = (float)g_currentConfig.BaseResolutionX / hwndClientRect.right;
+            g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
+            g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
         } while (0);
     }
-    if (g_windowed2 == true)
+    if (g_isWindowMode == true)
         ScreenToClient(m_hFocusWindow, &mousePos);
 
     if (!m_texture)
@@ -196,21 +196,19 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice8 *pDevice) {
 
     if (allowGetRenderData == true) {
         allowGetRenderData = false;
-        if (g_windowed2 == true) {
+        if (g_isWindowMode == true) {
             do // this is not a loop, I do this instead of goto statement
             {
                 IDirect3DSurface8* pSurface;
                 auto rs = pDevice->GetRenderTarget(&pSurface);
                 if (rs != D3D_OK) {
                     currentScale = 1.0f;
-                    g_currentScale2 = currentScale;
                     break;
                 }
                 D3DSURFACE_DESC SurfaceDesc;
                 rs = pSurface->GetDesc(&SurfaceDesc);
                 if (rs != D3D_OK) {
                     currentScale = 1.0f;
-                    g_currentScale2 = currentScale;
                     break;
                 }
                 backBufferSize.width = SurfaceDesc.Width;
@@ -221,14 +219,12 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice8 *pDevice) {
                 BOOL rs2 = GetClientRect(m_hFocusWindow, &rect);
                 if (rs2 == 0) {
                     currentScale = 1.0f;
-                    g_currentScale2 = currentScale;
                     break;
                 }
                 frontBufferSize.width = rect.right - rect.left;
                 frontBufferSize.height = rect.bottom - rect.top;
 
                 currentScale = (float)frontBufferSize.width / backBufferSize.width;
-                g_currentScale2 = currentScale;
             } while (0);
         } else {
             currentScale = 1.0f;
@@ -236,7 +232,7 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice8 *pDevice) {
     }
 
     D3DXVECTOR2 position((float)(mousePos.x), (float)(mousePos.y));
-    if (g_windowed2 == true && currentScale != 0.0f && currentScale != 1.0f) {
+    if (g_isWindowMode == true && currentScale != 0.0f && currentScale != 1.0f) {
         position /= currentScale;
     }
     position.x -= cursorWidthCenter;
@@ -292,7 +288,7 @@ HRESULT WINAPI MyEndScene(IDirect3DDevice8 *pDevice) {
 
     m_sprite->Begin();
 
-    if (g_working2) {
+    if (g_inputEnabled) {
         if (white) {
             pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_ADD);
             pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);

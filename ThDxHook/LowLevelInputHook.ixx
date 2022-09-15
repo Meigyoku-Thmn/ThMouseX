@@ -3,7 +3,7 @@ module;
 #include "framework.h"
 #include <mmsystem.h>
 
-export module core.mmsystemhook;
+export module core.lowlevelinputhook;
 
 import core.apihijack;
 import core.inputdeterminte;
@@ -67,9 +67,9 @@ MMRESULT WINAPI MyJoyGetPos(UINT uJoyID, LPJOYINFO pji) {
     if (g_handledByDirectInput != true) {
         auto gameInput = DetermineGameInput();
         if (gameInput & USE_BOMB)
-            pji->wButtons |= g_boomButton;
+            pji->wButtons |= gs_boomButton;
         if (gameInput & USE_SPECIAL)
-            pji->wButtons |= g_extraButton;
+            pji->wButtons |= gs_extraButton;
         if (gameInput & MOVE_LEFT)
             pji->wXpos = X_MIN;
         if (gameInput & MOVE_RIGHT)
@@ -105,9 +105,9 @@ MMRESULT WINAPI MyJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji) {
     if (g_handledByDirectInput == true) {
         auto gameInput = DetermineGameInput();
         if (gameInput & USE_BOMB)
-            pji->dwButtons |= g_boomButton;
+            pji->dwButtons |= gs_boomButton;
         if (gameInput & USE_SPECIAL)
-            pji->dwButtons |= g_extraButton;
+            pji->dwButtons |= gs_extraButton;
         if (gameInput & MOVE_LEFT)
             pji->dwXpos = X_MIN;
         if (gameInput & MOVE_RIGHT)

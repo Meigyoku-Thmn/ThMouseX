@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ReadConfig.ixx">
+    <ClCompile Include="Configurate.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThMouse.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="compilerConfig.cpp">

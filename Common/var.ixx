@@ -7,31 +7,18 @@ export module common.var;
 
 import common.datatype;
 
+// single game config
+export DLLEXPORT GameConfig       g_currentConfig;
+
+// global game state
 export DLLEXPORT HWND             g_hFocusWindow;
-export DLLEXPORT bool             g_mouseDown;
-export DLLEXPORT bool             g_midMouseDown;
-export DLLEXPORT GameConfig       g_currentGameConfig;
-export DLLEXPORT DWORD            g_boomButton;
-export DLLEXPORT DWORD            g_extraButton;
-export DLLEXPORT bool             g_working;
+export DLLEXPORT bool             g_leftMousePressed;
+export DLLEXPORT bool             g_midMousePressed;
+export DLLEXPORT bool             g_inputEnabled;
 export DLLEXPORT bool             g_handledByDirectInput;
-export DLLEXPORT bool             g_windowed = true;
-export DLLEXPORT float            g_currentScale;
-export DLLEXPORT bool             g_useAccurateMousePosition = false;
-export DLLEXPORT int              g_dxVersion = 9;
-export DLLEXPORT bool             g_offsetIsRelative = false;
-export DLLEXPORT int              g_baseOfCode;
-export DLLEXPORT unsigned long    g_firstOffsetDirection;
-export DLLEXPORT HMODULE          g_hModule;
-export DLLEXPORT HWND             g_hFocusWindow2;
-export DLLEXPORT bool             g_working2;
-export DLLEXPORT bool             g_windowed2;
-export DLLEXPORT char             *gs_textureFilePath2;
-export DLLEXPORT float            g_currentScale2;
-export DLLEXPORT float            *g_pixelRate;
-export DLLEXPORT FloatPoint       *g_pixelOffset;
-export DLLEXPORT FloatPoint       *g_basePixelOffset;
-export DLLEXPORT UINT             g_baseResolutionX;
+export DLLEXPORT bool             g_isWindowMode = true;
+export DLLEXPORT float            g_pixelRate = 1;
+export DLLEXPORT FloatPoint       g_pixelOffset{1, 1};
 
 // configuration from main exe
 #pragma data_seg(".CONFIG")
@@ -47,8 +34,6 @@ export DLLEXPORT DWORD            gs_d3d8_Reset_RVA{};
 export DLLEXPORT DWORD            gs_d3d8_EndScene_RVA{};
 
 export DLLEXPORT DWORD            gs_dinput8_GetDeviceState_RVA{};
-
-export DLLEXPORT DWORD            gs_dinputw_GetDeviceState_RVA{};
 #pragma data_seg()
 // make the above segment shared across processes
 #pragma comment(linker, "/SECTION:.CONFIG,RWS")

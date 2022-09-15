@@ -4,16 +4,27 @@
 #include <fstream>
 #include <sstream>
 
-export module main.readconfig;
+export module main.config;
 
+import core.directx9hook;
+import core.directinputhook;
+import dx8.hook;
 import common.datatype;
 
 using namespace std;
 
-export bool readGamesFile(GameConfigArray *pConfig);
-export bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath);
+export bool populateMethodRVAs(void) {
+    if (!PopulateD3D9MethodRVAs())
+        return false;
+    if (!PopulateD3D8MethodRVAs())
+        return false;
+    if (!PopulateDInputMethodRVAs())
+        return false;
+    return true;
+}
 
-bool readGamesFile(GameConfigArray *pConfig) {
+export bool readGamesFile(GameConfigArray *pConfig) {
+    // TODO: use a better configuration format
     ifstream gamesFile("games.txt");
     if (!gamesFile) {
         MessageBox(NULL, "Can not find games file.", "Launcher", MB_OK | MB_ICONERROR);
@@ -50,7 +61,7 @@ bool readGamesFile(GameConfigArray *pConfig) {
         string pointerChainStr;
         lineStream >> pointerChainStr;
         string::size_type leftBoundIdx = 0, rightBoundIdx = -1;
-        for (size_t addressIdx = 0; addressIdx < ADDRESS_CHAIN_MAX_LEN; addressIdx++) {
+        for (size_t addressLevelIdx = 0; addressLevelIdx < ADDRESS_CHAIN_MAX_LEN; addressLevelIdx++) {
             DWORD address;
             leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
             if (leftBoundIdx == string::npos)
@@ -62,10 +73,10 @@ bool readGamesFile(GameConfigArray *pConfig) {
             converter.clear();
             converter << memoryOffsetStr;
             converter >> hex >> address;
-            currentConfig.Posistion.Chain[addressIdx] = address;
-            currentConfig.Posistion.Length++;
+            currentConfig.Address.Level[addressLevelIdx] = address;
+            currentConfig.Address.Length++;
         }
-        if (currentConfig.Posistion.Chain[0] == 0) {
+        if (currentConfig.Address.Level[0] == 0) {
             configIdx--;
             continue;
         }
@@ -83,8 +94,6 @@ bool readGamesFile(GameConfigArray *pConfig) {
             configIdx--;
             continue;
         }
-
-        currentConfig.PixelRate = 1;
 
         // read offset (X,Y)
         string posOffsetStr;
@@ -110,8 +119,6 @@ bool readGamesFile(GameConfigArray *pConfig) {
         converter << offsetYStr;
         converter >> dec >> offsetY;
         currentConfig.BasePixelOffset.Y = offsetY;
-        currentConfig.PixelOffset.Y = 1;
-        currentConfig.PixelOffset.X = 1;
         if (lineStream.eof() == true) {
             configIdx--;
             continue;
@@ -119,14 +126,6 @@ bool readGamesFile(GameConfigArray *pConfig) {
 
         // read game-internal base resolution
         lineStream >> dec >> currentConfig.BaseResolutionX;
-
-        // the rest is for pointer chain starts on thread stack, useless for now
-        UINT offsetIsRelative;
-        lineStream >> offsetIsRelative;
-        currentConfig.OffsetIsRelative = (bool)offsetIsRelative;
-        if (offsetIsRelative == 0)
-            continue;
-        lineStream >> currentConfig.BaseName;
     }
 
     if (configIdx == 0) {
@@ -138,7 +137,7 @@ bool readGamesFile(GameConfigArray *pConfig) {
     return true;
 }
 
-bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath) {
+export bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath) {
     ifstream iniFile("ThMouse.ini");
     if (!iniFile) {
         MessageBox(NULL, "Can not find ThMouse.ini file.", "Launcher", MB_OK | MB_ICONERROR);

@@ -164,11 +164,11 @@
     <ClCompile Include="InputDetermine.ixx" />
     <ClCompile Include="compilerConfig.cpp" />
     <ClCompile Include="Direct3D9Hook.ixx" />
-    <ClCompile Include="DirectInput.ixx" />
-    <ClCompile Include="MMSystemHook.ixx" />
+    <ClCompile Include="DirectInputHook.ixx" />
+    <ClCompile Include="LowLevelInputHook.ixx" />
     <ClCompile Include="PeekMessageHook.ixx" />
     <ClCompile Include="SetCursorHook.ixx" />
-    <ClCompile Include="ThDxHook.ixx" />
+    <ClCompile Include="WindowsHook.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="macro.h" />

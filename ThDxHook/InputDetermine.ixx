@@ -16,55 +16,43 @@ export constexpr auto MOVE_DOWN = 0b0001'0000;
 
 export DWORD DetermineGameInput() {
     DWORD gameInput = 0;
-    if (g_mouseDown) {
+    if (g_leftMousePressed) {
         gameInput |= USE_BOMB;
-        g_mouseDown = 0;
+        g_leftMousePressed = false;
     }
-    if (g_midMouseDown) {
+    if (g_midMousePressed) {
         gameInput |= USE_SPECIAL;
-        g_midMouseDown = 0;
+        g_midMousePressed = false;
     }
-    if (g_dxVersion != 8 ? g_working : g_working2) {
-        auto address = g_currentGameConfig.Posistion.Chain[0];
-        if (g_offsetIsRelative == true) {
-            if (g_firstOffsetDirection == -1)
-                address = g_baseOfCode - address;
-            else
-                address += g_baseOfCode;
-        }
-        for (int i = 1; i < g_currentGameConfig.Posistion.Length; i++) {
-            address = *((DWORD*)address);
-            if (address == 0)
-                break;
-            address += g_currentGameConfig.Posistion.Chain[i];
-        }
+    if (g_inputEnabled) {
+        auto address = g_currentConfig.Address.value();
         if (address != 0) {
             POINT playerPos{}, mousePos;
 
             auto calulatePosition = [&]<typename T>(T * pPosition) {
-                playerPos.x = pPosition->X / g_currentGameConfig.PixelRate + g_currentGameConfig.PixelOffset.X;
-                playerPos.y = pPosition->Y / g_currentGameConfig.PixelRate + g_currentGameConfig.PixelOffset.Y;
+                playerPos.x = pPosition->X / g_pixelRate + g_pixelOffset.X;
+                playerPos.y = pPosition->Y / g_pixelRate + g_pixelOffset.Y;
             };
 
-            if (g_currentGameConfig.PosDataType == Int_DataType)
+            if (g_currentConfig.PosDataType == Int_DataType)
                 calulatePosition((IntPoint*)address);
-            else if (g_currentGameConfig.PosDataType == Float_DataType)
+            else if (g_currentConfig.PosDataType == Float_DataType)
                 calulatePosition((FloatPoint*)address);
-            else if (g_currentGameConfig.PosDataType == Short_DataType)
+            else if (g_currentConfig.PosDataType == Short_DataType)
                 calulatePosition((ShortPoint*)address);
 
             GetCursorPos(&mousePos);
-            if ((g_dxVersion != 8 ? g_windowed : g_windowed2) == true)
-                ScreenToClient(g_dxVersion != 8 ? g_hFocusWindow : g_hFocusWindow2, &mousePos);
+            if (g_isWindowMode == true)
+                ScreenToClient(g_hFocusWindow, &mousePos);
 
-            if (g_useAccurateMousePosition ? playerPos.x < mousePos.x : playerPos.x < mousePos.x - 1)
+            if (playerPos.x < mousePos.x - 1)
                 gameInput |= MOVE_RIGHT;
-            else if (g_useAccurateMousePosition ? playerPos.x > mousePos.x : playerPos.x > mousePos.x + 1)
+            else if (playerPos.x > mousePos.x + 1)
                 gameInput |= MOVE_LEFT;
 
-            if (g_useAccurateMousePosition ? playerPos.y < mousePos.y : playerPos.y < mousePos.y - 1)
+            if (playerPos.y < mousePos.y - 1)
                 gameInput |= MOVE_DOWN;
-            else if (g_useAccurateMousePosition ? playerPos.y > mousePos.y : playerPos.y > mousePos.y + 1)
+            else if (playerPos.y > mousePos.y + 1)
                 gameInput |= MOVE_UP;
         }
     }

@@ -20,8 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="compilerConfig.cpp" />
-    <ClCompile Include="ReadConfig.ixx" />
-    <ClCompile Include="ThMouse.cpp" />
+    <ClCompile Include="Configurate.ixx" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -38,6 +38,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{47c2ee88-18d4-4367-8e67-6daa01ab4451}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\DX8Hook\DX8Hook.vcxproj">
+      <Project>{dc5fe77d-43d4-4cc6-9ad2-409716483dbf}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ThDxHook\ThDxHook.vcxproj">
       <Project>{256b0d2c-0296-4d8f-ade8-79e544649d69}</Project>

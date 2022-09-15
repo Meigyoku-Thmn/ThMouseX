@@ -7,11 +7,11 @@ import common.minhook;
 import common.var;
 import common.datatype;
 import common.helper;
-import core.mmsystemhook;
+import core.lowlevelinputhook;
 import core.peekmesssagehook;
 import core.setcursorhook;
 import core.directinputhook;
-import core.thdxhook;
+import core.windowshook;
 import dx8.hook;
 import core.directx9hook;
 
@@ -36,30 +36,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 return TRUE;
 
             for (int i = 0; i < gs_gameConfigArray.Length; i++) {
-                // search the current process's name in our configuration, case-insensitively
                 if (_stricmp(buffer, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
-                    // extract some fields in the matching configuation item into the global variables.
-                    g_currentGameConfig = gs_gameConfigArray.Configs[i];
-                    g_pixelRate = &g_currentGameConfig.PixelRate;
-                    g_pixelOffset = (FloatPoint*)&g_currentGameConfig.PixelOffset;
-                    g_basePixelOffset = (FloatPoint*)&g_currentGameConfig.BasePixelOffset;
-                    g_baseResolutionX = g_currentGameConfig.BaseResolutionX;
-                    g_offsetIsRelative = g_currentGameConfig.OffsetIsRelative;
-
-                    // this is used for pointer chains that start from a thread stack,
-                    // for now only threadstack0 is supported
-                    if (g_offsetIsRelative == true) {
-                        g_baseOfCode = ResolveBaseName(g_currentGameConfig.BaseName, _ref g_firstOffsetDirection);
-                        if (g_baseOfCode == 0)
-                            break;
-                    }
-
-                    // store joypad's button numbers for BOMB and SPECIAL
-                    g_boomButton = gs_boomButton;
-                    g_extraButton = gs_extraButton;
-
-                    // store image path for crosshair
-                    gs_textureFilePath2 = gs_textureFilePath;
+                    g_currentConfig = gs_gameConfigArray.Configs[i];
 
                     MHook_Initialize();
 
@@ -69,8 +47,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                     MHook_CreateHook(D3D8HookConfig());
 
                     // hook DirectInput8 for input manipulation
-                    HookAPICalls(&DInput8Hook);
-                    HookAPICalls(&DInputHook);
+                    MHook_CreateHook(D3InputHookConfig());
                     // hook Joypad for input manipulation
                     HookAPICalls(&WinmmHook);
                     // hook GetKeyboardState for input manipulation
@@ -78,7 +55,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
                     // hook Message Loop for additional runtime configuration
                     HookAPICalls(&PeekMessageAHook);
-                    // hook some cursor API for cursor visibility toggling, must follows the Message Loop hook
+                    // hook some cursor API for cursor visibility toggling
                     HookAPICalls(&SetCursorHook);
 
                     MHook_EnableAll();

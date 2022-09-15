@@ -46,10 +46,9 @@ void DecreaseCursorVisibility() {
 
 bool lockCursorSwitch = false;
 void ToggleLockCursor() {
-    auto hwnd = g_dxVersion != 8 ? g_hFocusWindow : g_hFocusWindow2;
     RECT rect;
-    GetClientRect(hwnd, &rect);
-    ClientToScreen(hwnd, (POINT*)&rect);
+    GetClientRect(g_hFocusWindow, &rect);
+    ClientToScreen(g_hFocusWindow, (POINT*)&rect);
     rect.bottom = rect.top + rect.bottom;
     rect.right = rect.left + rect.right;
     if (lockCursorSwitch == false) {
@@ -66,7 +65,7 @@ void IncreaseCursorSpeed() {}
 void DecreaseCursorSpeed() {}
 
 void MyMessageLoop(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg) {
-    static BOOL lastR = 0;
+    static BOOL lastR = FALSE;
     if (lpMsg->message == WM_MOVE ||
         lpMsg->message == WM_SYSCOMMAND ||
         lpMsg->message == WM_KILLFOCUS || lpMsg->message == WM_SETFOCUS ||
@@ -88,18 +87,15 @@ void MyMessageLoop(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMa
             //ToggleLockCursor();       // D key
         }
     } else if (lpMsg->message == WM_LBUTTONDOWN) {
-        g_mouseDown = 1;
+        g_leftMousePressed = true;
     } else if (lpMsg->message == WM_MBUTTONDOWN) {
-        g_midMouseDown = 1;
+        g_midMousePressed = true;
     } else if (lpMsg->message == WM_RBUTTONDOWN) {
-        lastR = 1;
+        lastR = TRUE;
     } else if (lpMsg->message == WM_RBUTTONUP) {
-        if (lastR == 1) {
-            lastR = 0;
-            if (g_dxVersion != 8)
-                g_working = !g_working;
-            else
-                g_working2 = !g_working2;
+        if (lastR == TRUE) {
+            lastR = FALSE;
+            g_inputEnabled = !g_inputEnabled;
         }
     }
 }
