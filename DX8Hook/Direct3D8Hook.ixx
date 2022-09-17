@@ -26,6 +26,19 @@ int (WINAPIV *_sprintf)(char*, const char*, ...) = sprintf;
     dev->SetTextureStageState(i, D3DTSS_COLORARG1, arg1); \
     dev->SetTextureStageState(i, D3DTSS_COLORARG2, arg2)
 
+#define AllowOnlyOneSingleDevice(fallbackRoute) \
+    static DWORD firstReturnAddress; \
+    DWORD currentReturnAddress; \
+    __asm { \
+        __asm push eax \
+        __asm mov eax, [ebp + 4] \
+        __asm mov currentReturnAddress, eax \
+        __asm pop eax \
+    } \
+    if (firstReturnAddress != 0 && firstReturnAddress != currentReturnAddress) \
+    return fallbackRoute; \
+    firstReturnAddress = currentReturnAddress
+
 constexpr auto ResetIdx = 14;
 constexpr auto EndSceneIdx = 35;
 constexpr auto ErrorMessageTitle = "D3D8 Hook Setup Error";
@@ -144,7 +157,6 @@ HRESULT WINAPI D3DReset(IDirect3DDevice8* pDevice, D3DPRESENT_PARAMETERS* pPrese
 
 /*
 this routine:
-- determine g_isWindowMode
 - remove window's border if game is fullscreened (exclusive mode)
 - determine g_pixelRate
 - determine g_pixelOffset
@@ -153,7 +165,6 @@ void PrepareMeasurement(IDirect3DDevice8* pDevice) {
     if (measurementPrepared)
         return;
     measurementPrepared = true;
-    g_isWindowMode = true;
     RECTSIZE clientSize;
     if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
         return;
@@ -168,7 +179,6 @@ void PrepareMeasurement(IDirect3DDevice8* pDevice) {
         return;
     // (Heuristic) if client size is smaller than d3d size then it's likely that we are in fullscreen mode
     if (d3dSize.Width > UINT(clientSize.width()) || d3dSize.Height > UINT(clientSize.height())) {
-        g_isWindowMode = false;
         // clear border to avoid "click-out-of-bound"
         RemoveWindowBorder(d3dSize.Width, d3dSize.Height);
     }
@@ -186,10 +196,6 @@ void PrepareCursorState(IDirect3DDevice8* pDevice) {
     if (cursorStatePrepared)
         return;
     cursorStatePrepared = true;
-    if (g_isWindowMode != true) {
-        d3dScale = 1.f;
-        return;
-    }
     IDirect3DSurface8* pSurface;
     auto rs = pDevice->GetRenderTarget(&pSurface);
     if (rs != D3D_OK) {
@@ -222,7 +228,7 @@ void RenderCursor(IDirect3DDevice8* pDevice) {
     // scale mouse cursor's position from screen coordinate to D3D coordinate
     POINT pointerPosition = GetPointerPosition();
     D3DXVECTOR2 cursorPositionD3D(float(pointerPosition.x), float(pointerPosition.y));
-    if (g_isWindowMode == true && d3dScale != 0.f && d3dScale != 1.f)
+    if (d3dScale != 0.f && d3dScale != 1.f)
         cursorPositionD3D /= d3dScale;
 
     // DirectX8 doesn't have a conventional method for sprite pivot
@@ -251,6 +257,7 @@ void RenderCursor(IDirect3DDevice8* pDevice) {
 
 
 HRESULT WINAPI D3DEndScene(IDirect3DDevice8* pDevice) {
+    AllowOnlyOneSingleDevice(OriEndScene(pDevice));
     Initialize(pDevice);
     PrepareMeasurement(pDevice);
     PrepareCursorState(pDevice);

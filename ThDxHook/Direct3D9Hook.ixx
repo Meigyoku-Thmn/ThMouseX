@@ -20,6 +20,19 @@ import common.helper;
     dev->SetTextureStageState(i, D3DTSS_COLORARG1, arg1); \
     dev->SetTextureStageState(i, D3DTSS_COLORARG2, arg2)
 
+#define AllowOnlyOneSingleDevice(fallbackRoute) \
+    static DWORD firstReturnAddress; \
+    DWORD currentReturnAddress; \
+    __asm { \
+        __asm push eax \
+        __asm mov eax, [ebp + 4] \
+        __asm mov currentReturnAddress, eax \
+        __asm pop eax \
+    } \
+    if (firstReturnAddress != 0 && firstReturnAddress != currentReturnAddress) \
+    return fallbackRoute; \
+    firstReturnAddress = currentReturnAddress
+
 constexpr auto ResetIdx = 16;
 constexpr auto EndSceneIdx = 42;
 constexpr auto ErrorMessageTitle = "D3D9 Hook Setup Error";
@@ -140,7 +153,6 @@ HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPrese
 
 /*
 this routine:
-- determine g_isWindowMode
 - remove window's border if game is fullscreened (exclusive mode)
 - determine g_pixelRate
 - determine g_pixelOffset
@@ -149,7 +161,6 @@ void PrepareMeasurement(IDirect3DDevice9* pDevice) {
     if (measurementPrepared)
         return;
     measurementPrepared = true;
-    g_isWindowMode = true;
     RECTSIZE clientSize;
     if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
         return;
@@ -164,7 +175,6 @@ void PrepareMeasurement(IDirect3DDevice9* pDevice) {
         return;
     // (Heuristic) if client size is smaller than d3d size then it's likely that we are in fullscreen mode
     if (d3dSize.Width > UINT(clientSize.width()) || d3dSize.Height > UINT(clientSize.height())) {
-        g_isWindowMode = false;
         // clear border to avoid "click-out-of-bound"
         RemoveWindowBorder(d3dSize.Width, d3dSize.Height);
     }
@@ -182,10 +192,6 @@ void PrepareCursorState(IDirect3DDevice9* pDevice) {
     if (cursorStatePrepared)
         return;
     cursorStatePrepared = true;
-    if (g_isWindowMode != true) {
-        d3dScale = 1.f;
-        return;
-    }
     IDirect3DSurface9* pSurface;
     auto rs = pDevice->GetRenderTarget(0, &pSurface);
     if (rs != D3D_OK) {
@@ -218,7 +224,7 @@ void RenderCursor(IDirect3DDevice9* pDevice) {
     // scale mouse cursor's position from screen coordinate to D3D coordinate
     POINT pointerPosition = GetPointerPosition();
     D3DXVECTOR3 cursorPositionD3D(float(pointerPosition.x), float(pointerPosition.y), 0.f);
-    if (g_isWindowMode == true && d3dScale != 0.f && d3dScale != 1.f)
+    if (d3dScale != 0.f && d3dScale != 1.f)
         cursorPositionD3D /= d3dScale;
 
     cursorSprite->Begin(D3DXSPRITE_ALPHABLEND);
@@ -247,6 +253,7 @@ void RenderCursor(IDirect3DDevice9* pDevice) {
 }
 
 HRESULT WINAPI D3DEndScene(IDirect3DDevice9* pDevice) {
+    AllowOnlyOneSingleDevice(OriEndScene(pDevice));
     Initialize(pDevice);
     PrepareMeasurement(pDevice);
     PrepareCursorState(pDevice);

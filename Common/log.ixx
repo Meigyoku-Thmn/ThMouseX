@@ -1,10 +1,15 @@
 module;
 
+#ifdef _DEBUG
 #include "framework.h"
 #include "macro.h"
 #include <iostream>
+#include <chrono>
+#endif
 
 export module common.log;
+
+using namespace std;
 
 #ifdef _DEBUG
 bool consoleLoaded = false;
@@ -28,8 +33,8 @@ void OpenConsole() {
 }
 #endif
 
-export DLLEXPORT int ConsoleLog(const char* _Format, ...) {
 #ifdef _DEBUG
+export DLLEXPORT int ConsoleLog(const char* _Format, ...) {
     if (consoleLoaded == false) {
         OpenConsole();
         consoleLoaded = true;
@@ -39,7 +44,19 @@ export DLLEXPORT int ConsoleLog(const char* _Format, ...) {
     auto rs = vprintf(_Format, args);
     va_end(args);
     return rs;
-#else
-    return 0;
-#endif
 }
+#endif
+
+#ifdef _DEBUG
+export DLLEXPORT void PrintFPS() {
+    using namespace chrono;
+    static time_point<steady_clock> oldTime = high_resolution_clock::now();
+    static int fps; fps++;
+
+    if (duration_cast<seconds>(high_resolution_clock::now() - oldTime) >= seconds{1}) {
+        oldTime = high_resolution_clock::now();
+        ConsoleLog("FPS: %d\n", fps);
+        fps = 0;
+    }
+}
+#endif

@@ -62,45 +62,44 @@ constexpr UCHAR BlackIntensityLimit = 16;
 export DLLEXPORT void CalculateNextModulate(UCHAR& modulate, ModulateStage& modulateStage) {
     switch (modulateStage) {
         case WhiteInc: WhiteInc:
-            if (modulate == WhiteIntensityLimit) {
-                modulateStage = WhiteDec;
-                goto WhiteDec;
-            } else {
-                modulate += Delta;
-            }
-            break;
+    if (modulate == WhiteIntensityLimit) {
+        modulateStage = WhiteDec;
+        goto WhiteDec;
+    } else {
+        modulate += Delta;
+    }
+    break;
         case WhiteDec: WhiteDec:
-            if (modulate == 0) {
-                modulateStage = BlackInc;
-                modulate = BlackIntensityLimit;
-            } else {
-                modulate -= Delta;
-            }
-            break;
+    if (modulate == 0) {
+        modulateStage = BlackInc;
+        modulate = BlackIntensityLimit;
+    } else {
+        modulate -= Delta;
+    }
+    break;
         case BlackInc: BlackInc:
-            if (modulate == 0) {
-                modulateStage = BlackDec;
-                goto BlackDec;
-            } else {
-                modulate -= Delta;
-            }
-            break;
+    if (modulate == 0) {
+        modulateStage = BlackDec;
+        goto BlackDec;
+    } else {
+        modulate -= Delta;
+    }
+    break;
         case BlackDec: BlackDec:
-            if (modulate == BlackIntensityLimit) {
-                modulateStage = WhiteInc;
-                modulate = 0;
-            } else {
-                modulate += Delta;
-            }
-            break;
+    if (modulate == BlackIntensityLimit) {
+        modulateStage = WhiteInc;
+        modulate = 0;
+    } else {
+        modulate += Delta;
+    }
+    break;
     }
 }
 
 export DLLEXPORT POINT GetPointerPosition() {
     POINT pointerPosition;
     GetCursorPos(&pointerPosition);
-    if (g_isWindowMode == true)
-        ScreenToClient(g_hFocusWindow, &pointerPosition);
+    ScreenToClient(g_hFocusWindow, &pointerPosition);
     return pointerPosition;
 }
 

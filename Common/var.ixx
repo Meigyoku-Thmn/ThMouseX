@@ -15,7 +15,6 @@ export DLLEXPORT HWND             g_hFocusWindow;
 export DLLEXPORT bool             g_leftMousePressed;
 export DLLEXPORT bool             g_midMousePressed;
 export DLLEXPORT bool             g_inputEnabled;
-export DLLEXPORT bool             g_isWindowMode;
 export DLLEXPORT float            g_pixelRate = 1;
 export DLLEXPORT FloatPoint       g_pixelOffset{1, 1};
 
