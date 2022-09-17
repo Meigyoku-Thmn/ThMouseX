@@ -8,11 +8,23 @@ export module common.datatype;
 export constexpr auto PROCESS_NAME_MAX_LEN = 64;
 export constexpr auto ADDRESS_CHAIN_MAX_LEN = 8;
 export constexpr auto GAME_CONFIG_MAX_LEN = 128;
-export constexpr auto TEXTURE_FILE_PATH_LEN = 256;
+
+export enum ModulateStage {
+    WhiteInc, WhiteDec, BlackInc, BlackDec,
+};
 
 export struct UINTSIZE {
-    unsigned int width;
-    unsigned int height;
+    UINT width;
+    UINT height;
+};
+
+export struct RECTSIZE: RECT {
+    UNBOUND inline LONG width() const {
+        return right;
+    }
+    UNBOUND inline LONG height() const {
+        return bottom;
+    }
 };
 
 export enum PointDataType {
@@ -39,10 +51,10 @@ export union TypedPoint {
     FloatPoint  FloatData;
 };
 
-export struct DLLEXPORT AddressChain {
+export struct AddressChain {
     int     Length;
     DWORD   Level[ADDRESS_CHAIN_MAX_LEN];
-    DWORD   value() {
+    UNBOUND inline DWORD value() {
         auto address = Level[0];
         for (int i = 1; i < Length; i++) {
             address = *(DWORD*)address;

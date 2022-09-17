@@ -16,19 +16,19 @@ struct SDLLHook;
 export bool HookAPICalls(SDLLHook* Hook);
 
 export struct SFunctionHook {
-    const char *Name;         // Function name, e.g. "DirectInput8Create".
-    DWORD *HookFn;      // Address of your function.
-    DWORD *OrigFn;      // Stored by HookAPICalls, the address of the original function.
+    const char* Name;        // Function name, e.g. "DirectInput8Create".
+    DWORD*      HookFn;      // Address of your function.
+    DWORD*      OrigFn;      // Stored by HookAPICalls, the address of the original function.
 };
 
-
+#pragma warning(disable: 4200) // Trailing Array Idiom
 export struct SDLLHook {
     // Name of the DLL, e.g. "DDRAW.DLL"
-    const char *Name;
+    const char* Name;
 
     // Set true to call the default for all non-hooked functions before they are executed.
-    bool UseDefault;
-    void *DefaultFn;
+    bool  UseDefault;
+    void* DefaultFn;
 
     // Function hook array. Terminated with a NULL Name field.
     SFunctionHook Functions[];
@@ -67,7 +67,7 @@ void __cdecl DefaultHook(PVOID dummy) {
     // pointer math!  &dummy-1 really subtracts sizeof(PVOID)
     PDWORD pRetAddr = (PDWORD)(&dummy - 1);
 
-    DLPD_IAT_STUB *pDLPDStub = (DLPD_IAT_STUB*)(*pRetAddr - 5);
+    DLPD_IAT_STUB* pDLPDStub = (DLPD_IAT_STUB*)(*pRetAddr - 5);
 
     pDLPDStub->count++;
 
@@ -99,7 +99,7 @@ PIMAGE_NT_HEADERS PEHeaderFromHModule(HMODULE hModule) {
 
 //===========================================================================
 // Builds stubs for and redirects the IAT for one DLL (pImportDesc)
-bool RedirectIAT(SDLLHook *DLLHook, PIMAGE_IMPORT_DESCRIPTOR pImportDesc, PVOID pBaseLoadAddr) {
+bool RedirectIAT(SDLLHook* DLLHook, PIMAGE_IMPORT_DESCRIPTOR pImportDesc, PVOID pBaseLoadAddr) {
     PIMAGE_THUNK_DATA pIAT;     // Ptr to import address table
     PIMAGE_THUNK_DATA pINT;     // Ptr to import names table
     PIMAGE_THUNK_DATA pIteratingIAT;
@@ -146,7 +146,7 @@ bool RedirectIAT(SDLLHook *DLLHook, PIMAGE_IMPORT_DESCRIPTOR pImportDesc, PVOID 
     }
 
     // If the Default hook is enabled, build an array of redirection stubs in the processes memory.
-    DLPD_IAT_STUB *pStubs = 0;
+    DLPD_IAT_STUB* pStubs = 0;
     if (DLLHook->UseDefault) {
         // Allocate memory for the redirection stubs.  Make one extra stub at the
         // end to be a sentinel
@@ -160,14 +160,14 @@ bool RedirectIAT(SDLLHook *DLLHook, PIMAGE_IMPORT_DESCRIPTOR pImportDesc, PVOID 
     pIteratingIAT = pIAT;
 
     while (pIteratingIAT->u1.Function) {
-        void *HookFn = 0;  // Set to either the SFunctionHook or pStubs.
+        void* HookFn = 0;  // Set to either the SFunctionHook or pStubs.
 
         if (!IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))  // import by name
         {
             PIMAGE_IMPORT_BY_NAME pImportName = MakePtr(PIMAGE_IMPORT_BY_NAME, pBaseLoadAddr, pINT->u1.AddressOfData);
 
             // Iterate through the hook functions, searching for this import.
-            SFunctionHook *FHook = DLLHook->Functions;
+            SFunctionHook* FHook = DLLHook->Functions;
             while (FHook->Name) {
                 if (lstrcmpi(FHook->Name, (char*)pImportName->Name) == 0) {
                     // Save the old function in the SFunctionHook structure and get the new one.
@@ -232,7 +232,7 @@ bool RedirectIAT(SDLLHook *DLLHook, PIMAGE_IMPORT_DESCRIPTOR pImportDesc, PVOID 
 
 //===========================================================================
 // Top level routine to find the EXE's imports, and redirect them
-bool HookAPICalls(SDLLHook *Hook) {
+bool HookAPICalls(SDLLHook* Hook) {
     if (!Hook)
         return false;
 

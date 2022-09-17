@@ -6,8 +6,8 @@ export module core.setcursorhook;
 
 import core.apihijack;
 
-export typedef HCURSOR(WINAPI *SetCursor_t)(HCURSOR hCursor);
-export typedef int (WINAPI *ShowCursor_t)(BOOL bShow);
+export using SetCursor_t = HCURSOR(WINAPI*)(HCURSOR hCursor);
+export using ShowCursor_t = int (WINAPI*)(BOOL bShow);
 
 HCURSOR WINAPI MySetCursor(HCURSOR hCursor);
 int WINAPI MyShowCursor(BOOL bShow);

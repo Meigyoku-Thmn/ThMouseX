@@ -1,10 +1,12 @@
 module;
 
 #include "framework.h"
+#include <cmath>
 
 export module core.inputdeterminte;
 
 import common.var;
+import common.helper;
 
 export constexpr auto USE_BOMB = 0b0000'0001;
 export constexpr auto USE_SPECIAL = 0b0000'0010;
@@ -27,11 +29,11 @@ export DWORD DetermineGameInput() {
     if (g_inputEnabled) {
         auto address = g_currentConfig.Address.value();
         if (address != 0) {
-            POINT playerPos{}, mousePos;
+            POINT playerPos{};
 
             auto calulatePosition = [&]<typename T>(T * pPosition) {
-                playerPos.x = pPosition->X / g_pixelRate + g_pixelOffset.X;
-                playerPos.y = pPosition->Y / g_pixelRate + g_pixelOffset.Y;
+                playerPos.x = lrint(pPosition->X / g_pixelRate + g_pixelOffset.X);
+                playerPos.y = lrint(pPosition->Y / g_pixelRate + g_pixelOffset.Y);
             };
 
             if (g_currentConfig.PosDataType == Int_DataType)
@@ -41,9 +43,7 @@ export DWORD DetermineGameInput() {
             else if (g_currentConfig.PosDataType == Short_DataType)
                 calulatePosition((ShortPoint*)address);
 
-            GetCursorPos(&mousePos);
-            if (g_isWindowMode == true)
-                ScreenToClient(g_hFocusWindow, &mousePos);
+            auto mousePos = GetPointerPosition();
 
             if (playerPos.x < mousePos.x - 1)
                 gameInput |= MOVE_RIGHT;

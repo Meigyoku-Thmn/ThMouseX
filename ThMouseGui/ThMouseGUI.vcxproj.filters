@@ -43,6 +43,7 @@
     <Image Include="ThMouse.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="cursor.png" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ThMouse.rc">

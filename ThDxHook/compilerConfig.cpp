@@ -4,4 +4,3 @@
 #pragma comment(lib, "Lib/x86/D3dx9.lib")
 #pragma comment(lib, "Lib/x86/dinput8.lib")
 #pragma comment(lib, "Lib/x86/dxguid.lib")
-#pragma warning(disable: 4200) // Trailing Array Idiom

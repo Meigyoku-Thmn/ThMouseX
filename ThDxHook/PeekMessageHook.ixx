@@ -8,10 +8,8 @@ import core.apihijack;
 import core.setcursorhook;
 import common.var;
 
-typedef BOOL(WINAPI * PeekMessageA_t)(
-    LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
-typedef BOOL(WINAPI * PeekMessageW_t)(
-    LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
+using PeekMessageA_t = BOOL(WINAPI*)(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
+using PeekMessageW_t = BOOL(WINAPI*)(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
 
 BOOL WINAPI MyPeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
 BOOL WINAPI MyPeekMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);
@@ -24,7 +22,7 @@ export SDLLHook PeekMessageAHook = {
         {.Name = "PeekMessageA", .HookFn = (DWORD*)MyPeekMessageA},
         {.Name = "PeekMessageW", .HookFn = (DWORD*)MyPeekMessageW},
         {},
-    }
+    },
 };  
 
 HCURSOR _hCursor2 = 0;

@@ -9,9 +9,9 @@ export module common.minhook;
 using namespace std;
 
 export struct MHookConfig {
-    LPVOID pTarget;
-    LPVOID pDetour;
-    LPVOID *ppOriginal;
+    LPVOID  pTarget;
+    LPVOID  pDetour;
+    LPVOID* ppOriginal;
 };
 
 export DLLEXPORT bool MHook_Initialize() {

@@ -10,10 +10,12 @@ import core.directx9hook;
 import core.directinputhook;
 import dx8.hook;
 import common.datatype;
+import common.helper;
+import common.var;
 
 using namespace std;
 
-export bool populateMethodRVAs(void) {
+export bool PopulateMethodRVAs() {
     if (!PopulateD3D9MethodRVAs())
         return false;
     if (!PopulateD3D8MethodRVAs())
@@ -23,9 +25,11 @@ export bool populateMethodRVAs(void) {
     return true;
 }
 
-export bool readGamesFile(GameConfigArray *pConfig) {
+export bool ReadGamesFile() {
     // TODO: use a better configuration format
     ifstream gamesFile("games.txt");
+    auto& pConfig = gs_gameConfigArray;
+    pConfig = {};
     if (!gamesFile) {
         MessageBox(NULL, "Can not find games file.", "Launcher", MB_OK | MB_ICONERROR);
         return false;
@@ -33,25 +37,26 @@ export bool readGamesFile(GameConfigArray *pConfig) {
     int configIdx;
     // read each line of config file
     for (configIdx = 0; configIdx < GAME_CONFIG_MAX_LEN && !gamesFile.eof(); configIdx++) {
-        string line;
-        getline(gamesFile, line);
+        string _line;
+        getline(gamesFile, _line);
+        auto lineView = Trim(_line);
 
         // ignore empty line
-        if (line.empty()) {
+        if (lineView.empty()) {
             configIdx--;
             continue;
         }
 
         // ignore comment line
-        if (line[0] == ';') {
+        if (lineView[0] == ';') {
             configIdx--;
             continue;
         }
 
         // use a "tokenizer"
-        stringstream lineStream(line);
+        stringstream lineStream{string(lineView)};
         stringstream converter;
-        auto &currentConfig = pConfig->Configs[configIdx];
+        auto& currentConfig = pConfig.Configs[configIdx];
 
         // read process name
         string processName;
@@ -80,7 +85,7 @@ export bool readGamesFile(GameConfigArray *pConfig) {
             configIdx--;
             continue;
         }
-        
+
         // read data type
         string dataType;
         lineStream >> dataType;
@@ -132,12 +137,12 @@ export bool readGamesFile(GameConfigArray *pConfig) {
         MessageBox(NULL, "No valid data in config file.", "Launcher", MB_OK | MB_ICONERROR);
         return false;
     }
-    pConfig->Length = configIdx;
+    pConfig.Length = configIdx;
 
     return true;
 }
 
-export bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePath) {
+export bool ReadIniFile() {
     ifstream iniFile("ThMouse.ini");
     if (!iniFile) {
         MessageBox(NULL, "Can not find ThMouse.ini file.", "Launcher", MB_OK | MB_ICONERROR);
@@ -156,7 +161,7 @@ export bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePat
             auto numStr = line.substr(eqIndex + 1);
             stringstream ss;
             ss << numStr;
-            ss >> *pLeftButton;
+            ss >> gs_boomButton;
         } else if (line.find("CursorTexture") != string::npos) {
             auto eqIndex = line.find('=');
             auto pathStr = line.substr(eqIndex + 1);
@@ -164,14 +169,19 @@ export bool readIniFile(int *pLeftButton, int *pMidButton, char *pTextureFilePat
             ss << pathStr;
             string texturePath;
             ss >> texturePath;
-            memcpy(pTextureFilePath, texturePath.c_str(), texturePath.size());
-            pTextureFilePath[texturePath.size()] = '\0';
+            GetFullPathName(texturePath.c_str(), MAX_PATH, gs_textureFilePath, NULL);
         } else if (line.find("MiddleButton") != string::npos) {
             auto eqIndex = line.find('=');
             auto numStr = line.substr(eqIndex + 1);
             stringstream ss;
             ss << numStr;
-            ss >> *pMidButton;
+            ss >> gs_extraButton;
+        } else if (line.find("CursorOnResolutionX") != string::npos) {
+            auto eqIndex = line.find('=');
+            auto numStr = line.substr(eqIndex + 1);
+            stringstream ss;
+            ss << numStr;
+            ss >> gs_textureBaseResolutionX;
         }
     }
     return true;

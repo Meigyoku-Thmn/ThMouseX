@@ -18,10 +18,10 @@ constexpr auto ErrorMessageTitle = "DInput Hook Setup Error";
 
 using namespace std;
 
-HRESULT WINAPI MyGetDeviceStateDInput8(IDirectInputDevice8 *pDevice, DWORD cbData, LPVOID lpvData);
+HRESULT WINAPI MyGetDeviceStateDInput8(IDirectInputDevice8* pDevice, DWORD cbData, LPVOID lpvData);
 decltype(&MyGetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
-constexpr const char* GetDInputErrStr(const int errorCode) {
+inline const char* GetDInputErrStr(const int errorCode) {
     if (errorCode == DIERR_NOTINITIALIZED)
         return "DIERR_NOTINITIALIZED";
     if (errorCode == DIERR_NOINTERFACE)
@@ -40,12 +40,12 @@ constexpr const char* GetDInputErrStr(const int errorCode) {
 }
 
 export DLLEXPORT bool PopulateDInputMethodRVAs() {
-    bool result = false;
-    DWORD *vtable{};
-    HRESULT rs{};
-    IDirectInput8 *pDInput8{};
-    IDirectInputDevice8 *pDevice8{};
-    DWORD baseAddress{};
+    bool                 result = false;
+    DWORD*               vtable{};
+    HRESULT              rs{};
+    IDirectInput8*       pDInput8{};
+    IDirectInputDevice8* pDevice8{};
+    DWORD                baseAddress{};
 
     rs = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8A, (PVOID*)&pDInput8, NULL);
     if (rs != DI_OK) {
@@ -78,11 +78,11 @@ export vector<MHookConfig> D3InputHookConfig() {
     };
 }
 
-HRESULT WINAPI MyGetDeviceStateDInput8(IDirectInputDevice8 *pDevice, DWORD cbData, LPVOID lpvData) {
+HRESULT WINAPI MyGetDeviceStateDInput8(IDirectInputDevice8* pDevice, DWORD cbData, LPVOID lpvData) {
     auto hr = OriGetDeviceStateDInput8(pDevice, cbData, lpvData);
     if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
         g_handledByDirectInput = true;
-        auto keys = static_cast<BYTE*>(lpvData);
+        auto keys = PBYTE(lpvData);
         auto gameInput = DetermineGameInput();
         if (gameInput & USE_BOMB)
             keys[DIK_X] |= 0x80;
