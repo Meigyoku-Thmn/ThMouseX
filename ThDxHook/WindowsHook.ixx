@@ -10,6 +10,8 @@ import common.helper;
 import common.var;
 import core.directx9hook;
 import dx8.hook;
+import core.var;
+import core.messagequeuehook;
 
 // Shared data among all instances.
 #pragma data_seg(".HOOKDAT")
@@ -17,9 +19,11 @@ HHOOK hHookW = NULL;
 #pragma data_seg()
 #pragma comment(linker, "/SECTION:.HOOKDAT,RWS")
 
-export HINSTANCE hinstance;
-
-LRESULT CALLBACK hookprocW(int ncode, WPARAM wparam, LPARAM lparam) {
+bool hooked;
+LRESULT CALLBACK HookprocW(int ncode, WPARAM wparam, LPARAM lparam) {
+    if (!hooked && hookApplied)
+        NormalizeCursor();
+    hooked = true;
     // TODO: add a way for user to specify window class name
     if (g_hFocusWindow == NULL && ncode == HCBT_CREATEWND) {
         auto hwnd = (HWND)wparam;
@@ -33,7 +37,7 @@ LRESULT CALLBACK hookprocW(int ncode, WPARAM wparam, LPARAM lparam) {
 }
 
 export DLLEXPORT bool InstallThDxHook() {
-    hHookW = SetWindowsHookExW(WH_CBT, hookprocW, hinstance, NULL);
+    hHookW = SetWindowsHookExW(WH_CBT, HookprocW, hinstance, NULL);
     if (hHookW == NULL) {
         ReportLastError("Install ThDxHook.dll: Error");
         return false;

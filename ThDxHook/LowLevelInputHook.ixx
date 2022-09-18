@@ -2,17 +2,15 @@ module;
 
 #include "framework.h"
 #include <mmsystem.h>
+#include <vector>
 
 export module core.lowlevelinputhook;
 
-import core.apihijack;
+import common.minhook;
 import core.inputdeterminte;
 import common.var;
 
-BOOL WINAPI MyGetKeyboardState(PBYTE lpKeyState);
-MMRESULT WINAPI MyJoyGetDevCapsA(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc);
-MMRESULT WINAPI MyJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji);
-MMRESULT WINAPI MyJoyGetPos(UINT uJoyID, LPJOYINFO pji);
+using namespace std;
 
 constexpr auto X_MIN = 0;
 constexpr auto X_MID = 32767;
@@ -24,23 +22,24 @@ constexpr auto Y_MAX = 65535;
 constexpr auto VK_X = 0x58;
 constexpr auto VK_C = 0x43;
 
-enum {
-    User32FN_GetKeyboardState = 0,
-};
-export SDLLHook User32Hook = {
-    .Name = "USER32.DLL",
-    .UseDefault = false,
-    .DefaultFn = NULL,
-    .Functions = {
-        {.Name = "GetKeyboardState", .HookFn = (DWORD*)MyGetKeyboardState},
-        {},
-    },
-};
-using OriGetKeyboardState = BOOL(WINAPI*)(PBYTE lpKeyState);
+BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState);
+decltype(&_GetKeyboardState) OriGetKeyboardState;
+MMRESULT WINAPI _JoyGetDevCapsA(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc);
+decltype(&_JoyGetDevCapsA) OriJoyGetDevCapsA;
+MMRESULT WINAPI _JoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji);
+decltype(&_JoyGetPosEx) OriJoyGetPosEx;
+MMRESULT WINAPI _JoyGetPos(UINT uJoyID, LPJOYINFO pji);
+decltype(&_JoyGetPos) OriJoyGetPos;
 
-BOOL WINAPI MyGetKeyboardState(PBYTE lpKeyState) {
-    auto old_func = (OriGetKeyboardState)User32Hook.Functions[User32FN_GetKeyboardState].OrigFn;
-    auto rs = old_func(lpKeyState);
+export vector<MHookApiConfig> LowLevelInputHookConfig{
+    {L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, (PVOID*)&OriGetKeyboardState},
+    {L"WINMM.DLL", "joyGetDevCapsA", &_JoyGetDevCapsA, (PVOID*)&OriJoyGetDevCapsA},
+    {L"WINMM.DLL", "joyGetPosEx", &_JoyGetPosEx, (PVOID*)&OriJoyGetPosEx},
+    {L"WINMM.DLL", "joyGetPos", &_JoyGetPos, (PVOID*)&OriJoyGetPos},
+};
+
+BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState) {
+    auto rs = OriGetKeyboardState(lpKeyState);
     if (g_handledByDirectInput != true && rs != 0) {
         g_handledByGetKeyboardState = true;
         auto gameInput = DetermineGameInput();
@@ -60,26 +59,9 @@ BOOL WINAPI MyGetKeyboardState(PBYTE lpKeyState) {
     return rs;
 }
 
-enum {
-    WinmmFN_joyGetDevCapsA = 0,
-    WinmmFN_joyGetPosEx = 1,
-    WinmmFN_joyGetPos = 2,
-};
-export SDLLHook WinmmHook = {
-    .Name = "WINMM.DLL",
-    .UseDefault = false,
-    .DefaultFn = NULL,
-    .Functions = {
-        {.Name = "joyGetDevCapsA", .HookFn = (DWORD*)MyJoyGetDevCapsA},
-        {.Name = "joyGetPosEx", .HookFn = (DWORD*)MyJoyGetPosEx},
-        {.Name = "joyGetPos", .HookFn = (DWORD*)MyJoyGetPos},
-        {},
-    },
-};
-
 bool joyPadInitialized = false;
 
-MMRESULT WINAPI MyJoyGetDevCapsA(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc) {
+MMRESULT WINAPI _JoyGetDevCapsA(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc) {
     joyPadInitialized = true;
     strcpy(pjc->szPname, "ThMouse");
     pjc->wNumButtons = 32;
@@ -93,7 +75,7 @@ MMRESULT WINAPI MyJoyGetDevCapsA(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc) {
     return JOYERR_NOERROR;
 }
 
-MMRESULT WINAPI MyJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji) {
+MMRESULT WINAPI _JoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji) {
     if (joyPadInitialized == false)
         return JOYERR_NOERROR;
     pji->dwXpos = X_MID;
@@ -118,7 +100,7 @@ MMRESULT WINAPI MyJoyGetPosEx(UINT uJoyID, LPJOYINFOEX pji) {
     return JOYERR_NOERROR;
 }
 
-MMRESULT WINAPI MyJoyGetPos(UINT uJoyID, LPJOYINFO pji) {
+MMRESULT WINAPI _JoyGetPos(UINT uJoyID, LPJOYINFO pji) {
     if (joyPadInitialized == false)
         return JOYERR_NOERROR;
     pji->wXpos = X_MID;

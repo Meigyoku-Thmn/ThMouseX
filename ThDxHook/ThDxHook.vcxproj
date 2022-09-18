@@ -159,15 +159,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="apihijack.ixx" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="InputDetermine.ixx" />
     <ClCompile Include="compilerConfig.cpp" />
     <ClCompile Include="Direct3D9Hook.ixx" />
     <ClCompile Include="DirectInputHook.ixx" />
     <ClCompile Include="LowLevelInputHook.ixx" />
-    <ClCompile Include="PeekMessageHook.ixx" />
-    <ClCompile Include="SetCursorHook.ixx" />
+    <ClCompile Include="MessageQueueHook.ixx" />
+    <ClCompile Include="Variables.ixx" />
     <ClCompile Include="WindowsHook.ixx" />
   </ItemGroup>
   <ItemGroup>

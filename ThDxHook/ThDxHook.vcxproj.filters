@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="apihijack.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -26,19 +23,19 @@
     <ClCompile Include="LowLevelInputHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PeekMessageHook.ixx">
+    <ClCompile Include="MessageQueueHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WindowsHook.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SetCursorHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputDetermine.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="compilerConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Variables.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -257,7 +257,7 @@ void RenderCursor(IDirect3DDevice8* pDevice) {
 
 
 HRESULT WINAPI D3DEndScene(IDirect3DDevice8* pDevice) {
-    AllowOnlyOneSingleDevice(OriEndScene(pDevice));
+    //AllowOnlyOneSingleDevice(OriEndScene(pDevice));
     Initialize(pDevice);
     PrepareMeasurement(pDevice);
     PrepareCursorState(pDevice);

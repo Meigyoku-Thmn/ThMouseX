@@ -5,6 +5,7 @@ module;
 #include "macro.h"
 #include <iostream>
 #include <chrono>
+#include <cstdio>
 #endif
 
 export module common.log;
@@ -34,6 +35,26 @@ void OpenConsole() {
 #endif
 
 #ifdef _DEBUG
+export DLLEXPORT int ConsoleLogAndFile(const char* _Format, ...) {
+    if (consoleLoaded == false) {
+        OpenConsole();
+        consoleLoaded = true;
+    }
+    va_list args;
+    va_start(args, _Format);
+    while (true) {
+        FILE* logFile;
+        logFile = fopen("D:\\thmouse_log.txt", "a+");
+        if (logFile == NULL)
+            break;
+        vfprintf(logFile, _Format, args);
+        fclose(logFile);
+        break;
+    }
+    auto rs = vprintf(_Format, args);
+    va_end(args);
+    return rs;
+}
 export DLLEXPORT int ConsoleLog(const char* _Format, ...) {
     if (consoleLoaded == false) {
         OpenConsole();

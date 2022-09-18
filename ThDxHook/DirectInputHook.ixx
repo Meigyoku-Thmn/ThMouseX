@@ -8,7 +8,6 @@ module;
 
 export module core.directinputhook;
 
-import core.apihijack;
 import common.var;
 import core.inputdeterminte;
 import common.minhook;
@@ -18,8 +17,8 @@ constexpr auto ErrorMessageTitle = "DInput Hook Setup Error";
 
 using namespace std;
 
-HRESULT WINAPI MyGetDeviceStateDInput8(IDirectInputDevice8* pDevice, DWORD cbData, LPVOID lpvData);
-decltype(&MyGetDeviceStateDInput8) OriGetDeviceStateDInput8;
+HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8* pDevice, DWORD cbData, LPVOID lpvData);
+decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
 inline const char* GetDInputErrStr(const int errorCode) {
     if (errorCode == DIERR_NOTINITIALIZED)
@@ -71,14 +70,14 @@ CleanAndReturn:
     return result;
 }
 
-export vector<MHookConfig> D3InputHookConfig() {
+export vector<MHookConfig> DInputHookConfig() {
     auto baseAddress = (DWORD)GetModuleHandleA("DInput8.dll");
     return {
-        {PVOID(baseAddress + gs_dinput8_GetDeviceState_RVA), &MyGetDeviceStateDInput8, (PVOID*)&OriGetDeviceStateDInput8},
+        {PVOID(baseAddress + gs_dinput8_GetDeviceState_RVA), &GetDeviceStateDInput8, (PVOID*)&OriGetDeviceStateDInput8},
     };
 }
 
-HRESULT WINAPI MyGetDeviceStateDInput8(IDirectInputDevice8* pDevice, DWORD cbData, LPVOID lpvData) {
+HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8* pDevice, DWORD cbData, LPVOID lpvData) {
     auto hr = OriGetDeviceStateDInput8(pDevice, cbData, lpvData);
     if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
         g_handledByDirectInput = true;
