@@ -60,6 +60,12 @@ inline const char* GetD3dErrStr(const int errorCode) {
     return "Unknown error.";
 }
 
+using CallbackType = void (*)(void);
+CallbackType initializeCallback;
+export DLLEXPORT void RegisterD3D8InitializeCallback(CallbackType callback) {
+    initializeCallback = callback;
+}
+
 export DLLEXPORT bool PopulateD3D8MethodRVAs() {
     bool result = false;
     DWORD* vtable{};
@@ -134,6 +140,8 @@ void Initialize(IDirect3DDevice8* device) {
     if (initialized)
         return;
     initialized = true;
+    if (initializeCallback)
+        initializeCallback();
     D3DDEVICE_CREATION_PARAMETERS params;
     device->GetCreationParameters(&params);
     g_hFocusWindow = params.hFocusWindow;

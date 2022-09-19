@@ -53,8 +53,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                     // hook Joypad and GetKeyboardState for input manipulation
                     MHook_CreateHook(LowLevelInputHookConfig);
 
-                    // hook Message Loop for additional runtime configuration
-                    MHook_CreateHook(PeekMessageHookConfig);
+                    // hook Message Queue for additional runtime configuration
+                    MHook_CreateHook(MessageQueueHookConfig);
 
 
                     MHook_EnableAll();

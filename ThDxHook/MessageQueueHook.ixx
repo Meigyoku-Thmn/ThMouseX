@@ -10,6 +10,9 @@ import common.minhook;
 import common.var;
 import common.helper;
 import core.var;
+import common.log;
+import core.directx9hook;
+import dx8.hook;
 
 using namespace std;
 
@@ -18,17 +21,36 @@ decltype(&_SetCursor) OriSetCursor;
 int WINAPI _ShowCursor(BOOL bShow);
 decltype(&_ShowCursor) OriShowCursor;
 
-export vector<MHookApiConfig> PeekMessageHookConfig{
+export vector<MHookApiConfig> MessageQueueHookConfig{
     {L"USER32.DLL", "SetCursor", &_SetCursor, (PVOID*)&OriSetCursor},
     {L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor},
 };
 
+bool isCursorShow;
+auto hCursor = LoadCursorA(NULL, IDC_ARROW);
+
 void NormalizeCursor() {
+    // set cursor visibility to 0, reset cursor to a normal arrow,
+    // to ensure that there is a visible mouse cursor on the game's config dialog
     while (OriShowCursor(FALSE) >= 0);
     while (OriShowCursor(TRUE) < 0);
-    // cursor visibility should be 0 at this point
-    OriSetCursor(NULL);
+    OriSetCursor(hCursor);
+    isCursorShow = true;
 }
+
+struct OnInit {
+    OnInit() {
+        // hide the mouse cursor when D3D is initialized
+        RegisterD3D8InitializeCallback([] {
+            OriSetCursor(NULL);
+            isCursorShow = false;
+        });
+        RegisterD3D9InitializeCallback([] {
+            OriSetCursor(NULL);
+            isCursorShow = false;
+        });
+    }
+} _;
 
 HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
     return NULL;
@@ -46,14 +68,26 @@ LRESULT CALLBACK CBTProc(int code, WPARAM wparam, LPARAM lparam) {
     return CallNextHookEx(NULL, code, wparam, lparam);
 }
 
+constexpr auto VK_A = 0x41;
+constexpr auto VK_S = 0x53;
+
 bool KeyboardProcInstalled;
-auto hCursor = LoadCursorA(NULL, IDC_ARROW);
 LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam) {
     if (code == HC_ACTION && core_hookApplied) {
-        if (wParam == 0x41)
-            OriSetCursor(NULL); // A key
-        else if (wParam == 0x53)
-            OriSetCursor(hCursor); // S key
+        if (wParam == VK_A) {
+            // A key
+            OriSetCursor(NULL);
+            if (isCursorShow)
+                OriShowCursor(FALSE);
+            isCursorShow = false;
+        }
+        else if (wParam == VK_S) {
+            // S key
+            OriSetCursor(hCursor);
+            if (!isCursorShow)
+                OriShowCursor(TRUE);
+            isCursorShow = true;
+        }
     }
     KeyboardProcInstalled = true;
     return CallNextHookEx(NULL, code, wParam, lParam);
