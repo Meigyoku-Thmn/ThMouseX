@@ -17,7 +17,7 @@ constexpr auto ErrorMessageTitle = "DInput Hook Setup Error";
 
 using namespace std;
 
-HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8* pDevice, DWORD cbData, LPVOID lpvData);
+HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
 decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
 inline const char* GetDInputErrStr(const int errorCode) {
@@ -39,22 +39,22 @@ inline const char* GetDInputErrStr(const int errorCode) {
 }
 
 export DLLEXPORT bool PopulateDInputMethodRVAs() {
-    bool                 result = false;
-    DWORD*               vtable{};
-    HRESULT              rs{};
-    IDirectInput8*       pDInput8{};
-    IDirectInputDevice8* pDevice8{};
-    DWORD                baseAddress{};
+    bool                    result = false;
+    DWORD*                  vtable{};
+    HRESULT                 rs{};
+    IDirectInput8A*         pDInput8{};
+    IDirectInputDevice8A*   pDevice8{};
+    DWORD                   baseAddress{};
 
-    rs = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8A, (PVOID*)&pDInput8, NULL);
+    rs = DirectInput8Create(GetModuleHandleA(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8A, (PVOID*)&pDInput8, NULL);
     if (rs != DI_OK) {
-        MessageBox(NULL, (string("Failed to create an IDirectInput8 instance:") + GetDInputErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, (string("Failed to create an IDirectInput8 instance:") + GetDInputErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
         goto CleanAndReturn;
     }
 
     rs = pDInput8->CreateDevice(GUID_SysKeyboard, &pDevice8, NULL);
     if (rs != DI_OK) {
-        MessageBox(NULL, (string("Failed to create an IDirectInputDevice8 instance:") + GetDInputErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, (string("Failed to create an IDirectInputDevice8 instance:") + GetDInputErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
         goto CleanAndReturn;
     }
 
@@ -77,7 +77,7 @@ export vector<MHookConfig> DInputHookConfig() {
     };
 }
 
-HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8* pDevice, DWORD cbData, LPVOID lpvData) {
+HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData) {
     auto hr = OriGetDeviceStateDInput8(pDevice, cbData, lpvData);
     if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
         g_handledByDirectInput = true;

@@ -17,7 +17,7 @@ char buffer[MAX_PATH];
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH: {
-            hinstance = hModule;
+            core_hInstance = hModule;
             // We don't need thread notifications for what we're doing.
             // Thus, get rid of them, thereby eliminating some of the overhead of this DLL.
             DisableThreadLibraryCalls(hModule);
@@ -58,7 +58,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 
                     MHook_EnableAll();
-                    hookApplied = true;
+                    core_hookApplied = true;
 
                     break;
                 }
@@ -70,10 +70,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         case DLL_THREAD_DETACH:
             break;
         case DLL_PROCESS_DETACH:
-            if (hookApplied) {
-                //CleanUp();
+            if (core_hookApplied)
                 MHook_Uninitialize();
-            }
             break;
     }
     return TRUE;

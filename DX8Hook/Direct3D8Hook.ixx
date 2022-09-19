@@ -77,7 +77,7 @@ export DLLEXPORT bool PopulateD3D8MethodRVAs() {
 
     pD3D = Direct3DCreate8(D3D_SDK_VERSION);
     if (!pD3D) {
-        MessageBox(NULL, "Failed to create an IDirect3D8 instance.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, "Failed to create an IDirect3D8 instance.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
         goto CleanAndReturn;
     }
 
@@ -92,7 +92,7 @@ export DLLEXPORT bool PopulateD3D8MethodRVAs() {
 
     rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
     if (FAILED(rs)) {
-        MessageBox(NULL, (string("Failed to create an IDirect3DDevice8 instance:") + GetD3dErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, (string("Failed to create an IDirect3DDevice8 instance:") + GetD3dErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
         goto CleanAndReturn;
     }
 

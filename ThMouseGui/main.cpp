@@ -3,7 +3,7 @@
 
 import common.datatype;
 import main.config;
-import core.windowshook;
+import core.messagequeuehook;
 
 constexpr auto MAX_LOADSTRING = 100;
 
@@ -22,7 +22,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
     auto hMutex = CreateMutex(NULL, TRUE, "ThMouse");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
-        MessageBox(NULL, "ThMouseX is already running.", "ThMouseX", MB_OK | MB_ICONINFORMATION);
+        MessageBoxA(NULL, "ThMouseX is already running.", "ThMouseX", MB_OK | MB_ICONINFORMATION);
         return 1;
     }
 
@@ -39,9 +39,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
         return 1;
 
     // Initialize global strings
-    LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadString(hInstance, IDC_THMOUSE, szWindowClass, MAX_LOADSTRING);
-    LoadString(hInstance, IDS_BALLOON_INFO, szBalloonInfo, MAX_LOADSTRING);
+    LoadStringA(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+    LoadStringA(hInstance, IDC_THMOUSE, szWindowClass, MAX_LOADSTRING);
+    LoadStringA(hInstance, IDS_BALLOON_INFO, szBalloonInfo, MAX_LOADSTRING);
 
     WNDCLASSEX wcex{
         .cbSize = sizeof(WNDCLASSEX),
@@ -57,18 +57,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
         .lpszClassName = szWindowClass,
         .hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL)),
     };
-    RegisterClassEx(&wcex);
+    RegisterClassExA(&wcex);
 
-    auto hWnd = CreateWindowEx(WS_EX_TOOLWINDOW, szWindowClass, szTitle, WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+    auto hWnd = CreateWindowExA(WS_EX_TOOLWINDOW, szWindowClass, szTitle, WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
     if (!hWnd)
         return 1;
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
     MSG msg;
-    while (GetMessage(&msg, NULL, 0, 0)) {
+    while (GetMessageA(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
-        DispatchMessage(&msg);
+        DispatchMessageA(&msg);
     }
 
     RemoveThDxHook();
@@ -86,12 +86,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 .uID = 0,
                 .uFlags = NIF_ICON | NIF_MESSAGE | NIF_INFO | NIF_TIP,
                 .uCallbackMessage = WM_USER,
-                .hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_THMOUSE)),
+                .hIcon = LoadIconA(hInst, MAKEINTRESOURCE(IDI_THMOUSE)),
             };
-            lstrcpy(nid.szTip, szTitle);
-            lstrcpy(nid.szInfoTitle, szTitle);
-            lstrcpy(nid.szInfo, szBalloonInfo);
-            Shell_NotifyIcon(NIM_ADD, &nid);
+            lstrcpyA(nid.szTip, szTitle);
+            lstrcpyA(nid.szInfoTitle, szTitle);
+            lstrcpyA(nid.szInfo, szBalloonInfo);
+            Shell_NotifyIconA(NIM_ADD, &nid);
             return 0;
         }
         case WM_USER:
@@ -99,8 +99,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 // double click on the system tray icon
                 case WM_LBUTTONDBLCLK:
                     // if click exit then send close event
-                    if (DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, DialogProc) == IDC_ExitButton)
-                        SendMessage(hWnd, WM_CLOSE, wParam, lParam);
+                    if (DialogBoxA(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), NULL, DialogProc) == IDC_ExitButton)
+                        SendMessageA(hWnd, WM_CLOSE, wParam, lParam);
                     return 0;
             }
             break;
@@ -111,7 +111,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 .hWnd = hWnd,
                 .uID = 0,
             };
-            Shell_NotifyIcon(NIM_DELETE, &nid);
+            Shell_NotifyIconA(NIM_DELETE, &nid);
             PostQuitMessage(0);
             return 0;
         }

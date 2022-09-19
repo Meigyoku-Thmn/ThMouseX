@@ -26,9 +26,6 @@
     <ClCompile Include="MessageQueueHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WindowsHook.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="InputDetermine.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>

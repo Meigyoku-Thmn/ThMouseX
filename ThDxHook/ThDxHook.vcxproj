@@ -167,7 +167,6 @@
     <ClCompile Include="LowLevelInputHook.ixx" />
     <ClCompile Include="MessageQueueHook.ixx" />
     <ClCompile Include="Variables.ixx" />
-    <ClCompile Include="WindowsHook.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="macro.h" />

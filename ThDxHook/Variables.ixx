@@ -4,5 +4,5 @@ module;
 
 export module core.var;
 
-export HINSTANCE hinstance;
-export bool hookApplied;
+export HINSTANCE core_hInstance;
+export bool core_hookApplied;

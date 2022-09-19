@@ -26,7 +26,6 @@ export bool PopulateMethodRVAs() {
 }
 
 export bool ReadGamesFile() {
-    // TODO: use a better configuration format
     ifstream gamesFile("games.txt");
     auto& pConfig = gs_gameConfigArray;
     pConfig = {};
