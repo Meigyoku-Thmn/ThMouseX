@@ -40,13 +40,13 @@
     <Image Include="small.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="ThMouse.ico">
+    <Image Include="ThMouseX.ico">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="cursor.png" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ThMouse.rc">
+    <ResourceCompile Include="ThMouseX.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -54,6 +54,6 @@
     <Text Include="games.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ThMouse.ini" />
+    <None Include="ThMouseX.ini" />
   </ItemGroup>
 </Project>

@@ -21,7 +21,7 @@ export DLLEXPORT void ReportLastError(const char* title) {
     auto dwErr = GetLastError();
     // lookup error code and display it
     LPVOID lpMsgBuf{};
-    FormatMessage(
+    FormatMessageA(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
         dwErr,
@@ -30,28 +30,28 @@ export DLLEXPORT void ReportLastError(const char* title) {
         0,
         NULL
     );
-    MessageBox(NULL, (LPCTSTR)lpMsgBuf, title, MB_OK | MB_ICONERROR);
+    MessageBoxA(NULL, (LPCTSTR)lpMsgBuf, title, MB_OK | MB_ICONERROR);
     // Free the buffer.
     LocalFree(lpMsgBuf);
 }
 
-regex whitespace(R"([^\s])", regex::ECMAScript | regex::optimize);
+wregex whitespace(LR"([^\s])", wregex::ECMAScript | wregex::optimize);
 
-export DLLEXPORT string_view LTrim(string_view str) {
-    match_results<string_view::const_iterator> match;
-    auto pos = regex_search(str.cbegin(), str.cend(), match, whitespace) ? match.position(0) : string::npos;
+export DLLEXPORT wstring_view LTrim(wstring_view str) {
+    match_results<wstring_view::const_iterator> match;
+    auto pos = regex_search(str.cbegin(), str.cend(), match, whitespace) ? match.position(0) : wstring::npos;
     str.remove_prefix(min(pos, str.length()));
     return str;
 }
 
-export DLLEXPORT string_view RTrim(string_view str) {
-    match_results<reverse_iterator<string_view::const_iterator>> match;
-    auto pos = regex_search(str.crbegin(), str.crend(), match, whitespace) ? match.position(0) : string::npos;
+export DLLEXPORT wstring_view RTrim(wstring_view str) {
+    match_results<reverse_iterator<wstring_view::const_iterator>> match;
+    auto pos = regex_search(str.crbegin(), str.crend(), match, whitespace) ? match.position(0) : wstring::npos;
     str.remove_suffix(min(pos, str.length()));
     return str;
 }
 
-export DLLEXPORT string_view Trim(string_view str) {
+export DLLEXPORT wstring_view Trim(wstring_view str) {
     return RTrim(LTrim(str));
 }
 

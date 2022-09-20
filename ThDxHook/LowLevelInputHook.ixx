@@ -63,7 +63,7 @@ bool joyPadInitialized = false;
 
 MMRESULT WINAPI _JoyGetDevCapsA(UINT_PTR uJoyID, LPJOYCAPSA pjc, UINT cbjc) {
     joyPadInitialized = true;
-    strcpy(pjc->szPname, "ThMouse");
+    strcpy(pjc->szPname, "ThMouseX");
     pjc->wNumButtons = 32;
     pjc->wMaxButtons = 32;
     pjc->wNumAxes = 2;

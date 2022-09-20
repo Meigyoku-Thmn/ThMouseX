@@ -20,7 +20,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
     UNREFERENCED_PARAMETER(lpCmdLine);
     hInst = hInstance;
 
-    auto hMutex = CreateMutex(NULL, TRUE, "ThMouse");
+    auto hMutex = CreateMutexA(NULL, TRUE, "ThMouseX");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         MessageBoxA(NULL, "ThMouseX is already running.", "ThMouseX", MB_OK | MB_ICONINFORMATION);
         return 1;
@@ -40,22 +40,22 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
     // Initialize global strings
     LoadStringA(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringA(hInstance, IDC_THMOUSE, szWindowClass, MAX_LOADSTRING);
+    LoadStringA(hInstance, IDC_THMOUSEX, szWindowClass, MAX_LOADSTRING);
     LoadStringA(hInstance, IDS_BALLOON_INFO, szBalloonInfo, MAX_LOADSTRING);
 
-    WNDCLASSEX wcex{
+    WNDCLASSEXA wcex{
         .cbSize = sizeof(WNDCLASSEX),
         .style = CS_HREDRAW | CS_VREDRAW,
         .lpfnWndProc = WndProc,
         .cbClsExtra = 0,
         .cbWndExtra = 0,
         .hInstance = hInstance,
-        .hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_THMOUSE)),
-        .hCursor = LoadCursor(NULL, IDC_ARROW),
+        .hIcon = LoadIconA(hInstance, MAKEINTRESOURCEA(IDI_THMOUSEX)),
+        .hCursor = LoadCursorA(NULL, IDC_ARROW),
         .hbrBackground = HBRUSH(COLOR_WINDOW + 1),
         .lpszMenuName = NULL,
         .lpszClassName = szWindowClass,
-        .hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL)),
+        .hIconSm = LoadIconA(wcex.hInstance, MAKEINTRESOURCEA(IDI_SMALL)),
     };
     RegisterClassExA(&wcex);
 
@@ -86,7 +86,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 .uID = 0,
                 .uFlags = NIF_ICON | NIF_MESSAGE | NIF_INFO | NIF_TIP,
                 .uCallbackMessage = WM_USER,
-                .hIcon = LoadIconA(hInst, MAKEINTRESOURCE(IDI_THMOUSE)),
+                .hIcon = LoadIconA(hInst, MAKEINTRESOURCE(IDI_THMOUSEX)),
             };
             lstrcpyA(nid.szTip, szTitle);
             lstrcpyA(nid.szInfoTitle, szTitle);

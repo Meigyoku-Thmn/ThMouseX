@@ -67,7 +67,7 @@ export struct AddressChain {
 };
 
 export struct GameConfig {
-    char            ProcessName[PROCESS_NAME_MAX_LEN];
+    WCHAR           ProcessName[PROCESS_NAME_MAX_LEN];
     AddressChain    Address;
     PointDataType   PosDataType;
     FloatPoint      BasePixelOffset;

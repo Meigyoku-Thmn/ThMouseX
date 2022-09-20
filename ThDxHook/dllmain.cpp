@@ -13,7 +13,6 @@ import dx8.hook;
 import core.directx9hook;
 import core.var;
 
-char buffer[MAX_PATH];
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH: {
@@ -22,21 +21,22 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             // Thus, get rid of them, thereby eliminating some of the overhead of this DLL.
             DisableThreadLibraryCalls(hModule);
 
+            WCHAR currentProcessName[MAX_PATH];
             // Only hook the APIs if we have a configuation of the process.
             // If the process is not what we have anything to do with, just return TRUE, no need to eagerly unload.
-            // The DLL will be forcefully unloaded from all processes when ThMouseGUI closes.
-            GetModuleFileNameA(GetModuleHandleA(NULL), buffer, sizeof(buffer));
-            PathStripPathA(buffer);
+            // The DLL will be forcefully unloaded from all processes when ThMouseX closes.
+            GetModuleFileNameW(GetModuleHandleW(NULL), currentProcessName, MAX_PATH);
+            PathStripPathW(currentProcessName);
 
             // Of course we ignore the mother.
-            if (strcmp(buffer, "THMouseGUI.exe") == 0)
+            if (wcscmp(currentProcessName, L"THMouseX.exe") == 0)
                 return TRUE;
 
             // We use SetWindowsHookEx, so DllMain is always called from a message loop in the target process.
             // Therefore, this is pretty thread-safe beside some edge cases (the PeekMessageHook).
             // The same thing happens for UnhookWindowsHookEx.
             for (int i = 0; i < gs_gameConfigArray.Length; i++) {
-                if (_stricmp(buffer, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
+                if (_wcsicmp(currentProcessName, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
                     g_currentConfig = gs_gameConfigArray.Configs[i];
 
                     MHook_Initialize();

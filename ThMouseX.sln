@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "THMouseGUI", "ThMouseGUI\ThMouseGUI.vcxproj", "{0FA9DE0E-B696-468D-9178-E85B228CAB70}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "THMouseX", "ThMouseX\ThMouseX.vcxproj", "{0FA9DE0E-B696-468D-9178-E85B228CAB70}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThDxHook", "ThDxHook\ThDxHook.vcxproj", "{256B0D2C-0296-4D8F-ADE8-79E544649D69}"
 EndProject

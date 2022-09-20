@@ -1,0 +1,51 @@
+; This file tells ThMouseX how to find player position data.
+; Each line for a game.
+;
+; exeName       positionAddress         dataType    offset          baseResolutionX
+;
+; Touhou 6
+th06.exe        [006CA6B8]              float       (0,0)           640
+th06e.exe       [006CA6B8]              float       (0,0)           640
+東方紅魔郷.exe   [006CA6B8]              float       (0,0)           640
+; Touhou 7
+th07.exe        [004BE408]              float       (32,16)         640
+th07e.exe       [004BE408]              float       (32,16)         640
+; Touhou 8
+th08.exe        [017D6110]              float       (0,0)           640
+th08e.exe       [017D6110]              float       (0,0)           640
+; Touhou 9
+th09.exe        [004A7D94][00001B88]    float       (161,17)        640
+th09e.exe       [004A7D94][00001B88]    float       (161,17)        640
+; Touhou 9.5
+th095.exe       [004C4E70][0000015C]    float       (0,0)           640
+th095e.exe      [004C4E70][0000015C]    float       (0,0)           640
+; Touhou 10
+th10.exe        [00477834][000003CC]    int         (22500,1700)    64000
+th10e.exe       [00477834][000003CC]    int         (22500,1700)    64000
+; Touhou 11
+th11.exe        [004A8EB4][00000888]    int         (28800,2176)    81920
+th11e.exe       [004A8EB4][00000888]    int         (28800,2176)    81920
+; Touhou 12
+th12.exe        [004B4514][00000988]    int         (28800,2176)    81920
+th12e.exe       [004B4514][00000988]    int         (28800,2176)    81920
+; Touhou 12.5
+th125.exe       [004B68C8][00000604]    int         (41088,2176)    81920
+th125e.exe      [004B68C8][00000604]    int         (41088,2176)    81920
+; Touhou 12.8
+th128.exe       [004B8A80][00000ED8]    int         (41088,2176)    81920
+th128e.exe      [004B8A80][00000ED8]    int         (41088,2176)    81920
+; Touhou 13
+th13.exe        [004C22C4][000005c4]    int         (28800,2176)    81920
+th13e.exe       [004C22C4][000005c4]    int         (28800,2176)    81920
+; Touhou 14
+th14.exe        [004DB67C][000005ec]    int         (28800,2176)    81920
+; Touhou 14.3
+th143.exe       [004E6B88][000005ec]    int         (41088,2176)    81920
+; Touhou 15
+th15.exe        [004E9BB8][00000624]    int         (28800,2176)    81920
+; Touhou 16
+th16.exe        [0049FAFC][0000061C]    int         (28800,2176)    81920
+; Touhou 18
+th18.exe        [004CF410][0000062C]    int         (28800,2176)    81920
+; Touhou 18.5
+th185.exe       [004D7C3C][0000062C]    int         (41088,2176)    81920

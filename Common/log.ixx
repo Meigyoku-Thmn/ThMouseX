@@ -44,7 +44,7 @@ export DLLEXPORT int ConsoleLogAndFile(const char* _Format, ...) {
     va_start(args, _Format);
     while (true) {
         FILE* logFile;
-        logFile = fopen("D:\\thmouse_log.txt", "a+");
+        logFile = fopen("D:\\thmousex_log.txt", "a+");
         if (logFile == NULL)
             break;
         vfprintf(logFile, _Format, args);

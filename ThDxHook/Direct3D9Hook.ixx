@@ -44,9 +44,9 @@ inline const char* GetD3dErrStr(const int errorCode) {
 }
 
 using CallbackType = void (*)(void);
-CallbackType initializeCallback;
+vector<CallbackType> initializeCallbacks;
 export void RegisterD3D9InitializeCallback(CallbackType callback) {
-    initializeCallback = callback;
+    initializeCallbacks.emplace_back(callback);
 }
 
 export DLLEXPORT bool PopulateD3D9MethodRVAs() {
@@ -119,22 +119,33 @@ D3DXVECTOR3         cursorPivot;
 D3DXVECTOR2         cursorScale;
 float               d3dScale = 1.f;
 
+struct OnInit {
+    OnInit() {
+        RegisterMHookUninitializeCallback([] {
+            if (cursorSprite)
+                cursorSprite->Release();
+            if (cursorTexture)
+                cursorTexture->Release();
+        });
+    }
+} _;
+
 void Initialize(IDirect3DDevice9* device) {
     if (initialized)
         return;
     initialized = true;
-    if (initializeCallback)
-        initializeCallback();
+    for (auto& callback : initializeCallbacks)
+        callback();
     D3DDEVICE_CREATION_PARAMETERS params;
     device->GetCreationParameters(&params);
     g_hFocusWindow = params.hFocusWindow;
-    if (gs_textureFilePath[0] && D3DXCreateTextureFromFile(device, gs_textureFilePath, &cursorTexture) == D3D_OK) {
+    if (gs_textureFilePath[0] && D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture) == D3D_OK) {
         D3DXCreateSprite(device, &cursorSprite);
         D3DSURFACE_DESC cursorSize;
         cursorTexture->GetLevelDesc(0, &cursorSize);
         cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f};
     }
-    SystemParametersInfo(SPI_SETCURSORSHADOW, 0, (PVOID)TRUE, SPIF_SENDCHANGE);
+    SystemParametersInfoA(SPI_SETCURSORSHADOW, 0, (PVOID)TRUE, SPIF_SENDCHANGE);
 }
 
 HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {

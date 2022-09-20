@@ -53,15 +53,15 @@ https://github.com/Meigyoku-Thmn/ThMouseX/releases
 This project can be compiled via Visual Studio, or just Visual Studio Build Tools:
 * [Visual Studio](https://visualstudio.microsoft.com/), select "Desktop development with C++" during installation.
 * [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools), select "Visual C++ build tools" during installation.
-Remember to compile in 32-bit mode, and put cursor.png, ThDxHook.dll, DX8Hook.dll, ThMouse.exe, ThMouse.ini in the same folder.
+Remember to compile in 32-bit mode, and put cursor.png, ThDxHook.dll, DX8Hook.dll, ThMouseX.exe, ThMouseX.ini in the same folder.
 
-### How to use ThMouse?
-1. Run ThMouse.exe before entering a game.
+### How to use ThMouseX?
+1. Run ThMouseX.exe before entering a game.
 2. Enable the option to select resolutions first when lauching the game (if the game doesn't show a dialog initially, the cursor cannot show up).
 3. If the game is supported, a cursor will show upon entering the game.
 
 ### How to control?
-* The character will move towards where the cursor points. Please note that it will NOT move immidiately with the cursor, because ThMouse doesn't change the moving speed.
+* The character will move towards where the cursor points. Please note that it will NOT move immidiately with the cursor, because ThMouseX doesn't change the moving speed.
 * You still have to use left hand to focus and shoot.
 * Left click can initiate bomb.
 * Right click can turn off mouse control temporally.
@@ -69,25 +69,25 @@ Remember to compile in 32-bit mode, and put cursor.png, ThDxHook.dll, DX8Hook.dl
 
 ### How to close it?
 1. Exit the game first.
-2. Double-click the ThMouse icon on the taskbar and press the quit button.
+2. Double-click the ThMouseX icon on the taskbar and press the quit button.
 
 Additional Instructions
 -----------------------
 ### Bomb for TH11
-In order to bomb in TH11 (Subterranean Animism), you may need to modify ThMouse.ini:
+In order to bomb in TH11 (Subterranean Animism), you may need to modify ThMouseX.ini:
 1. Run TH11.exe, go to OPTIONS, then KEY CONFIG.
 2. Find the number xx that corresponds to the button "SPECIAL".
-3. Exit the game and open up ThMouse.ini.
+3. Exit the game and open up ThMouseX.ini.
 4. change the number after "LeftButton = " to the number you find through step 1-2.
 
 ### Cursor sprite
 The crosshair/cursor sprite may be changed:
-1. Find your preferred crosshair in .png format and place it into the same folder as ThMouse.exe.
-2. Open up ThMouse.ini.
+1. Find your preferred crosshair in .png format and place it into the same folder as ThMouseX.exe.
+2. Open up ThMouseX.ini.
 3. Change the file name after "CursorTexture = " to the preferred crosshair file's name. (Don't forget the file extension name ".png".)
 
 ### "games.txt" file
-You can extend ThMouse to support more Shoot 'em ups games by modifying the "games.txt" file.
+You can extend ThMouseX to support more Shoot 'em ups games by modifying the "games.txt" file.
 
 Open the file with any text editor and try yourself.
 

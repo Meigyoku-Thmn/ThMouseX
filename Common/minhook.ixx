@@ -21,6 +21,12 @@ export struct MHookApiConfig {
     LPVOID* ppOriginal;
 };
 
+using CallbackType = void (*)(void);
+vector<CallbackType> uninitializeCallbacks;
+export DLLEXPORT void RegisterMHookUninitializeCallback(CallbackType callback) {
+    uninitializeCallbacks.emplace_back(callback);
+}
+
 export DLLEXPORT bool MHook_Initialize() {
     return MH_Initialize() == MH_OK;
 }
@@ -48,5 +54,7 @@ export DLLEXPORT bool MHook_EnableAll() {
 }
 
 export DLLEXPORT void MHook_Uninitialize() {
+    for (auto& callback : uninitializeCallbacks)
+        callback();
     MH_Uninitialize();
 }
