@@ -53,7 +53,7 @@ https://github.com/Meigyoku-Thmn/ThMouseX/releases
 This project can be compiled via Visual Studio, or just Visual Studio Build Tools:
 * [Visual Studio](https://visualstudio.microsoft.com/), select "Desktop development with C++" during installation.
 * [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools), select "Visual C++ build tools" during installation.
-Remember to compile in 32-bit mode, and put cursor.png, ThDxHook.dll, DX8Hook.dll, ThMouseX.exe, ThMouseX.ini in the same folder.
+Remember to compile in 32-bit mode, and put cursor.png, ThMouseXCore.dll, DX8Hook.dll, ThMouseX.exe, ThMouseX.ini in the same folder.
 
 ### How to use ThMouseX?
 1. Run ThMouseX.exe before entering a game.

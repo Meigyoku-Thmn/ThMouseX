@@ -117,7 +117,7 @@ LRESULT CALLBACK MouseProc(int code, WPARAM wParam, LPARAM lParam) {
 bool CheckHookProcHandle(HHOOK handle) {
     if (handle != NULL)
         return true;
-    ReportLastError("Install ThDxHook.dll: Error");
+    ReportLastError("Install Hook: Error");
     return false;
 }
 
@@ -125,7 +125,7 @@ HHOOK CBTProcHandle;
 HHOOK KeyboardProdHandle;
 HHOOK MouseProcHandle;
 
-export DLLEXPORT bool InstallThDxHook() {
+export DLLEXPORT bool InstallHooks() {
     // use CBT hook to inject DLL to the target process as soon as possible
     CBTProcHandle = SetWindowsHookExW(WH_CBT, CBTProc, core_hInstance, NULL);
     if (!CheckHookProcHandle(CBTProcHandle))
@@ -139,7 +139,7 @@ export DLLEXPORT bool InstallThDxHook() {
     return true;
 }
 
-export DLLEXPORT void RemoveThDxHook(void) {
+export DLLEXPORT void RemoveHooks(void) {
     UnhookWindowsHookEx(CBTProcHandle);
     UnhookWindowsHookEx(KeyboardProdHandle);
     UnhookWindowsHookEx(MouseProcHandle);

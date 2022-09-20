@@ -35,7 +35,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
     if (!ReadIniFile())
         return 1;
 
-    if (!InstallThDxHook())
+    if (!InstallHooks())
         return 1;
 
     // Initialize global strings
@@ -71,7 +71,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
         DispatchMessageA(&msg);
     }
 
-    RemoveThDxHook();
+    RemoveHooks();
 
     return 0;
 }
