@@ -43,7 +43,7 @@
     <ProjectReference Include="..\DX8Hook\DX8Hook.vcxproj">
       <Project>{dc5fe77d-43d4-4cc6-9ad2-409716483dbf}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\ThMouseXCore\ThMouseXCore.vcxproj">
+    <ProjectReference Include="..\ThMCore\ThMCore.vcxproj">
       <Project>{256b0d2c-0296-4d8f-ade8-79e544649d69}</Project>
     </ProjectReference>
   </ItemGroup>
