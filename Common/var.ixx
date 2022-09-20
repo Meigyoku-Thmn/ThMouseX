@@ -31,10 +31,10 @@ export DLLEXPORT char             gs_textureFilePath[MAX_PATH]{};
 export DLLEXPORT DWORD            gs_textureBaseResolutionX = 480;
 
 export DLLEXPORT DWORD            gs_d3d9_Reset_RVA{};
-export DLLEXPORT DWORD            gs_d3d9_EndScene_RVA{};
+export DLLEXPORT DWORD            gs_d3d9_Present_RVA{};
 
 export DLLEXPORT DWORD            gs_d3d8_Reset_RVA{};
-export DLLEXPORT DWORD            gs_d3d8_EndScene_RVA{};
+export DLLEXPORT DWORD            gs_d3d8_Present_RVA{};
 
 export DLLEXPORT DWORD            gs_dinput8_GetDeviceState_RVA{};
 #pragma data_seg()

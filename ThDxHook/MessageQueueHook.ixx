@@ -43,10 +43,12 @@ struct OnInit {
         // hide the mouse cursor when D3D is initialized
         RegisterD3D8InitializeCallback([] {
             OriSetCursor(NULL);
+            OriShowCursor(FALSE);
             isCursorShow = false;
         });
         RegisterD3D9InitializeCallback([] {
             OriSetCursor(NULL);
+            OriShowCursor(FALSE);
             isCursorShow = false;
         });
     }

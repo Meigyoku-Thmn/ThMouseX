@@ -20,29 +20,16 @@ import common.helper;
     dev->SetTextureStageState(i, D3DTSS_COLORARG1, arg1); \
     dev->SetTextureStageState(i, D3DTSS_COLORARG2, arg2)
 
-#define AllowOnlyOneSingleDevice(fallbackRoute) \
-    static DWORD firstReturnAddress; \
-    DWORD currentReturnAddress; \
-    __asm { \
-        __asm push eax \
-        __asm mov eax, [ebp + 4] \
-        __asm mov currentReturnAddress, eax \
-        __asm pop eax \
-    } \
-    if (firstReturnAddress != 0 && firstReturnAddress != currentReturnAddress) \
-    return fallbackRoute; \
-    firstReturnAddress = currentReturnAddress
-
 constexpr auto ResetIdx = 16;
-constexpr auto EndSceneIdx = 42;
+constexpr auto PresentIdx = 17;
 constexpr auto ErrorMessageTitle = "D3D9 Hook Setup Error";
 
 using namespace std;
 
 HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
 decltype(&D3DReset) OriReset;
-HRESULT WINAPI D3DEndScene(IDirect3DDevice9* pDevice);
-decltype(&D3DEndScene) OriEndScene;
+HRESULT WINAPI D3DPresent(IDirect3DDevice9 * pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
+decltype(&D3DPresent) OriPresent;
 
 inline const char* GetD3dErrStr(const int errorCode) {
     if (errorCode == D3DERR_DEVICELOST)
@@ -102,7 +89,7 @@ export DLLEXPORT bool PopulateD3D9MethodRVAs() {
     baseAddress = (DWORD)GetModuleHandleA("d3d9.dll");
 
     gs_d3d9_Reset_RVA = vtable[ResetIdx] - baseAddress;
-    gs_d3d9_EndScene_RVA = vtable[EndSceneIdx] - baseAddress;
+    gs_d3d9_Present_RVA = vtable[PresentIdx] - baseAddress;
 
     result = true;
 CleanAndReturn:
@@ -116,7 +103,7 @@ export vector<MHookConfig> D3D9HookConfig() {
     auto baseAddress = (DWORD)GetModuleHandleA("d3d9.dll");
     return {
         {PVOID(baseAddress + gs_d3d9_Reset_RVA), &D3DReset, (PVOID*)&OriReset},
-        {PVOID(baseAddress + gs_d3d9_EndScene_RVA), &D3DEndScene, (PVOID*)&OriEndScene},
+        {PVOID(baseAddress + gs_d3d9_Present_RVA), &D3DPresent, (PVOID*)&OriPresent},
     };
 }
 
@@ -229,6 +216,8 @@ void RenderCursor(IDirect3DDevice9* pDevice) {
     if (!cursorTexture)
         return;
 
+    pDevice->BeginScene();
+
     // scale mouse cursor's position from screen coordinate to D3D coordinate
     POINT pointerPosition = GetPointerPosition();
     D3DXVECTOR3 cursorPositionD3D(float(pointerPosition.x), float(pointerPosition.y), 0.f);
@@ -258,13 +247,14 @@ void RenderCursor(IDirect3DDevice9* pDevice) {
         cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
     }
     cursorSprite->End();
+
+    pDevice->EndScene();
 }
 
-HRESULT WINAPI D3DEndScene(IDirect3DDevice9* pDevice) {
-    AllowOnlyOneSingleDevice(OriEndScene(pDevice));
+HRESULT WINAPI D3DPresent(IDirect3DDevice9 * pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion) {
     Initialize(pDevice);
     PrepareMeasurement(pDevice);
     PrepareCursorState(pDevice);
     RenderCursor(pDevice);
-    return OriEndScene(pDevice);
+    return OriPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
