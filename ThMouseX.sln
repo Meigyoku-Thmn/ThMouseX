@@ -11,20 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX8Hook", "DX8Hook\DX8Hook.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{47C2EE88-18D4-4367-8E67-6DAA01AB4451}"
 EndProject
-Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "th07e", "..\..\Old Laptop\Home\Game\Touhou Project\Official Games\Touhou 07\th07e.exe", "{A27AA1A4-17F2-4E53-B403-688D8B4A5A1D}"
-	ProjectSection(DebuggerProjectSystem) = preProject
-		PortSupplier = 00000000-0000-0000-0000-000000000000
-		Executable = D:\Old Laptop\Home\Game\Touhou Project\Official Games\Touhou 07\th07e.exe
-		RemoteMachine = VNLT072
-		StartingDirectory = D:\Old Laptop\Home\Game\Touhou Project\Official Games\Touhou 07
-		Environment = Default
-		LaunchingEngine = 00000000-0000-0000-0000-000000000000
-		UseLegacyDebugEngines = No
-		LaunchSQLEngine = No
-		AttachLaunchAction = No
-		IORedirection = Auto
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -65,10 +51,6 @@ Global
 		{47C2EE88-18D4-4367-8E67-6DAA01AB4451}.Release|x64.Build.0 = Release|x64
 		{47C2EE88-18D4-4367-8E67-6DAA01AB4451}.Release|x86.ActiveCfg = Release|Win32
 		{47C2EE88-18D4-4367-8E67-6DAA01AB4451}.Release|x86.Build.0 = Release|Win32
-		{A27AA1A4-17F2-4E53-B403-688D8B4A5A1D}.Debug|x64.ActiveCfg = Release|x86
-		{A27AA1A4-17F2-4E53-B403-688D8B4A5A1D}.Debug|x86.ActiveCfg = Release|x86
-		{A27AA1A4-17F2-4E53-B403-688D8B4A5A1D}.Release|x64.ActiveCfg = Release|x86
-		{A27AA1A4-17F2-4E53-B403-688D8B4A5A1D}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
