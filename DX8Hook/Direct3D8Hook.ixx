@@ -2,9 +2,8 @@ module;
 
 #include "framework.h"
 #include "macro.h"
-#include <stdio.h>
-#include "d3d8.h"
-#include "d3dx8core.h"
+#include "Include/d3d8.h"
+#include "Include/d3dx8core.h"
 #include <string>
 #include <vector>
 

@@ -10,7 +10,6 @@ import common.minhook;
 import common.var;
 import common.helper;
 import core.var;
-import common.log;
 import core.directx9hook;
 import dx8.hook;
 

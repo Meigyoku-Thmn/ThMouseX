@@ -28,7 +28,7 @@ using namespace std;
 
 HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
 decltype(&D3DReset) OriReset;
-HRESULT WINAPI D3DPresent(IDirect3DDevice9 * pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
+HRESULT WINAPI D3DPresent(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
 decltype(&D3DPresent) OriPresent;
 
 inline const char* GetD3dErrStr(const int errorCode) {

@@ -61,7 +61,7 @@ constexpr UCHAR BlackIntensityLimit = 16;
 
 export DLLEXPORT void CalculateNextModulate(UCHAR& modulate, ModulateStage& modulateStage) {
     switch (modulateStage) {
-        case WhiteInc: WhiteInc:
+        case WhiteInc:
     if (modulate == WhiteIntensityLimit) {
         modulateStage = WhiteDec;
         goto WhiteDec;
@@ -77,7 +77,7 @@ export DLLEXPORT void CalculateNextModulate(UCHAR& modulate, ModulateStage& modu
         modulate -= Delta;
     }
     break;
-        case BlackInc: BlackInc:
+        case BlackInc:
     if (modulate == 0) {
         modulateStage = BlackDec;
         goto BlackDec;
