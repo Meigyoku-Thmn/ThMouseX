@@ -21,7 +21,7 @@ export struct MHookApiConfig {
     LPVOID* ppOriginal;
 };
 
-using CallbackType = void (*)(void);
+using CallbackType = void (*)(bool isProcessTerminating);
 vector<CallbackType>& uninitializeCallbacks() {
     static vector<CallbackType> backing;
     return backing;
@@ -56,8 +56,8 @@ export DLLEXPORT bool MHook_EnableAll() {
     return MH_EnableHook(MH_ALL_HOOKS) == MH_OK;
 }
 
-export DLLEXPORT void MHook_Uninitialize() {
+export DLLEXPORT void MHook_Uninitialize(bool isProcessTerminating) {
     for (auto& callback : uninitializeCallbacks())
-        callback();
+        callback(isProcessTerminating);
     MH_Uninitialize();
 }

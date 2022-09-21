@@ -48,16 +48,13 @@ void NormalizeCursor() {
 struct OnInit {
     OnInit() {
         // Hide the mouse cursor when D3D is initialized
-        RegisterD3D8InitializeCallback([] {
-            OriSetCursor(NULL);
-            OriShowCursor(FALSE);
-            isCursorShow = false;
-        });
-        RegisterD3D9InitializeCallback([] {
-            OriSetCursor(NULL);
-            OriShowCursor(FALSE);
-            isCursorShow = false;
-        });
+        RegisterD3D8InitializeCallback(Callback);
+        RegisterD3D9InitializeCallback(Callback);
+    }
+    static void Callback() {
+        OriSetCursor(NULL);
+        OriShowCursor(FALSE);
+        isCursorShow = false;
     }
 } _;
 

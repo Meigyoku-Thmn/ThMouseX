@@ -122,12 +122,15 @@ float               d3dScale = 1.f;
 
 struct OnInit {
     OnInit() {
-        RegisterMHookUninitializeCallback([] {
-            if (cursorSprite)
-                cursorSprite->Release();
-            if (cursorTexture)
-                cursorTexture->Release();
-        });
+        RegisterMHookUninitializeCallback(Callback);
+    }
+    static void Callback(bool isProcessTerminating) {
+        if (isProcessTerminating)
+            return;
+        if (cursorSprite)
+            cursorSprite->Release();
+        if (cursorTexture)
+            cursorTexture->Release();
     }
 } _;
 

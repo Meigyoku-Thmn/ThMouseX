@@ -70,8 +70,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         case DLL_THREAD_DETACH:
             break;
         case DLL_PROCESS_DETACH:
-            if (core_hookApplied)
-                MHook_Uninitialize();
+            if (core_hookApplied) {
+                auto isProcessTerminating = lpReserved != 0;
+                MHook_Uninitialize(isProcessTerminating);
+            }
             break;
     }
     return TRUE;
