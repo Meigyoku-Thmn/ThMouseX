@@ -68,7 +68,7 @@ export bool ReadGamesFile() {
         // read pointer chain
         wstring pointerChainStr;
         lineStream >> pointerChainStr;
-        wstring::size_type leftBoundIdx = 0, rightBoundIdx = -1;
+        size_t leftBoundIdx = 0, rightBoundIdx = -1;
         for (size_t addressLevelIdx = 0; addressLevelIdx < ADDRESS_CHAIN_MAX_LEN; addressLevelIdx++) {
             DWORD address;
             leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);

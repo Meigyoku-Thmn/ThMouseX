@@ -48,9 +48,12 @@ inline const char* GetD3dErrStr(const int errorCode) {
 }
 
 using CallbackType = void (*)(void);
-vector<CallbackType> initializeCallbacks;
+vector<CallbackType>& initializeCallbacks() {
+    static vector<CallbackType> backing;
+    return backing;
+}
 export DLLEXPORT void RegisterD3D8InitializeCallback(CallbackType callback) {
-    initializeCallbacks.emplace_back(callback);
+    initializeCallbacks().push_back(callback);
 }
 
 export DLLEXPORT bool PopulateD3D8MethodRVAs() {
@@ -138,7 +141,7 @@ void Initialize(IDirect3DDevice8* device) {
     if (initialized)
         return;
     initialized = true;
-    for (auto& callback : initializeCallbacks)
+    for (auto& callback : initializeCallbacks())
         callback();
     D3DDEVICE_CREATION_PARAMETERS params;
     device->GetCreationParameters(&params);

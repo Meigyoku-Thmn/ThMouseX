@@ -26,11 +26,19 @@ export vector<MHookApiConfig> MessageQueueHookConfig{
     {L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor},
 };
 
+HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
+    return NULL;
+}
+
+int WINAPI _ShowCursor(BOOL bShow) {
+    return bShow == TRUE ? 0 : -1;
+}
+
 bool isCursorShow;
 auto hCursor = LoadCursorA(NULL, IDC_ARROW);
 
 void NormalizeCursor() {
-    // set cursor visibility to 0, reset cursor to a normal arrow,
+    // Set cursor visibility to 0, reset cursor to a normal arrow,
     // to ensure that there is a visible mouse cursor on the game's config dialog
     while (OriShowCursor(FALSE) >= 0);
     while (OriShowCursor(TRUE) < 0);
@@ -40,7 +48,7 @@ void NormalizeCursor() {
 
 struct OnInit {
     OnInit() {
-        // hide the mouse cursor when D3D is initialized
+        // Hide the mouse cursor when D3D is initialized
         RegisterD3D8InitializeCallback([] {
             OriSetCursor(NULL);
             OriShowCursor(FALSE);
@@ -53,14 +61,6 @@ struct OnInit {
         });
     }
 } _;
-
-HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
-    return NULL;
-}
-
-int WINAPI _ShowCursor(BOOL bShow) {
-    return bShow == TRUE ? 0 : -1;
-}
 
 bool CBTProcInstalled;
 LRESULT CALLBACK CBTProc(int code, WPARAM wparam, LPARAM lparam) {
