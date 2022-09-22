@@ -59,7 +59,7 @@ struct OnInit {
 } _;
 
 bool CBTProcInstalled;
-LRESULT CALLBACK CBTProc(int code, WPARAM wparam, LPARAM lparam) {
+LRESULT CALLBACK CBTProcW(int code, WPARAM wparam, LPARAM lparam) {
     if (!CBTProcInstalled && core_hookApplied)
         NormalizeCursor();
     CBTProcInstalled = true;
@@ -70,7 +70,7 @@ constexpr auto VK_A = 0x41;
 constexpr auto VK_S = 0x53;
 
 bool KeyboardProcInstalled;
-LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK KeyboardProcW(int code, WPARAM wParam, LPARAM lParam) {
     if (code == HC_ACTION && core_hookApplied) {
         if (wParam == VK_A) {
             // A key
@@ -92,7 +92,7 @@ LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam) {
 }
 
 bool MouseProcInstalled;
-LRESULT CALLBACK MouseProc(int code, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK MouseProcW(int code, WPARAM wParam, LPARAM lParam) {
     static bool isRightMousePressing = false;
     if (code == HC_ACTION && core_hookApplied) {
         if (wParam == WM_LBUTTONDOWN)
@@ -123,13 +123,13 @@ HHOOK MouseProcHandle;
 
 export DLLEXPORT bool InstallHooks() {
     // use CBT hook to inject DLL to the target process as soon as possible
-    CBTProcHandle = SetWindowsHookExW(WH_CBT, CBTProc, core_hInstance, NULL);
+    CBTProcHandle = SetWindowsHookExW(WH_CBT, CBTProcW, core_hInstance, NULL);
     if (!CheckHookProcHandle(CBTProcHandle))
         return false;
-    KeyboardProdHandle = SetWindowsHookExW(WH_KEYBOARD, KeyboardProc, core_hInstance, NULL);
+    KeyboardProdHandle = SetWindowsHookExW(WH_KEYBOARD, KeyboardProcW, core_hInstance, NULL);
     if (!CheckHookProcHandle(KeyboardProdHandle))
         return false;
-    MouseProcHandle = SetWindowsHookExW(WH_MOUSE, MouseProc, core_hInstance, NULL);
+    MouseProcHandle = SetWindowsHookExW(WH_MOUSE, MouseProcW, core_hInstance, NULL);
     if (!CheckHookProcHandle(MouseProcHandle))
         return false;
     return true;

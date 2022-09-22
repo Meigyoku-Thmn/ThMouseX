@@ -31,17 +31,17 @@ export DWORD DetermineGameInput() {
         if (address != 0) {
             POINT playerPos{};
 
-            auto calulatePosition = [&]<typename T>(T * pPosition) {
-                playerPos.x = lrint(pPosition->X / g_pixelRate + g_pixelOffset.X);
-                playerPos.y = lrint(pPosition->Y / g_pixelRate + g_pixelOffset.Y);
-            };
+#define CalculatePosition(position) { \
+                playerPos.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X); \
+                playerPos.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y); \
+            }
 
             if (g_currentConfig.PosDataType == Int_DataType)
-                calulatePosition((IntPoint*)address);
+                CalculatePosition((IntPoint*)address)
             else if (g_currentConfig.PosDataType == Float_DataType)
-                calulatePosition((FloatPoint*)address);
+                CalculatePosition((FloatPoint*)address)
             else if (g_currentConfig.PosDataType == Short_DataType)
-                calulatePosition((ShortPoint*)address);
+                CalculatePosition((ShortPoint*)address)
 
             auto mousePos = GetPointerPosition();
 

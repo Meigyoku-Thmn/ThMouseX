@@ -27,9 +27,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             // The DLL will be forcefully unloaded from all processes when ThMouseX closes.
             GetModuleFileNameW(GetModuleHandleW(NULL), currentProcessName, MAX_PATH);
             PathStripPathW(currentProcessName);
+            PathRemoveExtensionW(currentProcessName);
 
             // Of course we ignore the mother.
-            if (wcscmp(currentProcessName, L"THMouseX.exe") == 0)
+            if (wcscmp(currentProcessName, L"THMouseX") == 0)
                 return TRUE;
 
             // We use SetWindowsHookEx, so DllMain is always called from a message loop in the target process.
