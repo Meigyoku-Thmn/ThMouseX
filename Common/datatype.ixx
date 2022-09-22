@@ -71,7 +71,8 @@ export struct GameConfig {
     AddressChain    Address;
     PointDataType   PosDataType;
     FloatPoint      BasePixelOffset;
-    unsigned int    BaseResolutionX;
+    unsigned int    BaseHeight;
+    FloatPoint      AspectRatio;
 };
 
 export struct GameConfigArray {

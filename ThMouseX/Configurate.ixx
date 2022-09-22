@@ -133,7 +133,32 @@ export bool ReadGamesFile() {
         }
 
         // read game-internal base resolution
-        lineStream >> dec >> currentConfig.BaseResolutionX;
+        lineStream >> dec >> currentConfig.BaseHeight;
+        if (lineStream.eof() == true) {
+            configIdx--;
+            continue;
+        }
+
+        // read aspect ratio w:h
+        wstring aspectRatioStr;
+        lineStream >> aspectRatioStr;
+        auto colonIdx = aspectRatioStr.find(':');
+        if (colonIdx == wstring::npos) {
+            configIdx--;
+            continue;
+        }
+        auto ratioXStr = aspectRatioStr.substr(0, colonIdx);
+        float ratioX;
+        converter.clear();
+        converter << ratioXStr;
+        converter >> ratioX;
+        currentConfig.AspectRatio.X = ratioX;
+        auto ratioYStr = aspectRatioStr.substr(colonIdx + 1, aspectRatioStr.length() - colonIdx - 1);
+        float ratioY;
+        converter.clear();
+        converter << ratioYStr;
+        converter >> ratioY;
+        currentConfig.AspectRatio.Y = ratioY;
     }
 
     if (configIdx == 0) {
@@ -188,7 +213,7 @@ export bool ReadIniFile() {
             auto numStr = lineView.substr(eqIndex + 1);
             wstringstream ss;
             ss << numStr;
-            ss >> gs_textureBaseResolutionX;
+            ss >> gs_textureBaseHeight;
         }
     }
     return true;

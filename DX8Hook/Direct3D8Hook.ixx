@@ -183,14 +183,14 @@ void PrepareMeasurement(IDirect3DDevice8* pDevice) {
     rs = pSurface->GetDesc(&d3dSize);
     if (rs != D3D_OK)
         return;
-    // (Heuristic) if client size is smaller than d3d size then it's likely that we are in fullscreen mode
+    // if client size is smaller than d3d size (fullscreen exclusive mode)
     if (d3dSize.Width > UINT(clientSize.width()) || d3dSize.Height > UINT(clientSize.height())) {
         // clear border to avoid "click-out-of-bound"
         RemoveWindowBorder(d3dSize.Width, d3dSize.Height);
     }
     if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
         return;
-    g_pixelRate = float(g_currentConfig.BaseResolutionX) / clientSize.width();
+    g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
     g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
     g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
 }
@@ -214,7 +214,7 @@ void PrepareCursorState(IDirect3DDevice8* pDevice) {
         d3dScale = 0.f;
         return;
     }
-    auto scale = float(d3dSize.Height) / gs_textureBaseResolutionX;
+    auto scale = float(d3dSize.Height) / gs_textureBaseHeight;
     cursorScale = D3DXVECTOR2(scale, scale);
     pSurface->Release();
 

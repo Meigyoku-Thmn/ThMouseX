@@ -28,7 +28,7 @@ export DLLEXPORT GameConfigArray  gs_gameConfigArray{};
 export DLLEXPORT DWORD            gs_boomButton = 1;
 export DLLEXPORT DWORD            gs_extraButton = 3;
 export DLLEXPORT WCHAR            gs_textureFilePath[MAX_PATH]{};
-export DLLEXPORT DWORD            gs_textureBaseResolutionX = 480;
+export DLLEXPORT DWORD            gs_textureBaseHeight = 480;
 
 export DLLEXPORT DWORD            gs_d3d9_Reset_RVA{};
 export DLLEXPORT DWORD            gs_d3d9_Present_RVA{};

@@ -7,6 +7,7 @@ export module core.inputdeterminte;
 
 import common.var;
 import common.helper;
+import common.log;
 
 export constexpr auto USE_BOMB = 0b0000'0001;
 export constexpr auto USE_SPECIAL = 0b0000'0010;
@@ -29,19 +30,23 @@ export DWORD DetermineGameInput() {
     if (g_inputEnabled) {
         auto address = g_currentConfig.Address.value();
         if (address != 0) {
-            POINT playerPos{};
+            // support borderless mode (except the DOT by DOT mode from Touhou 18 which I gave up)
+            RECTSIZE clientSize;
+            GetClientRect(g_hFocusWindow, &clientSize);
+            auto realWidth = clientSize.height() * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
+            auto paddingX = (clientSize.width() - realWidth) / 2;
 
+            POINT playerPos;
 #define CalculatePosition(position) { \
-                playerPos.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X); \
-                playerPos.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y); \
-            }
-
+    playerPos.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X + paddingX); \
+    playerPos.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y); \
+}
             if (g_currentConfig.PosDataType == Int_DataType)
                 CalculatePosition((IntPoint*)address)
             else if (g_currentConfig.PosDataType == Float_DataType)
                 CalculatePosition((FloatPoint*)address)
             else if (g_currentConfig.PosDataType == Short_DataType)
-                CalculatePosition((ShortPoint*)address)
+                CalculatePosition((ShortPoint*)address);
 
             auto mousePos = GetPointerPosition();
 
