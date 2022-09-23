@@ -180,9 +180,9 @@ void PrepareMeasurement(IDirect3DDevice9* pDevice) {
     auto rs = pDevice->GetRenderTarget(0, &pSurface);
     if (rs != D3D_OK)
         return;
-    pSurface->Release();
     D3DSURFACE_DESC d3dSize;
     rs = pSurface->GetDesc(&d3dSize);
+    pSurface->Release();
     if (rs != D3D_OK)
         return;
     // if client size is smaller than d3d size (fullscreen exclusive mode)
@@ -212,13 +212,13 @@ void PrepareCursorState(IDirect3DDevice9* pDevice) {
     }
     D3DSURFACE_DESC d3dSize;
     rs = pSurface->GetDesc(&d3dSize);
+    pSurface->Release();
     if (rs != D3D_OK) {
         d3dScale = 0.f;
         return;
     }
     auto scale = float(d3dSize.Height) / gs_textureBaseHeight;
     cursorScale = D3DXVECTOR2(scale, scale);
-    pSurface->Release();
 
     RECTSIZE clientSize;
     BOOL rs2 = GetClientRect(g_hFocusWindow, &clientSize);

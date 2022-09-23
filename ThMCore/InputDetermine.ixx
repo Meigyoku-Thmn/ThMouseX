@@ -7,7 +7,6 @@ export module core.inputdeterminte;
 
 import common.var;
 import common.helper;
-import common.log;
 
 export constexpr auto USE_BOMB = 0b0000'0001;
 export constexpr auto USE_SPECIAL = 0b0000'0010;
