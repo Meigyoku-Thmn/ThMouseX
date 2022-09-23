@@ -110,6 +110,7 @@ export DLLEXPORT vector<MHookConfig> D3D8HookConfig() {
 
 // job flags
 bool initialized;
+bool isReset;
 bool measurementPrepared;
 bool cursorStatePrepared;
 
@@ -120,6 +121,15 @@ D3DXVECTOR2         cursorPivot;
 D3DXVECTOR2         cursorScale;
 float               d3dScale = 1.f;
 
+void CleanUp() {
+    if (cursorSprite)
+        cursorSprite->Release();
+    if (cursorTexture)
+        cursorTexture->Release();
+    cursorSprite = NULL;
+    cursorTexture = NULL;
+}
+
 struct OnInit {
     OnInit() {
         RegisterMHookUninitializeCallback(Callback);
@@ -127,10 +137,7 @@ struct OnInit {
     static void Callback(bool isProcessTerminating) {
         if (isProcessTerminating)
             return;
-        if (cursorSprite)
-            cursorSprite->Release();
-        if (cursorTexture)
-            cursorTexture->Release();
+        CleanUp();
     }
 } _;
 
@@ -140,9 +147,11 @@ void Initialize(IDirect3DDevice8* device) {
     initialized = true;
     for (auto& callback : initializeCallbacks())
         callback();
-    D3DDEVICE_CREATION_PARAMETERS params;
-    device->GetCreationParameters(&params);
-    g_hFocusWindow = params.hFocusWindow;
+    if (!isReset) {
+        D3DDEVICE_CREATION_PARAMETERS params;
+        device->GetCreationParameters(&params);
+        g_hFocusWindow = params.hFocusWindow;
+    }
     if (gs_textureFilePath[0] && D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture) == D3D_OK) {
         D3DXCreateSprite(device, &cursorSprite);
         D3DSURFACE_DESC cursorSize;
@@ -156,6 +165,9 @@ HRESULT WINAPI D3DReset(IDirect3DDevice8* pDevice, D3DPRESENT_PARAMETERS* pPrese
     Initialize(pDevice);
     if (pPresentationParameters->hDeviceWindow != NULL)
         g_hFocusWindow = pPresentationParameters->hDeviceWindow;
+    CleanUp();
+    isReset = true;
+    initialized = false;
     measurementPrepared = false;
     cursorStatePrepared = false;
     return OriReset(pDevice, pPresentationParameters);
