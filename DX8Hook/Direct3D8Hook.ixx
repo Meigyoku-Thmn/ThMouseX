@@ -243,6 +243,23 @@ void RenderCursor(IDirect3DDevice8* pDevice) {
     if (!cursorTexture)
         return;
 
+    bool needRestoreViewport = false;
+    D3DVIEWPORT8 currentViewport;
+    IDirect3DSurface8* pSurface;
+    D3DSURFACE_DESC d3dSize;
+    if (pDevice->GetRenderTarget(&pSurface) == D3D_OK && pSurface->GetDesc(&d3dSize) == D3D_OK) {
+        pSurface->Release();
+        needRestoreViewport = true;
+        pDevice->GetViewport(&currentViewport);
+        D3DVIEWPORT8 myViewport{
+            .X = 0,
+            .Y = 0,
+            .Width = d3dSize.Width,
+            .Height = d3dSize.Height,
+        };
+        pDevice->SetViewport(&myViewport);
+    }
+
     pDevice->BeginScene();
 
     // scale mouse cursor's position from screen coordinate to D3D coordinate
@@ -273,6 +290,9 @@ void RenderCursor(IDirect3DDevice8* pDevice) {
         cursorSprite->Draw(cursorTexture, NULL, scale, NULL, 0, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
     }
     cursorSprite->End();
+
+    if (needRestoreViewport)
+        pDevice->SetViewport(&currentViewport);
 
     pDevice->EndScene();
 }

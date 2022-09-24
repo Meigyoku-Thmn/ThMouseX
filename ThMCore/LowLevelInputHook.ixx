@@ -15,23 +15,12 @@ using namespace std;
 constexpr auto VK_X = 0x58;
 constexpr auto VK_C = 0x43;
 
-SHORT WINAPI _GetAsyncKeyState(int vKey);
-decltype(&_GetAsyncKeyState) OriGetAsyncKeyState;
 BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState);
 decltype(&_GetKeyboardState) OriGetKeyboardState;
 
 export vector<MHookApiConfig> LowLevelInputHookConfig{
-    {L"USER32.DLL", "GetAsyncKeyState", &_GetAsyncKeyState, (PVOID*)&OriGetAsyncKeyState},
     {L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, (PVOID*)&OriGetKeyboardState},
 };
-
-SHORT WINAPI _GetAsyncKeyState(int vKey) {
-    auto rs = OriGetAsyncKeyState(vKey);
-    if (!g_handledByDirectInput) {
-
-    }
-    return rs;
-}
 
 BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState) {
     auto rs = OriGetKeyboardState(lpKeyState);
