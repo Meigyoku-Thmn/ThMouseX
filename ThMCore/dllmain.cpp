@@ -22,11 +22,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             // Thus, get rid of them, thereby eliminating some of the overhead of this DLL.
             DisableThreadLibraryCalls(hModule);
 
-            WCHAR currentProcessName[MAX_PATH];
+            WCHAR currentProcessName[MAX_PATH + 1];
             // Only hook the APIs if we have a configuation of the process.
             // If the process is not what we have anything to do with, just return TRUE, no need to eagerly unload.
             // The DLL will be forcefully unloaded from all processes when ThMouseX closes.
-            GetModuleFileNameW(GetModuleHandleW(NULL), currentProcessName, MAX_PATH);
+            GetModuleFileNameW(GetModuleHandleW(NULL), currentProcessName, MAX_PATH + 1);
+            currentProcessName[MAX_PATH] = '\0';
             PathStripPathW(currentProcessName);
             PathRemoveExtensionW(currentProcessName);
 

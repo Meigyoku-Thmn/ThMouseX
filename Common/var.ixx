@@ -20,8 +20,8 @@ export DLLEXPORT float            g_pixelRate = 1;
 export DLLEXPORT FloatPoint       g_pixelOffset{1, 1};
 
 export DLLEXPORT bool             g_handledByDirectInput;
+export DLLEXPORT bool             g_handledByGetAsyncKeyState;
 export DLLEXPORT bool             g_handledByGetKeyboardState;
-export DLLEXPORT bool             g_handledByJoyGetPosEx;
 
 // configuration from main exe
 #pragma data_seg(".SHRCONF")

@@ -13,6 +13,8 @@ export enum ModulateStage {
     WhiteInc, WhiteDec, BlackInc, BlackDec,
 };
 
+
+
 export struct UINTSIZE {
     UINT width;
     UINT height;
