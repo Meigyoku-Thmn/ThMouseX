@@ -54,8 +54,8 @@ export union TypedPoint {
 export struct AddressChain {
     int     Length;
     DWORD   Level[ADDRESS_CHAIN_MAX_LEN];
-    UNBOUND inline DWORD value() {
-        auto address = Level[0];
+    UNBOUND inline DWORD value(HMODULE baseAddress) const {
+        auto address = Level[0] + (DWORD)baseAddress;
         for (int i = 1; i < Length; i++) {
             address = *(DWORD*)address;
             if (address == NULL)

@@ -27,7 +27,7 @@ export DWORD DetermineGameInput() {
         g_midMousePressed = false;
     }
     if (g_inputEnabled) {
-        auto address = g_currentConfig.Address.value();
+        auto address = g_currentConfig.Address.value(g_mainModule);
         if (address != 0) {
             // support borderless mode (except the DOT by DOT mode from Touhou 18 which I gave up)
             RECTSIZE clientSize;

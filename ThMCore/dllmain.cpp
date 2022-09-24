@@ -17,6 +17,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH: {
             core_hInstance = hModule;
+            g_mainModule = GetModuleHandleA(NULL);
             // We don't need thread notifications for what we're doing.
             // Thus, get rid of them, thereby eliminating some of the overhead of this DLL.
             DisableThreadLibraryCalls(hModule);

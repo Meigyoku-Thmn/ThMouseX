@@ -11,6 +11,7 @@ import common.datatype;
 export DLLEXPORT GameConfig       g_currentConfig;
 
 // global game state
+export DLLEXPORT HMODULE          g_mainModule;
 export DLLEXPORT HWND             g_hFocusWindow;
 export DLLEXPORT bool             g_leftMousePressed;
 export DLLEXPORT bool             g_midMousePressed;

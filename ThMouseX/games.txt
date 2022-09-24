@@ -1,51 +1,53 @@
 ; This file tells ThMouseX how to find player position data.
 ; Each line for a game.
 ;
-; processName   positionAddress         dataType    offset          baseHeight      aspectRatio
+; processName   positionRVA             dataType    offset          baseHeight      aspectRatio
 ;
 ; Touhou 6
-th06            [006CA6B8]              float       (0,0)           480             4:3
-th06e           [006CA6B8]              float       (0,0)           480             4:3
-東方紅魔郷       [006CA6B8]              float       (0,0)           480             4:3
+th06            [002CA6B8]              float       (0,0)           480             4:3
+th06e           [002CA6B8]              float       (0,0)           480             4:3
+東方紅魔郷       [002CA6B8]              float       (0,0)           480             4:3
 ; Touhou 7
-th07            [004BE408]              float       (32,16)         480             4:3
-th07e           [004BE408]              float       (32,16)         480             4:3
+th07            [000BE408]              float       (32,16)         480             4:3
+th07e           [000BE408]              float       (32,16)         480             4:3
 ; Touhou 8
-th08            [017D6110]              float       (0,0)           480             4:3
-th08e           [017D6110]              float       (0,0)           480             4:3
+th08            [013D6110]              float       (0,0)           480             4:3
+th08e           [013D6110]              float       (0,0)           480             4:3
 ; Touhou 9
-th09            [004A7D94][1B88]        float       (161,17)        480             4:3
-th09e           [004A7D94][1B88]        float       (161,17)        480             4:3
+th09            [000A7D94][1B88]        float       (161,17)        480             4:3
+th09e           [000A7D94][1B88]        float       (161,17)        480             4:3
 ; Touhou 9.5
-th095           [004C4E70][15C]         float       (0,0)           480             4:3
-th095e          [004C4E70][15C]         float       (0,0)           480             4:3
+th095           [000C4E70][15C]         float       (0,0)           480             4:3
+th095e          [000C4E70][15C]         float       (0,0)           480             4:3
 ; Touhou 10
-th10            [00477834][3CC]         int         (22400,1600)    48000           4:3
-th10e           [00477834][3CC]         int         (22400,1600)    48000           4:3
+th10            [00077834][3CC]         int         (22400,1600)    48000           4:3
+th10e           [00077834][3CC]         int         (22400,1600)    48000           4:3
 ; Touhou 11
-th11            [004A8EB4][888]         int         (28672,2048)    61440           4:3
-th11e           [004A8EB4][888]         int         (28672,2048)    61440           4:3
+th11            [000A8EB4][888]         int         (28672,2048)    61440           4:3
+th11e           [000A8EB4][888]         int         (28672,2048)    61440           4:3
 ; Touhou 12
-th12            [004B4514][988]         int         (28672,2048)    61440           4:3
-th12e           [004B4514][988]         int         (28672,2048)    61440           4:3
+th12            [000B4514][988]         int         (28672,2048)    61440           4:3
+th12e           [000B4514][988]         int         (28672,2048)    61440           4:3
 ; Touhou 12.5
-th125           [004B68C8][604]         int         (40960,2048)    61440           4:3
-th125e          [004B68C8][604]         int         (40960,2048)    61440           4:3
+th125           [000B68C8][604]         int         (40960,2048)    61440           4:3
+th125e          [000B68C8][604]         int         (40960,2048)    61440           4:3
 ; Touhou 12.8
-th128           [004B8A80][ED8]         int         (40960,2048)    61440           4:3
-th128e          [004B8A80][ED8]         int         (40960,2048)    61440           4:3
+th128           [000B8A80][ED8]         int         (40960,2048)    61440           4:3
+th128e          [000B8A80][ED8]         int         (40960,2048)    61440           4:3
 ; Touhou 13
-th13            [004C22C4][5C4]         int         (28672,2048)    61440           4:3
-th13e           [004C22C4][5C4]         int         (28672,2048)    61440           4:3
+th13            [000C22C4][5C4]         int         (28672,2048)    61440           4:3
+th13e           [000C22C4][5C4]         int         (28672,2048)    61440           4:3
 ; Touhou 14
-th14            [004DB67C][5EC]         int         (28672,2048)    61440           4:3
+th14            [000DB67C][5EC]         int         (28672,2048)    61440           4:3
 ; Touhou 14.3
-th143           [004E6B88][5EC]         int         (40960,2048)    61440           4:3
+th143           [000E6B88][5EC]         int         (40960,2048)    61440           4:3
 ; Touhou 15
-th15            [004E9BB8][624]         int         (28672,2048)    61440           4:3
+th15            [000E9BB8][624]         int         (28672,2048)    61440           4:3
 ; Touhou 16
-th16            [0049FAFC][61C]         int         (28672,2048)    61440           4:3
+th16            [0009FAFC][61C]         int         (28672,2048)    61440           4:3
 ; Touhou 18
-th18            [004CF410][62C]         int         (28672,2048)    61440           4:3
+th18            [000CF410][62C]         int         (28672,2048)    61440           4:3
 ; Touhou 18.5
-th185           [004D7C3C][62C]         int         (40960,2048)    61440           4:3
+th185           [000D7C3C][62C]         int         (40960,2048)    61440           4:3
+; DANMAKAI: Red Forbidden Fruit
+Danmakai        [023D561C][1B4][B4]     float       (239.5,13.5)    540             16:9
