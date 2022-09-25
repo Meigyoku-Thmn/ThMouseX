@@ -39,17 +39,23 @@ int WINAPI _ShowCursor(BOOL bShow) {
     return bShow == TRUE ? 0 : -1;
 }
 
+int cursorVisibility;
+void ShowCursorEx(bool show) {
+    if (show && cursorVisibility < 0)
+        OriShowCursor(TRUE);
+    else if (!show && cursorVisibility >= 0)
+        OriShowCursor(FALSE);
+}
+
 void HideMousePointer() {
     OriSetCursor(NULL);
-    if (isCursorShow)
-        OriShowCursor(FALSE);
+    ShowCursorEx(false);
     isCursorShow = false;
 }
 
 void ShowMousePointer() {
     OriSetCursor(hCursor);
-    if (!isCursorShow)
-        OriShowCursor(TRUE);
+    ShowCursorEx(true);
     isCursorShow = true;
 }
 
@@ -69,10 +75,15 @@ void NormalizeCursor() {
     // to ensure that there is a visible mouse cursor on the game's config dialog
     while (OriShowCursor(TRUE) < 0);
     while (OriShowCursor(FALSE) >= 0);
+    cursorVisibility = -1;
     ShowMousePointer();
 }
 
 LRESULT CALLBACK CBTProcW(int code, WPARAM wParam, LPARAM lParam) {
+    static auto CBTProcInstalled = false;
+    if (!CBTProcInstalled && core_hookApplied)
+        NormalizeCursor();
+    CBTProcInstalled = true;
     return CallNextHookEx(NULL, code, wParam, lParam);
 }
 
@@ -108,9 +119,9 @@ LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
                     ShowMousePointer();
                 else
                     HideMousePointer();
-            }
-            else {
-                OriSetCursor(hCursor);
+            } else {
+                ShowCursorEx(true);
+                DefWindowProcW(_->hwnd, _->message, _->wParam, _->lParam);
             }
         }
     }
