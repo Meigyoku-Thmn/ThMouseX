@@ -1,53 +1,53 @@
 ; This file tells ThMouseX how to find player position data.
 ; Each line for a game.
 ;
-; processName   positionRVA             dataType    offset          baseHeight      aspectRatio     inputMethod
+; processName   positionRVA           dataType   offset         baseHeight   aspectRatio   inputMethod   fixFullBorder
 ;
 ; Touhou 6
-th06            [002CA6B8]              float       (0,0)           480             4:3             DirectInput
-th06e           [002CA6B8]              float       (0,0)           480             4:3             DirectInput
-東方紅魔郷       [002CA6B8]              float       (0,0)           480             4:3             DirectInput
+th06            [002CA6B8]            float      (0,0)          480          4:3           DirectInput        yes
+th06e           [002CA6B8]            float      (0,0)          480          4:3           DirectInput        yes
+東方紅魔郷       [002CA6B8]            float      (0,0)          480          4:3           DirectInput        yes
 ; Touhou 7
-th07            [000BE408]              float       (32,16)         480             4:3             DirectInput
-th07e           [000BE408]              float       (32,16)         480             4:3             DirectInput
+th07            [000BE408]            float      (32,16)        480          4:3           DirectInput        yes
+th07e           [000BE408]            float      (32,16)        480          4:3           DirectInput        yes
 ; Touhou 8
-th08            [013D6110]              float       (0,0)           480             4:3             DirectInput
-th08e           [013D6110]              float       (0,0)           480             4:3             DirectInput
+th08            [013D6110]            float      (0,0)          480          4:3           DirectInput        yes
+th08e           [013D6110]            float      (0,0)          480          4:3           DirectInput        yes
 ; Touhou 9
-th09            [000A7D94][1B88]        float       (161,17)        480             4:3             DirectInput
-th09e           [000A7D94][1B88]        float       (161,17)        480             4:3             DirectInput
+th09            [000A7D94][1B88]      float      (161,17)       480          4:3           DirectInput        yes
+th09e           [000A7D94][1B88]      float      (161,17)       480          4:3           DirectInput        yes
 ; Touhou 9.5
-th095           [000C4E70][15C]         float       (0,0)           480             4:3             DirectInput
-th095e          [000C4E70][15C]         float       (0,0)           480             4:3             DirectInput
+th095           [000C4E70][15C]       float      (0,0)          480          4:3           DirectInput        yes
+th095e          [000C4E70][15C]       float      (0,0)          480          4:3           DirectInput        yes
 ; Touhou 10
-th10            [00077834][3CC]         int         (22400,1600)    48000           4:3             DirectInput
-th10e           [00077834][3CC]         int         (22400,1600)    48000           4:3             DirectInput
+th10            [00077834][3CC]       int        (22400,1600)   48000        4:3           DirectInput        yes
+th10e           [00077834][3CC]       int        (22400,1600)   48000        4:3           DirectInput        yes
 ; Touhou 11
-th11            [000A8EB4][888]         int         (28672,2048)    61440           4:3             DirectInput
-th11e           [000A8EB4][888]         int         (28672,2048)    61440           4:3             DirectInput
+th11            [000A8EB4][888]       int        (28672,2048)   61440        4:3           DirectInput        yes
+th11e           [000A8EB4][888]       int        (28672,2048)   61440        4:3           DirectInput        yes
 ; Touhou 12
-th12            [000B4514][988]         int         (28672,2048)    61440           4:3             DirectInput
-th12e           [000B4514][988]         int         (28672,2048)    61440           4:3             DirectInput
+th12            [000B4514][988]       int        (28672,2048)   61440        4:3           DirectInput        yes
+th12e           [000B4514][988]       int        (28672,2048)   61440        4:3           DirectInput        yes
 ; Touhou 12.5
-th125           [000B68C8][604]         int         (40960,2048)    61440           4:3             DirectInput
-th125e          [000B68C8][604]         int         (40960,2048)    61440           4:3             DirectInput
+th125           [000B68C8][604]       int        (40960,2048)   61440        4:3           DirectInput        yes
+th125e          [000B68C8][604]       int        (40960,2048)   61440        4:3           DirectInput        yes
 ; Touhou 12.8
-th128           [000B8A80][ED8]         int         (40960,2048)    61440           4:3             DirectInput
-th128e          [000B8A80][ED8]         int         (40960,2048)    61440           4:3             DirectInput
+th128           [000B8A80][ED8]       int        (40960,2048)   61440        4:3           DirectInput        yes
+th128e          [000B8A80][ED8]       int        (40960,2048)   61440        4:3           DirectInput        yes
 ; Touhou 13
-th13            [000C22C4][5C4]         int         (28672,2048)    61440           4:3             DirectInput
-th13e           [000C22C4][5C4]         int         (28672,2048)    61440           4:3             DirectInput
+th13            [000C22C4][5C4]       int        (28672,2048)   61440        4:3           DirectInput        yes
+th13e           [000C22C4][5C4]       int        (28672,2048)   61440        4:3           DirectInput        yes
 ; Touhou 14
-th14            [000DB67C][5EC]         int         (28672,2048)    61440           4:3             DirectInput
+th14            [000DB67C][5EC]       int        (28672,2048)   61440        4:3           DirectInput        yes
 ; Touhou 14.3
-th143           [000E6B88][5EC]         int         (40960,2048)    61440           4:3             DirectInput
+th143           [000E6B88][5EC]       int        (40960,2048)   61440        4:3           DirectInput        yes
 ; Touhou 15
-th15            [000E9BB8][624]         int         (28672,2048)    61440           4:3             DirectInput
+th15            [000E9BB8][624]       int        (28672,2048)   61440        4:3           DirectInput        yes
 ; Touhou 16
-th16            [0009FAFC][61C]         int         (28672,2048)    61440           4:3             DirectInput
+th16            [0009FAFC][61C]       int        (28672,2048)   61440        4:3           DirectInput        yes
 ; Touhou 18
-th18            [000CF410][62C]         int         (28672,2048)    61440           4:3             GetKeyboardState
+th18            [000CF410][62C]       int        (28672,2048)   61440        4:3           GetKeyboardState   no
 ; Touhou 18.5
-th185           [000D7C3C][62C]         int         (40960,2048)    61440           4:3             GetKeyboardState
+th185           [000D7C3C][62C]       int        (40960,2048)   61440        4:3           GetKeyboardState   no
 ; DANMAKAI: Red Forbidden Fruit
-Danmakai        [023D561C][1B4][B4]     float       (239.5,13.5)    540             16:9            SendInput
+Danmakai        [023D561C][1B4][B4]   float      (239.5,13.5)   540          16:9          SendInput          no

@@ -182,6 +182,19 @@ export bool ReadGamesFile() {
             continue;
         }
 #pragma endregion
+
+#pragma region read fix fullscreen border
+        wstring fixFullBorder;
+        lineStream >> fixFullBorder;
+        if (_wcsicmp(fixFullBorder.c_str(), L"Yes") == 0)
+            currentConfig.FixFullscreenBorder = true;
+        else if (_wcsicmp(fixFullBorder.c_str(), L"No") == 0)
+            currentConfig.FixFullscreenBorder = false;
+        else {
+            configIdx--;
+            continue;
+        }
+#pragma endregion
     }
 
     if (configIdx == 0) {

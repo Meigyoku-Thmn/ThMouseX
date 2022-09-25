@@ -118,3 +118,13 @@ export DLLEXPORT void RemoveWindowBorder(UINT width, UINT height) {
         return;
     SetWindowPos(g_hFocusWindow, NULL, 0, 0, width, height, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
 }
+
+export DLLEXPORT void FixFullscreenBorder(UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight) {
+    if (!g_currentConfig.FixFullscreenBorder)
+        return;
+    // if client size is smaller than d3d size (fullscreen exclusive mode)
+    if (d3dWidth > clientWidth || d3dHeight > clientHeight) {
+        // clear border to avoid "click-out-of-bound"
+        RemoveWindowBorder(d3dWidth, d3dHeight);
+    }
+}

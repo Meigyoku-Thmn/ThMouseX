@@ -195,11 +195,9 @@ void PrepareMeasurement(IDirect3DDevice9* pDevice) {
     pSurface->Release();
     if (rs != D3D_OK)
         return;
-    // if client size is smaller than d3d size (fullscreen exclusive mode)
-    if (d3dSize.Width > UINT(clientSize.width()) || d3dSize.Height > UINT(clientSize.height())) {
-        // clear border to avoid "click-out-of-bound"
-        RemoveWindowBorder(d3dSize.Width, d3dSize.Height);
-    }
+
+    FixFullscreenBorder(d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
+
     if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
         return;
     g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();

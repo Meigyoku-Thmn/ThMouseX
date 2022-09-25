@@ -78,6 +78,7 @@ export struct GameConfig {
     unsigned int    BaseHeight;
     FloatPoint      AspectRatio;
     InputMethod     InputMethod;
+    bool            FixFullscreenBorder;
 };
 
 export struct GameConfigArray {
