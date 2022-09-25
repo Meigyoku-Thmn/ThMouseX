@@ -44,6 +44,7 @@ export bool ReadGamesFile() {
         getline(gamesFile, _line);
         auto lineView = Trim(_line);
 
+#pragma region ignore blank line and comment line
         // ignore empty line
         if (lineView.empty()) {
             configIdx--;
@@ -55,17 +56,19 @@ export bool ReadGamesFile() {
             configIdx--;
             continue;
         }
+#pragma endregion
 
         // use a "tokenizer"
         wstringstream lineStream{wstring(lineView)};
         wstringstream converter;
         auto& currentConfig = pConfig.Configs[configIdx];
 
-        // read process name
+#pragma region read process name
         wstring processName;
         lineStream >> currentConfig.ProcessName;
+#pragma endregion
 
-        // read pointer chain
+#pragma region read pointer chain
         wstring pointerChainStr;
         lineStream >> pointerChainStr;
         size_t leftBoundIdx = 0, rightBoundIdx = -1;
@@ -88,22 +91,24 @@ export bool ReadGamesFile() {
             configIdx--;
             continue;
         }
+#pragma endregion
 
-        // read data type
+#pragma region read data type
         wstring dataType;
         lineStream >> dataType;
-        if (dataType.compare(L"int") == 0)
-            currentConfig.PosDataType = Int_DataType;
-        else if (dataType.compare(L"float") == 0)
-            currentConfig.PosDataType = Float_DataType;
-        else if (dataType.compare(L"short") == 0)
-            currentConfig.PosDataType = Short_DataType;
+        if (_wcsicmp(dataType.c_str(), L"Int") == 0)
+            currentConfig.PosDataType = PointDataType::Int;
+        else if (_wcsicmp(dataType.c_str(), L"Float") == 0)
+            currentConfig.PosDataType = PointDataType::Float;
+        else if (_wcsicmp(dataType.c_str(), L"Short") == 0)
+            currentConfig.PosDataType = PointDataType::Short;
         else {
             configIdx--;
             continue;
         }
-
-        // read offset (X,Y)
+#pragma endregion
+        
+#pragma region read offset (X,Y)
         wstring posOffsetStr;
         lineStream >> posOffsetStr;
         if (posOffsetStr[0] != '(' || posOffsetStr[posOffsetStr.length() - 1] != ')') {
@@ -131,15 +136,17 @@ export bool ReadGamesFile() {
             configIdx--;
             continue;
         }
+#pragma endregion
 
-        // read game-internal base resolution
+#pragma region read game-internal base resolution
         lineStream >> dec >> currentConfig.BaseHeight;
         if (lineStream.eof() == true) {
             configIdx--;
             continue;
         }
+#pragma endregion
 
-        // read aspect ratio w:h
+#pragma region read aspect ratio w:h
         wstring aspectRatioStr;
         lineStream >> aspectRatioStr;
         auto colonIdx = aspectRatioStr.find(':');
@@ -159,6 +166,22 @@ export bool ReadGamesFile() {
         converter << ratioYStr;
         converter >> ratioY;
         currentConfig.AspectRatio.Y = ratioY;
+#pragma endregion
+
+#pragma region read input method
+        wstring inputMethod;
+        lineStream >> inputMethod;
+        if (_wcsicmp(inputMethod.c_str(), L"DirectInput") == 0)
+            currentConfig.InputMethod = InputMethod::DirectInput;
+        else if (_wcsicmp(inputMethod.c_str(), L"GetKeyboardState") == 0)
+            currentConfig.InputMethod = InputMethod::GetKeyboardState;
+        else if (_wcsicmp(inputMethod.c_str(), L"SendInput") == 0)
+            currentConfig.InputMethod = InputMethod::SendInput;
+        else {
+            configIdx--;
+            continue;
+        }
+#pragma endregion
     }
 
     if (configIdx == 0) {

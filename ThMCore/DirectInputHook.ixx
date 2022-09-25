@@ -11,6 +11,7 @@ export module core.directinputhook;
 import common.var;
 import core.inputdeterminte;
 import common.minhook;
+import common.datatype;
 
 constexpr auto GetDeviceStateIdx = 9;
 constexpr auto ErrorMessageTitle = "DInput Hook Setup Error";
@@ -71,6 +72,8 @@ CleanAndReturn:
 }
 
 export vector<MHookConfig> DInputHookConfig() {
+    if (g_currentConfig.InputMethod != InputMethod::DirectInput)
+        return {};
     auto baseAddress = (DWORD)GetModuleHandleA("DInput8.dll");
     return {
         {PVOID(baseAddress + gs_dinput8_GetDeviceState_RVA), &GetDeviceStateDInput8, (PVOID*)&OriGetDeviceStateDInput8},
@@ -80,7 +83,6 @@ export vector<MHookConfig> DInputHookConfig() {
 HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData) {
     auto hr = OriGetDeviceStateDInput8(pDevice, cbData, lpvData);
     if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
-        g_handledByDirectInput = true;
         auto keys = PBYTE(lpvData);
         auto gameInput = DetermineGameInput();
         if (gameInput & USE_BOMB)

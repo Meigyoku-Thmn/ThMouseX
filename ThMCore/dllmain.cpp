@@ -32,7 +32,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             PathRemoveExtensionW(currentProcessName);
 
             // Of course we ignore the mother.
-            if (wcscmp(currentProcessName, L"THMouseX") == 0)
+            if (_wcsicmp(currentProcessName, L"THMouseX") == 0)
                 return TRUE;
 
             // We use SetWindowsHookEx, so DllMain is always called from a message loop in the target process.
@@ -54,7 +54,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                     MHook_CreateHook(DInputHookConfig());
 
                     // hook Joypad and GetKeyboardState for input manipulation
-                    MHook_CreateHook(LowLevelInputHookConfig);
+                    MHook_CreateHook(LowLevelInputHookConfig());
 
                     // hook Message Queue for additional runtime configuration
                     MHook_CreateHook(MessageQueueHookConfig);

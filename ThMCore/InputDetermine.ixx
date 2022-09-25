@@ -40,11 +40,11 @@ export DWORD DetermineGameInput() {
     playerPos.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X + paddingX); \
     playerPos.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y); \
 }
-            if (g_currentConfig.PosDataType == Int_DataType)
+            if (g_currentConfig.PosDataType == PointDataType::Int)
                 CalculatePosition((IntPoint*)address)
-            else if (g_currentConfig.PosDataType == Float_DataType)
+            else if (g_currentConfig.PosDataType == PointDataType::Float)
                 CalculatePosition((FloatPoint*)address)
-            else if (g_currentConfig.PosDataType == Short_DataType)
+            else if (g_currentConfig.PosDataType == PointDataType::Short)
                 CalculatePosition((ShortPoint*)address);
 
             auto mousePos = GetPointerPosition();

@@ -27,8 +27,8 @@ export struct RECTSIZE: RECT {
     }
 };
 
-export enum PointDataType {
-    Int_DataType, Float_DataType, Short_DataType,
+export enum class PointDataType {
+    Int, Float, Short
 };
 
 export struct IntPoint {
@@ -66,6 +66,10 @@ export struct AddressChain {
     }
 };
 
+export enum class InputMethod {
+    DirectInput, GetKeyboardState, SendInput,
+};
+
 export struct GameConfig {
     WCHAR           ProcessName[PROCESS_NAME_MAX_LEN];
     AddressChain    Address;
@@ -73,6 +77,7 @@ export struct GameConfig {
     FloatPoint      BasePixelOffset;
     unsigned int    BaseHeight;
     FloatPoint      AspectRatio;
+    InputMethod     InputMethod;
 };
 
 export struct GameConfigArray {
