@@ -112,7 +112,6 @@ export vector<MHookConfig> D3D9HookConfig() {
 
 // job flags
 bool initialized;
-bool isReset;
 bool measurementPrepared;
 bool cursorStatePrepared;
 
@@ -147,28 +146,27 @@ void Initialize(IDirect3DDevice9* device) {
     if (initialized)
         return;
     initialized = true;
+    
     for (auto& callback : initializeCallbacks())
         callback();
-    if (!isReset) {
-        D3DDEVICE_CREATION_PARAMETERS params;
-        device->GetCreationParameters(&params);
-        g_hFocusWindow = params.hFocusWindow;
-    }
+
+    D3DDEVICE_CREATION_PARAMETERS params;
+    device->GetCreationParameters(&params);
+    g_hFocusWindow = params.hFocusWindow;
+
     if (gs_textureFilePath[0] && D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture) == D3D_OK) {
         D3DXCreateSprite(device, &cursorSprite);
         D3DSURFACE_DESC cursorSize;
         cursorTexture->GetLevelDesc(0, &cursorSize);
         cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f};
     }
+
     SystemParametersInfoA(SPI_SETCURSORSHADOW, 0, (PVOID)TRUE, SPIF_SENDCHANGE);
 }
 
 HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
     Initialize(pDevice);
-    if (pPresentationParameters->hDeviceWindow != NULL)
-        g_hFocusWindow = pPresentationParameters->hDeviceWindow;
     CleanUp();
-    isReset = true;
     initialized = false;
     measurementPrepared = false;
     cursorStatePrepared = false;
@@ -233,7 +231,7 @@ void PrepareCursorState(IDirect3DDevice9* pDevice) {
     cursorScale = D3DXVECTOR2(scale, scale);
 
     RECTSIZE clientSize;
-    BOOL rs2 = GetClientRect(g_hFocusWindow, &clientSize);
+    auto rs2 = GetClientRect(g_hFocusWindow, &clientSize);
     if (rs2 == 0) {
         d3dScale = 0.f;
         return;
