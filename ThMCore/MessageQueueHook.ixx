@@ -17,6 +17,8 @@ using namespace std;
 
 HCURSOR WINAPI _SetCursor(HCURSOR hCursor);
 decltype(&_SetCursor) OriSetCursor;
+int WINAPI _ShowCursor(BOOL bShow);
+decltype(&_ShowCursor) OriShowCursor;
 
 bool isCursorShow = true;
 auto hCursor = LoadCursorA(NULL, IDC_ARROW);
@@ -26,19 +28,28 @@ constexpr auto VK_S = 0x53;
 
 export vector<MHookApiConfig> MessageQueueHookConfig{
     {L"USER32.DLL", "SetCursor", &_SetCursor, (PVOID*)&OriSetCursor},
+    {L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor},
 };
 
 HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
     return NULL;
 }
 
+int WINAPI _ShowCursor(BOOL bShow) {
+    return bShow == TRUE ? 0 : -1;
+}
+
 void HideMousePointer() {
     OriSetCursor(NULL);
+    if (isCursorShow)
+        OriShowCursor(FALSE);
     isCursorShow = false;
 }
 
 void ShowMousePointer() {
     OriSetCursor(hCursor);
+    if (!isCursorShow)
+        OriShowCursor(TRUE);
     isCursorShow = true;
 }
 
@@ -53,8 +64,16 @@ struct OnInit {
     }
 } _;
 
-LRESULT CALLBACK CBTProcW(int code, WPARAM wparam, LPARAM lparam) {
-    return CallNextHookEx(NULL, code, wparam, lparam);
+void NormalizeCursor() {
+    // Set cursor visibility to -1, reset cursor to a normal arrow,
+    // to ensure that there is a visible mouse cursor on the game's config dialog
+    while (OriShowCursor(TRUE) < 0);
+    while (OriShowCursor(FALSE) >= 0);
+    ShowMousePointer();
+}
+
+LRESULT CALLBACK CBTProcW(int code, WPARAM wParam, LPARAM lParam) {
+    return CallNextHookEx(NULL, code, wParam, lParam);
 }
 
 LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
@@ -80,9 +99,9 @@ LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
     return CallNextHookEx(NULL, code, wParam, lParam);
 }
 
-LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wparam, LPARAM lparam) {
+LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
     if (code == HC_ACTION && core_hookApplied) {
-        auto _ = (PCWPRETSTRUCT)lparam;
+        auto _ = (PCWPRETSTRUCT)lParam;
         if (_->message == WM_SETCURSOR) {
             if (LOWORD(_->lParam) == HTCLIENT) {
                 if (isCursorShow)
@@ -95,7 +114,7 @@ LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wparam, LPARAM lparam) {
             }
         }
     }
-    return CallNextHookEx(NULL, code, wparam, lparam);
+    return CallNextHookEx(NULL, code, wParam, lParam);
 }
 
 bool CheckHookProcHandle(HHOOK handle) {
