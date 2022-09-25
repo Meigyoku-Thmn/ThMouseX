@@ -17,30 +17,27 @@ using namespace std;
 
 HCURSOR WINAPI _SetCursor(HCURSOR hCursor);
 decltype(&_SetCursor) OriSetCursor;
-int WINAPI _ShowCursor(BOOL bShow);
-decltype(&_ShowCursor) OriShowCursor;
+
+bool isCursorShow = true;
+auto hCursor = LoadCursorA(NULL, IDC_ARROW);
+
+constexpr auto VK_A = 0x41;
+constexpr auto VK_S = 0x53;
 
 export vector<MHookApiConfig> MessageQueueHookConfig{
     {L"USER32.DLL", "SetCursor", &_SetCursor, (PVOID*)&OriSetCursor},
-    {L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor},
 };
 
 HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
     return NULL;
 }
 
-int WINAPI _ShowCursor(BOOL bShow) {
-    return bShow == TRUE ? 0 : -1;
+void HideMousePointer() {
+    OriSetCursor(NULL);
+    isCursorShow = false;
 }
 
-bool isCursorShow;
-auto hCursor = LoadCursorA(NULL, IDC_ARROW);
-
-void NormalizeCursor() {
-    // Set cursor visibility to 0, reset cursor to a normal arrow,
-    // to ensure that there is a visible mouse cursor on the game's config dialog
-    while (OriShowCursor(FALSE) >= 0);
-    while (OriShowCursor(TRUE) < 0);
+void ShowMousePointer() {
     OriSetCursor(hCursor);
     isCursorShow = true;
 }
@@ -52,62 +49,53 @@ struct OnInit {
         RegisterD3D9InitializeCallback(Callback);
     }
     static void Callback() {
-        OriSetCursor(NULL);
-        OriShowCursor(FALSE);
-        isCursorShow = false;
+        HideMousePointer();
     }
 } _;
 
-bool CBTProcInstalled;
 LRESULT CALLBACK CBTProcW(int code, WPARAM wparam, LPARAM lparam) {
-    if (!CBTProcInstalled && core_hookApplied)
-        NormalizeCursor();
-    CBTProcInstalled = true;
     return CallNextHookEx(NULL, code, wparam, lparam);
 }
 
-constexpr auto VK_A = 0x41;
-constexpr auto VK_S = 0x53;
-
-bool KeyboardProcInstalled;
-LRESULT CALLBACK KeyboardProcW(int code, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
     if (code == HC_ACTION && core_hookApplied) {
-        if (wParam == VK_A) {
-            // A key
-            OriSetCursor(NULL);
-            if (isCursorShow)
-                OriShowCursor(FALSE);
-            isCursorShow = false;
-        }
-        else if (wParam == VK_S) {
-            // S key
-            OriSetCursor(hCursor);
-            if (!isCursorShow)
-                OriShowCursor(TRUE);
-            isCursorShow = true;
+        static bool isRightMousePressing = false;
+        auto _ = (PMSG)lParam;
+        if (_->message == WM_LBUTTONDOWN)
+            g_leftMousePressed = true;
+        else if (_->message == WM_MBUTTONDOWN)
+            g_midMousePressed = true;
+        else if (_->message == WM_RBUTTONDOWN)
+            isRightMousePressing = true;
+        else if (_->message == WM_RBUTTONUP && isRightMousePressing == true) {
+            isRightMousePressing = false;
+            g_inputEnabled = !g_inputEnabled;
+        } else if (_->message == WM_KEYDOWN) {
+            if (_->wParam == VK_A)
+                HideMousePointer();
+            else if (_->wParam == VK_S)
+                ShowMousePointer();
         }
     }
-    KeyboardProcInstalled = true;
     return CallNextHookEx(NULL, code, wParam, lParam);
 }
 
-bool MouseProcInstalled;
-LRESULT CALLBACK MouseProcW(int code, WPARAM wParam, LPARAM lParam) {
-    static bool isRightMousePressing = false;
+LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wparam, LPARAM lparam) {
     if (code == HC_ACTION && core_hookApplied) {
-        if (wParam == WM_LBUTTONDOWN)
-            g_leftMousePressed = true;
-        else if (wParam == WM_MBUTTONDOWN)
-            g_midMousePressed = true;
-        else if (wParam == WM_RBUTTONDOWN)
-            isRightMousePressing = true;
-        else if (wParam == WM_RBUTTONUP && isRightMousePressing == true) {
-            isRightMousePressing = false;
-            g_inputEnabled = !g_inputEnabled;
+        auto _ = (PCWPRETSTRUCT)lparam;
+        if (_->message == WM_SETCURSOR) {
+            if (LOWORD(_->lParam) == HTCLIENT) {
+                if (isCursorShow)
+                    ShowMousePointer();
+                else
+                    HideMousePointer();
+            }
+            else {
+                OriSetCursor(hCursor);
+            }
         }
     }
-    MouseProcInstalled = true;
-    return CallNextHookEx(NULL, code, wParam, lParam);
+    return CallNextHookEx(NULL, code, wparam, lparam);
 }
 
 bool CheckHookProcHandle(HHOOK handle) {
@@ -118,27 +106,27 @@ bool CheckHookProcHandle(HHOOK handle) {
 }
 
 HHOOK CBTProcHandle;
-HHOOK KeyboardProdHandle;
-HHOOK MouseProcHandle;
+HHOOK GetMsgProcHandle;
+HHOOK CallWndRetProcHandle;
 
 export DLLEXPORT bool InstallHooks() {
     // use CBT hook to inject DLL to the target process as soon as possible
     CBTProcHandle = SetWindowsHookExW(WH_CBT, CBTProcW, core_hInstance, NULL);
     if (!CheckHookProcHandle(CBTProcHandle))
         return false;
-    KeyboardProdHandle = SetWindowsHookExW(WH_KEYBOARD, KeyboardProcW, core_hInstance, NULL);
-    if (!CheckHookProcHandle(KeyboardProdHandle))
+    GetMsgProcHandle = SetWindowsHookExW(WH_GETMESSAGE, GetMsgProcW, core_hInstance, NULL);
+    if (!CheckHookProcHandle(GetMsgProcHandle))
         return false;
-    MouseProcHandle = SetWindowsHookExW(WH_MOUSE, MouseProcW, core_hInstance, NULL);
-    if (!CheckHookProcHandle(MouseProcHandle))
+    CallWndRetProcHandle = SetWindowsHookExW(WH_CALLWNDPROCRET, CallWndRetProcW, core_hInstance, NULL);
+    if (!CheckHookProcHandle(CallWndRetProcHandle))
         return false;
     return true;
 }
 
 export DLLEXPORT void RemoveHooks(void) {
     UnhookWindowsHookEx(CBTProcHandle);
-    UnhookWindowsHookEx(KeyboardProdHandle);
-    UnhookWindowsHookEx(MouseProcHandle);
+    UnhookWindowsHookEx(GetMsgProcHandle);
+    UnhookWindowsHookEx(CallWndRetProcHandle);
     // force all top-level windows to process a message, therefore force all processes to unload the DLL.
     DWORD dwResult;
     SendMessageTimeoutA(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &dwResult);
