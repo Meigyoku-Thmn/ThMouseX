@@ -105,26 +105,51 @@ export DLLEXPORT POINT GetPointerPosition() {
 
 export DLLEXPORT void RemoveWindowBorder(UINT width, UINT height) {
     auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
-    if (style == 0)
-        return;
-    style &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU);
+    style &= ~(WS_CAPTION | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
     auto lExStyle = GetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE);
-    if (lExStyle == 0)
-        return;
     lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
-    if (SetWindowLongPtrW(g_hFocusWindow, GWL_STYLE, style) == 0)
-        return;
-    if (SetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE, lExStyle) == 0)
-        return;
+    SetWindowLongPtrW(g_hFocusWindow, GWL_STYLE, style);
+    SetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE, lExStyle);
     SetWindowPos(g_hFocusWindow, NULL, 0, 0, width, height, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
 }
 
-export DLLEXPORT void FixFullscreenBorder(UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight) {
-    if (!g_currentConfig.FixFullscreenBorder)
-        return;
-    // if client size is smaller than d3d size (fullscreen exclusive mode)
-    if (d3dWidth > clientWidth || d3dHeight > clientHeight) {
-        // clear border to avoid "click-out-of-bound"
-        RemoveWindowBorder(d3dWidth, d3dHeight);
+export DLLEXPORT void FixWindowCoordinate(
+    bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight
+) {
+    if (isExclusiveMode) {
+        auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
+        style &= ~(WS_CAPTION | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+        auto exStyle = GetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE);
+        exStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
+        SetWindowLongPtrW(g_hFocusWindow, GWL_STYLE, style);
+        SetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE, exStyle);
+        auto updateFlags = SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER;
+        SetWindowPos(g_hFocusWindow, NULL, 0, 0, d3dWidth, d3dHeight, updateFlags);
     }
+    else if (d3dWidth > clientWidth || d3dHeight > clientHeight) {
+        // fix for Touhou 18
+        RECTSIZE size{0, 0, LONG(d3dWidth), LONG(d3dHeight)};
+        auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
+        auto hasMenu = GetMenu(g_hFocusWindow) != NULL ? TRUE : FALSE;
+        auto exStyle = GetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE);
+        AdjustWindowRectEx(&size, style, hasMenu, exStyle);
+        auto updateFlags = SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOREPOSITION;
+        SetWindowPos(g_hFocusWindow, NULL, 0, 0, size.width(), size.height(), updateFlags);
+    }
+}
+
+// use for directx8
+export DLLEXPORT bool TestFullscreenHeuristically() {
+    MONITORINFO monitorInfo{
+        .cbSize = sizeof(MONITORINFO),
+    };
+    GetMonitorInfoW(MonitorFromWindow(g_hFocusWindow, MONITOR_DEFAULTTOPRIMARY), &monitorInfo);
+
+    RECT hwndRect;
+    GetWindowRect(g_hFocusWindow, &hwndRect);
+
+    return hwndRect.left == monitorInfo.rcMonitor.left
+        && hwndRect.right == monitorInfo.rcMonitor.right
+        && hwndRect.top == monitorInfo.rcMonitor.top
+        && hwndRect.bottom == monitorInfo.rcMonitor.bottom;
 }

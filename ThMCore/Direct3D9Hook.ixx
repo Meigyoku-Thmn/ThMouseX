@@ -20,14 +20,20 @@ import common.helper;
     dev->SetTextureStageState(i, D3DTSS_COLORARG1, arg1); \
     dev->SetTextureStageState(i, D3DTSS_COLORARG2, arg2)
 
+constexpr auto CreateDeviceIdx = 16;
+
 constexpr auto ResetIdx = 16;
 constexpr auto PresentIdx = 17;
 constexpr auto ErrorMessageTitle = "D3D9 Hook Setup Error";
 
 using namespace std;
 
+HRESULT WINAPI D3DCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DDevice9 **ppReturnedDeviceInterface);
+decltype(&D3DCreateDevice) OriCreateDevice;
+
 HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
 decltype(&D3DReset) OriReset;
+
 HRESULT WINAPI D3DPresent(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
 decltype(&D3DPresent) OriPresent;
 
@@ -53,13 +59,13 @@ export void RegisterD3D9InitializeCallback(CallbackType callback) {
 }
 
 export DLLEXPORT bool PopulateD3D9MethodRVAs() {
-    bool                  result = false;
-    DWORD*                vtable{};
-    HRESULT               rs{};
-    IDirect3D9*           pD3D{};
-    IDirect3DDevice9*     pDevice{};
-    D3DPRESENT_PARAMETERS d3dpp{};
-    DWORD                 baseAddress{};
+    bool                    result = false;
+    DWORD*                  vtable{};
+    HRESULT                 rs{};
+    IDirect3D9*             pD3D{};
+    IDirect3DDevice9*       pDevice{};
+    D3DPRESENT_PARAMETERS   d3dpp{};
+    DWORD                   baseAddress = (DWORD)GetModuleHandleA("d3d9.dll");
 
     auto tmpWnd = CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL);
     if (tmpWnd == NULL) {
@@ -72,6 +78,9 @@ export DLLEXPORT bool PopulateD3D9MethodRVAs() {
         MessageBoxA(NULL, "Failed to create an IDirect3D9 instance.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
         goto CleanAndReturn;
     }
+
+    vtable = *(DWORD**)pD3D;
+    gs_d3d9_CreateDevice_RVA = vtable[CreateDeviceIdx] - baseAddress;
 
     d3dpp.Windowed = TRUE;
     d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
@@ -89,8 +98,6 @@ export DLLEXPORT bool PopulateD3D9MethodRVAs() {
     }
 
     vtable = *(DWORD**)pDevice;
-    baseAddress = (DWORD)GetModuleHandleA("d3d9.dll");
-
     gs_d3d9_Reset_RVA = vtable[ResetIdx] - baseAddress;
     gs_d3d9_Present_RVA = vtable[PresentIdx] - baseAddress;
 
@@ -105,6 +112,7 @@ CleanAndReturn:
 export vector<MHookConfig> D3D9HookConfig() {
     auto baseAddress = (DWORD)GetModuleHandleA("d3d9.dll");
     return {
+        {PVOID(baseAddress + gs_d3d9_CreateDevice_RVA), &D3DCreateDevice, (PVOID*)&OriCreateDevice},
         {PVOID(baseAddress + gs_d3d9_Reset_RVA), &D3DReset, (PVOID*)&OriReset},
         {PVOID(baseAddress + gs_d3d9_Present_RVA), &D3DPresent, (PVOID*)&OriPresent},
     };
@@ -129,6 +137,14 @@ void CleanUp() {
         cursorTexture->Release();
     cursorSprite = NULL;
     cursorTexture = NULL;
+    initialized = false;
+    measurementPrepared = false;
+    cursorStatePrepared = false;
+}
+
+HRESULT WINAPI D3DCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DDevice9 **ppReturnedDeviceInterface) {
+    CleanUp();
+    return OriCreateDevice(pD3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
 }
 
 struct OnInit {
@@ -146,7 +162,7 @@ void Initialize(IDirect3DDevice9* device) {
     if (initialized)
         return;
     initialized = true;
-    
+
     for (auto& callback : initializeCallbacks())
         callback();
 
@@ -165,11 +181,7 @@ void Initialize(IDirect3DDevice9* device) {
 }
 
 HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
-    Initialize(pDevice);
     CleanUp();
-    initialized = false;
-    measurementPrepared = false;
-    cursorStatePrepared = false;
     return OriReset(pDevice, pPresentationParameters);
 }
 
@@ -183,20 +195,35 @@ void PrepareMeasurement(IDirect3DDevice9* pDevice) {
     if (measurementPrepared)
         return;
     measurementPrepared = true;
+
     RECTSIZE clientSize;
     if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
         return;
+
     IDirect3DSurface9* pSurface;
     auto rs = pDevice->GetRenderTarget(0, &pSurface);
     if (rs != D3D_OK)
         return;
+
     D3DSURFACE_DESC d3dSize;
     rs = pSurface->GetDesc(&d3dSize);
     pSurface->Release();
     if (rs != D3D_OK)
         return;
 
-    FixFullscreenBorder(d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
+    IDirect3DSwapChain9* pSwapChain;
+    rs = pDevice->GetSwapChain(0, &pSwapChain);
+    if (rs != D3D_OK)
+        return;
+
+    D3DPRESENT_PARAMETERS presentParams;
+    rs = pSwapChain->GetPresentParameters(&presentParams);
+    pSwapChain->Release();
+    if (rs != D3D_OK)
+        return;
+
+    FixWindowCoordinate(!presentParams.Windowed,
+        d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
 
     if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
         return;
@@ -242,11 +269,10 @@ void RenderCursor(IDirect3DDevice9* pDevice) {
         return;
 
     bool needRestoreViewport = false;
-    D3DVIEWPORT9 currentViewport;
-    IDirect3DSurface9* pSurface;
+    IDirect3DSurface9* pSurface = NULL;
     D3DSURFACE_DESC d3dSize;
+    D3DVIEWPORT9 currentViewport;
     if (pDevice->GetRenderTarget(0, &pSurface) == D3D_OK && pSurface->GetDesc(&d3dSize) == D3D_OK) {
-        pSurface->Release();
         needRestoreViewport = true;
         pDevice->GetViewport(&currentViewport);
         D3DVIEWPORT9 myViewport{
@@ -257,6 +283,8 @@ void RenderCursor(IDirect3DDevice9* pDevice) {
         };
         pDevice->SetViewport(&myViewport);
     }
+    if (pSurface != NULL)
+        pSurface->Release();
 
     pDevice->BeginScene();
 

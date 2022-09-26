@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="games.txt" />
+    <Text Include="virtual-key-codes.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ThMouseX.ini" />
@@ -134,7 +135,8 @@
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)games.txt" "$(OutDir)"
 xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)"
-xcopy /y "$(ProjectDir)ThMouseX.ini" "$(OutDir)"</Command>
+xcopy /y "$(ProjectDir)ThMouseX.ini" "$(OutDir)"
+xcopy /y "$(ProjectDir)virtual-key-codes.txt" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -176,7 +178,8 @@ xcopy /y "$(ProjectDir)ThMouseX.ini" "$(OutDir)"</Command>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)games.txt" "$(OutDir)"
 xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)"
-xcopy /y "$(ProjectDir)ThMouseX.ini" "$(OutDir)"</Command>
+xcopy /y "$(ProjectDir)ThMouseX.ini" "$(OutDir)"
+xcopy /y "$(ProjectDir)virtual-key-codes.txt" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

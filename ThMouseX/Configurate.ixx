@@ -182,19 +182,6 @@ export bool ReadGamesFile() {
             continue;
         }
 #pragma endregion
-
-#pragma region read fix fullscreen border
-        wstring fixFullBorder;
-        lineStream >> fixFullBorder;
-        if (_wcsicmp(fixFullBorder.c_str(), L"Yes") == 0)
-            currentConfig.FixFullscreenBorder = true;
-        else if (_wcsicmp(fixFullBorder.c_str(), L"No") == 0)
-            currentConfig.FixFullscreenBorder = false;
-        else {
-            configIdx--;
-            continue;
-        }
-#pragma endregion
     }
 
     if (configIdx == 0) {
@@ -224,13 +211,7 @@ export bool ReadIniFile() {
     while (!iniFile.eof()) {
         getline(iniFile, _line);
         lineView = Trim(_line);
-        if (lineView.find(L"LeftButton") != wstring::npos) {
-            auto eqIndex = lineView.find('=');
-            auto numStr = lineView.substr(eqIndex + 1);
-            wstringstream ss;
-            ss << numStr;
-            ss >> gs_boomButton;
-        } else if (lineView.find(L"CursorTexture") != wstring::npos) {
+        if (lineView.find(L"CursorTexture") != wstring::npos) {
             auto eqIndex = lineView.find('=');
             auto pathStr = lineView.substr(eqIndex + 1);
             wstringstream ss;
@@ -238,12 +219,6 @@ export bool ReadIniFile() {
             wstring texturePath;
             ss >> texturePath;
             GetFullPathNameW(texturePath.c_str(), MAX_PATH, gs_textureFilePath, NULL);
-        } else if (lineView.find(L"MiddleButton") != wstring::npos) {
-            auto eqIndex = lineView.find('=');
-            auto numStr = lineView.substr(eqIndex + 1);
-            wstringstream ss;
-            ss << numStr;
-            ss >> gs_extraButton;
         } else if (lineView.find(L"CursorOnResolutionX") != wstring::npos) {
             auto eqIndex = lineView.find('=');
             auto numStr = lineView.substr(eqIndex + 1);

@@ -20,10 +20,10 @@ export struct UINTSIZE {
 
 export struct RECTSIZE: RECT {
     UNBOUND inline LONG width() const {
-        return right;
+        return right - left;
     }
     UNBOUND inline LONG height() const {
-        return bottom;
+        return bottom - top;
     }
 };
 
@@ -78,7 +78,6 @@ export struct GameConfig {
     unsigned int    BaseHeight;
     FloatPoint      AspectRatio;
     InputMethod     InputMethod;
-    bool            FixFullscreenBorder;
 };
 
 export struct GameConfigArray {

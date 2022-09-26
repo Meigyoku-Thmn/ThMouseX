@@ -27,9 +27,11 @@ export DLLEXPORT DWORD            gs_extraButton = 3;
 export DLLEXPORT WCHAR            gs_textureFilePath[MAX_PATH]{};
 export DLLEXPORT DWORD            gs_textureBaseHeight = 480;
 
+export DLLEXPORT DWORD            gs_d3d9_CreateDevice_RVA{};
 export DLLEXPORT DWORD            gs_d3d9_Reset_RVA{};
 export DLLEXPORT DWORD            gs_d3d9_Present_RVA{};
 
+export DLLEXPORT DWORD            gs_d3d8_CreateDevice_RVA{};
 export DLLEXPORT DWORD            gs_d3d8_Reset_RVA{};
 export DLLEXPORT DWORD            gs_d3d8_Present_RVA{};
 

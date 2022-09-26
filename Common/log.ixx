@@ -35,36 +35,26 @@ void OpenConsole() {
 #endif
 
 #ifdef _DEBUG
-export DLLEXPORT int ConsoleLogAndFile(const char* _Format, ...) {
-    if (consoleLoaded == false) {
-        OpenConsole();
-        consoleLoaded = true;
-    }
+export DLLEXPORT void FileLog(const char* _Format, ...) {
     va_list args;
     va_start(args, _Format);
-    while (true) {
-        FILE* logFile;
-        logFile = fopen("D:\\thmousex_log.txt", "a+");
-        if (logFile == NULL)
-            break;
+    FILE* logFile;
+    logFile = fopen("D:\\thmousex_log.txt", "a+");
+    if (logFile != NULL) {
         vfprintf(logFile, _Format, args);
         fclose(logFile);
-        break;
     }
-    auto rs = vprintf(_Format, args);
     va_end(args);
-    return rs;
 }
-export DLLEXPORT int ConsoleLog(const char* _Format, ...) {
+export DLLEXPORT void ConsoleLog(const char* _Format, ...) {
     if (consoleLoaded == false) {
         OpenConsole();
         consoleLoaded = true;
     }
     va_list args;
     va_start(args, _Format);
-    auto rs = vprintf(_Format, args);
+    vprintf(_Format, args);
     va_end(args);
-    return rs;
 }
 #endif
 
