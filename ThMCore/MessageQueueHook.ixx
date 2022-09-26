@@ -131,7 +131,7 @@ LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
 bool CheckHookProcHandle(HHOOK handle) {
     if (handle != NULL)
         return true;
-    ReportLastError("Install Hook: Error");
+    ReportLastError("ThMouseX: SetWindowsHookEx Error");
     return false;
 }
 

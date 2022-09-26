@@ -13,9 +13,6 @@ import common.datatype;
 
 using namespace std;
 
-constexpr auto VK_X = 0x58;
-constexpr auto VK_C = 0x43;
-
 BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState);
 decltype(&_GetKeyboardState) OriGetKeyboardState;
 
@@ -32,9 +29,9 @@ BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState) {
     if (rs != FALSE) {
         auto gameInput = DetermineGameInput();
         if (gameInput & USE_BOMB)
-            lpKeyState[VK_X] |= 0x80;
+            lpKeyState[gs_bombButton] |= 0x80;
         if (gameInput & USE_SPECIAL)
-            lpKeyState[VK_C] |= 0x80;
+            lpKeyState[gs_extraButton] |= 0x80;
         if (gameInput & MOVE_LEFT)
             lpKeyState[VK_LEFT] |= 0x80;
         if (gameInput & MOVE_RIGHT)

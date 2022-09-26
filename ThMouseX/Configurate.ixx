@@ -5,6 +5,7 @@
 #include <sstream>
 #include <locale>
 #include <codecvt>
+#include <unordered_map>
 
 export module main.config;
 
@@ -185,7 +186,7 @@ export bool ReadGamesFile() {
     }
 
     if (configIdx == 0) {
-        MessageBoxA(NULL, "No valid data in config file.", "ThMouseX", MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, "No valid data in games file.", "ThMouseX", MB_OK | MB_ICONERROR);
         return false;
     }
     pConfig.Length = configIdx;
@@ -195,17 +196,58 @@ export bool ReadGamesFile() {
 
 export bool ReadIniFile() {
     locale loc(locale(), new codecvt_utf8<wchar_t>);
+    wstring _line;
+    wstring_view lineView;
+
+    wifstream vkcodeFile("virtual-key-codes.txt");
+    vkcodeFile.imbue(loc);
+    if (!vkcodeFile) {
+        MessageBoxA(NULL, "Can not find virtual-key-codes.txt file.", "ThMouseX", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    unordered_map<wstring, BYTE> vkCodes;
+    while (!vkcodeFile.eof()) {
+        getline(vkcodeFile, _line);
+        lineView = Trim(_line);
+        if (lineView.empty())
+            continue;
+        if (lineView[0] == ';')
+            continue;
+        wstringstream lineStream{wstring(lineView)};
+        wstringstream converter;
+
+        wstring key;
+        lineStream >> key;
+        wstring valueStr;
+        lineStream >> valueStr;
+        if (key.size() == 0 || valueStr.size() == 0) {
+            MessageBoxA(NULL, "virtual-key-codes.txt has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        if (valueStr.find(L"0x") != 0) {
+            MessageBoxA(NULL, "virtual-key-codes.txt has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        converter << valueStr.substr(2);
+        int value = -1;
+        converter >> hex >> value;
+        if (value < 0) {
+            MessageBoxA(NULL, "virtual-key-codes.txt has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        vkCodes[key] = value;
+    }
+
     wifstream iniFile("ThMouseX.ini");
     iniFile.imbue(loc);
     if (!iniFile) {
         MessageBoxA(NULL, "Can not find ThMouseX.ini file.", "ThMouseX", MB_OK | MB_ICONERROR);
         return false;
     }
-    wstring _line;
     getline(iniFile, _line);
-    auto lineView = Trim(_line);
+    lineView = Trim(_line);
     if (lineView.compare(L"[ThMouseX]") != 0) {
-        MessageBoxA(NULL, "ThMouseX.ini file error.", "ThMouseX", MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, "ThMouseX.ini has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
         return false;
     }
     while (!iniFile.eof()) {
@@ -213,18 +255,40 @@ export bool ReadIniFile() {
         lineView = Trim(_line);
         if (lineView.find(L"CursorTexture") != wstring::npos) {
             auto eqIndex = lineView.find('=');
-            auto pathStr = lineView.substr(eqIndex + 1);
-            wstringstream ss;
-            ss << pathStr;
-            wstring texturePath;
-            ss >> texturePath;
-            GetFullPathNameW(texturePath.c_str(), MAX_PATH, gs_textureFilePath, NULL);
-        } else if (lineView.find(L"CursorOnResolutionX") != wstring::npos) {
+            auto texturePath = Trim(lineView.substr(eqIndex + 1));
+            if (texturePath.size() == 0) {
+                MessageBoxA(NULL, "ThMouseX.ini: Invalid CursorTexture.", "ThMouseX", MB_OK | MB_ICONERROR);
+                return false;
+            }
+            GetFullPathNameW(wstring(texturePath).c_str(), MAX_PATH, gs_textureFilePath, NULL);
+        } else if (lineView.find(L"CursorBaseHeight") != wstring::npos) {
             auto eqIndex = lineView.find('=');
             auto numStr = lineView.substr(eqIndex + 1);
             wstringstream ss;
             ss << numStr;
             ss >> gs_textureBaseHeight;
+            if (gs_textureBaseHeight == 0) {
+                MessageBoxA(NULL, "ThMouseX.ini: Invalid CursorBaseHeight.", "ThMouseX", MB_OK | MB_ICONERROR);
+                return false;
+            }
+        } else if (lineView.find(L"BombButton") != wstring::npos) {
+            auto eqIndex = lineView.find('=');
+            auto key = wstring(Trim(lineView.substr(eqIndex + 1)));
+            auto value = vkCodes.find(key);
+            if (value == vkCodes.end()) {
+                MessageBoxA(NULL, "ThMouseX.ini: Invalid BombButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                return false;
+            }
+            gs_bombButton = value->second;
+        } else if (lineView.find(L"ExtraButton") != wstring::npos) {
+            auto eqIndex = lineView.find('=');
+            auto key = wstring(Trim(lineView.substr(eqIndex + 1)));
+            auto value = vkCodes.find(key);
+            if (value == vkCodes.end()) {
+                MessageBoxA(NULL, "ThMouseX.ini: Invalid ExtraButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                return false;
+            }
+            gs_extraButton = value->second;
         }
     }
     return true;

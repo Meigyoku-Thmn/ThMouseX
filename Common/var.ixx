@@ -22,8 +22,8 @@ export DLLEXPORT FloatPoint       g_pixelOffset{1, 1};
 // configuration from main exe
 #pragma data_seg(".SHRCONF")
 export DLLEXPORT GameConfigArray  gs_gameConfigArray{};
-export DLLEXPORT DWORD            gs_boomButton = 1;
-export DLLEXPORT DWORD            gs_extraButton = 3;
+export DLLEXPORT BYTE             gs_bombButton = 0x58;
+export DLLEXPORT BYTE             gs_extraButton = 0x43;
 export DLLEXPORT WCHAR            gs_textureFilePath[MAX_PATH]{};
 export DLLEXPORT DWORD            gs_textureBaseHeight = 480;
 
