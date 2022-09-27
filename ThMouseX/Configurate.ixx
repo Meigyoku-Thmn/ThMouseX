@@ -205,7 +205,7 @@ export bool ReadIniFile() {
         MessageBoxA(NULL, "Can not find virtual-key-codes.txt file.", "ThMouseX", MB_OK | MB_ICONERROR);
         return false;
     }
-    unordered_map<wstring, BYTE> vkCodes;
+    unordered_map<wstring, BYTE, wstring_hash, equal_to<>> vkCodes;
     while (!vkcodeFile.eof()) {
         getline(vkcodeFile, _line);
         lineView = Trim(_line);
@@ -254,26 +254,22 @@ export bool ReadIniFile() {
         getline(iniFile, _line);
         lineView = Trim(_line);
         if (lineView.find(L"CursorTexture") != wstring::npos) {
-            auto eqIndex = lineView.find('=');
-            auto texturePath = Trim(lineView.substr(eqIndex + 1));
+            auto texturePath = Trim(lineView.substr(lineView.find('=') + 1));
             if (texturePath.size() == 0) {
                 MessageBoxA(NULL, "ThMouseX.ini: Invalid CursorTexture.", "ThMouseX", MB_OK | MB_ICONERROR);
                 return false;
             }
             GetFullPathNameW(wstring(texturePath).c_str(), MAX_PATH, gs_textureFilePath, NULL);
         } else if (lineView.find(L"CursorBaseHeight") != wstring::npos) {
-            auto eqIndex = lineView.find('=');
-            auto numStr = lineView.substr(eqIndex + 1);
             wstringstream ss;
-            ss << numStr;
+            ss << lineView.substr(lineView.find('=') + 1);
             ss >> gs_textureBaseHeight;
             if (gs_textureBaseHeight == 0) {
                 MessageBoxA(NULL, "ThMouseX.ini: Invalid CursorBaseHeight.", "ThMouseX", MB_OK | MB_ICONERROR);
                 return false;
             }
         } else if (lineView.find(L"BombButton") != wstring::npos) {
-            auto eqIndex = lineView.find('=');
-            auto key = wstring(Trim(lineView.substr(eqIndex + 1)));
+            auto key = Trim(lineView.substr(lineView.find('=') + 1));
             auto value = vkCodes.find(key);
             if (value == vkCodes.end()) {
                 MessageBoxA(NULL, "ThMouseX.ini: Invalid BombButton.", "ThMouseX", MB_OK | MB_ICONERROR);
@@ -281,8 +277,7 @@ export bool ReadIniFile() {
             }
             gs_bombButton = value->second;
         } else if (lineView.find(L"ExtraButton") != wstring::npos) {
-            auto eqIndex = lineView.find('=');
-            auto key = wstring(Trim(lineView.substr(eqIndex + 1)));
+            auto key = Trim(lineView.substr(lineView.find('=') + 1));
             auto value = vkCodes.find(key);
             if (value == vkCodes.end()) {
                 MessageBoxA(NULL, "ThMouseX.ini: Invalid ExtraButton.", "ThMouseX", MB_OK | MB_ICONERROR);

@@ -2,8 +2,11 @@ module;
 
 #include "framework.h"
 #include "macro.h"
+#include <functional>
 
 export module common.datatype;
+
+using namespace std;
 
 export constexpr auto PROCESS_NAME_MAX_LEN = 64;
 export constexpr auto ADDRESS_CHAIN_MAX_LEN = 8;
@@ -83,4 +86,12 @@ export struct GameConfig {
 export struct GameConfigArray {
     int         Length;
     GameConfig  Configs[GAME_CONFIG_MAX_LEN];
+};
+
+export struct wstring_hash {
+    using hash_type = hash<wstring_view>;
+    using is_transparent = void;
+    UNBOUND size_t operator()(const wchar_t* str) const { return hash_type{}(str); }
+    UNBOUND size_t operator()(wstring_view str) const { return hash_type{}(str); }
+    UNBOUND size_t operator()(wstring const& str) const { return hash_type{}(str); }
 };
