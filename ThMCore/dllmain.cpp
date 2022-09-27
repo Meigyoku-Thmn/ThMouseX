@@ -6,7 +6,7 @@ import common.minhook;
 import common.var;
 import common.datatype;
 import common.helper;
-import core.lowlevelinputhook;
+import core.keyboardstatehook;
 import core.messagequeuehook;
 import core.directinputhook;
 import dx8.hook;
@@ -36,7 +36,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 return TRUE;
 
             // We use SetWindowsHookEx, so DllMain is always called from a message loop in the target process.
-            // Therefore, this is pretty thread-safe beside some edge cases (the PeekMessageHook).
+            // Therefore, this is pretty thread-safe unless you hook GetMessage/PeekMessage.
             // The same thing happens for UnhookWindowsHookEx.
             for (int i = 0; i < gs_gameConfigArray.Length; i++) {
                 if (_wcsicmp(currentProcessName, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
@@ -54,7 +54,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                     MHook_CreateHook(DInputHookConfig());
 
                     // hook Joypad and GetKeyboardState for input manipulation
-                    MHook_CreateHook(LowLevelInputHookConfig());
+                    MHook_CreateHook(KeyboardStateHookConfig());
 
                     // hook Message Queue for additional runtime configuration
                     MHook_CreateHook(MessageQueueHookConfig);

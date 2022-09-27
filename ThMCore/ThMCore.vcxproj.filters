@@ -20,7 +20,7 @@
     <ClCompile Include="DirectInputHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LowLevelInputHook.ixx">
+    <ClCompile Include="KeyboardStateHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MessageQueueHook.ixx">

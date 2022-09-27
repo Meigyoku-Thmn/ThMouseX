@@ -159,5 +159,5 @@ export DLLEXPORT void RemoveHooks(void) {
     UnhookWindowsHookEx(CallWndRetProcHandle);
     // force all top-level windows to process a message, therefore force all processes to unload the DLL.
     DWORD dwResult;
-    SendMessageTimeoutA(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &dwResult);
+    SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &dwResult);
 }

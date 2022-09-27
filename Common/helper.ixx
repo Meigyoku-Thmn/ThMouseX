@@ -18,21 +18,12 @@ import common.datatype;
 using namespace std;
 
 export DLLEXPORT void ReportLastError(const char* title) {
+    auto flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
     auto dwErr = GetLastError();
-    // lookup error code and display it
-    LPVOID lpMsgBuf{};
-    FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        dwErr,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-        (LPTSTR)&lpMsgBuf,
-        0,
-        NULL
-    );
-    MessageBoxA(NULL, (LPCTSTR)lpMsgBuf, title, MB_OK | MB_ICONERROR);
-    // Free the buffer.
-    LocalFree(lpMsgBuf);
+    PSTR errorMessage{};
+    FormatMessageA(flags, NULL, dwErr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), PSTR(&errorMessage), 0, NULL);
+    MessageBoxA(NULL, errorMessage, title, MB_OK | MB_ICONERROR);
+    LocalFree(errorMessage);
 }
 
 wregex whitespace(LR"([^\s])", wregex::ECMAScript | wregex::optimize);

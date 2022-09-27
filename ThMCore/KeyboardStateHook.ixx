@@ -4,7 +4,7 @@ module;
 #include <mmsystem.h>
 #include <vector>
 
-export module core.lowlevelinputhook;
+export module core.keyboardstatehook;
 
 import common.minhook;
 import core.inputdeterminte;
@@ -16,7 +16,7 @@ using namespace std;
 BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState);
 decltype(&_GetKeyboardState) OriGetKeyboardState;
 
-export vector<MHookApiConfig> LowLevelInputHookConfig() {
+export vector<MHookApiConfig> KeyboardStateHookConfig() {
     if (g_currentConfig.InputMethod != InputMethod::GetKeyboardState)
         return {};
     return {

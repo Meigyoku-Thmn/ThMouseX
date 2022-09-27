@@ -164,7 +164,7 @@
     <ClCompile Include="compilerConfig.cpp" />
     <ClCompile Include="Direct3D9Hook.ixx" />
     <ClCompile Include="DirectInputHook.ixx" />
-    <ClCompile Include="LowLevelInputHook.ixx" />
+    <ClCompile Include="KeyboardStateHook.ixx" />
     <ClCompile Include="MessageQueueHook.ixx" />
     <ClCompile Include="Variables.ixx" />
   </ItemGroup>

@@ -13,15 +13,9 @@ export module common.log;
 using namespace std;
 
 #ifdef _DEBUG
-bool consoleLoaded = false;
-#endif
-
-#ifdef _DEBUG
 void OpenConsole() {
-    if (consoleLoaded == true)
+    if (AllocConsole() == FALSE)
         return;
-    consoleLoaded = true;
-    AllocConsole();
 
 #pragma warning(push)
 #pragma warning(disable: 6031)
@@ -47,10 +41,7 @@ export DLLEXPORT void FileLog(const char* _Format, ...) {
     va_end(args);
 }
 export DLLEXPORT void ConsoleLog(const char* _Format, ...) {
-    if (consoleLoaded == false) {
-        OpenConsole();
-        consoleLoaded = true;
-    }
+    OpenConsole();
     va_list args;
     va_start(args, _Format);
     vprintf(_Format, args);
