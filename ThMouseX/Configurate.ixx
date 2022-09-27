@@ -176,8 +176,8 @@ export bool ReadGamesFile() {
             currentConfig.InputMethod = InputMethod::DirectInput;
         else if (_wcsicmp(inputMethod.c_str(), L"GetKeyboardState") == 0)
             currentConfig.InputMethod = InputMethod::GetKeyboardState;
-        else if (_wcsicmp(inputMethod.c_str(), L"SendInput") == 0)
-            currentConfig.InputMethod = InputMethod::SendInput;
+        else if (_wcsicmp(inputMethod.c_str(), L"SendKey") == 0)
+            currentConfig.InputMethod = InputMethod::SendKey;
         else {
             configIdx--;
             continue;
@@ -259,7 +259,7 @@ export bool ReadIniFile() {
                 MessageBoxA(NULL, "ThMouseX.ini: Invalid CursorTexture.", "ThMouseX", MB_OK | MB_ICONERROR);
                 return false;
             }
-            GetFullPathNameW(wstring(texturePath).c_str(), MAX_PATH, gs_textureFilePath, NULL);
+            GetFullPathNameW(wstring(texturePath).c_str(), ARRAYSIZE(gs_textureFilePath), gs_textureFilePath, NULL);
         } else if (lineView.find(L"CursorBaseHeight") != wstring::npos) {
             wstringstream ss;
             ss << lineView.substr(lineView.find('=') + 1);

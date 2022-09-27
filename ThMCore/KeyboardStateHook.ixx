@@ -7,7 +7,7 @@ module;
 export module core.keyboardstatehook;
 
 import common.minhook;
-import core.inputdeterminte;
+import core.inputdetermine;
 import common.var;
 import common.datatype;
 

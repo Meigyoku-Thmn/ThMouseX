@@ -70,7 +70,7 @@ export struct AddressChain {
 };
 
 export enum class InputMethod {
-    DirectInput, GetKeyboardState, SendInput,
+    DirectInput, GetKeyboardState, SendKey,
 };
 
 export struct GameConfig {

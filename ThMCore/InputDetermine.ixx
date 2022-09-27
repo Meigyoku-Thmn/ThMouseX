@@ -3,7 +3,7 @@ module;
 #include "framework.h"
 #include <cmath>
 
-export module core.inputdeterminte;
+export module core.inputdetermine;
 
 import common.var;
 import common.helper;

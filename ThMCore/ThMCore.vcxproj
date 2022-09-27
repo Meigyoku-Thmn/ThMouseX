@@ -166,6 +166,7 @@
     <ClCompile Include="DirectInputHook.ixx" />
     <ClCompile Include="KeyboardStateHook.ixx" />
     <ClCompile Include="MessageQueueHook.ixx" />
+    <ClCompile Include="SendKey.cpp" />
     <ClCompile Include="Variables.ixx" />
   </ItemGroup>
   <ItemGroup>

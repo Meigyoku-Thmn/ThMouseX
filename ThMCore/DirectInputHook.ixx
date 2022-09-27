@@ -9,7 +9,7 @@ module;
 export module core.directinputhook;
 
 import common.var;
-import core.inputdeterminte;
+import core.inputdetermine;
 import common.minhook;
 import common.datatype;
 

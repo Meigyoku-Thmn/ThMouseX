@@ -50,12 +50,21 @@ inline const char* GetD3dErrStr(const int errorCode) {
 }
 
 using CallbackType = void (*)(void);
+
 vector<CallbackType>& initializeCallbacks() {
     static vector<CallbackType> backing;
     return backing;
 }
 export void RegisterD3D9InitializeCallback(CallbackType callback) {
     initializeCallbacks().push_back(callback);
+}
+
+vector<CallbackType>& postRenderCallbacks() {
+    static vector<CallbackType> backing;
+    return backing;
+}
+export DLLEXPORT void RegisterD3D9PostRenderCallbacks(CallbackType callback) {
+    postRenderCallbacks().push_back(callback);
 }
 
 export DLLEXPORT bool PopulateD3D9MethodRVAs() {
@@ -329,5 +338,7 @@ HRESULT WINAPI D3DPresent(IDirect3DDevice9 * pDevice, RECT* pSourceRect, RECT* p
     PrepareMeasurement(pDevice);
     PrepareCursorState(pDevice);
     RenderCursor(pDevice);
+    for (auto& callback : postRenderCallbacks())
+        callback();
     return OriPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }

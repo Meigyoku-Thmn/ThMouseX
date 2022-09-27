@@ -26,8 +26,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             // Only hook the APIs if we have a configuation of the process.
             // If the process is not what we have anything to do with, just return TRUE, no need to eagerly unload.
             // The DLL will be forcefully unloaded from all processes when ThMouseX closes.
-            GetModuleFileNameW(GetModuleHandleW(NULL), currentProcessName, MAX_PATH + 1);
-            currentProcessName[MAX_PATH] = '\0';
+            GetModuleFileNameW(GetModuleHandleW(NULL), currentProcessName, ARRAYSIZE(currentProcessName));
+            currentProcessName[ARRAYSIZE(currentProcessName) - 1] = '\0';
             PathStripPathW(currentProcessName);
             PathRemoveExtensionW(currentProcessName);
 
