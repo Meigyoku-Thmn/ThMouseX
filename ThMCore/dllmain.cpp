@@ -1,11 +1,13 @@
 ﻿#include "framework.h"
 #include "macro.h"
 #include <shlwapi.h>
+#include <clocale>
 
 import common.minhook;
 import common.var;
 import common.datatype;
 import common.helper;
+import common.scripting;
 import core.keyboardstatehook;
 import core.messagequeuehook;
 import core.directinputhook;
@@ -16,6 +18,8 @@ import core.var;
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH: {
+            setlocale(LC_ALL, ".UTF8");
+
             core_hInstance = hModule;
             g_mainModule = GetModuleHandleA(NULL);
             // We don't need thread notifications for what we're doing.
@@ -42,6 +46,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 if (_wcsicmp(currentProcessName, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
                     g_currentConfig = gs_gameConfigArray.Configs[i];
 
+                    InitializeScripting();
                     MHook_Initialize();
 
                     // hook DirectX 9 for crosshair cursor and collect window measurement
@@ -74,8 +79,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             break;
         case DLL_PROCESS_DETACH:
             if (core_hookApplied) {
-                auto isProcessTerminating = lpReserved != 0;
-                MHook_Uninitialize(isProcessTerminating);
+                MHook_Uninitialize(lpReserved != 0);
+                UninitializeScripting();
             }
             break;
     }

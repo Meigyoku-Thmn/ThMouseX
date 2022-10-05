@@ -1,5 +1,6 @@
 ﻿#include "framework.h"
 #include "resource.h"
+#include <clocale>
 
 import common.datatype;
 import main.config;
@@ -8,16 +9,19 @@ import core.messagequeuehook;
 constexpr auto MAX_LOADSTRING = 100;
 
 HINSTANCE   hInst;							// current instance
-TCHAR       szTitle[MAX_LOADSTRING];        // The title bar text
-TCHAR       szWindowClass[MAX_LOADSTRING];	// the main window class name
-TCHAR       szBalloonInfo[MAX_LOADSTRING];
+CHAR        szTitle[MAX_LOADSTRING];        // The title bar text
+CHAR        szWindowClass[MAX_LOADSTRING];	// the main window class name
+CHAR        szBalloonInfo[MAX_LOADSTRING];
 
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK	DialogProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK DialogProc(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow) {
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+
+    setlocale(LC_ALL, ".UTF8");
+
     hInst = hInstance;
 
     auto hMutex = CreateMutexA(NULL, TRUE, "ThMouseX");

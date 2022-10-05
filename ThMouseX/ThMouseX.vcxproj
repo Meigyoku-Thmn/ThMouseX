@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="compilerConfig.cpp" />
+    <ClCompile Include="CompilerConfig.cpp" />
     <ClCompile Include="Configurate.ixx" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -52,6 +52,7 @@
     <Text Include="virtual-key-codes.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ConfigScripts\Danmakai.lua" />
     <None Include="ThMouseX.ini" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -133,10 +134,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)games.txt" "$(OutDir)"
-xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)"
-xcopy /y "$(ProjectDir)ThMouseX.ini" "$(OutDir)"
-xcopy /y "$(ProjectDir)virtual-key-codes.txt" "$(OutDir)"</Command>
+      <Command>
+xcopy /y "$(ProjectDir)games.txt" "$(OutDir)" /s /d
+xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)" /s /d
+xcopy /y "$(ProjectDir)ThMouseX.ini" "$(OutDir)" /s /d
+xcopy /y "$(ProjectDir)virtual-key-codes.txt" "$(OutDir)" /s /d
+xcopy /y "$(ProjectDir)ConfigScripts" "$(OutDir)ConfigScripts" /i /s /d
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -176,10 +180,13 @@ xcopy /y "$(ProjectDir)virtual-key-codes.txt" "$(OutDir)"</Command>
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)games.txt" "$(OutDir)"
-xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)"
-xcopy /y "$(ProjectDir)ThMouseX.ini" "$(OutDir)"
-xcopy /y "$(ProjectDir)virtual-key-codes.txt" "$(OutDir)"</Command>
+      <Command>
+xcopy /y "$(ProjectDir)games.txt" "$(OutDir)" /s /d
+xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)" /s /d
+xcopy /y "$(ProjectDir)ThMouseX.ini" "$(OutDir)" /s /d
+xcopy /y "$(ProjectDir)virtual-key-codes.txt" "$(OutDir)" /s /d
+xcopy /y "$(ProjectDir)ConfigScripts" "$(OutDir)ConfigScripts" /i /s /d
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

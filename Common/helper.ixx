@@ -14,6 +14,7 @@ export module common.helper;
 
 import common.var;
 import common.datatype;
+import common.scripting;
 
 using namespace std;
 
@@ -104,9 +105,8 @@ export DLLEXPORT void RemoveWindowBorder(UINT width, UINT height) {
     SetWindowPos(g_hFocusWindow, NULL, 0, 0, width, height, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
 }
 
-export DLLEXPORT void FixWindowCoordinate(
-    bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight
-) {
+export DLLEXPORT
+void FixWindowCoordinate(bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight) {
     if (isExclusiveMode) {
         auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
         style &= ~(WS_CAPTION | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
@@ -143,4 +143,29 @@ export DLLEXPORT bool TestFullscreenHeuristically() {
         && hwndRect.right == monitorInfo.rcMonitor.right
         && hwndRect.top == monitorInfo.rcMonitor.top
         && hwndRect.bottom == monitorInfo.rcMonitor.bottom;
+}
+
+DLLEXPORT_C DWORD resolveAddress(DWORD* offsets, int length) {
+    if (length <= 0)
+        return NULL;
+    auto address = offsets[0] + (DWORD)g_mainModule;
+    for (int i = 1; i < length; i++) {
+        address = *PDWORD(address);
+        if (address == NULL)
+            break;
+        address += offsets[i];
+    }
+    return address;
+}
+
+DLLEXPORT_C bool compareToString(DWORD address, const char* str) {
+    return strcmp((const char*)address, str) == 0;
+}
+
+export DLLEXPORT DWORD CalculateAddress() {
+    if (g_currentConfig.CalcAddressByScripting) {
+        return GetPositionAddress();
+    } else {
+        return resolveAddress(g_currentConfig.Address.Level, g_currentConfig.Address.Length);
+    }
 }

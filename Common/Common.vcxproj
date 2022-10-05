@@ -168,12 +168,14 @@
     <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="datatype.ixx" />
-    <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="helper.ixx" />
-    <ClCompile Include="log.ixx" />
-    <ClCompile Include="minhook.ixx" />
-    <ClCompile Include="var.ixx" />
+    <ClCompile Include="CompilerConfig.cpp" />
+    <ClCompile Include="DataType.ixx" />
+    <ClCompile Include="DllMain.cpp" />
+    <ClCompile Include="Helper.ixx" />
+    <ClCompile Include="Log.ixx" />
+    <ClCompile Include="MinHook.ixx" />
+    <ClCompile Include="Scripting.ixx" />
+    <ClCompile Include="Var.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

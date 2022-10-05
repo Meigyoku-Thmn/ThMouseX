@@ -6,13 +6,16 @@ module;
 #include <iostream>
 #include <chrono>
 #include <cstdio>
+#include <string>
+#include <codecvt>
 #endif
 
 export module common.log;
 
+import common.var;
+
 using namespace std;
 
-#ifdef _DEBUG
 void OpenConsole() {
     if (AllocConsole() == FALSE)
         return;
@@ -26,20 +29,25 @@ void OpenConsole() {
 
     printf("Debugging Window:\n\n");
 }
-#endif
 
-#ifdef _DEBUG
+FILE* logFile;
+string logPath;
 export DLLEXPORT void FileLog(const char* _Format, ...) {
     va_list args;
     va_start(args, _Format);
-    FILE* logFile;
-    logFile = fopen("D:\\thmousex_log.txt", "a+");
+    if (logFile == NULL) {
+        if (logPath.size() == 0)
+            logPath = wstring_convert<codecvt_utf8_utf16<wchar_t>>().to_bytes(wstring(g_currentModuleDirPath) + L"/log.txt");
+        logFile = fopen(logPath.c_str(), "a+");
+        if (logFile != NULL)
+            setvbuf(logFile, NULL, _IONBF, 0);
+    }
     if (logFile != NULL) {
         vfprintf(logFile, _Format, args);
-        fclose(logFile);
     }
     va_end(args);
 }
+
 export DLLEXPORT void ConsoleLog(const char* _Format, ...) {
     OpenConsole();
     va_list args;
@@ -47,9 +55,7 @@ export DLLEXPORT void ConsoleLog(const char* _Format, ...) {
     vprintf(_Format, args);
     va_end(args);
 }
-#endif
 
-#ifdef _DEBUG
 export DLLEXPORT void PrintFPS() {
     using namespace chrono;
     static time_point<steady_clock> oldTime = high_resolution_clock::now();
@@ -61,4 +67,3 @@ export DLLEXPORT void PrintFPS() {
         fps = 0;
     }
 }
-#endif

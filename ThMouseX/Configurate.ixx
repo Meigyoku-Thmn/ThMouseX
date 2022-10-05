@@ -69,28 +69,33 @@ export bool ReadGamesFile() {
         lineStream >> currentConfig.ProcessName;
 #pragma endregion
 
-#pragma region read pointer chain
+#pragma region read position address
         wstring pointerChainStr;
         lineStream >> pointerChainStr;
-        size_t leftBoundIdx = 0, rightBoundIdx = -1;
-        for (size_t addressLevelIdx = 0; addressLevelIdx < ADDRESS_CHAIN_MAX_LEN; addressLevelIdx++) {
-            DWORD address;
-            leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
-            if (leftBoundIdx == wstring::npos)
-                break;
-            rightBoundIdx = pointerChainStr.find(']', leftBoundIdx + 1);
-            if (rightBoundIdx == wstring::npos)
-                break;
-            auto memoryOffsetStr = pointerChainStr.substr(leftBoundIdx + 1, rightBoundIdx - leftBoundIdx - 1);
-            converter.clear();
-            converter << memoryOffsetStr;
-            converter >> hex >> address;
-            currentConfig.Address.Level[addressLevelIdx] = address;
-            currentConfig.Address.Length++;
+        if (_wcsicmp(pointerChainStr.c_str(), L"UseConfigScript") == 0) {
+            currentConfig.CalcAddressByScripting = true;
         }
-        if (currentConfig.Address.Level[0] == 0) {
-            configIdx--;
-            continue;
+        else {
+            size_t leftBoundIdx = 0, rightBoundIdx = -1;
+            for (size_t addressLevelIdx = 0; addressLevelIdx < ADDRESS_CHAIN_MAX_LEN; addressLevelIdx++) {
+                DWORD address;
+                leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
+                if (leftBoundIdx == wstring::npos)
+                    break;
+                rightBoundIdx = pointerChainStr.find(']', leftBoundIdx + 1);
+                if (rightBoundIdx == wstring::npos)
+                    break;
+                auto memoryOffsetStr = pointerChainStr.substr(leftBoundIdx + 1, rightBoundIdx - leftBoundIdx - 1);
+                converter.clear();
+                converter << memoryOffsetStr;
+                converter >> hex >> address;
+                currentConfig.Address.Level[addressLevelIdx] = address;
+                currentConfig.Address.Length++;
+            }
+            if (currentConfig.Address.Level[0] == 0) {
+                configIdx--;
+                continue;
+            }
         }
 #pragma endregion
 

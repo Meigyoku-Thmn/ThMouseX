@@ -11,7 +11,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="DllMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Direct3D9Hook.ixx">
@@ -29,7 +29,7 @@
     <ClCompile Include="InputDetermine.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="compilerConfig.cpp">
+    <ClCompile Include="CompilerConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Variables.ixx">

@@ -153,7 +153,7 @@ export DLLEXPORT bool InstallHooks() {
     return true;
 }
 
-export DLLEXPORT void RemoveHooks(void) {
+export DLLEXPORT void RemoveHooks() {
     UnhookWindowsHookEx(CBTProcHandle);
     UnhookWindowsHookEx(GetMsgProcHandle);
     UnhookWindowsHookEx(CallWndRetProcHandle);

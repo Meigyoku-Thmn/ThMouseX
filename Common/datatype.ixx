@@ -57,16 +57,6 @@ export union TypedPoint {
 export struct AddressChain {
     int     Length;
     DWORD   Level[ADDRESS_CHAIN_MAX_LEN];
-    UNBOUND inline DWORD value(HMODULE baseAddress) const {
-        auto address = Level[0] + (DWORD)baseAddress;
-        for (int i = 1; i < Length; i++) {
-            address = *(DWORD*)address;
-            if (address == NULL)
-                break;
-            address += Level[i];
-        }
-        return address;
-    }
 };
 
 export enum class InputMethod {
@@ -76,6 +66,7 @@ export enum class InputMethod {
 export struct GameConfig {
     WCHAR           ProcessName[PROCESS_NAME_MAX_LEN];
     AddressChain    Address;
+    bool            CalcAddressByScripting;
     PointDataType   PosDataType;
     FloatPoint      BasePixelOffset;
     unsigned int    BaseHeight;

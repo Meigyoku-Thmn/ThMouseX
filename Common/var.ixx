@@ -7,6 +7,9 @@ export module common.var;
 
 import common.datatype;
 
+export HMODULE g_commonModule;
+export WCHAR g_currentModuleDirPath[MAX_PATH + 1];
+
 // single game config
 export DLLEXPORT GameConfig       g_currentConfig;
 

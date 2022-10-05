@@ -159,9 +159,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="InputDetermine.ixx" />
-    <ClCompile Include="compilerConfig.cpp" />
+    <ClCompile Include="CompilerConfig.cpp" />
     <ClCompile Include="Direct3D9Hook.ixx" />
     <ClCompile Include="DirectInputHook.ixx" />
     <ClCompile Include="KeyboardStateHook.ixx" />
