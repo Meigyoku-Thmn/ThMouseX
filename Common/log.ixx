@@ -16,7 +16,7 @@ import common.var;
 
 using namespace std;
 
-void OpenConsole() {
+DLLEXPORT_C void OpenConsole() {
     if (AllocConsole() == FALSE)
         return;
 

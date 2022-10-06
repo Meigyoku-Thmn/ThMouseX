@@ -158,8 +158,8 @@ DLLEXPORT_C DWORD resolveAddress(DWORD* offsets, int length) {
     return address;
 }
 
-DLLEXPORT_C bool compareToString(DWORD address, const char* str) {
-    return strcmp((const char*)address, str) == 0;
+DLLEXPORT_C DWORD readUInt32(DWORD address) {
+    return *PDWORD(address);
 }
 
 export DLLEXPORT DWORD CalculateAddress() {
