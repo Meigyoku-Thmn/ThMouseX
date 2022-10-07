@@ -2,13 +2,10 @@
 -- This game was made in GameMaker Studio
 local ffi = require("ffi")
 ffi.cdef [[
-    void     OpenConsole     ();
     uint32_t resolveAddress  (uint32_t* offsets, int length);
     uint32_t readUInt32      (uint32_t address);
 ]]
 local ThMouseX = ffi.load('Common.dll')
-
--- ThMouseX.OpenConsole()
 
 local PLAYER_ELDY = 278
 local PLAYER_DIANA = 279
