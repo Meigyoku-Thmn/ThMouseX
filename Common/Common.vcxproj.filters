@@ -37,10 +37,13 @@
     <ClCompile Include="MinHook.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scripting.ixx">
+    <ClCompile Include="LuaJIT.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CompilerConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NeoLua.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -12,8 +12,18 @@ import common.helper;
 import core.var;
 import core.directx9hook;
 import dx8.hook;
+import common.neolua;
 
 using namespace std;
+
+UINT CLEAN_MANAGED_DATA = RegisterWindowMessageA("CLEAN_MANAGED_DATA {6BF7C2B8-F245-4781-AA3C-467366CA3551}");
+export DLLEXPORT bool TestRegisteredWindowMessages() {
+    if (CLEAN_MANAGED_DATA == 0) {
+        MessageBoxA(NULL, "Failed to register CLEAN_MANAGED_DATA message.", "RegisterWindowMessage error", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    return true;
+}
 
 HCURSOR WINAPI _SetCursor(HCURSOR hCursor);
 decltype(&_SetCursor) OriSetCursor;
@@ -79,31 +89,33 @@ void NormalizeCursor() {
     ShowMousePointer();
 }
 
-LRESULT CALLBACK CBTProcW(int code, WPARAM wParam, LPARAM lParam) {
-    static auto CBTProcInstalled = false;
-    if (!CBTProcInstalled && core_hookApplied)
-        NormalizeCursor();
-    CBTProcInstalled = true;
-    return CallNextHookEx(NULL, code, wParam, lParam);
-}
-
 LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
     if (code == HC_ACTION && core_hookApplied) {
+        static auto neoLuaInitialized = false;
+        if (!neoLuaInitialized) {
+            neoLuaInitialized = true;
+            InitializeNeoLua();
+        }
+        static auto cursorNormalized = false;
+        if (!cursorNormalized) {
+            cursorNormalized = true;
+            NormalizeCursor();
+        }
         static bool isRightMousePressing = false;
-        auto _ = (PMSG)lParam;
-        if (_->message == WM_LBUTTONDOWN)
+        auto e = (PMSG)lParam;
+        if (e->message == WM_LBUTTONDOWN)
             g_leftMousePressed = true;
-        else if (_->message == WM_MBUTTONDOWN)
+        else if (e->message == WM_MBUTTONDOWN)
             g_midMousePressed = true;
-        else if (_->message == WM_RBUTTONDOWN)
+        else if (e->message == WM_RBUTTONDOWN)
             isRightMousePressing = true;
-        else if (_->message == WM_RBUTTONUP && isRightMousePressing == true) {
+        else if (e->message == WM_RBUTTONUP && isRightMousePressing == true) {
             isRightMousePressing = false;
             g_inputEnabled = !g_inputEnabled;
-        } else if (_->message == WM_KEYDOWN) {
-            if (_->wParam == VK_A)
+        } else if (e->message == WM_KEYDOWN) {
+            if (e->wParam == VK_A)
                 HideMousePointer();
-            else if (_->wParam == VK_S)
+            else if (e->wParam == VK_S)
                 ShowMousePointer();
         }
     }
@@ -112,16 +124,19 @@ LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
 
 LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
     if (code == HC_ACTION && core_hookApplied) {
-        auto _ = (PCWPRETSTRUCT)lParam;
-        if (_->message == WM_SETCURSOR) {
-            if (LOWORD(_->lParam) == HTCLIENT) {
+        auto e = (PCWPRETSTRUCT)lParam;
+        if (e->message == CLEAN_MANAGED_DATA) {
+            UninitializeNeoLua();
+        }
+        else if (e->message == WM_SETCURSOR) {
+            if (LOWORD(e->lParam) == HTCLIENT) {
                 if (isCursorShow)
                     ShowMousePointer();
                 else
                     HideMousePointer();
             } else {
                 ShowCursorEx(true);
-                DefWindowProcW(_->hwnd, _->message, _->wParam, _->lParam);
+                DefWindowProcW(e->hwnd, e->message, e->wParam, e->lParam);
             }
         }
     }
@@ -135,15 +150,10 @@ bool CheckHookProcHandle(HHOOK handle) {
     return false;
 }
 
-HHOOK CBTProcHandle;
 HHOOK GetMsgProcHandle;
 HHOOK CallWndRetProcHandle;
 
 export DLLEXPORT bool InstallHooks() {
-    // use CBT hook to inject DLL to the target process as soon as possible
-    CBTProcHandle = SetWindowsHookExW(WH_CBT, CBTProcW, core_hInstance, NULL);
-    if (!CheckHookProcHandle(CBTProcHandle))
-        return false;
     GetMsgProcHandle = SetWindowsHookExW(WH_GETMESSAGE, GetMsgProcW, core_hInstance, NULL);
     if (!CheckHookProcHandle(GetMsgProcHandle))
         return false;
@@ -154,10 +164,13 @@ export DLLEXPORT bool InstallHooks() {
 }
 
 export DLLEXPORT void RemoveHooks() {
-    UnhookWindowsHookEx(CBTProcHandle);
+    DWORD _;
+    auto broadcastFlags = SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG;
+    // notify targets to clean up managed data, but managed DLLs/assemblies unfortunately cannot be unloaded.
+    SendMessageTimeoutW(HWND_BROADCAST, CLEAN_MANAGED_DATA, 0, 0, broadcastFlags, 1000, &_);
+    // unregister hooks.
     UnhookWindowsHookEx(GetMsgProcHandle);
     UnhookWindowsHookEx(CallWndRetProcHandle);
     // force all top-level windows to process a message, therefore force all processes to unload the DLL.
-    DWORD dwResult;
-    SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &dwResult);
+    SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, broadcastFlags, 1000, &_);
 }

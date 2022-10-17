@@ -6,14 +6,14 @@ module;
 #include "macro.h"
 #include "luajit/lua.hpp"
 
-export module common.scripting;
+export module common.luajit;
 
 import common.var;
 import common.log;
 
 using namespace std;
 
-export bool scriptingDisabled = false;
+bool scriptingDisabled = false;
 
 #define GET_POSITION_ADDRESS "getPositionAddress"
 
@@ -21,20 +21,20 @@ lua_State* L;
 
 bool CheckAndDisableIfError(lua_State *L, int r) {
     if (r != 0) {
-        FileLog("[LuaJIT] %s\n", lua_tostring(L, -1));
+        FileLog("[LuaJIT] %s", lua_tostring(L, -1));
         scriptingDisabled = true;
         return false;
     }
     return true;
 }
 
-export DLLEXPORT void InitializeScripting() {
-    if (!g_currentConfig.CalcAddressByScripting)
+export DLLEXPORT void InitializeLuaJIT() {
+    if (g_currentConfig.ScriptingMethodToFindAddress != ScriptingMethod::LuaJIT)
         return;
 
     L = luaL_newstate();
     if (L == NULL) {
-        FileLog("[LuaJIT] %s\n", "Failed to initialize LuaJIT.");
+        FileLog("[LuaJIT] %s", "Failed to initialize LuaJIT.");
         scriptingDisabled = true;
         return;
     }
@@ -49,13 +49,13 @@ export DLLEXPORT void InitializeScripting() {
 
     lua_getglobal(L, GET_POSITION_ADDRESS);
     if (!lua_isfunction(L, -1)) {
-        FileLog("[LuaJIT] %s\n", GET_POSITION_ADDRESS " function not found in global scope.");
+        FileLog("[LuaJIT] %s", GET_POSITION_ADDRESS " function not found in global scope.");
         scriptingDisabled = true;
         return;
     }
 }
 
-export DWORD GetPositionAddress() {
+export DWORD LuaJIT_GetPositionAddress() {
     if (scriptingDisabled)
         return NULL;
 
@@ -65,7 +65,7 @@ export DWORD GetPositionAddress() {
         return NULL;
 
     if (!lua_isnumber(L, -1)) {
-        FileLog("[LuaJIT] %s\n", "The value returned from " GET_POSITION_ADDRESS " wasn't a number.");
+        FileLog("[LuaJIT] %s", "The value returned from " GET_POSITION_ADDRESS " wasn't a number.");
         scriptingDisabled = true;
         return NULL;
     }
@@ -75,7 +75,7 @@ export DWORD GetPositionAddress() {
     return result;
 }
 
-export DLLEXPORT void UninitializeScripting() {
+export DLLEXPORT void UninitializeLuaJIT() {
     if (L != NULL)
         lua_close(L);
 }

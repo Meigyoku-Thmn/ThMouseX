@@ -14,7 +14,8 @@ export module common.helper;
 
 import common.var;
 import common.datatype;
-import common.scripting;
+import common.luajit;
+import common.neolua;
 
 using namespace std;
 
@@ -163,8 +164,10 @@ DLLEXPORT_C DWORD readUInt32(DWORD address) {
 }
 
 export DLLEXPORT DWORD CalculateAddress() {
-    if (g_currentConfig.CalcAddressByScripting) {
-        return GetPositionAddress();
+    if (g_currentConfig.ScriptingMethodToFindAddress == ScriptingMethod::LuaJIT) {
+        return LuaJIT_GetPositionAddress();
+    } else if (g_currentConfig.ScriptingMethodToFindAddress == ScriptingMethod::NeoLua) {
+        return NeoLua_GetPositionAddress();
     } else {
         return resolveAddress(g_currentConfig.Address.Level, g_currentConfig.Address.Length);
     }

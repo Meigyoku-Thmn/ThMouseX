@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ConfigScripts\Danmakai.lua" />
+    <None Include="ConfigScripts\THMHJ.lua" />
     <None Include="ThMouseX.ini" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

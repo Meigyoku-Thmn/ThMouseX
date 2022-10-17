@@ -62,5 +62,8 @@
     <None Include="ConfigScripts\Danmakai.lua">
       <Filter>ConfigScripts</Filter>
     </None>
+    <None Include="ConfigScripts\THMHJ.lua">
+      <Filter>ConfigScripts</Filter>
+    </None>
   </ItemGroup>
 </Project>

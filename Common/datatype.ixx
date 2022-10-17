@@ -63,10 +63,14 @@ export enum class InputMethod {
     DirectInput, GetKeyboardState, SendKey,
 };
 
+export enum class ScriptingMethod {
+    None, LuaJIT, NeoLua
+};
+
 export struct GameConfig {
     WCHAR           ProcessName[PROCESS_NAME_MAX_LEN];
     AddressChain    Address;
-    bool            CalcAddressByScripting;
+    ScriptingMethod ScriptingMethodToFindAddress;
     PointDataType   PosDataType;
     FloatPoint      BasePixelOffset;
     unsigned int    BaseHeight;

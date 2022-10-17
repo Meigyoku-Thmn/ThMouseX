@@ -7,7 +7,6 @@ module;
 #include <chrono>
 #include <cstdio>
 #include <string>
-#include <codecvt>
 #endif
 
 export module common.log;
@@ -31,19 +30,20 @@ DLLEXPORT_C void OpenConsole() {
 }
 
 FILE* logFile;
-string logPath;
+wstring logPath;
 export DLLEXPORT void FileLog(const char* _Format, ...) {
     va_list args;
     va_start(args, _Format);
     if (logFile == NULL) {
         if (logPath.size() == 0)
-            logPath = wstring_convert<codecvt_utf8_utf16<wchar_t>>().to_bytes(wstring(g_currentModuleDirPath) + L"/log.txt");
-        logFile = fopen(logPath.c_str(), "a+");
+            logPath = wstring(g_currentModuleDirPath) + L"/log.txt";
+        logFile = _wfsopen(logPath.c_str(), L"a+", _SH_DENYNO);
         if (logFile != NULL)
             setvbuf(logFile, NULL, _IONBF, 0);
     }
     if (logFile != NULL) {
         vfprintf(logFile, _Format, args);
+        fprintf(logFile, "\n");
     }
     va_end(args);
 }
@@ -53,6 +53,7 @@ export DLLEXPORT void ConsoleLog(const char* _Format, ...) {
     va_list args;
     va_start(args, _Format);
     vprintf(_Format, args);
+    printf("\n");
     va_end(args);
 }
 
@@ -63,7 +64,7 @@ export DLLEXPORT void PrintFPS() {
 
     if (duration_cast<seconds>(high_resolution_clock::now() - oldTime) >= seconds{1}) {
         oldTime = high_resolution_clock::now();
-        ConsoleLog("FPS: %d\n", fps);
+        ConsoleLog("FPS: %d", fps);
         fps = 0;
     }
 }

@@ -44,14 +44,12 @@ end
 
 -- native code will call into this function for each frame
 function getPositionAddress()
-    -- use cache address
     if (objectFound == true) then
         local address = testAndGetAddress()
         if (address ~= 0) then
             return address
         end
     end
-    -- scan address range if presets scan fails, this is for practice mode
     for objectIdx = 0, ThMouseX.readUInt32(objectPoolCountAddress) - 1 do
         local address = testAndGetAddress(objectIdx)
         if (address ~= 0) then
@@ -59,7 +57,6 @@ function getPositionAddress()
             return address
         end
     end
-    -- remove cache if all fail
     objectFound = false
     return 0
 end

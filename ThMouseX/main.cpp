@@ -30,6 +30,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 1;
     }
 
+    if (!TestRegisteredWindowMessages())
+        return 1;
+
     if (!PopulateMethodRVAs())
         return 1;
 

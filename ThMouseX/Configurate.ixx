@@ -72,10 +72,12 @@ export bool ReadGamesFile() {
 #pragma region read position address
         wstring pointerChainStr;
         lineStream >> pointerChainStr;
-        if (_wcsicmp(pointerChainStr.c_str(), L"UseConfigScript") == 0) {
-            currentConfig.CalcAddressByScripting = true;
-        }
-        else {
+        currentConfig.ScriptingMethodToFindAddress = ScriptingMethod::None;
+        if (_wcsicmp(pointerChainStr.c_str(), L"LuaJIT") == 0) {
+            currentConfig.ScriptingMethodToFindAddress = ScriptingMethod::LuaJIT;
+        } else if (_wcsicmp(pointerChainStr.c_str(), L"NeoLua") == 0) {
+            currentConfig.ScriptingMethodToFindAddress = ScriptingMethod::NeoLua;
+        } else {
             size_t leftBoundIdx = 0, rightBoundIdx = -1;
             for (size_t addressLevelIdx = 0; addressLevelIdx < ADDRESS_CHAIN_MAX_LEN; addressLevelIdx++) {
                 DWORD address;
@@ -113,7 +115,7 @@ export bool ReadGamesFile() {
             continue;
         }
 #pragma endregion
-        
+
 #pragma region read offset (X,Y)
         wstring posOffsetStr;
         lineStream >> posOffsetStr;
