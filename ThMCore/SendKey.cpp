@@ -8,6 +8,12 @@ import common.datatype;
 import core.inputdetermine;
 import common.minhook;
 
+using namespace core::inputdetermine;
+
+namespace minhook = common::minhook;
+namespace directx8 = dx8::hook;
+namespace directx9 = core::directx9hook;
+
 struct LastState {
     bool bomb;
     bool extra;
@@ -49,33 +55,35 @@ void HandleTriggerKey(DWORD gameInput, bool& lastState, BYTE vkCode) {
     }
 }
 
+void TestInputAndSendKeys() {
+    if (g_currentConfig.InputMethod != InputMethod::SendKey)
+        return;
+    auto gameInput = DetermineGameInput();
+    HandleTriggerKey(gameInput & USE_BOMB, _ref lastState.bomb, gs_bombButton);
+    HandleTriggerKey(gameInput & USE_SPECIAL, _ref lastState.extra, gs_extraButton);
+    HandleHoldKey(gameInput & MOVE_LEFT, _ref lastState.left, VK_LEFT);
+    HandleHoldKey(gameInput & MOVE_RIGHT, _ref lastState.right, VK_RIGHT);
+    HandleHoldKey(gameInput & MOVE_UP, _ref lastState.up, VK_UP);
+    HandleHoldKey(gameInput & MOVE_DOWN, _ref lastState.down, VK_DOWN);
+}
+
+void CleanUp(bool isProcessTerminating) {
+    if (g_currentConfig.InputMethod != InputMethod::SendKey)
+        return;
+    if (isProcessTerminating)
+        return;
+    SendKeyUp(gs_bombButton);
+    SendKeyUp(gs_extraButton);
+    SendKeyUp(VK_LEFT);
+    SendKeyUp(VK_RIGHT);
+    SendKeyUp(VK_UP);
+    SendKeyUp(VK_DOWN);
+}
+
 struct OnInit {
     OnInit() {
-        RegisterD3D8PostRenderCallbacks(TestInputAndSendKeys);
-        RegisterD3D9PostRenderCallbacks(TestInputAndSendKeys);
-        RegisterMHookUninitializeCallback(CleanUp);
-    }
-    static void TestInputAndSendKeys() {
-        if (g_currentConfig.InputMethod != InputMethod::SendKey)
-            return;
-        auto gameInput = DetermineGameInput();
-        HandleTriggerKey(gameInput & USE_BOMB, _ref lastState.bomb, gs_bombButton);
-        HandleTriggerKey(gameInput & USE_SPECIAL, _ref lastState.extra, gs_extraButton);
-        HandleHoldKey(gameInput & MOVE_LEFT, _ref lastState.left, VK_LEFT);
-        HandleHoldKey(gameInput & MOVE_RIGHT, _ref lastState.right, VK_RIGHT);
-        HandleHoldKey(gameInput & MOVE_UP, _ref lastState.up, VK_UP);
-        HandleHoldKey(gameInput & MOVE_DOWN, _ref lastState.down, VK_DOWN);
-    }
-    static void CleanUp(bool isProcessTerminating) {
-        if (g_currentConfig.InputMethod != InputMethod::SendKey)
-            return;
-        if (isProcessTerminating)
-            return;
-        SendKeyUp(gs_bombButton);
-        SendKeyUp(gs_extraButton);
-        SendKeyUp(VK_LEFT);
-        SendKeyUp(VK_RIGHT);
-        SendKeyUp(VK_UP);
-        SendKeyUp(VK_DOWN);
+        directx8::RegisterPostRenderCallbacks(TestInputAndSendKeys);
+        directx9::RegisterPostRenderCallbacks(TestInputAndSendKeys);
+        minhook::RegisterUninitializeCallback(CleanUp);
     }
 } _;

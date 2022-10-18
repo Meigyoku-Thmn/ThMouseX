@@ -25,10 +25,10 @@
     <ClCompile Include="Log.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Var.ixx">
+    <ClCompile Include="Variables.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DataType.ixx">
+    <ClCompile Include="DataTypes.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Helper.ixx">
@@ -44,6 +44,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NeoLua.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.Memory.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

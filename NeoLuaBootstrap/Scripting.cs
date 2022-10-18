@@ -4,64 +4,15 @@ using Sigil;
 using Sigil.NonGeneric;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace NeoLuaBootstrap
 {
-    using DelegateMap = Dictionary<string, (Delegate Delegate, GCHandle Handle)>;
-    public static class Handlers
-    {
-        [DllImport("Common", CallingConvention = CallingConvention.Cdecl)]
-        static extern void SetOnClose(IntPtr address);
-
-        static readonly DelegateMap EventDelegates = new DelegateMap();
-
-        static Handlers()
-        {
-            var onCloseDelegate = new OnClose(OnClose_Impl);
-            var gcOnCloseHandle = GCHandle.Alloc(onCloseDelegate);
-            EventDelegates.Add(nameof(OnClose), (onCloseDelegate, gcOnCloseHandle));
-        }
-
-        static public int OnInit(string scriptPath)
-        {
-            Scripting.Patch(scriptPath);
-            SetOnClose(Marshal.GetFunctionPointerForDelegate(EventDelegates[nameof(OnClose)].Delegate));
-            return 0;
-        }
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        delegate void OnClose();
-        static public void OnClose_Impl()
-        {
-            Scripting.Unpatch();
-        }
-    }
-
-    static class Logging
-    {
-        static readonly string LogPath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "log.txt");
-        static StreamWriter _log;
-        public static StreamWriter Log {
-            get {
-                if (_log == null) _log = new StreamWriter(new FileStream(
-                        LogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 1), Encoding.UTF8, 1) {
-                    AutoFlush = true
-                };
-                return _log;
-            }
-        }
-    }
-
     static class Scripting
     {
         [StructLayout(LayoutKind.Sequential)]
@@ -72,10 +23,13 @@ namespace NeoLuaBootstrap
         }
 
         [DllImport("Common", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void SetPositionAddress(IntPtr address);
+        public static extern void Common_NeoLua_SetPositionAddress(IntPtr address);
 
         [DllImport("Common", CallingConvention = CallingConvention.Cdecl)]
-        public static extern PointDataType GetDataType();
+        public static extern PointDataType Common_NeoLua_GetDataType();
+
+        [DllImport("Common", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void Common_NeoLua_OpenConsole();
 
         static readonly List<Delegate> DelegateStore = new List<Delegate>();
         static readonly FieldInfo DelegateStoreField = AccessTools.Field(typeof(Scripting), nameof(DelegateStore));
@@ -85,7 +39,7 @@ namespace NeoLuaBootstrap
         {
             Int, Float, Short
         };
-        static readonly PointDataType DataType = GetDataType();
+        static readonly PointDataType DataType = Common_NeoLua_GetDataType();
         public static readonly object Pos = DataType == PointDataType.Int ? new Position<int>() :
                                             DataType == PointDataType.Float ? new Position<float>() :
                                             DataType == PointDataType.Short ? new Position<short>() : default(object);
@@ -153,7 +107,7 @@ namespace NeoLuaBootstrap
         static readonly Harmony HarmonyInst = new Harmony(HarmonyId);
         static public void Unpatch()
         {
-            SetPositionAddress(IntPtr.Zero);
+            Common_NeoLua_SetPositionAddress(IntPtr.Zero);
             HarmonyInst.UnpatchAll(HarmonyId);
             PrefixStore.Clear();
             PostfixStore.Clear();
@@ -162,11 +116,12 @@ namespace NeoLuaBootstrap
             L = null;
         }
 
-        const string InitialScript = @"
+        const string PreparationScript = @"
             const _Traverse typeof HarmonyLib.Traverse
             Traverse = _Traverse
             const Scripting typpeof NeoLuaBootstrap.Scripting
-            Pos = Scripting.Pos
+            Position = Scripting.Pos
+            OpenConsole = Scripting.Common_NeoLua_OpenConsole
         ";
 
         static public void Patch(string scriptPath)
@@ -175,12 +130,12 @@ namespace NeoLuaBootstrap
             {
                 if (Pos == null)
                     return;
-                SetPositionAddress(PosHandle.AddrOfPinnedObject());
+                Common_NeoLua_SetPositionAddress(PosHandle.AddrOfPinnedObject());
 
                 L = new Lua();
                 var g = L.CreateEnvironment();
 
-                g.DoChunk(InitialScript, nameof(InitialScript));
+                g.DoChunk(PreparationScript, nameof(PreparationScript));
 
                 var chunk = L.CompileChunk(scriptPath, new LuaCompileOptions {
                     DebugEngine = LuaStackTraceDebugger.Default,
@@ -199,7 +154,7 @@ namespace NeoLuaBootstrap
                     var targetMethodPath = config[1] as string;
                     if (targetMethodPath == null)
                     {
-                        Logging.Log.WriteLine($"[NeoLua] Invalid target method path in hook configuration (Ordinal: {i + 1}).");
+                        Logging.File.WriteLine($"[NeoLua] Invalid target method path in hook configuration (Ordinal: {i + 1}).");
                         continue;
                     }
 
@@ -207,14 +162,14 @@ namespace NeoLuaBootstrap
                     var postfixHook = config[3] as Delegate;
                     if (prefixHook == null && postfixHook == null)
                     {
-                        Logging.Log.WriteLine($"[NeoLua] All hook functions are invalid in hook configuration (Ordinal: {i + 1}).");
+                        Logging.File.WriteLine($"[NeoLua] All hook functions are invalid in hook configuration (Ordinal: {i + 1}).");
                         continue;
                     }
 
                     var original = AccessTools.Method(targetMethodPath);
                     if (original == null)
                     {
-                        Logging.Log.WriteLine($"[NeoLua] Failed to get method ${targetMethodPath}.");
+                        Logging.File.WriteLine($"[NeoLua] Failed to get method ${targetMethodPath}.");
                         continue;
                     }
 
@@ -233,13 +188,13 @@ namespace NeoLuaBootstrap
             }
             catch (LuaRuntimeException e)
             {
-                Logging.Log.WriteLine("[NeoLua] " + LuaExceptionData.GetData(e).FormatStackTrace(0, false));
-                Logging.Log.WriteLine("[NeoLua] " + e);
+                Logging.File.WriteLine("[NeoLua] " + LuaExceptionData.GetData(e).FormatStackTrace(0, false));
+                Logging.File.WriteLine("[NeoLua] " + e);
                 Unpatch();
             }
             catch (Exception e) when (e is LuaParseException || e is Exception)
             {
-                Logging.Log.WriteLine("[NeoLua] " + e);
+                Logging.File.WriteLine("[NeoLua] " + e);
                 Unpatch();
             }
         }

@@ -32,9 +32,6 @@
     <ClCompile Include="CompilerConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Variables.ixx">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SendKey.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

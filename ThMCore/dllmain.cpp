@@ -13,15 +13,22 @@ import core.messagequeuehook;
 import core.directinputhook;
 import dx8.hook;
 import core.directx9hook;
-import core.var;
+
+namespace minhook = common::minhook;
+namespace luajit = common::luajit;
+namespace messagequeuehook = core::messagequeuehook;
+namespace directx8 = dx8::hook;
+namespace directx9 = core::directx9hook;
+namespace directinput = core::directinputhook;
+namespace keyboardstate = core::keyboardstatehook;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH: {
             setlocale(LC_ALL, ".UTF8");
 
-            core_hInstance = hModule;
-            g_mainModule = GetModuleHandleW(NULL);
+            g_coreModule = hModule;
+            g_targetModule = GetModuleHandleW(NULL);
             // We don't need thread notifications for what we're doing.
             // Thus, get rid of them, thereby eliminating some of the overhead of this DLL.
             DisableThreadLibraryCalls(hModule);
@@ -30,7 +37,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             // Only hook the APIs if we have a configuation of the process.
             // If the process is not what we have anything to do with, just return TRUE, no need to eagerly unload.
             // The DLL will be forcefully unloaded from all processes when ThMouseX closes.
-            GetModuleFileNameW(g_mainModule, currentProcessName, ARRAYSIZE(currentProcessName));
+            GetModuleFileNameW(g_targetModule, currentProcessName, ARRAYSIZE(currentProcessName));
             currentProcessName[ARRAYSIZE(currentProcessName) - 1] = '\0';
             PathStripPathW(currentProcessName);
             PathRemoveExtensionW(currentProcessName);
@@ -46,27 +53,27 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 if (_wcsicmp(currentProcessName, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
                     g_currentConfig = gs_gameConfigArray.Configs[i];
 
-                    InitializeLuaJIT();
-                    MHook_Initialize();
-
-                    // hook DirectX 9 for crosshair cursor and collect window measurement
-                    MHook_CreateHook(D3D9HookConfig());
+                    luajit::Initialize();
+                    minhook::Initialize();
 
                     // hook DirectX 8 for crosshair cursor and collect window measurement
-                    MHook_CreateHook(D3D8HookConfig());
+                    minhook::CreateHook(directx8::HookConfig());
+
+                    // hook DirectX 9 for crosshair cursor and collect window measurement
+                    minhook::CreateHook(directx9::HookConfig());
 
                     // hook DirectInput8 for input manipulation
-                    MHook_CreateHook(DInputHookConfig());
+                    minhook::CreateHook(directinput::HookConfig());
 
                     // hook Joypad and GetKeyboardState for input manipulation
-                    MHook_CreateHook(KeyboardStateHookConfig());
+                    minhook::CreateHook(keyboardstate::HookConfig());
 
                     // hook Message Queue for additional runtime configuration
-                    MHook_CreateHook(MessageQueueHookConfig);
+                    minhook::CreateHook(messagequeuehook::HookConfig);
 
 
-                    MHook_EnableAll();
-                    core_hookApplied = true;
+                    minhook::EnableAll();
+                    g_hookApplied = true;
 
                     break;
                 }
@@ -78,9 +85,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         case DLL_THREAD_DETACH:
             break;
         case DLL_PROCESS_DETACH:
-            if (core_hookApplied) {
-                MHook_Uninitialize(lpReserved != 0);
-                UninitializeLuaJIT();
+            if (g_hookApplied) {
+                minhook::Uninitialize(lpReserved != 0);
+                luajit::Uninitialize();
             }
             break;
     }

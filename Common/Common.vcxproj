@@ -169,14 +169,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompilerConfig.cpp" />
-    <ClCompile Include="DataType.ixx" />
+    <ClCompile Include="DataTypes.ixx" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="Helper.ixx" />
     <ClCompile Include="Log.ixx" />
+    <ClCompile Include="Helper.Memory.ixx" />
     <ClCompile Include="MinHook.ixx" />
     <ClCompile Include="LuaJIT.ixx" />
     <ClCompile Include="NeoLua.ixx" />
-    <ClCompile Include="Var.ixx" />
+    <ClCompile Include="Variables.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

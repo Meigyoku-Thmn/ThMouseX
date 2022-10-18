@@ -14,7 +14,9 @@ export WCHAR g_currentModuleDirPath[MAX_PATH + 1];
 export DLLEXPORT GameConfig       g_currentConfig;
 
 // global game state
-export DLLEXPORT HMODULE          g_mainModule;
+export DLLEXPORT bool             g_hookApplied;
+export DLLEXPORT HMODULE          g_targetModule;
+export DLLEXPORT HMODULE          g_coreModule;
 export DLLEXPORT HWND             g_hFocusWindow;
 export DLLEXPORT bool             g_leftMousePressed;
 export DLLEXPORT bool             g_midMousePressed;

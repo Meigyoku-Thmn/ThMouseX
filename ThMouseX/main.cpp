@@ -1,10 +1,14 @@
 ﻿#include "framework.h"
 #include "resource.h"
 #include <clocale>
+#include <iostream>
 
 import common.datatype;
 import main.config;
 import core.messagequeuehook;
+
+namespace config = main::config;
+namespace messagequeuehook = core::messagequeuehook;
 
 constexpr auto MAX_LOADSTRING = 100;
 
@@ -24,25 +28,25 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     hInst = hInstance;
 
-    auto hMutex = CreateMutexA(NULL, TRUE, "ThMouseX");
+    auto mutex = CreateMutexA(NULL, TRUE, "ThMouseX");
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         MessageBoxA(NULL, "ThMouseX is already running.", "ThMouseX", MB_OK | MB_ICONINFORMATION);
         return 1;
     }
 
-    if (!TestRegisteredWindowMessages())
+    if (!messagequeuehook::TestRegisteredWindowMessages())
         return 1;
 
-    if (!PopulateMethodRVAs())
+    if (!config::PopulateMethodRVAs())
         return 1;
 
-    if (!ReadGamesFile())
+    if (!config::ReadGamesFile())
         return 1;
 
-    if (!ReadIniFile())
+    if (!config::ReadIniFile())
         return 1;
 
-    if (!InstallHooks())
+    if (!messagequeuehook::InstallHooks())
         return 1;
 
     // Initialize global strings
@@ -78,7 +82,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         DispatchMessageA(&msg);
     }
 
-    RemoveHooks();
+    messagequeuehook::RemoveHooks();
 
     return 0;
 }

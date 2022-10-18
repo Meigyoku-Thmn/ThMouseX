@@ -1,7 +1,7 @@
 local function CharacterUpdate(___body: object): void
     local position = ___body.position
-    Pos.X = position.X
-    Pos.Y = position.Y
+    Position.X = position.X
+    Position.Y = position.Y
 end
 
 return {
