@@ -96,16 +96,6 @@ namespace core::messagequeuehook {
         constexpr auto VK_A = 0x41;
         constexpr auto VK_S = 0x53;
         if (code == HC_ACTION && g_hookApplied) {
-            static auto neoLuaInitialized = false;
-            if (!neoLuaInitialized) {
-                neoLuaInitialized = true;
-                neolua::Initialize();
-            }
-            static auto cursorNormalized = false;
-            if (!cursorNormalized) {
-                cursorNormalized = true;
-                NormalizeCursor();
-            }
             static bool isRightMousePressing = false;
             auto e = (PMSG)lParam;
             if (e->message == WM_LBUTTONDOWN)
@@ -129,6 +119,16 @@ namespace core::messagequeuehook {
 
     LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
         if (code == HC_ACTION && g_hookApplied) {
+            static auto neoLuaInitialized = false;
+            if (!neoLuaInitialized) {
+                neoLuaInitialized = true;
+                neolua::Initialize();
+            }
+            static auto cursorNormalized = false;
+            if (!cursorNormalized) {
+                cursorNormalized = true;
+                NormalizeCursor();
+            }
             auto e = (PCWPRETSTRUCT)lParam;
             if (e->message == CLEAN_MANAGED_DATA) {
                 neolua::Uninitialize();
