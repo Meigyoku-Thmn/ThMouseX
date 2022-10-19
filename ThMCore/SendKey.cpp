@@ -56,7 +56,7 @@ void HandleTriggerKey(DWORD gameInput, bool& lastState, BYTE vkCode) {
 }
 
 void TestInputAndSendKeys() {
-    if (g_currentConfig.InputMethod != InputMethod::SendKey)
+    if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::None)
         return;
     auto gameInput = DetermineGameInput();
     HandleTriggerKey(gameInput & USE_BOMB, _ref lastState.bomb, gs_bombButton);
@@ -68,7 +68,7 @@ void TestInputAndSendKeys() {
 }
 
 void CleanUp(bool isProcessTerminating) {
-    if (g_currentConfig.InputMethod != InputMethod::SendKey)
+    if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::None)
         return;
     if (isProcessTerminating)
         return;

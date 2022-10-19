@@ -183,15 +183,19 @@ export namespace main::config {
 #pragma endregion
 
 #pragma region read input method
-            wstring inputMethod;
-            lineStream >> inputMethod;
-            if (_wcsicmp(inputMethod.c_str(), L"DirectInput") == 0)
-                currentConfig.InputMethod = InputMethod::DirectInput;
-            else if (_wcsicmp(inputMethod.c_str(), L"GetKeyboardState") == 0)
-                currentConfig.InputMethod = InputMethod::GetKeyboardState;
-            else if (_wcsicmp(inputMethod.c_str(), L"SendKey") == 0)
-                currentConfig.InputMethod = InputMethod::SendKey;
-            else {
+            wstring inputMethods;
+            lineStream >> inputMethods;
+            auto inputMethod = _wcstok(inputMethods.data(), L"/");
+            while (inputMethod != NULL) {
+                if (_wcsicmp(inputMethod, L"DirectInput") == 0)
+                    currentConfig.InputMethods |= InputMethod::DirectInput;
+                else if (_wcsicmp(inputMethod, L"GetKeyboardState") == 0)
+                    currentConfig.InputMethods |= InputMethod::GetKeyboardState;
+                else if (_wcsicmp(inputMethod, L"SendKey") == 0)
+                    currentConfig.InputMethods |= InputMethod::SendKey;
+                inputMethod = _wcstok(NULL, L"/");
+            }
+            if (currentConfig.InputMethods == InputMethod::None) {
                 configIdx--;
                 continue;
             }

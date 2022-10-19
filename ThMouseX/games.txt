@@ -23,8 +23,8 @@ th095e          [000C4E70][15C]       float      (0,0)          480          4:3
 th10            [00077834][3CC]       int        (22400,1600)   48000        4:3           DirectInput
 th10e           [00077834][3CC]       int        (22400,1600)   48000        4:3           DirectInput
 ; Touhou 11
-th11            [000A8EB4][888]       int        (28672,2048)   61440        4:3           DirectInput
-th11e           [000A8EB4][888]       int        (28672,2048)   61440        4:3           DirectInput
+th11            [000A8EB4][888]       int        (28672,2048)   61440        4:3           DirectInput/GetKeyboardState
+th11e           [000A8EB4][888]       int        (28672,2048)   61440        4:3           DirectInput/GetKeyboardState
 ; Touhou 12
 th12            [000B4514][988]       int        (28672,2048)   61440        4:3           DirectInput
 th12e           [000B4514][988]       int        (28672,2048)   61440        4:3           DirectInput

@@ -59,9 +59,12 @@ export struct AddressChain {
     DWORD   Level[ADDRESS_CHAIN_MAX_LEN];
 };
 
-export enum class InputMethod {
-    DirectInput, GetKeyboardState, SendKey,
-};
+BEGIN_EXPORT_FLAG_ENUM(InputMethod, int)
+    None = 0,
+    DirectInput = 1 << 0,
+    GetKeyboardState = 1 << 1,
+    SendKey = 1 << 2,
+END_FLAG_ENUM()
 
 export enum class ScriptingMethod {
     None, LuaJIT, NeoLua
@@ -75,7 +78,7 @@ export struct GameConfig {
     FloatPoint      BasePixelOffset;
     unsigned int    BaseHeight;
     FloatPoint      AspectRatio;
-    InputMethod     InputMethod;
+    InputMethod     InputMethods;
 };
 
 export struct GameConfigArray {

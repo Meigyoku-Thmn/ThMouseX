@@ -76,7 +76,7 @@ CleanAndReturn:
     }
 
     export vector<minhook::HookConfig> HookConfig() {
-        if (g_currentConfig.InputMethod != InputMethod::DirectInput)
+        if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
             return {};
         auto baseAddress = (DWORD)GetModuleHandleA("DInput8.dll");
         return {

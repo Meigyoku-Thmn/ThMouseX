@@ -21,7 +21,7 @@ namespace core::keyboardstatehook {
     decltype(&_GetKeyboardState) OriGetKeyboardState;
 
     export vector<minhook::HookApiConfig> HookConfig() {
-        if (g_currentConfig.InputMethod != InputMethod::GetKeyboardState)
+        if ((g_currentConfig.InputMethods & InputMethod::GetKeyboardState) == InputMethod::None)
             return {};
         return {
             {L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, (PVOID*)&OriGetKeyboardState},
