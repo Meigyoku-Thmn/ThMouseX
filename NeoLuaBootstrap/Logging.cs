@@ -15,8 +15,11 @@ namespace NeoLuaBootstrap
                 if (_file == null)
                 {
                     _file = new StreamWriter(
-                        new FileStream(LogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 1), Encoding.UTF8, 1);
-                    _file.AutoFlush = true;
+                        new FileStream(LogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 1),
+                        new UTF8Encoding(false), 1) {
+                        AutoFlush = true,
+                        NewLine = "\n"
+                    };
                 }
                 return _file;
             }
