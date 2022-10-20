@@ -19,20 +19,17 @@ namespace note = common::log;
 using namespace std;
 using namespace Microsoft::WRL;
 
-#define ReturnWithErrorMessageAndDetail(message, detail) { \
-    note::ToFile("[NeoLua] %s: %s", message, detail); \
-    return; \
-}
+#define TAG "[NeoLua]"
 
 #define ReturnWithErrorMessage(message) { \
-    note::ToFile("[NeoLua] %s", message); \
+    note::ToFile(TAG " %s", message); \
     return; \
-}
+}0
 
-#define IfFailedReturnWithLog(result, message) { \
-    if (FAILED(result)) \
-        ReturnWithErrorMessageAndDetail(message, _com_error(result).ErrorMessage()); \
-}
+#define IfFailedReturnWithLog(tag, result, message) if (FAILED(result)) { \
+    note::ToFileMessage(tag, message, _com_error(result).ErrorMessage()); \
+    return; \
+}0
 
 void OnClose();
 decltype(&OnClose) onClose;
@@ -65,26 +62,32 @@ namespace common::neolua {
         if (g_currentConfig.ScriptingMethodToFindAddress != ScriptingMethod::NeoLua)
             return;
         if (_CLRCreateInstance == nullptr) {
-            log::ToFile("[NeoLua] %s", "Failed to import mscoree.dll|CLRCreateInstance.");
+            log::ToFile(TAG " %s", "Failed to import mscoree.dll|CLRCreateInstance.");
             return;
         }
 
         ComPtr<ICLRMetaHost> metaHost;
         auto result = _CLRCreateInstance(CLSID_CLRMetaHost, IID_PPV_ARGS(&metaHost));
-        IfFailedReturnWithLog(result, "Cannot create ICLRMetaHost instance");
+        IfFailedReturnWithLog(TAG, result, "Cannot create ICLRMetaHost instance");
 
         ComPtr<IEnumUnknown> enumerator;
-        result = metaHost->EnumerateLoadedRuntimes(GetCurrentProcess(), &enumerator);
-        IfFailedReturnWithLog(result, "Cannot enumerate loaded clr runtimes");
+        for (auto i = 0; i < 5; i++) {
+            // It seems that EnumerateLoadedRuntimes call CreateToolhelp32Snapshot internally, which can fail with ERROR_BAD_LENGTH for no obvious reason. So, just retry if that's the case.
+            result = metaHost->EnumerateLoadedRuntimes(GetCurrentProcess(), &enumerator);
+            if (WIN32_FROM_HRESULT(result) != ERROR_BAD_LENGTH)
+                break;
+        }
+        IfFailedReturnWithLog(TAG, result, "Cannot enumerate loaded clr runtimes");
         ComPtr<ICLRRuntimeInfo> runtimeInfo;
         ULONG count = 0;
-        enumerator->Next(1, (IUnknown**)&runtimeInfo, &count);
+        result = enumerator->Next(1, (IUnknown**)&runtimeInfo, &count);
+        IfFailedReturnWithLog(TAG, result, "Cannot enumerate on IEnum");
         if (count == 0)
-            ReturnWithErrorMessage("There is no loaded clr runtime");
+            ReturnWithErrorMessage("There is no loaded clr runtime.");
 
         ComPtr<ICLRRuntimeHost> runtimeHost;
         result = runtimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_PPV_ARGS(&runtimeHost));
-        IfFailedReturnWithLog(result, "Cannot get ICLRRuntimeHost instance");
+        IfFailedReturnWithLog(TAG, result, "Cannot get ICLRRuntimeHost instance");
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/NeoLuaBootstrap.dll";
         auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
@@ -96,7 +99,7 @@ namespace common::neolua {
             scriptPath.c_str(),
             (PDWORD)&_
         );
-        IfFailedReturnWithLog(result, "Failed to invoke NeoLuaBootstrap.Handlers.OnInit");
+        IfFailedReturnWithLog(TAG, result, "Failed to invoke NeoLuaBootstrap.Handlers.OnInit");
     }
 
     export DLLEXPORT void Uninitialize() {

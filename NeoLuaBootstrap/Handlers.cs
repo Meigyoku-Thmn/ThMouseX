@@ -21,9 +21,18 @@ namespace NeoLuaBootstrap
 
         static public int OnInit(string scriptPath)
         {
-            Scripting.Patch(scriptPath);
-            Common_NeoLua_SetOnClose(Marshal.GetFunctionPointerForDelegate(EventDelegates[nameof(OnClose)].Delegate));
-            return 0;
+            try
+            {
+                Scripting.Patch(scriptPath);
+                Common_NeoLua_SetOnClose(Marshal.GetFunctionPointerForDelegate(EventDelegates[nameof(OnClose)].Delegate));
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Logging.ToFile("[NeoLua] {0}", e);
+                Scripting.Unpatch();
+                return 1;
+            }
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)]

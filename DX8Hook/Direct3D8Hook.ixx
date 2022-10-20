@@ -6,6 +6,7 @@ module;
 #include "Include/d3dx8core.h"
 #include <string>
 #include <vector>
+#include <comdef.h>
 
 export module dx8.hook;
 
@@ -18,6 +19,10 @@ import common.log;
 namespace minhook = common::minhook;
 namespace helper = common::helper;
 namespace note = common::log;
+
+#define TAG "[DirectX8]"
+
+#define ToFileMessage(tag, result, message) note::ToFileMessage(tag, message, _com_error(result).ErrorMessage())
 
 #define ModulateColor(i) D3DCOLOR_RGBA(i, i, i, 255)
 #define SetTextureColorStage(dev, i, op, arg1, arg2)      \
@@ -217,15 +222,14 @@ CleanAndReturn:
 
         RECTSIZE clientSize;
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-            auto lastErr = GetLastError();
-            note::ToFile("[DirectX8] GetClientRect failed with error 0x%x (%d).", lastErr, lastErr);
+            ToFileMessage(TAG, GetLastError(), "GetClientRect failed");
             return;
         }
 
         IDirect3DSurface8* pSurface;
         auto rs = pDevice->GetRenderTarget(&pSurface);
         if (rs != D3D_OK) {
-            note::ToFile("[DirectX8] pDevice->GetRenderTarget method failed.");
+            ToFileMessage(TAG, rs, "pDevice->GetRenderTarget failed");
             return;
         }
 
@@ -233,7 +237,7 @@ CleanAndReturn:
         rs = pSurface->GetDesc(&d3dSize);
         pSurface->Release();
         if (rs != D3D_OK) {
-            note::ToFile("[DirectX8] pSurface->GetDesc method failed.");
+            ToFileMessage(TAG, rs, "pSurface->GetDesc failed");
             return;
         }
 
@@ -243,8 +247,7 @@ CleanAndReturn:
             d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
 
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-            auto lastErr = GetLastError();
-            note::ToFile("[DirectX8] GetClientRect failed with error 0x%x (%d).", lastErr, lastErr);
+            ToFileMessage(TAG, GetLastError(), "GetClientRect failed");
             return;
         }
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
@@ -263,7 +266,7 @@ CleanAndReturn:
         auto rs = pDevice->GetRenderTarget(&pSurface);
         if (rs != D3D_OK) {
             d3dScale = 0.f;
-            note::ToFile("[DirectX8] pDevice->GetRenderTarget method failed.");
+            ToFileMessage(TAG, rs, "pDevice->GetRenderTarget failed");
             return;
         }
         D3DSURFACE_DESC d3dSize;
@@ -271,7 +274,7 @@ CleanAndReturn:
         pSurface->Release();
         if (rs != D3D_OK) {
             d3dScale = 0.f;
-            note::ToFile("[DirectX8] pSurface->GetDesc method failed.");
+            ToFileMessage(TAG, rs, "pSurface->GetDesc failed");
             return;
         }
         auto scale = float(d3dSize.Height) / gs_textureBaseHeight;
@@ -279,8 +282,7 @@ CleanAndReturn:
 
         RECTSIZE clientSize;
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-            auto lastErr = GetLastError();
-            note::ToFile("[DirectX8] GetClientRect failed with error 0x%x (%d).", lastErr, lastErr);
+            ToFileMessage(TAG, GetLastError(), "GetClientRect failed");
             return;
         }
         d3dScale = float(clientSize.width()) / d3dSize.Width;

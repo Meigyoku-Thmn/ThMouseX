@@ -14,9 +14,8 @@ namespace NeoLuaBootstrap
             get {
                 if (_file == null)
                 {
-                    _file = new StreamWriter(
-                        new FileStream(LogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 1),
-                        new UTF8Encoding(false), 1) {
+                    var baseStream = new FileStream(LogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 1);
+                    _file = new StreamWriter(baseStream, new UTF8Encoding(false), 1) {
                         AutoFlush = true,
                         NewLine = "\n"
                     };

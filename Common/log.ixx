@@ -54,6 +54,13 @@ namespace common::log {
         va_end(args);
     }
 
+    export DLLEXPORT void ToFileMessage(const char* tag, const char* message, const char* detail) {
+        if (tag != NULL)
+            ToFile("%s %s: %s", tag, message, detail);
+        else
+            ToFile("%s %s:", message, detail);
+    }
+
     export DLLEXPORT void ToConsole(const char* _Format, ...) {
         OpenConsole();
         va_list args;
