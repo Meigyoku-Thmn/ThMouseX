@@ -71,20 +71,20 @@ namespace common::neolua {
 
         ComPtr<ICLRMetaHost> metaHost;
         auto result = _CLRCreateInstance(CLSID_CLRMetaHost, IID_PPV_ARGS(&metaHost));
-        IfFailedReturnWithLog(result, "Cannot create ICLRMetaHost instance");
+        IfFailedReturnWithLog(result, "[NeoLua] Cannot create ICLRMetaHost instance");
 
         ComPtr<IEnumUnknown> enumerator;
         result = metaHost->EnumerateLoadedRuntimes(GetCurrentProcess(), &enumerator);
-        IfFailedReturnWithLog(result, "Cannot enumerate loaded clr runtimes");
+        IfFailedReturnWithLog(result, "[NeoLua] Cannot enumerate loaded clr runtimes");
         ComPtr<ICLRRuntimeInfo> runtimeInfo;
         ULONG count = 0;
         enumerator->Next(1, (IUnknown**)&runtimeInfo, &count);
         if (count == 0)
-            ReturnWithErrorMessage("There is no loaded clr runtime");
+            ReturnWithErrorMessage("[NeoLua] There is no loaded clr runtime");
 
         ComPtr<ICLRRuntimeHost> runtimeHost;
         result = runtimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_PPV_ARGS(&runtimeHost));
-        IfFailedReturnWithLog(result, "Cannot get ICLRRuntimeHost instance");
+        IfFailedReturnWithLog(result, "[NeoLua] Cannot get ICLRRuntimeHost instance");
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/NeoLuaBootstrap.dll";
         auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
@@ -96,7 +96,7 @@ namespace common::neolua {
             scriptPath.c_str(),
             (PDWORD)&_
         );
-        IfFailedReturnWithLog(result, "Failed to invoke NeoLuaBootstrap.Handlers.OnInit");
+        IfFailedReturnWithLog(result, "[NeoLua] Failed to invoke NeoLuaBootstrap.Handlers.OnInit");
     }
 
     export DLLEXPORT void Uninitialize() {

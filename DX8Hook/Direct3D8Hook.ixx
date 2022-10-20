@@ -13,9 +13,11 @@ import common.datatype;
 import common.var;
 import common.helper;
 import common.minhook;
+import common.log;
 
 namespace minhook = common::minhook;
 namespace helper = common::helper;
+namespace note = common::log;
 
 #define ModulateColor(i) D3DCOLOR_RGBA(i, i, i, 255)
 #define SetTextureColorStage(dev, i, op, arg1, arg2)      \
@@ -87,7 +89,8 @@ namespace dx8::hook {
 
         pD3D = Direct3DCreate8(D3D_SDK_VERSION);
         if (!pD3D) {
-            MessageBoxA(NULL, "Failed to create an IDirect3D8 instance.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
+            auto message = "Failed to create an IDirect3D8 instance.";
+            MessageBoxA(NULL, message, ErrorMessageTitle, MB_OK | MB_ICONERROR);
             goto CleanAndReturn;
         }
 
@@ -105,7 +108,9 @@ namespace dx8::hook {
 
         rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
         if (FAILED(rs)) {
-            MessageBoxA(NULL, (string("Failed to create an IDirect3DDevice8 instance:") + GetD3dErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
+            auto d3dErr = GetD3dErrStr(rs);
+            auto message = "Failed to create an IDirect3DDevice8 instance: ";
+            MessageBoxA(NULL, (string(message) + d3dErr).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
             goto CleanAndReturn;
         }
 
@@ -211,27 +216,37 @@ CleanAndReturn:
         measurementPrepared = true;
 
         RECTSIZE clientSize;
-        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
+        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
+            auto lastErr = GetLastError();
+            note::ToFile("[DirectX8] GetClientRect failed with error 0x%x (%d).", lastErr, lastErr);
             return;
+        }
 
         IDirect3DSurface8* pSurface;
         auto rs = pDevice->GetRenderTarget(&pSurface);
-        if (rs != D3D_OK)
+        if (rs != D3D_OK) {
+            note::ToFile("[DirectX8] pDevice->GetRenderTarget method failed.");
             return;
+        }
 
         D3DSURFACE_DESC d3dSize;
         rs = pSurface->GetDesc(&d3dSize);
         pSurface->Release();
-        if (rs != D3D_OK)
+        if (rs != D3D_OK) {
+            note::ToFile("[DirectX8] pSurface->GetDesc method failed.");
             return;
+        }
 
         // There is no way to get back D3DPRESENT_PARAMETERS in DirectX8
         // So, use a heuristic method to detect fullscreen mode
         helper::FixWindowCoordinate(helper::TestFullscreenHeuristically(),
             d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
 
-        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
+        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
+            auto lastErr = GetLastError();
+            note::ToFile("[DirectX8] GetClientRect failed with error 0x%x (%d).", lastErr, lastErr);
             return;
+        }
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
         g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
@@ -248,6 +263,7 @@ CleanAndReturn:
         auto rs = pDevice->GetRenderTarget(&pSurface);
         if (rs != D3D_OK) {
             d3dScale = 0.f;
+            note::ToFile("[DirectX8] pDevice->GetRenderTarget method failed.");
             return;
         }
         D3DSURFACE_DESC d3dSize;
@@ -255,15 +271,16 @@ CleanAndReturn:
         pSurface->Release();
         if (rs != D3D_OK) {
             d3dScale = 0.f;
+            note::ToFile("[DirectX8] pSurface->GetDesc method failed.");
             return;
         }
         auto scale = float(d3dSize.Height) / gs_textureBaseHeight;
         cursorScale = D3DXVECTOR2(scale, scale);
 
         RECTSIZE clientSize;
-        auto rs2 = GetClientRect(g_hFocusWindow, &clientSize);
-        if (rs2 == 0) {
-            d3dScale = 0.f;
+        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
+            auto lastErr = GetLastError();
+            note::ToFile("[DirectX8] GetClientRect failed with error 0x%x (%d).", lastErr, lastErr);
             return;
         }
         d3dScale = float(clientSize.width()) / d3dSize.Width;

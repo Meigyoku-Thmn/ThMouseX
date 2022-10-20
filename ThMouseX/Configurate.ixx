@@ -52,14 +52,8 @@ export namespace main::config {
             auto lineView = helper::Trim(_line);
 
 #pragma region ignore blank line and comment line
-            // ignore empty line
-            if (lineView.empty()) {
-                configIdx--;
-                continue;
-            }
-
-            // ignore comment line
-            if (lineView[0] == ';') {
+            // ignore empty line and comment line
+            if (lineView.empty() || lineView[0] == ';') {
                 configIdx--;
                 continue;
             }
@@ -226,9 +220,7 @@ export namespace main::config {
         while (!vkcodeFile.eof()) {
             getline(vkcodeFile, _line);
             lineView = helper::Trim(_line);
-            if (lineView.empty())
-                continue;
-            if (lineView[0] == ';')
+            if (lineView.empty() || lineView[0] == ';')
                 continue;
             wstringstream lineStream{wstring(lineView)};
             wstringstream converter;

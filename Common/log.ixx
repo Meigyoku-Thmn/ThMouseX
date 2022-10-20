@@ -13,6 +13,11 @@ import common.var;
 
 using namespace std;
 
+tm& GetTimeNow() {
+    auto now = time(nullptr);
+    return *localtime(&now);
+}
+
 namespace common::log {
     export DLLEXPORT void OpenConsole() {
         if (AllocConsole() == FALSE)
@@ -39,6 +44,10 @@ namespace common::log {
                 setvbuf(logFile, NULL, _IONBF, 0);
         }
         if (logFile != NULL) {
+            auto& now = GetTimeNow();
+            fprintf(logFile, "[%02d/%02d/%02d %02d:%02d:%02d] ",
+                now.tm_mday, now.tm_mon + 1, now.tm_year + 1900,
+                now.tm_hour, now.tm_min, now.tm_sec);
             vfprintf(logFile, _Format, args);
             fprintf(logFile, "\n");
         }

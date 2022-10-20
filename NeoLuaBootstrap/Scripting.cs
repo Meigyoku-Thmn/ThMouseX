@@ -154,7 +154,7 @@ namespace NeoLuaBootstrap
                     var targetMethodPath = config[1] as string;
                     if (targetMethodPath == null)
                     {
-                        Logging.File.WriteLine($"[NeoLua] Invalid target method path in hook configuration (Ordinal: {i + 1}).");
+                        Logging.ToFile("[NeoLua] Invalid target method path in hook configuration (Index: {0}).", i + 1);
                         continue;
                     }
 
@@ -162,14 +162,14 @@ namespace NeoLuaBootstrap
                     var postfixHook = config[3] as Delegate;
                     if (prefixHook == null && postfixHook == null)
                     {
-                        Logging.File.WriteLine($"[NeoLua] All hook functions are invalid in hook configuration (Ordinal: {i + 1}).");
+                        Logging.ToFile("[NeoLua] All hook functions are invalid in hook configuration (Index: {0}).", i + 1);
                         continue;
                     }
 
                     var original = AccessTools.Method(targetMethodPath);
                     if (original == null)
                     {
-                        Logging.File.WriteLine($"[NeoLua] Failed to get method ${targetMethodPath}.");
+                        Logging.ToFile("[NeoLua] Failed to get method {0}.", targetMethodPath);
                         continue;
                     }
 
@@ -188,13 +188,13 @@ namespace NeoLuaBootstrap
             }
             catch (LuaRuntimeException e)
             {
-                Logging.File.WriteLine("[NeoLua] " + LuaExceptionData.GetData(e).FormatStackTrace(0, false));
-                Logging.File.WriteLine("[NeoLua] " + e);
+                Logging.ToFile("[NeoLua] {0}", LuaExceptionData.GetData(e).FormatStackTrace(0, false));
+                Logging.ToFile("[NeoLua] {0}", e);
                 Unpatch();
             }
             catch (Exception e) when (e is LuaParseException || e is Exception)
             {
-                Logging.File.WriteLine("[NeoLua] " + e);
+                Logging.ToFile("[NeoLua] {0}", e);
                 Unpatch();
             }
         }

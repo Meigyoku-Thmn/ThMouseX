@@ -13,9 +13,11 @@ import common.minhook;
 import common.var;
 import common.datatype;
 import common.helper;
+import common.log;
 
 namespace minhook = common::minhook;
 namespace helper = common::helper;
+namespace note = common::log;
 
 #define ModulateColor(i) D3DCOLOR_RGBA(i, i, i, 255)
 #define SetTextureColorStage(dev, i, op, arg1, arg2)      \
@@ -210,36 +212,50 @@ CleanAndReturn:
         measurementPrepared = true;
 
         RECTSIZE clientSize;
-        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
+        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
+            auto lastErr = GetLastError();
+            note::ToFile("[DirectX9] GetClientRect failed with error 0x%x (%d).", lastErr, lastErr);
             return;
+        }
 
         IDirect3DSurface9* pSurface;
         auto rs = pDevice->GetRenderTarget(0, &pSurface);
-        if (rs != D3D_OK)
+        if (rs != D3D_OK) {
+            note::ToFile("[DirectX9] pDevice->GetRenderTarget method failed.");
             return;
+        }
 
         D3DSURFACE_DESC d3dSize;
         rs = pSurface->GetDesc(&d3dSize);
         pSurface->Release();
-        if (rs != D3D_OK)
+        if (rs != D3D_OK) {
+            note::ToFile("[DirectX9] pSurface->GetDesc method failed.");
             return;
+        }
 
         IDirect3DSwapChain9* pSwapChain;
         rs = pDevice->GetSwapChain(0, &pSwapChain);
-        if (rs != D3D_OK)
+        if (rs != D3D_OK) {
+            note::ToFile("[DirectX9] pDevice->GetSwapChain method failed.");
             return;
+        }
 
         D3DPRESENT_PARAMETERS presentParams;
         rs = pSwapChain->GetPresentParameters(&presentParams);
         pSwapChain->Release();
-        if (rs != D3D_OK)
+        if (rs != D3D_OK) {
+            note::ToFile("[DirectX9] pSwapChain->GetPresentParameters method failed.");
             return;
+        }
 
         helper::FixWindowCoordinate(!presentParams.Windowed,
             d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
 
-        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE)
+        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
+            auto lastErr = GetLastError();
+            note::ToFile("[DirectX9] GetClientRect failed with error 0x%x (%d).", lastErr, lastErr);
             return;
+        }
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
         g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
@@ -256,6 +272,7 @@ CleanAndReturn:
         auto rs = pDevice->GetRenderTarget(0, &pSurface);
         if (rs != D3D_OK) {
             d3dScale = 0.f;
+            note::ToFile("[DirectX9] pDevice->GetRenderTarget method failed.");
             return;
         }
         D3DSURFACE_DESC d3dSize;
@@ -263,15 +280,16 @@ CleanAndReturn:
         pSurface->Release();
         if (rs != D3D_OK) {
             d3dScale = 0.f;
+            note::ToFile("[DirectX9] pSurface->GetDesc method failed.");
             return;
         }
         auto scale = float(d3dSize.Height) / gs_textureBaseHeight;
         cursorScale = D3DXVECTOR2(scale, scale);
 
         RECTSIZE clientSize;
-        auto rs2 = GetClientRect(g_hFocusWindow, &clientSize);
-        if (rs2 == 0) {
-            d3dScale = 0.f;
+        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
+            auto lastErr = GetLastError();
+            note::ToFile("[DirectX9] GetClientRect failed with error 0x%x (%d).", lastErr, lastErr);
             return;
         }
         d3dScale = float(clientSize.width()) / d3dSize.Width;

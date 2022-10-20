@@ -25,15 +25,24 @@ DLLEXPORT_C DWORD Common_LuaJIT_ResolveAddress(DWORD* offsets, int length) {
     return memory::ResolveAddress(offsets, length);
 }
 
+DLLEXPORT_C void Common_LuaJIT_OpenConsole() {
+    note::OpenConsole();
+}
+
 auto PreparationScript = R"(
     local ffi = require("ffi")
 
     ffi.cdef [[
         uint32_t Common_LuaJIT_ReadUInt32     (uint32_t address);
         uint32_t Common_LuaJIT_ResolveAddress (uint32_t* offsets, int length);
+        void     Common_LuaJIT_OpenConsole ();
     ]]
 
     local ThMouseX = ffi.load('Common.dll')
+
+    function OpenConsole()
+        return ThMouseX.Common_LuaJIT_OpenConsole()
+    end
 
     function ReadUInt32(address)
         return ThMouseX.Common_LuaJIT_ReadUInt32(address)
