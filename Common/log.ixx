@@ -1,13 +1,11 @@
 module;
 
-#ifdef _DEBUG
 #include "framework.h"
 #include "macro.h"
 #include <iostream>
 #include <chrono>
 #include <cstdio>
 #include <string>
-#endif
 
 export module common.log;
 
