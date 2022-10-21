@@ -23,6 +23,7 @@ namespace NeoLuaBootstrap
         {
             try
             {
+                OnClose_Impl();
                 Scripting.Patch(scriptPath);
                 Common_NeoLua_SetOnClose(Marshal.GetFunctionPointerForDelegate(EventDelegates[nameof(OnClose)].Delegate));
                 return 0;

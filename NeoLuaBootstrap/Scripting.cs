@@ -15,13 +15,6 @@ namespace NeoLuaBootstrap
 {
     static class Scripting
     {
-        [StructLayout(LayoutKind.Sequential)]
-        public class Position<T>
-        {
-            public T X;
-            public T Y;
-        }
-
         [DllImport("Common", CallingConvention = CallingConvention.Cdecl)]
         public static extern void Common_NeoLua_SetPositionAddress(IntPtr address);
 
@@ -35,6 +28,12 @@ namespace NeoLuaBootstrap
         static readonly FieldInfo DelegateStoreField = AccessTools.Field(typeof(Scripting), nameof(DelegateStore));
         static readonly MethodInfo getItemMethod = DelegateStore.GetType().GetMethod("get_Item");
 
+        [StructLayout(LayoutKind.Sequential)]
+        public class Position<T>
+        {
+            public T X;
+            public T Y;
+        }
         public enum PointDataType
         {
             Int, Float, Short
@@ -42,14 +41,8 @@ namespace NeoLuaBootstrap
         static readonly PointDataType DataType = Common_NeoLua_GetDataType();
         public static readonly object Pos = DataType == PointDataType.Int ? new Position<int>() :
                                             DataType == PointDataType.Float ? new Position<float>() :
-                                            DataType == PointDataType.Short ? new Position<short>() : default(object);
-        static readonly GCHandle PosHandle;
-
-        static Scripting()
-        {
-            if (Pos != null)
-                PosHandle = GCHandle.Alloc(Pos, GCHandleType.Pinned);
-        }
+                                            DataType == PointDataType.Short ? new Position<short>() : new object();
+        static readonly GCHandle PosHandle = GCHandle.Alloc(Pos, GCHandleType.Pinned);
 
         static void LoadDelegate(this Emit emitter, Delegate dele)
         {
@@ -107,13 +100,20 @@ namespace NeoLuaBootstrap
         static readonly Harmony HarmonyInst = new Harmony(HarmonyId);
         static public void Unpatch()
         {
-            Common_NeoLua_SetPositionAddress(IntPtr.Zero);
-            HarmonyInst.UnpatchAll(HarmonyId);
-            PrefixStore.Clear();
-            PostfixStore.Clear();
-            DelegateStore.Clear();
-            L?.Dispose();
-            L = null;
+            try
+            {
+                Common_NeoLua_SetPositionAddress(IntPtr.Zero);
+                HarmonyInst.UnpatchAll(HarmonyId);
+                PrefixStore.Clear();
+                PostfixStore.Clear();
+                DelegateStore.Clear();
+                L?.Dispose();
+                L = null;
+            }
+            catch (Exception e)
+            {
+                Logging.ToFile("[NeoLua] {0}", e);
+            }
         }
 
         const string PreparationScript = @"
