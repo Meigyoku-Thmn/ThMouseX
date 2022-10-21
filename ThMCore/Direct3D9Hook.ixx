@@ -20,9 +20,7 @@ namespace minhook = common::minhook;
 namespace helper = common::helper;
 namespace note = common::log;
 
-#define TAG "[DirectX9]"
-
-#define ToFileMessage(tag, result, message) note::ToFileMessage(tag, message, _com_error(result).ErrorMessage())
+#define TAG "[DirectX9] "
 
 #define ModulateColor(i) D3DCOLOR_RGBA(i, i, i, 255)
 #define SetTextureColorStage(dev, i, op, arg1, arg2)      \
@@ -218,14 +216,14 @@ CleanAndReturn:
 
         RECTSIZE clientSize;
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-            ToFileMessage(TAG, GetLastError(), "GetClientRect failed");
+            note::LastErrorToFile(TAG "GetClientRect failed");
             return;
         }
 
         IDirect3DSurface9* pSurface;
         auto rs = pDevice->GetRenderTarget(0, &pSurface);
         if (rs != D3D_OK) {
-            ToFileMessage(TAG, rs, "pDevice->GetRenderTarget failed");
+            note::HResultToFile(TAG "pDevice->GetRenderTarget failed", rs);
             return;
         }
 
@@ -233,14 +231,14 @@ CleanAndReturn:
         rs = pSurface->GetDesc(&d3dSize);
         pSurface->Release();
         if (rs != D3D_OK) {
-            ToFileMessage(TAG, rs, "pSurface->GetDesc failed");
+            note::HResultToFile(TAG "pSurface->GetDesc failed", rs);
             return;
         }
 
         IDirect3DSwapChain9* pSwapChain;
         rs = pDevice->GetSwapChain(0, &pSwapChain);
         if (rs != D3D_OK) {
-            ToFileMessage(TAG, rs, "pDevice->GetSwapChain failed");
+            note::HResultToFile(TAG "pDevice->GetSwapChain failed", rs);
             return;
         }
 
@@ -248,7 +246,7 @@ CleanAndReturn:
         rs = pSwapChain->GetPresentParameters(&presentParams);
         pSwapChain->Release();
         if (rs != D3D_OK) {
-            ToFileMessage(TAG, rs, "pSwapChain->GetPresentParameters failed");
+            note::HResultToFile(TAG "pSwapChain->GetPresentParameters failed", rs);
             return;
         }
 
@@ -256,7 +254,7 @@ CleanAndReturn:
             d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
 
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-            ToFileMessage(TAG, GetLastError(), "GetClientRect failed");
+            note::LastErrorToFile(TAG "GetClientRect failed");
             return;
         }
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
@@ -275,7 +273,7 @@ CleanAndReturn:
         auto rs = pDevice->GetRenderTarget(0, &pSurface);
         if (rs != D3D_OK) {
             d3dScale = 0.f;
-            ToFileMessage(TAG, rs, "pDevice->GetRenderTarget failed");
+            note::HResultToFile(TAG "pDevice->GetRenderTarget failed", rs);
             return;
         }
         D3DSURFACE_DESC d3dSize;
@@ -283,7 +281,7 @@ CleanAndReturn:
         pSurface->Release();
         if (rs != D3D_OK) {
             d3dScale = 0.f;
-            ToFileMessage(TAG, rs, "pSurface->GetDesc failed");
+            note::HResultToFile(TAG "pSurface->GetDesc failed", rs);
             return;
         }
         auto scale = float(d3dSize.Height) / gs_textureBaseHeight;
@@ -291,7 +289,7 @@ CleanAndReturn:
 
         RECTSIZE clientSize;
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-            ToFileMessage(TAG, GetLastError(), "GetClientRect failed");
+            note::LastErrorToFile(TAG "GetClientRect failed");
             return;
         }
         d3dScale = float(clientSize.width()) / d3dSize.Width;

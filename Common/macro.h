@@ -1,4 +1,6 @@
 #pragma once
+#include <winerror.h>
+
 #define EXTERN_C extern "C"
 #define DLLEXPORT __declspec(dllexport)
 #define DLLEXPORT_C EXTERN_C __declspec(dllexport)
