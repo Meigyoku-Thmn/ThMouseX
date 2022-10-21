@@ -8,9 +8,9 @@ export module common.datatype;
 
 using namespace std;
 
-export constexpr auto PROCESS_NAME_MAX_LEN = 64;
-export constexpr auto ADDRESS_CHAIN_MAX_LEN = 8;
-export constexpr auto GAME_CONFIG_MAX_LEN = 128;
+constexpr auto PROCESS_NAME_MAX_LEN = 64;
+constexpr auto ADDRESS_CHAIN_MAX_LEN = 8;
+constexpr auto GAME_CONFIG_MAX_LEN = 128;
 
 export enum ModulateStage {
     WhiteInc, WhiteDec, BlackInc, BlackDec,
@@ -86,10 +86,10 @@ export struct GameConfigArray {
     GameConfig  Configs[GAME_CONFIG_MAX_LEN];
 };
 
-export struct wstring_hash {
-    using hash_type = hash<wstring_view>;
+export struct string_hash {
+    using hash_type = hash<string_view>;
     using is_transparent = void;
-    UNBOUND size_t operator()(const wchar_t* str) const { return hash_type{}(str); }
-    UNBOUND size_t operator()(wstring_view str) const { return hash_type{}(str); }
-    UNBOUND size_t operator()(wstring const& str) const { return hash_type{}(str); }
+    UNBOUND size_t operator()(const char* str) const { return hash_type{}(str); }
+    UNBOUND size_t operator()(string_view str) const { return hash_type{}(str); }
+    UNBOUND size_t operator()(string const& str) const { return hash_type{}(str); }
 };

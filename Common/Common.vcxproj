@@ -94,7 +94,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;COMMON_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;__WRL_NO_DEFAULT_LIB__;__WRL_CLASSIC_COM_STRICT__;_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;COMMON_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;__WRL_NO_DEFAULT_LIB__;__WRL_CLASSIC_COM_STRICT__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
@@ -113,7 +113,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;COMMON_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;__WRL_NO_DEFAULT_LIB__;__WRL_CLASSIC_COM_STRICT__;_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;COMMON_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;__WRL_NO_DEFAULT_LIB__;__WRL_CLASSIC_COM_STRICT__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
@@ -174,6 +174,7 @@
     <ClCompile Include="CompilerConfig.cpp" />
     <ClCompile Include="DataTypes.ixx" />
     <ClCompile Include="DllMain.cpp" />
+    <ClCompile Include="Helper.Encoding.ixx" />
     <ClCompile Include="Helper.ixx" />
     <ClCompile Include="Log.ixx" />
     <ClCompile Include="Helper.Memory.ixx" />

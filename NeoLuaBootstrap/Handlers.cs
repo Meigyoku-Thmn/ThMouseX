@@ -23,15 +23,15 @@ namespace NeoLuaBootstrap
         {
             try
             {
-                OnClose_Impl();
-                Scripting.Patch(scriptPath);
+                Scripting.Uninitialize();
+                Scripting.Initialize(scriptPath);
                 Common_NeoLua_SetOnClose(Marshal.GetFunctionPointerForDelegate(EventDelegates[nameof(OnClose)].Delegate));
                 return 0;
             }
             catch (Exception e)
             {
                 Logging.ToFile("[NeoLua] {0}", e);
-                Scripting.Unpatch();
+                Scripting.Uninitialize();
                 return 1;
             }
         }
@@ -40,7 +40,7 @@ namespace NeoLuaBootstrap
         delegate void OnClose();
         static public void OnClose_Impl()
         {
-            Scripting.Unpatch();
+            Scripting.Uninitialize();
         }
     }
 }

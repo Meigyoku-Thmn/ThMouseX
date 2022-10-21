@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -25,7 +26,7 @@ namespace NeoLuaBootstrap
         }
         public static void ToFile(string format, params object[] args)
         {
-            File.Write("[{0:dd/MM/yyyy HH:mm:ss}] ", DateTime.Now);
+            File.Write("[{0} {1:dd/MM/yyyy HH:mm:ss}] ", Process.GetCurrentProcess().ProcessName, DateTime.Now);
             File.WriteLine(format, args);
         }
     }

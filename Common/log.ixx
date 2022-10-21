@@ -12,6 +12,9 @@ module;
 export module common.log;
 
 import common.var;
+import common.helper.encoding;
+
+namespace encoding = common::helper::encoding;
 
 using namespace std;
 using namespace Microsoft::WRL;
@@ -36,19 +39,23 @@ namespace common::log {
 
     FILE* logFile;
     wstring logPath;
+    string processName;
     export DLLEXPORT void ToFile(const char* _Format, ...) {
         va_list args;
         va_start(args, _Format);
         if (logFile == NULL) {
-            if (logPath.size() == 0)
+            if (logPath.size() == 0) {
                 logPath = wstring(g_currentModuleDirPath) + L"/log.txt";
+                processName = encoding::ConvertToUtf8(g_currentConfig.ProcessName);
+            }
             logFile = _wfsopen(logPath.c_str(), L"a+", _SH_DENYNO);
             if (logFile != NULL)
                 setvbuf(logFile, NULL, _IONBF, 0);
         }
         if (logFile != NULL) {
             auto& now = GetTimeNow();
-            fprintf(logFile, "[%02d/%02d/%02d %02d:%02d:%02d] ",
+            fprintf(logFile, "[%s %02d/%02d/%02d %02d:%02d:%02d] ",
+                processName.c_str(),
                 now.tm_mday, now.tm_mon + 1, now.tm_year + 1900,
                 now.tm_hour, now.tm_min, now.tm_sec);
             vfprintf(logFile, _Format, args);

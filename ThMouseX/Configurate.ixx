@@ -3,8 +3,6 @@
 #include "framework.h"
 #include <fstream>
 #include <sstream>
-#include <locale>
-#include <codecvt>
 #include <unordered_map>
 
 export module main.config;
@@ -14,9 +12,11 @@ import core.directinputhook;
 import dx8.hook;
 import common.datatype;
 import common.helper;
+import common.helper.encoding;
 import common.var;
 
 namespace helper = common::helper;
+namespace encoding = common::helper::encoding;
 namespace directx8 = dx8::hook;
 namespace directx9 = core::directx9hook;
 namespace directinput = core::directinputhook;
@@ -35,9 +35,7 @@ export namespace main::config {
     }
 
     bool ReadGamesFile() {
-        locale loc(locale(), new codecvt_utf8<wchar_t>);
-        wifstream gamesFile("games.txt");
-        gamesFile.imbue(loc);
+        ifstream gamesFile("games.txt");
         auto& pConfig = gs_gameConfigArray;
         pConfig = {};
         if (!gamesFile) {
@@ -46,8 +44,8 @@ export namespace main::config {
         }
         int configIdx;
         // read each line of config file
-        for (configIdx = 0; configIdx < GAME_CONFIG_MAX_LEN && !gamesFile.eof(); configIdx++) {
-            wstring _line;
+        for (configIdx = 0; configIdx < ARRAYSIZE(pConfig.Configs) && !gamesFile.eof(); configIdx++) {
+            string _line;
             getline(gamesFile, _line);
             auto lineView = helper::Trim(_line);
 
@@ -60,38 +58,48 @@ export namespace main::config {
 #pragma endregion
 
             // use a "tokenizer"
-            wstringstream lineStream{wstring(lineView)};
-            wstringstream converter;
+            stringstream lineStream{string(lineView)};
+            stringstream converter;
             auto& currentConfig = pConfig.Configs[configIdx];
 
 #pragma region read process name
-            wstring processName;
-            lineStream >> currentConfig.ProcessName;
+            string processName;
+            lineStream >> processName;
+            if (processName.size() == 0) {
+                configIdx--;
+                continue;
+            }
+            auto wProcessName = encoding::ConvertToUtf16(processName.c_str());
+            if (wProcessName.size() > ARRAYSIZE(currentConfig.ProcessName) - 1) {
+                configIdx--;
+                continue;
+            }
+            memcpy(currentConfig.ProcessName, wProcessName.c_str(), wProcessName.size() * sizeof(wProcessName[0]));
 #pragma endregion
 
 #pragma region read position address
-            wstring pointerChainStr;
+            string pointerChainStr;
             lineStream >> pointerChainStr;
             currentConfig.ScriptingMethodToFindAddress = ScriptingMethod::None;
-            if (_wcsicmp(pointerChainStr.c_str(), L"LuaJIT") == 0) {
+            if (_stricmp(pointerChainStr.c_str(), "LuaJIT") == 0) {
                 currentConfig.ScriptingMethodToFindAddress = ScriptingMethod::LuaJIT;
-            } else if (_wcsicmp(pointerChainStr.c_str(), L"NeoLua") == 0) {
+            } else if (_stricmp(pointerChainStr.c_str(), "NeoLua") == 0) {
                 currentConfig.ScriptingMethodToFindAddress = ScriptingMethod::NeoLua;
             } else {
                 size_t leftBoundIdx = 0, rightBoundIdx = -1;
-                for (size_t addressLevelIdx = 0; addressLevelIdx < ADDRESS_CHAIN_MAX_LEN; addressLevelIdx++) {
+                for (size_t addrLevelIdx = 0; addrLevelIdx < ARRAYSIZE(currentConfig.Address.Level); addrLevelIdx++) {
                     DWORD address;
                     leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
-                    if (leftBoundIdx == wstring::npos)
+                    if (leftBoundIdx == string::npos)
                         break;
                     rightBoundIdx = pointerChainStr.find(']', leftBoundIdx + 1);
-                    if (rightBoundIdx == wstring::npos)
+                    if (rightBoundIdx == string::npos)
                         break;
                     auto memoryOffsetStr = pointerChainStr.substr(leftBoundIdx + 1, rightBoundIdx - leftBoundIdx - 1);
                     converter.clear();
                     converter << memoryOffsetStr;
                     converter >> hex >> address;
-                    currentConfig.Address.Level[addressLevelIdx] = address;
+                    currentConfig.Address.Level[addrLevelIdx] = address;
                     currentConfig.Address.Length++;
                 }
                 if (currentConfig.Address.Level[0] == 0) {
@@ -102,13 +110,13 @@ export namespace main::config {
 #pragma endregion
 
 #pragma region read data type
-            wstring dataType;
+            string dataType;
             lineStream >> dataType;
-            if (_wcsicmp(dataType.c_str(), L"Int") == 0)
+            if (_stricmp(dataType.c_str(), "Int") == 0)
                 currentConfig.PosDataType = PointDataType::Int;
-            else if (_wcsicmp(dataType.c_str(), L"Float") == 0)
+            else if (_stricmp(dataType.c_str(), "Float") == 0)
                 currentConfig.PosDataType = PointDataType::Float;
-            else if (_wcsicmp(dataType.c_str(), L"Short") == 0)
+            else if (_stricmp(dataType.c_str(), "Short") == 0)
                 currentConfig.PosDataType = PointDataType::Short;
             else {
                 configIdx--;
@@ -117,14 +125,14 @@ export namespace main::config {
 #pragma endregion
 
 #pragma region read offset (X,Y)
-            wstring posOffsetStr;
+            string posOffsetStr;
             lineStream >> posOffsetStr;
             if (posOffsetStr[0] != '(' || posOffsetStr[posOffsetStr.length() - 1] != ')') {
                 configIdx--;
                 continue;
             }
             auto commaIdx = posOffsetStr.find(',');
-            if (commaIdx == wstring::npos) {
+            if (commaIdx == string::npos) {
                 configIdx--;
                 continue;
             }
@@ -155,10 +163,10 @@ export namespace main::config {
 #pragma endregion
 
 #pragma region read aspect ratio w:h
-            wstring aspectRatioStr;
+            string aspectRatioStr;
             lineStream >> aspectRatioStr;
             auto colonIdx = aspectRatioStr.find(':');
-            if (colonIdx == wstring::npos) {
+            if (colonIdx == string::npos) {
                 configIdx--;
                 continue;
             }
@@ -177,17 +185,17 @@ export namespace main::config {
 #pragma endregion
 
 #pragma region read input method
-            wstring inputMethods;
+            string inputMethods;
             lineStream >> inputMethods;
-            auto inputMethod = _wcstok(inputMethods.data(), L"/");
+            auto inputMethod = strtok(inputMethods.data(), "/");
             while (inputMethod != NULL) {
-                if (_wcsicmp(inputMethod, L"DirectInput") == 0)
+                if (_stricmp(inputMethod, "DirectInput") == 0)
                     currentConfig.InputMethods |= InputMethod::DirectInput;
-                else if (_wcsicmp(inputMethod, L"GetKeyboardState") == 0)
+                else if (_stricmp(inputMethod, "GetKeyboardState") == 0)
                     currentConfig.InputMethods |= InputMethod::GetKeyboardState;
-                else if (_wcsicmp(inputMethod, L"SendKey") == 0)
+                else if (_stricmp(inputMethod, "SendKey") == 0)
                     currentConfig.InputMethods |= InputMethod::SendKey;
-                inputMethod = _wcstok(NULL, L"/");
+                inputMethod = strtok(NULL, "/");
             }
             if (currentConfig.InputMethods == InputMethod::None) {
                 configIdx--;
@@ -206,34 +214,32 @@ export namespace main::config {
     }
 
     bool ReadIniFile() {
-        locale loc(locale(), new codecvt_utf8<wchar_t>);
-        wstring _line;
-        wstring_view lineView;
+        string _line;
+        string_view lineView;
 
-        wifstream vkcodeFile("virtual-key-codes.txt");
-        vkcodeFile.imbue(loc);
+        ifstream vkcodeFile("virtual-key-codes.txt");
         if (!vkcodeFile) {
             MessageBoxA(NULL, "Can not find virtual-key-codes.txt file.", "ThMouseX", MB_OK | MB_ICONERROR);
             return false;
         }
-        unordered_map<wstring, BYTE, wstring_hash, equal_to<>> vkCodes;
+        unordered_map<string, BYTE, string_hash, equal_to<>> vkCodes;
         while (!vkcodeFile.eof()) {
             getline(vkcodeFile, _line);
             lineView = helper::Trim(_line);
             if (lineView.empty() || lineView[0] == ';')
                 continue;
-            wstringstream lineStream{wstring(lineView)};
-            wstringstream converter;
+            stringstream lineStream{string(lineView)};
+            stringstream converter;
 
-            wstring key;
+            string key;
             lineStream >> key;
-            wstring valueStr;
+            string valueStr;
             lineStream >> valueStr;
             if (key.size() == 0 || valueStr.size() == 0) {
                 MessageBoxA(NULL, "virtual-key-codes.txt has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
                 return false;
             }
-            if (valueStr.find(L"0x") != 0) {
+            if (valueStr.find("0x") != 0) {
                 MessageBoxA(NULL, "virtual-key-codes.txt has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
                 return false;
             }
@@ -247,37 +253,37 @@ export namespace main::config {
             vkCodes[key] = value;
         }
 
-        wifstream iniFile("ThMouseX.ini");
-        iniFile.imbue(loc);
+        ifstream iniFile("ThMouseX.ini");
         if (!iniFile) {
             MessageBoxA(NULL, "Can not find ThMouseX.ini file.", "ThMouseX", MB_OK | MB_ICONERROR);
             return false;
         }
         getline(iniFile, _line);
         lineView = helper::Trim(_line);
-        if (lineView.compare(L"[ThMouseX]") != 0) {
+        if (lineView.compare("[ThMouseX]") != 0) {
             MessageBoxA(NULL, "ThMouseX.ini has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
             return false;
         }
         while (!iniFile.eof()) {
             getline(iniFile, _line);
             lineView = helper::Trim(_line);
-            if (lineView.find(L"CursorTexture") != wstring::npos) {
+            if (lineView.find("CursorTexture") != string::npos) {
                 auto texturePath = helper::Trim(lineView.substr(lineView.find('=') + 1));
                 if (texturePath.size() == 0) {
                     MessageBoxA(NULL, "ThMouseX.ini: Invalid CursorTexture.", "ThMouseX", MB_OK | MB_ICONERROR);
                     return false;
                 }
-                GetFullPathNameW(wstring(texturePath).c_str(), ARRAYSIZE(gs_textureFilePath), gs_textureFilePath, NULL);
-            } else if (lineView.find(L"CursorBaseHeight") != wstring::npos) {
-                wstringstream ss;
+                auto wTexturePath = encoding::ConvertToUtf16(string(texturePath).c_str());
+                GetFullPathNameW(wTexturePath.c_str(), ARRAYSIZE(gs_textureFilePath), gs_textureFilePath, NULL);
+            } else if (lineView.find("CursorBaseHeight") != string::npos) {
+                stringstream ss;
                 ss << lineView.substr(lineView.find('=') + 1);
                 ss >> gs_textureBaseHeight;
                 if (gs_textureBaseHeight == 0) {
                     MessageBoxA(NULL, "ThMouseX.ini: Invalid CursorBaseHeight.", "ThMouseX", MB_OK | MB_ICONERROR);
                     return false;
                 }
-            } else if (lineView.find(L"BombButton") != wstring::npos) {
+            } else if (lineView.find("BombButton") != string::npos) {
                 auto key = helper::Trim(lineView.substr(lineView.find('=') + 1));
                 auto value = vkCodes.find(key);
                 if (value == vkCodes.end()) {
@@ -285,7 +291,7 @@ export namespace main::config {
                     return false;
                 }
                 gs_bombButton = value->second;
-            } else if (lineView.find(L"ExtraButton") != wstring::npos) {
+            } else if (lineView.find("ExtraButton") != string::npos) {
                 auto key = helper::Trim(lineView.substr(lineView.find('=') + 1));
                 auto value = vkCodes.find(key);
                 if (value == vkCodes.end()) {

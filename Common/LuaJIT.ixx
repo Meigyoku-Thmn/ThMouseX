@@ -11,9 +11,11 @@ export module common.luajit;
 import common.var;
 import common.log;
 import common.helper.memory;
+import common.helper.encoding;
 
 namespace note = common::log;
 namespace memory = common::helper::memory;
+namespace encoding = common::helper::encoding;
 
 using namespace std;
 
@@ -91,8 +93,8 @@ namespace common::luajit {
             return;
         }
 
-        auto scriptPath = wstring_convert<codecvt_utf8_utf16<wchar_t>>().to_bytes(
-            wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua");
+        auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
+        auto scriptPath = encoding::ConvertToUtf8(wScriptPath.c_str());
 
         if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str())))
             return;

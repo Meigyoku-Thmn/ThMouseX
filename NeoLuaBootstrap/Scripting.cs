@@ -98,7 +98,7 @@ namespace NeoLuaBootstrap
 
         const string HarmonyId = "ThMouseX NeoLua Scripting";
         static readonly Harmony HarmonyInst = new Harmony(HarmonyId);
-        static public void Unpatch()
+        static public void Uninitialize()
         {
             try
             {
@@ -124,7 +124,7 @@ namespace NeoLuaBootstrap
             OpenConsole = Scripting.Common_NeoLua_OpenConsole
         ";
 
-        static public void Patch(string scriptPath)
+        static public void Initialize(string scriptPath)
         {
             try
             {
@@ -190,12 +190,12 @@ namespace NeoLuaBootstrap
             {
                 Logging.ToFile("[NeoLua] {0}", LuaExceptionData.GetData(e).FormatStackTrace(0, false));
                 Logging.ToFile("[NeoLua] {0}", e);
-                Unpatch();
+                Uninitialize();
             }
             catch (Exception e) when (e is LuaParseException || e is Exception)
             {
                 Logging.ToFile("[NeoLua] {0}", e);
-                Unpatch();
+                Uninitialize();
             }
         }
     }
