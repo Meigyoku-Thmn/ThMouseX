@@ -48,13 +48,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="games.txt" />
-    <Text Include="virtual-key-codes.txt" />
+    <UpToDateCheckInput Include="games.txt" />
+    <UpToDateCheckInput Include="virtual-key-codes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ConfigScripts\Danmakai.lua" />
-    <None Include="ConfigScripts\THMHJ.lua" />
-    <None Include="ThMouseX.ini" />
+    <UpToDateCheckInput Include="ConfigScripts\Danmakai.lua" />
+    <UpToDateCheckInput Include="ConfigScripts\THMHJ.lua" />
+    <UpToDateCheckInput Include="ThMouseX.ini" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0FA9DE0E-B696-468D-9178-E85B228CAB70}</ProjectGuid>

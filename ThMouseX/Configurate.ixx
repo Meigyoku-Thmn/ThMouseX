@@ -3,6 +3,7 @@
 #include "framework.h"
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 #include <unordered_map>
 
 export module main.config;
@@ -64,7 +65,7 @@ export namespace main::config {
 
 #pragma region read process name
             string processName;
-            lineStream >> processName;
+            lineStream >> quoted(processName);
             if (processName.size() == 0) {
                 configIdx--;
                 continue;

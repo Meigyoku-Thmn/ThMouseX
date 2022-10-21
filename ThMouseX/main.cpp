@@ -55,9 +55,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         return 1;
 
     // Initialize global strings
-    LoadStringA(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringA(hInstance, IDC_THMOUSEX, szWindowClass, MAX_LOADSTRING);
-    LoadStringA(hInstance, IDS_BALLOON_INFO, szBalloonInfo, MAX_LOADSTRING);
+    LoadStringA(hInstance, IDS_APP_TITLE, szTitle, ARRAYSIZE(szTitle));
+    LoadStringA(hInstance, IDC_THMOUSEX, szWindowClass, ARRAYSIZE(szWindowClass));
+    LoadStringA(hInstance, IDS_BALLOON_INFO, szBalloonInfo, ARRAYSIZE(szBalloonInfo));
 
     WNDCLASSEXA wcex{
         .cbSize = sizeof(WNDCLASSEX),
