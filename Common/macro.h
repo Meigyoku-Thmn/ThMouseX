@@ -15,7 +15,7 @@ export UNBOUND EnumName operator &=(EnumName& a, const EnumName b) { \
     (EnumType&)a &= (EnumType)b; \
     return b; \
 } \
-export UNBOUND EnumName operator |(EnumName& a, const EnumName b) { \
+export UNBOUND EnumName operator |(EnumName a, const EnumName b) { \
     return (EnumName)((EnumType)a | (EnumType)b); \
 } \
 export UNBOUND EnumName operator |=(EnumName& a, const EnumName b) { \

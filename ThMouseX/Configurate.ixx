@@ -24,8 +24,8 @@ namespace directinput = core::directinputhook;
 
 using namespace std;
 
-export namespace main::config {
-    bool PopulateMethodRVAs() {
+namespace main::config {
+    export bool PopulateMethodRVAs() {
         if (!directx8::PopulateMethodRVAs())
             return false;
         if (!directx9::PopulateMethodRVAs())
@@ -35,7 +35,7 @@ export namespace main::config {
         return true;
     }
 
-    bool ReadGamesFile() {
+    export bool ReadGamesFile() {
         ifstream gamesFile("games.txt");
         auto& pConfig = gs_gameConfigArray;
         pConfig = {};
@@ -190,7 +190,9 @@ export namespace main::config {
             lineStream >> inputMethods;
             auto inputMethod = strtok(inputMethods.data(), "/");
             while (inputMethod != NULL) {
-                if (_stricmp(inputMethod, "DirectInput") == 0)
+                if (_stricmp(inputMethod, "HookAll") == 0)
+                    currentConfig.InputMethods |= InputMethod::DirectInput | InputMethod::GetKeyboardState;
+                else if (_stricmp(inputMethod, "DirectInput") == 0)
                     currentConfig.InputMethods |= InputMethod::DirectInput;
                 else if (_stricmp(inputMethod, "GetKeyboardState") == 0)
                     currentConfig.InputMethods |= InputMethod::GetKeyboardState;
@@ -214,7 +216,7 @@ export namespace main::config {
         return true;
     }
 
-    bool ReadIniFile() {
+    export bool ReadIniFile() {
         string _line;
         string_view lineView;
 
@@ -300,6 +302,14 @@ export namespace main::config {
                     return false;
                 }
                 gs_extraButton = value->second;
+            } else if (lineView.find("ToggleOsCursorButton") != string::npos) {
+                auto key = helper::Trim(lineView.substr(lineView.find('=') + 1));
+                auto value = vkCodes.find(key);
+                if (value == vkCodes.end()) {
+                    MessageBoxA(NULL, "ThMouseX.ini: Invalid ToggleOsCursorButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_toggleOsCursorButton = value->second;
             }
         }
         return true;

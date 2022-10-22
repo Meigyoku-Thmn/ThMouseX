@@ -93,8 +93,6 @@ namespace core::messagequeuehook {
     }
 
     LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        constexpr auto VK_A = 0x41;
-        constexpr auto VK_S = 0x53;
         if (code == HC_ACTION && g_hookApplied) {
             static bool isRightMousePressing = false;
             auto e = (PMSG)lParam;
@@ -108,10 +106,12 @@ namespace core::messagequeuehook {
                 isRightMousePressing = false;
                 g_inputEnabled = !g_inputEnabled;
             } else if (e->message == WM_KEYDOWN) {
-                if (e->wParam == VK_A)
-                    HideMousePointer();
-                else if (e->wParam == VK_S)
-                    ShowMousePointer();
+                if (e->wParam == gs_toggleOsCursorButton) {
+                    if (isCursorShow)
+                        HideMousePointer();
+                    else
+                        ShowMousePointer();
+                }
             }
         }
         return CallNextHookEx(NULL, code, wParam, lParam);
