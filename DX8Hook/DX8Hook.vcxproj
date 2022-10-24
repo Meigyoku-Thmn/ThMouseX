@@ -175,7 +175,7 @@
     <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="DllMain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
@@ -190,7 +190,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Direct3D8Hook.ixx" />
-    <ClCompile Include="compilerConfig.cpp" />
+    <ClCompile Include="CompilerConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
