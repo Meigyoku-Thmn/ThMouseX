@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <format>
 #include <tuple>
+#include <cassert>
 
 export module main.config;
 
@@ -101,24 +102,26 @@ public:
             if (!succeeded)
                 return false;
 
-            auto& config = gameConfigs.Configs[gameConfigs.Length++];
+            auto& gameConfig = gameConfigs.Configs[gameConfigs.Length++];
 
-            static_assert(is_same<decltype(&config.ProcessName[0]), decltype(processName.data())>());
-            memcpy(config.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
+            static_assert(is_same<decltype(&gameConfig.ProcessName[0]), decltype(processName.data())>());
+            memcpy(gameConfig.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
 
-            static_assert(is_same<decltype(&config.Address.Level[0]), decltype(addressOffsets.data())>());
-            memcpy(config.Address.Level, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
+            static_assert(is_same<decltype(&gameConfig.Address.Level[0]), decltype(addressOffsets.data())>());
+            memcpy(gameConfig.Address.Level, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
+            assert(addressOffsets.size() <= ARRAYSIZE(gameConfig.Address.Level));
+            gameConfig.Address.Length = addressOffsets.size();
 
-            config.PosDataType = dataType;
+            gameConfig.PosDataType = dataType;
 
-            config.BasePixelOffset = offset;
+            gameConfig.BasePixelOffset = offset;
 
-            static_assert(is_same<decltype(config.BaseHeight), decltype(baseHeight)>());
-            config.BaseHeight = baseHeight;
+            static_assert(is_same<decltype(gameConfig.BaseHeight), decltype(baseHeight)>());
+            gameConfig.BaseHeight = baseHeight;
 
-            config.AspectRatio = aspectRatio;
+            gameConfig.AspectRatio = aspectRatio;
 
-            config.InputMethods = inputMethods;
+            gameConfig.InputMethods = inputMethods;
         }
 
         return true;
