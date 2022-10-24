@@ -53,6 +53,7 @@ export struct AddressChain {
     int     Length;
     DWORD   Level[ADDRESS_CHAIN_MAX_LEN];
 };
+static_assert(sizeof(void*) == sizeof(AddressChain::Level[0]));
 
 BEGIN_EXPORT_FLAG_ENUM(InputMethod, int)
     None = 0,
