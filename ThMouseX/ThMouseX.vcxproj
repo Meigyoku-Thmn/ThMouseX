@@ -29,7 +29,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="cursor.png" />
     <Image Include="small.ico" />
     <Image Include="ThMouseX.ico" />
   </ItemGroup>
@@ -48,7 +47,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="games.txt" />
+    <CopyFileToFolders Include="Cursor.png" />
+    <CopyFileToFolders Include="Games.txt" />
     <CopyFileToFolders Include="ThMouseX.txt" />
     <CopyFileToFolders Include="VirtualKeyCodes.txt" />
     <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">

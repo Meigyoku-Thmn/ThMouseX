@@ -4,5 +4,5 @@
 BombButton           = VK_X
 ExtraButton          = VK_C
 ToggleOsCursorButton = VK_M
-CursorTexture        = cursor.png
+CursorTexture        = Cursor.png
 CursorBaseHeight     = 480

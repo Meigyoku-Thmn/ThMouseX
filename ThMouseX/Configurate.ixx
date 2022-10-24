@@ -25,7 +25,7 @@ namespace directx8 = dx8::hook;
 namespace directx9 = core::directx9hook;
 namespace directinput = core::directinputhook;
 
-#define GameFile "games.txt"
+#define GameFile "Games.txt"
 #define ThMouseXFile "ThMouseX.txt"
 #define VirtualKeyCodesFile "VirtualKeyCodes.txt"
 

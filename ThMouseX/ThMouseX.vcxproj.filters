@@ -46,7 +46,6 @@
     <Image Include="ThMouseX.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="cursor.png" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ThMouseX.rc">
@@ -54,7 +53,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="games.txt" />
+    <CopyFileToFolders Include="Games.txt" />
     <CopyFileToFolders Include="ThMouseX.txt" />
     <CopyFileToFolders Include="VirtualKeyCodes.txt" />
     <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">
@@ -63,5 +62,6 @@
     <CopyFileToFolders Include="ConfigScripts/THMHJ.lua">
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="Cursor.png" />
   </ItemGroup>
 </Project>
