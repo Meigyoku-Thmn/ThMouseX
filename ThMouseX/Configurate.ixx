@@ -219,10 +219,9 @@ private:
         if (wProcessName.size() > maxSize) {
             MessageBoxA(NULL, format("processName longer than {} characters at line {} in " GameFile ".",
                 maxSize, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(wProcessName, false);
+            return {move(wProcessName), false};
         }
-
-        return tuple(wProcessName, true);
+        return {move(wProcessName), true};
     }
 
     static tuple<vector<DWORD>, ScriptingMethod, bool> ExtractPositionRVA(stringstream& stream, int lineCount) {
@@ -252,7 +251,7 @@ private:
                 if (convMessage != nullptr) {
                     MessageBoxA(NULL, format("Invalid positionRVA: {} at line {} in " GameFile ".",
                         convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-                    return tuple(addressOffsets, scriptingEngine, false);
+                    return {move(addressOffsets), scriptingEngine, false};
                 }
 
                 addressOffsets.push_back(offset);
@@ -261,11 +260,11 @@ private:
             if (addressOffsets.size() == 0) {
                 MessageBoxA(NULL, format("Found no address offset for positionRVA at line {} in " GameFile ".",
                     lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-                return tuple(addressOffsets, scriptingEngine, false);
+                return {move(addressOffsets), scriptingEngine, false};
             }
         }
 
-        return tuple(addressOffsets, scriptingEngine, true);
+        return {move(addressOffsets), scriptingEngine, true};
     }
 
     static tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount) {
@@ -282,10 +281,10 @@ private:
         else {
             MessageBoxA(NULL, format("Invalid dataType at line {} in " GameFile ".", lineCount).c_str(),
                 "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(dataType, false);
+            return {move(dataType), false};
         }
 
-        return tuple(dataType, true);
+        return {move(dataType), true};
     }
 
     static tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount) {
@@ -295,13 +294,13 @@ private:
         if (posOffsetStr[0] != '(' || posOffsetStr[posOffsetStr.length() - 1] != ')') {
             MessageBoxA(NULL, format("Invalid offset: expected wrapping '(' and ')' at line {} in " GameFile ".",
                 lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(FloatPoint(), false);
+            return {FloatPoint(), false};
         }
         auto commaIdx = posOffsetStr.find(',');
         if (commaIdx == string::npos) {
             MessageBoxA(NULL, format("Invalid offset: expected separating comma ',' at line {} in " GameFile ".",
                 lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(FloatPoint(), false);
+            return {FloatPoint(), false};
         }
 
         const char* convMessage;
@@ -312,7 +311,7 @@ private:
         if (convMessage != nullptr) {
             MessageBoxA(NULL, format("Invalid offset X: {} at line {} in " GameFile ".",
                 convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(FloatPoint(), false);
+            return {FloatPoint(), false};
         }
 
         auto offsetYStr = posOffsetStr.substr(commaIdx + 1, posOffsetStr.length() - commaIdx - 2);
@@ -320,10 +319,10 @@ private:
         if (convMessage != nullptr) {
             MessageBoxA(NULL, format("Invalid offset Y: {} at line {} in " GameFile ".",
                 convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(FloatPoint(), false);
+            return {FloatPoint(), false};
         }
 
-        return tuple(offset, true);
+        return {offset, true};
     }
 
     static tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount) {
@@ -333,10 +332,10 @@ private:
         if (baseHeight == 0) {
             MessageBoxA(NULL, format("Invalid baseHeight at line {} in " GameFile ".", lineCount).c_str(),
                 "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(baseHeight, false);
+            return {baseHeight, false};
         }
 
-        return tuple(baseHeight, true);
+        return {baseHeight, true};
     }
 
     static tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount) {
@@ -347,7 +346,7 @@ private:
         if (colonIdx == string::npos) {
             MessageBoxA(NULL, format("Invalid aspectRatio: expected separating ':' at line {} in " GameFile ".",
                 lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(FloatPoint(), false);
+            return {FloatPoint(), false};
         }
 
         FloatPoint ratio;
@@ -358,7 +357,7 @@ private:
         if (convMessage != nullptr) {
             MessageBoxA(NULL, format("Invalid aspectRatio X: {} at line {} in " GameFile ".",
                 convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(FloatPoint(), false);
+            return {FloatPoint(), false};
         }
 
         auto ratioYStr = aspectRatioStr.substr(colonIdx + 1, aspectRatioStr.length() - colonIdx - 1);
@@ -366,10 +365,10 @@ private:
         if (convMessage != nullptr) {
             MessageBoxA(NULL, format("Invalid aspectRatio Y: {} at line {} in " GameFile ".",
                 convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(FloatPoint(), false);
+            return {FloatPoint(), false};
         }
 
-        return tuple(ratio, true);
+        return {ratio, true};
     }
 
     static tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount) {
@@ -393,10 +392,10 @@ private:
         if (inputMethods == InputMethod::None) {
             MessageBoxA(NULL, format("Invalid inputMethod at line {} in " GameFile ".", lineCount).c_str(),
                 "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(inputMethods, false);
+            return {inputMethods, false};
         }
 
-        return tuple(inputMethods, true);
+        return {inputMethods, true};
     }
 
     static tuple<VkCodes, bool> ReadVkCodes() {
@@ -407,7 +406,7 @@ private:
         ifstream vkcodeFile(VirtualKeyCodesFile);
         if (!vkcodeFile) {
             MessageBoxA(NULL, "Missing " VirtualKeyCodesFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
-            return tuple(vkCodes, false);
+            return {move(vkCodes), false};
         }
 
         while (getline(vkcodeFile, line)) {
@@ -425,11 +424,11 @@ private:
             if (convMessage != nullptr) {
                 MessageBoxA(NULL, format("Invalid value: {} at line {} in " VirtualKeyCodesFile ".",
                     convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
-                return tuple(vkCodes, false);
+                return {move(vkCodes), false};
             }
             vkCodes[key] = value;
         }
 
-        return tuple(vkCodes, true);
+        return {move(vkCodes), true};
     }
 };
