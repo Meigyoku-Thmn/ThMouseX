@@ -55,10 +55,10 @@
   </ItemGroup>
   <ItemGroup>
     <UpToDateCheckInput Include="games.txt" />
-    <UpToDateCheckInput Include="virtual-key-codes.txt" />
+    <UpToDateCheckInput Include="VirtualKeyCodes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <UpToDateCheckInput Include="ThMouseX.ini" />
+    <UpToDateCheckInput Include="ThMouseX.txt" />
     <UpToDateCheckInput Include="ConfigScripts\Danmakai.lua">
       <Filter>ConfigScripts</Filter>
     </UpToDateCheckInput>

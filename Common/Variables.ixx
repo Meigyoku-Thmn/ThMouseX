@@ -29,9 +29,9 @@ export DLLEXPORT FloatPoint       g_pixelOffset{1, 1};
 export DLLEXPORT GameConfigArray  gs_gameConfigArray{};
 export DLLEXPORT BYTE             gs_bombButton = 0x58; // VK_X
 export DLLEXPORT BYTE             gs_extraButton = 0x43; // VK_C
+export DLLEXPORT DWORD            gs_toggleOsCursorButton = 0x4D; // VK_M
 export DLLEXPORT WCHAR            gs_textureFilePath[MAX_PATH]{};
 export DLLEXPORT DWORD            gs_textureBaseHeight = 480;
-export DLLEXPORT DWORD            gs_toggleOsCursorButton = 0x4D; // VK_M
 
 export DLLEXPORT DWORD            gs_d3d9_CreateDevice_RVA{};
 export DLLEXPORT DWORD            gs_d3d9_Reset_RVA{};

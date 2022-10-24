@@ -2,12 +2,7 @@ module;
 
 #include "framework.h"
 #include "macro.h"
-#include <vector>
-#include <Psapi.h>
-#include <tlhelp32.h>
-#include <string_view>
 #include <string>
-#include <regex>
 #include <tuple>
 
 export module common.helper;
@@ -24,8 +19,6 @@ namespace memory = common::helper::memory;
 
 using namespace std;
 
-wregex whitespace(LR"([^\s])", wregex::ECMAScript | wregex::optimize);
-
 namespace common::helper {
     export DLLEXPORT void ReportLastError(const char* title) {
         auto flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
@@ -36,22 +29,37 @@ namespace common::helper {
         LocalFree(errorMessage);
     }
 
-    export DLLEXPORT string_view LTrim(string_view str) {
-        match_results<string_view::const_iterator> match;
-        auto pos = regex_search(str.cbegin(), str.cend(), match, whitespace) ? match.position(0) : string::npos;
-        str.remove_prefix(min(pos, str.length()));
-        return str;
+    export UNBOUND tuple<float, const char*> ConvertToFloat(const string& input) {
+        char* endPtr;
+        const char* message = nullptr;
+        auto result = strtof(input.c_str(), &endPtr);
+        if (errno == ERANGE)
+            message = "out of range (type float)";
+        else if (endPtr - input.c_str() != input.size() || input.size() == 0)
+            message = "invalid format";
+        return tuple(result, message);
     }
 
-    export DLLEXPORT string_view RTrim(string_view str) {
-        match_results<reverse_iterator<string_view::const_iterator>> match;
-        auto pos = regex_search(str.crbegin(), str.crend(), match, whitespace) ? match.position(0) : string::npos;
-        str.remove_suffix(min(pos, str.length()));
-        return str;
+    export UNBOUND tuple<long, const char*> ConvertToLong(const string& input, int base) {
+        char* endPtr;
+        const char* message = nullptr;
+        auto result = strtol(input.c_str(), &endPtr, base);
+        if (errno == ERANGE)
+            message = "out of range (type long)";
+        else if (endPtr - input.c_str() != input.size() || input.size() == 0)
+            message = "invalid format";
+        return tuple(result, message);
     }
 
-    export DLLEXPORT string_view Trim(string_view str) {
-        return RTrim(LTrim(str));
+    export UNBOUND tuple<unsigned long, const char*> ConvertToULong(const string& input, int base) {
+        char* endPtr;
+        const char* message = nullptr;
+        auto result = strtoul(input.c_str(), &endPtr, base);
+        if (errno == ERANGE)
+            message = "out of range (type unsigned long)";
+        else if (endPtr - input.c_str() != input.size() || input.size() == 0)
+            message = "invalid format";
+        return tuple(result, message);
     }
 
     export DLLEXPORT void CalculateNextModulate(UCHAR& modulate, ModulateStage& modulateStage) {

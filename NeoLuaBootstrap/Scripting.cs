@@ -36,7 +36,7 @@ namespace NeoLuaBootstrap
         }
         public enum PointDataType
         {
-            Int, Float, Short
+            None, Int, Float, Short
         };
         static readonly PointDataType DataType = Common_NeoLua_GetDataType();
         public static readonly object Pos = DataType == PointDataType.Int ? new Position<int>() :

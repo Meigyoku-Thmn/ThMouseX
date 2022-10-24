@@ -6,7 +6,6 @@
 import common.minhook;
 import common.var;
 import common.datatype;
-import common.helper;
 import common.luajit;
 import core.keyboardstatehook;
 import core.messagequeuehook;

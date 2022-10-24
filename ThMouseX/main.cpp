@@ -7,8 +7,9 @@ import common.datatype;
 import main.config;
 import core.messagequeuehook;
 
-namespace config = main::config;
 namespace messagequeuehook = core::messagequeuehook;
+
+typedef main::config config;
 
 constexpr auto MAX_LOADSTRING = 100;
 constexpr auto NOTIFICATION_ICON_MSG = WM_USER;
@@ -48,7 +49,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     if (!config::ReadGamesFile())
         return 1;
 
-    if (!config::ReadIniFile())
+    if (!config::ReadGeneralConfigFile())
         return 1;
 
     if (!messagequeuehook::InstallHooks())

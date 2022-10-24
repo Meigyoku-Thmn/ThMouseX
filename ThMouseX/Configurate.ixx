@@ -5,6 +5,8 @@
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
+#include <format>
+#include <tuple>
 
 export module main.config;
 
@@ -22,10 +24,20 @@ namespace directx8 = dx8::hook;
 namespace directx9 = core::directx9hook;
 namespace directinput = core::directinputhook;
 
+#define GameFile "games.txt"
+#define ThMouseXFile "ThMouseX.txt"
+#define VirtualKeyCodesFile "VirtualKeyCodes.txt"
+
 using namespace std;
 
-namespace main::config {
-    export bool PopulateMethodRVAs() {
+typedef unordered_map<string, BYTE, string_hash, equal_to<>> VkCodes;
+
+namespace main {
+    export class config;
+}
+class main::config {
+public:
+    static bool PopulateMethodRVAs() {
         if (!directx8::PopulateMethodRVAs())
             return false;
         if (!directx9::PopulateMethodRVAs())
@@ -35,283 +47,386 @@ namespace main::config {
         return true;
     }
 
-    export bool ReadGamesFile() {
-        ifstream gamesFile("games.txt");
-        auto& pConfig = gs_gameConfigArray;
-        pConfig = {};
+    static bool ReadGamesFile() {
+        ifstream gamesFile(GameFile);
         if (!gamesFile) {
-            MessageBoxA(NULL, "Can not find games file.", "ThMouseX", MB_OK | MB_ICONERROR);
+            MessageBoxA(NULL, "Missing " GameFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
             return false;
         }
-        int configIdx;
-        // read each line of config file
-        for (configIdx = 0; configIdx < ARRAYSIZE(pConfig.Configs) && !gamesFile.eof(); configIdx++) {
-            string _line;
-            getline(gamesFile, _line);
-            auto lineView = helper::Trim(_line);
+        gs_gameConfigArray = {};
+        auto& gameConfigs = gs_gameConfigArray;
 
-#pragma region ignore blank line and comment line
-            // ignore empty line and comment line
-            if (lineView.empty() || lineView[0] == ';') {
-                configIdx--;
+        string line;
+        int lineCount = 0;
+        while (gameConfigs.Length < ARRAYSIZE(gameConfigs.Configs) && getline(gamesFile, line)) {
+            lineCount++;
+            stringstream lineStream(line);
+            if (TestCommentLine(lineStream))
                 continue;
-            }
-#pragma endregion
+            bool succeeded;
 
-            // use a "tokenizer"
-            stringstream lineStream{string(lineView)};
-            stringstream converter;
-            auto& currentConfig = pConfig.Configs[configIdx];
+            wstring processName;
+            tie(processName, succeeded) = ExtractProcessName(lineStream, lineCount);
+            if (!succeeded)
+                return false;
 
-#pragma region read process name
-            string processName;
-            lineStream >> quoted(processName);
-            if (processName.size() == 0) {
-                configIdx--;
-                continue;
-            }
-            auto wProcessName = encoding::ConvertToUtf16(processName.c_str());
-            if (wProcessName.size() > ARRAYSIZE(currentConfig.ProcessName) - 1) {
-                configIdx--;
-                continue;
-            }
-            memcpy(currentConfig.ProcessName, wProcessName.c_str(), wProcessName.size() * sizeof(wProcessName[0]));
-#pragma endregion
+            vector<DWORD> addressOffsets;
+            ScriptingMethod scriptingMethod;
+            tie(addressOffsets, scriptingMethod, succeeded) = ExtractPositionRVA(lineStream, lineCount);
+            if (!succeeded)
+                return false;
 
-#pragma region read position address
-            string pointerChainStr;
-            lineStream >> pointerChainStr;
-            currentConfig.ScriptingMethodToFindAddress = ScriptingMethod::None;
-            if (_stricmp(pointerChainStr.c_str(), "LuaJIT") == 0) {
-                currentConfig.ScriptingMethodToFindAddress = ScriptingMethod::LuaJIT;
-            } else if (_stricmp(pointerChainStr.c_str(), "NeoLua") == 0) {
-                currentConfig.ScriptingMethodToFindAddress = ScriptingMethod::NeoLua;
-            } else {
-                size_t leftBoundIdx = 0, rightBoundIdx = -1;
-                for (size_t addrLevelIdx = 0; addrLevelIdx < ARRAYSIZE(currentConfig.Address.Level); addrLevelIdx++) {
-                    DWORD address;
-                    leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
-                    if (leftBoundIdx == string::npos)
-                        break;
-                    rightBoundIdx = pointerChainStr.find(']', leftBoundIdx + 1);
-                    if (rightBoundIdx == string::npos)
-                        break;
-                    auto memoryOffsetStr = pointerChainStr.substr(leftBoundIdx + 1, rightBoundIdx - leftBoundIdx - 1);
-                    converter.clear();
-                    converter << memoryOffsetStr;
-                    converter >> hex >> address;
-                    currentConfig.Address.Level[addrLevelIdx] = address;
-                    currentConfig.Address.Length++;
-                }
-                if (currentConfig.Address.Level[0] == 0) {
-                    configIdx--;
-                    continue;
-                }
-            }
-#pragma endregion
+            PointDataType dataType;
+            tie(dataType, succeeded) = ExtractDataType(lineStream, lineCount);
+            if (!succeeded)
+                return false;
 
-#pragma region read data type
-            string dataType;
-            lineStream >> dataType;
-            if (_stricmp(dataType.c_str(), "Int") == 0)
-                currentConfig.PosDataType = PointDataType::Int;
-            else if (_stricmp(dataType.c_str(), "Float") == 0)
-                currentConfig.PosDataType = PointDataType::Float;
-            else if (_stricmp(dataType.c_str(), "Short") == 0)
-                currentConfig.PosDataType = PointDataType::Short;
-            else {
-                configIdx--;
-                continue;
-            }
-#pragma endregion
+            FloatPoint offset;
+            tie(offset, succeeded) = ExtractOffset(lineStream, lineCount);
+            if (!succeeded)
+                return false;
 
-#pragma region read offset (X,Y)
-            string posOffsetStr;
-            lineStream >> posOffsetStr;
-            if (posOffsetStr[0] != '(' || posOffsetStr[posOffsetStr.length() - 1] != ')') {
-                configIdx--;
-                continue;
-            }
-            auto commaIdx = posOffsetStr.find(',');
-            if (commaIdx == string::npos) {
-                configIdx--;
-                continue;
-            }
-            auto offsetXStr = posOffsetStr.substr(1, commaIdx - 1);
-            float offsetX;
-            converter.clear();
-            converter << offsetXStr;
-            converter >> dec >> offsetX;
-            currentConfig.BasePixelOffset.X = offsetX;
-            auto offsetYStr = posOffsetStr.substr(commaIdx + 1, posOffsetStr.length() - commaIdx - 2);
-            float offsetY;
-            converter.clear();
-            converter << offsetYStr;
-            converter >> dec >> offsetY;
-            currentConfig.BasePixelOffset.Y = offsetY;
-            if (lineStream.eof() == true) {
-                configIdx--;
-                continue;
-            }
-#pragma endregion
+            DWORD baseHeight;
+            tie(baseHeight, succeeded) = ExtractBaseHeight(lineStream, lineCount);
+            if (!succeeded)
+                return false;
 
-#pragma region read game-internal base resolution
-            lineStream >> dec >> currentConfig.BaseHeight;
-            if (lineStream.eof() == true) {
-                configIdx--;
-                continue;
-            }
-#pragma endregion
+            FloatPoint aspectRatio;
+            tie(aspectRatio, succeeded) = ExtractAspectRatio(lineStream, lineCount);
+            if (!succeeded)
+                return false;
 
-#pragma region read aspect ratio w:h
-            string aspectRatioStr;
-            lineStream >> aspectRatioStr;
-            auto colonIdx = aspectRatioStr.find(':');
-            if (colonIdx == string::npos) {
-                configIdx--;
-                continue;
-            }
-            auto ratioXStr = aspectRatioStr.substr(0, colonIdx);
-            float ratioX;
-            converter.clear();
-            converter << ratioXStr;
-            converter >> ratioX;
-            currentConfig.AspectRatio.X = ratioX;
-            auto ratioYStr = aspectRatioStr.substr(colonIdx + 1, aspectRatioStr.length() - colonIdx - 1);
-            float ratioY;
-            converter.clear();
-            converter << ratioYStr;
-            converter >> ratioY;
-            currentConfig.AspectRatio.Y = ratioY;
-#pragma endregion
+            InputMethod inputMethods;
+            tie(inputMethods, succeeded) = ExtractInputMethod(lineStream, lineCount);
+            if (!succeeded)
+                return false;
 
-#pragma region read input method
-            string inputMethods;
-            lineStream >> inputMethods;
-            auto inputMethod = strtok(inputMethods.data(), "/");
-            while (inputMethod != NULL) {
-                if (_stricmp(inputMethod, "HookAll") == 0)
-                    currentConfig.InputMethods |= InputMethod::DirectInput | InputMethod::GetKeyboardState;
-                else if (_stricmp(inputMethod, "DirectInput") == 0)
-                    currentConfig.InputMethods |= InputMethod::DirectInput;
-                else if (_stricmp(inputMethod, "GetKeyboardState") == 0)
-                    currentConfig.InputMethods |= InputMethod::GetKeyboardState;
-                else if (_stricmp(inputMethod, "SendKey") == 0)
-                    currentConfig.InputMethods |= InputMethod::SendKey;
-                inputMethod = strtok(NULL, "/");
-            }
-            if (currentConfig.InputMethods == InputMethod::None) {
-                configIdx--;
-                continue;
-            }
-#pragma endregion
+            auto& config = gameConfigs.Configs[gameConfigs.Length++];
+
+            static_assert(is_same<decltype(&config.ProcessName[0]), decltype(processName.data())>());
+            memcpy(config.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
+
+            static_assert(is_same<decltype(&config.Address.Level[0]), decltype(addressOffsets.data())>());
+            memcpy(config.Address.Level, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
+
+            config.PosDataType = dataType;
+
+            config.BasePixelOffset = offset;
+
+            static_assert(is_same<decltype(config.BaseHeight), decltype(baseHeight)>());
+            config.BaseHeight = baseHeight;
+
+            config.AspectRatio = aspectRatio;
+
+            config.InputMethods = inputMethods;
         }
-
-        if (configIdx == 0) {
-            MessageBoxA(NULL, "No valid data in games file.", "ThMouseX", MB_OK | MB_ICONERROR);
-            return false;
-        }
-        pConfig.Length = configIdx;
 
         return true;
     }
 
-    export bool ReadIniFile() {
-        string _line;
-        string_view lineView;
+    static bool ReadGeneralConfigFile() {
+        auto [vkCodes, succeeded] = ReadVkCodes();
+        if (!succeeded)
+            return false;
 
-        ifstream vkcodeFile("virtual-key-codes.txt");
-        if (!vkcodeFile) {
-            MessageBoxA(NULL, "Can not find virtual-key-codes.txt file.", "ThMouseX", MB_OK | MB_ICONERROR);
+        ifstream iniFile(ThMouseXFile);
+        if (!iniFile) {
+            MessageBoxA(NULL, "Missing " ThMouseXFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
             return false;
         }
-        unordered_map<string, BYTE, string_hash, equal_to<>> vkCodes;
-        while (!vkcodeFile.eof()) {
-            getline(vkcodeFile, _line);
-            lineView = helper::Trim(_line);
-            if (lineView.empty() || lineView[0] == ';')
+
+        int lineCount = 0;
+        string line;
+        while (getline(iniFile, line)) {
+            lineCount++;
+            stringstream lineStream(line);
+
+            string key;
+            getline(lineStream >> ws, key, '=');
+            key = key.substr(0, key.find(' '));
+            if (key.starts_with(";"))
                 continue;
-            stringstream lineStream{string(lineView)};
-            stringstream converter;
+
+            string value;
+            lineStream >> quoted(value);
+
+            if (key.empty() && value.empty())
+                continue;
+            if (key == "BombButton") {
+                auto vkCode = vkCodes.find(value);
+                if (vkCode == vkCodes.end()) {
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid BombButton value.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_bombButton = vkCode->second;
+            } else if (key == "ExtraButton") {
+                auto vkCode = vkCodes.find(value);
+                if (vkCode == vkCodes.end()) {
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid ExtraButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_extraButton = vkCode->second;
+            } else if (key == "ToggleOsCursorButton") {
+                auto vkCode = vkCodes.find(value);
+                if (vkCode == vkCodes.end()) {
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid ToggleOsCursorButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_toggleOsCursorButton = vkCode->second;
+            } else if (key == "CursorTexture") {
+                if (value.size() == 0) {
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid CursorTexture.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                auto wTexturePath = encoding::ConvertToUtf16(value.c_str());
+                GetFullPathNameW(wTexturePath.c_str(), ARRAYSIZE(gs_textureFilePath), gs_textureFilePath, NULL);
+            } else if (key == "CursorBaseHeight") {
+                auto [height, convMessage] = helper::ConvertToULong(value, 10);
+                if (convMessage != nullptr) {
+                    MessageBoxA(NULL, format(ThMouseXFile ": Invalid CursorBaseHeight: {}.", convMessage).c_str(),
+                        "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_textureBaseHeight = height;
+            } else {
+                MessageBoxA(NULL, format("Invalid attribute at line {} in " ThMouseXFile ".", lineCount).c_str(),
+                    "ThMouseX", MB_OK | MB_ICONERROR);
+                return false;
+            }
+        }
+        return true;
+    }
+private:
+    static bool TestCommentLine(stringstream& stream) {
+        char firstChr;
+        stream >> ws >> firstChr;
+        if (firstChr == ';' || firstChr == '\0')
+            return true;
+
+        stream.seekg(-1, ios_base::cur);
+        return false;
+    }
+
+    static tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount) {
+        string processName;
+        stream >> quoted(processName);
+        auto wProcessName = encoding::ConvertToUtf16(processName.c_str());
+
+        auto maxSize = ARRAYSIZE(gs_gameConfigArray.Configs[0].ProcessName) - 1;
+        if (wProcessName.size() > maxSize) {
+            MessageBoxA(NULL, format("processName longer than {} characters at line {} in " GameFile ".",
+                maxSize, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(wProcessName, false);
+        }
+
+        return tuple(wProcessName, true);
+    }
+
+    static tuple<vector<DWORD>, ScriptingMethod, bool> ExtractPositionRVA(stringstream& stream, int lineCount) {
+        string pointerChainStr;
+        stream >> pointerChainStr;
+        vector<DWORD> addressOffsets;
+        auto scriptingEngine = ScriptingMethod::None;
+
+        if (_stricmp(pointerChainStr.c_str(), "LuaJIT") == 0)
+            scriptingEngine = ScriptingMethod::LuaJIT; 
+        else if (_stricmp(pointerChainStr.c_str(), "NeoLua") == 0)
+            scriptingEngine = ScriptingMethod::NeoLua; 
+        else {
+            auto maxSize = ARRAYSIZE(gs_gameConfigArray.Configs[0].Address.Level);
+            addressOffsets.reserve(maxSize);
+            size_t leftBoundIdx = 0, rightBoundIdx = -1;
+            for (size_t addrLevelIdx = 0; addrLevelIdx < maxSize; addrLevelIdx++) {
+                leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
+                if (leftBoundIdx == string::npos)
+                    break;
+                rightBoundIdx = pointerChainStr.find(']', leftBoundIdx + 1);
+                if (rightBoundIdx == string::npos)
+                    break;
+
+                auto offsetStr = pointerChainStr.substr(leftBoundIdx + 1, rightBoundIdx - leftBoundIdx - 1);
+                auto [offset, convMessage] = helper::ConvertToULong(offsetStr, 16);
+                if (convMessage != nullptr) {
+                    MessageBoxA(NULL, format("Invalid positionRVA: {} at line {} in " GameFile ".",
+                        convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+                    return tuple(addressOffsets, scriptingEngine, false);
+                }
+
+                addressOffsets.push_back(offset);
+            }
+
+            if (addressOffsets.size() == 0) {
+                MessageBoxA(NULL, format("Found no address offset for positionRVA at line {} in " GameFile ".",
+                    lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+                return tuple(addressOffsets, scriptingEngine, false);
+            }
+        }
+
+        return tuple(addressOffsets, scriptingEngine, true);
+    }
+
+    static tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount) {
+        string dataTypeStr;
+        stream >> dataTypeStr;
+        auto dataType = PointDataType::None;
+
+        if (_stricmp(dataTypeStr.c_str(), "Int") == 0)
+            dataType = PointDataType::Int;
+        else if (_stricmp(dataTypeStr.c_str(), "Float") == 0)
+            dataType = PointDataType::Float;
+        else if (_stricmp(dataTypeStr.c_str(), "Short") == 0)
+            dataType = PointDataType::Short;
+        else {
+            MessageBoxA(NULL, format("Invalid dataType at line {} in " GameFile ".", lineCount).c_str(),
+                "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(dataType, false);
+        }
+
+        return tuple(dataType, true);
+    }
+
+    static tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount) {
+        string posOffsetStr;
+        stream >> posOffsetStr;
+
+        if (posOffsetStr[0] != '(' || posOffsetStr[posOffsetStr.length() - 1] != ')') {
+            MessageBoxA(NULL, format("Invalid offset: expected wrapping '(' and ')' at line {} in " GameFile ".",
+                lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(FloatPoint(), false);
+        }
+        auto commaIdx = posOffsetStr.find(',');
+        if (commaIdx == string::npos) {
+            MessageBoxA(NULL, format("Invalid offset: expected separating comma ',' at line {} in " GameFile ".",
+                lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(FloatPoint(), false);
+        }
+
+        const char* convMessage;
+        FloatPoint offset{};
+
+        auto offsetXStr = posOffsetStr.substr(1, commaIdx - 1);
+        tie(offset.X, convMessage) = helper::ConvertToFloat(offsetXStr);
+        if (convMessage != nullptr) {
+            MessageBoxA(NULL, format("Invalid offset X: {} at line {} in " GameFile ".",
+                convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(FloatPoint(), false);
+        }
+
+        auto offsetYStr = posOffsetStr.substr(commaIdx + 1, posOffsetStr.length() - commaIdx - 2);
+        tie(offset.Y, convMessage) = helper::ConvertToFloat(offsetYStr);
+        if (convMessage != nullptr) {
+            MessageBoxA(NULL, format("Invalid offset Y: {} at line {} in " GameFile ".",
+                convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(FloatPoint(), false);
+        }
+
+        return tuple(offset, true);
+    }
+
+    static tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount) {
+        DWORD baseHeight;
+        stream >> dec >> baseHeight;
+
+        if (baseHeight == 0) {
+            MessageBoxA(NULL, format("Invalid baseHeight at line {} in " GameFile ".", lineCount).c_str(),
+                "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(baseHeight, false);
+        }
+
+        return tuple(baseHeight, true);
+    }
+
+    static tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount) {
+        string aspectRatioStr;
+        stream >> aspectRatioStr;
+
+        auto colonIdx = aspectRatioStr.find(':');
+        if (colonIdx == string::npos) {
+            MessageBoxA(NULL, format("Invalid aspectRatio: expected separating ':' at line {} in " GameFile ".",
+                lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(FloatPoint(), false);
+        }
+
+        FloatPoint ratio;
+        const char* convMessage;
+
+        auto ratioXStr = aspectRatioStr.substr(0, colonIdx);
+        tie(ratio.X, convMessage) = helper::ConvertToFloat(ratioXStr);
+        if (convMessage != nullptr) {
+            MessageBoxA(NULL, format("Invalid aspectRatio X: {} at line {} in " GameFile ".",
+                convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(FloatPoint(), false);
+        }
+
+        auto ratioYStr = aspectRatioStr.substr(colonIdx + 1, aspectRatioStr.length() - colonIdx - 1);
+        tie(ratio.Y, convMessage) = helper::ConvertToFloat(ratioYStr);
+        if (convMessage != nullptr) {
+            MessageBoxA(NULL, format("Invalid aspectRatio Y: {} at line {} in " GameFile ".",
+                convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(FloatPoint(), false);
+        }
+
+        return tuple(ratio, true);
+    }
+
+    static tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount) {
+        string inputMethodStr;
+        stream >> inputMethodStr;
+
+        auto inputMethods = InputMethod::None;
+        auto inputMethodIter = strtok(inputMethodStr.data(), "/");
+        while (inputMethodIter != NULL) {
+            if (_stricmp(inputMethodIter, "HookAll") == 0)
+                inputMethods |= InputMethod::DirectInput | InputMethod::GetKeyboardState;
+            else if (_stricmp(inputMethodIter, "DirectInput") == 0)
+                inputMethods |= InputMethod::DirectInput;
+            else if (_stricmp(inputMethodIter, "GetKeyboardState") == 0)
+                inputMethods |= InputMethod::GetKeyboardState;
+            else if (_stricmp(inputMethodIter, "SendKey") == 0)
+                inputMethods |= InputMethod::SendKey;
+            inputMethodIter = strtok(NULL, "/");
+        }
+
+        if (inputMethods == InputMethod::None) {
+            MessageBoxA(NULL, format("Invalid inputMethod at line {} in " GameFile ".", lineCount).c_str(),
+                "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(inputMethods, false);
+        }
+
+        return tuple(inputMethods, true);
+    }
+
+    static tuple<VkCodes, bool> ReadVkCodes() {
+        VkCodes vkCodes;
+        int lineCount = 0;
+        string line;
+
+        ifstream vkcodeFile(VirtualKeyCodesFile);
+        if (!vkcodeFile) {
+            MessageBoxA(NULL, "Missing " VirtualKeyCodesFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
+            return tuple(vkCodes, false);
+        }
+
+        while (getline(vkcodeFile, line)) {
+            lineCount++;
+            stringstream lineStream(line);
 
             string key;
             lineStream >> key;
+            if (key.empty() || key.starts_with(";"))
+                continue;
+
             string valueStr;
             lineStream >> valueStr;
-            if (key.size() == 0 || valueStr.size() == 0) {
-                MessageBoxA(NULL, "virtual-key-codes.txt has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            if (valueStr.find("0x") != 0) {
-                MessageBoxA(NULL, "virtual-key-codes.txt has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
-                return false;
-            }
-            converter << valueStr.substr(2);
-            int value = -1;
-            converter >> hex >> value;
-            if (value < 0) {
-                MessageBoxA(NULL, "virtual-key-codes.txt has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
-                return false;
+            auto [value, convMessage] = helper::ConvertToULong(valueStr, 0);
+            if (convMessage != nullptr) {
+                MessageBoxA(NULL, format("Invalid value: {} at line {} in " VirtualKeyCodesFile ".",
+                    convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+                return tuple(vkCodes, false);
             }
             vkCodes[key] = value;
         }
 
-        ifstream iniFile("ThMouseX.ini");
-        if (!iniFile) {
-            MessageBoxA(NULL, "Can not find ThMouseX.ini file.", "ThMouseX", MB_OK | MB_ICONERROR);
-            return false;
-        }
-        getline(iniFile, _line);
-        lineView = helper::Trim(_line);
-        if (lineView.compare("[ThMouseX]") != 0) {
-            MessageBoxA(NULL, "ThMouseX.ini has invalid format.", "ThMouseX", MB_OK | MB_ICONERROR);
-            return false;
-        }
-        while (!iniFile.eof()) {
-            getline(iniFile, _line);
-            lineView = helper::Trim(_line);
-            if (lineView.find("CursorTexture") != string::npos) {
-                auto texturePath = helper::Trim(lineView.substr(lineView.find('=') + 1));
-                if (texturePath.size() == 0) {
-                    MessageBoxA(NULL, "ThMouseX.ini: Invalid CursorTexture.", "ThMouseX", MB_OK | MB_ICONERROR);
-                    return false;
-                }
-                auto wTexturePath = encoding::ConvertToUtf16(string(texturePath).c_str());
-                GetFullPathNameW(wTexturePath.c_str(), ARRAYSIZE(gs_textureFilePath), gs_textureFilePath, NULL);
-            } else if (lineView.find("CursorBaseHeight") != string::npos) {
-                stringstream ss;
-                ss << lineView.substr(lineView.find('=') + 1);
-                ss >> gs_textureBaseHeight;
-                if (gs_textureBaseHeight == 0) {
-                    MessageBoxA(NULL, "ThMouseX.ini: Invalid CursorBaseHeight.", "ThMouseX", MB_OK | MB_ICONERROR);
-                    return false;
-                }
-            } else if (lineView.find("BombButton") != string::npos) {
-                auto key = helper::Trim(lineView.substr(lineView.find('=') + 1));
-                auto value = vkCodes.find(key);
-                if (value == vkCodes.end()) {
-                    MessageBoxA(NULL, "ThMouseX.ini: Invalid BombButton.", "ThMouseX", MB_OK | MB_ICONERROR);
-                    return false;
-                }
-                gs_bombButton = value->second;
-            } else if (lineView.find("ExtraButton") != string::npos) {
-                auto key = helper::Trim(lineView.substr(lineView.find('=') + 1));
-                auto value = vkCodes.find(key);
-                if (value == vkCodes.end()) {
-                    MessageBoxA(NULL, "ThMouseX.ini: Invalid ExtraButton.", "ThMouseX", MB_OK | MB_ICONERROR);
-                    return false;
-                }
-                gs_extraButton = value->second;
-            } else if (lineView.find("ToggleOsCursorButton") != string::npos) {
-                auto key = helper::Trim(lineView.substr(lineView.find('=') + 1));
-                auto value = vkCodes.find(key);
-                if (value == vkCodes.end()) {
-                    MessageBoxA(NULL, "ThMouseX.ini: Invalid ToggleOsCursorButton.", "ThMouseX", MB_OK | MB_ICONERROR);
-                    return false;
-                }
-                gs_toggleOsCursorButton = value->second;
-            }
-        }
-        return true;
+        return tuple(vkCodes, true);
     }
-}
+};

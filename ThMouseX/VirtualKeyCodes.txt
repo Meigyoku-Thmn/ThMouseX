@@ -1,4 +1,5 @@
 ; Reference: https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+; Required encoding is UTF-8 without BOM
 ; Constant      Value   Description
 VK_BACK         0x08    BACKSPACE key
 VK_TAB          0x09    TAB key

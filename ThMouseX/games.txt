@@ -1,6 +1,7 @@
 ; This file tells ThMouseX how to find player position data.
 ; Each line for a game.
 ; Use quotes "" for process names that have spaces.
+; Required encoding is UTF-8 without BOM
 ;
 ; processName   positionRVA        dataType   offset         baseHeight   aspectRatio   inputMethod        WarpAssist
 ;

@@ -16,11 +16,6 @@ export enum ModulateStage {
     WhiteInc, WhiteDec, BlackInc, BlackDec,
 };
 
-export struct UINTSIZE {
-    UINT width;
-    UINT height;
-};
-
 export struct RECTSIZE: RECT {
     UNBOUND inline LONG width() const {
         return right - left;
@@ -31,7 +26,7 @@ export struct RECTSIZE: RECT {
 };
 
 export enum class PointDataType {
-    Int, Float, Short
+    None, Int, Float, Short
 };
 
 export struct IntPoint {
@@ -76,7 +71,7 @@ export struct GameConfig {
     ScriptingMethod ScriptingMethodToFindAddress;
     PointDataType   PosDataType;
     FloatPoint      BasePixelOffset;
-    unsigned int    BaseHeight;
+    DWORD           BaseHeight;
     FloatPoint      AspectRatio;
     InputMethod     InputMethods;
 };
