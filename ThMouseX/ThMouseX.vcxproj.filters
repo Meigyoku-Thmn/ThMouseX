@@ -54,16 +54,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <UpToDateCheckInput Include="games.txt" />
-    <UpToDateCheckInput Include="VirtualKeyCodes.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <UpToDateCheckInput Include="ThMouseX.txt" />
-    <UpToDateCheckInput Include="ConfigScripts\Danmakai.lua">
+    <CopyFileToFolders Include="games.txt" />
+    <CopyFileToFolders Include="ThMouseX.txt" />
+    <CopyFileToFolders Include="VirtualKeyCodes.txt" />
+    <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">
       <Filter>ConfigScripts</Filter>
-    </UpToDateCheckInput>
-    <UpToDateCheckInput Include="ConfigScripts\THMHJ.lua">
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ConfigScripts/THMHJ.lua">
       <Filter>ConfigScripts</Filter>
-    </UpToDateCheckInput>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

@@ -48,13 +48,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <UpToDateCheckInput Include="games.txt" />
-    <UpToDateCheckInput Include="VirtualKeyCodes.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <UpToDateCheckInput Include="ConfigScripts\Danmakai.lua" />
-    <UpToDateCheckInput Include="ConfigScripts\THMHJ.lua" />
-    <UpToDateCheckInput Include="ThMouseX.txt" />
+    <CopyFileToFolders Include="games.txt" />
+    <CopyFileToFolders Include="ThMouseX.txt" />
+    <CopyFileToFolders Include="VirtualKeyCodes.txt" />
+    <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">
+      <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ConfigScripts/THMHJ.lua">
+      <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
+    </CopyFileToFolders>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0FA9DE0E-B696-468D-9178-E85B228CAB70}</ProjectGuid>
@@ -134,15 +136,6 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>
-xcopy /y "$(ProjectDir)games.txt" "$(OutDir)" /s /d
-xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)" /s /d
-xcopy /y "$(ProjectDir)ThMouseX.txt" "$(OutDir)" /s /d
-xcopy /y "$(ProjectDir)VirtualKeyCodes.txt" "$(OutDir)" /s /d
-xcopy /y "$(ProjectDir)ConfigScripts" "$(OutDir)ConfigScripts" /i /s /d
-</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -180,15 +173,6 @@ xcopy /y "$(ProjectDir)ConfigScripts" "$(OutDir)ConfigScripts" /i /s /d
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>
-xcopy /y "$(ProjectDir)games.txt" "$(OutDir)" /s /d
-xcopy /y "$(ProjectDir)cursor.png" "$(OutDir)" /s /d
-xcopy /y "$(ProjectDir)ThMouseX.txt" "$(OutDir)" /s /d
-xcopy /y "$(ProjectDir)VirtualKeyCodes.txt" "$(OutDir)" /s /d
-xcopy /y "$(ProjectDir)ConfigScripts" "$(OutDir)ConfigScripts" /i /s /d
-</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
