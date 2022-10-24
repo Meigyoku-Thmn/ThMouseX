@@ -42,6 +42,8 @@ export struct ShortPoint {
 export struct FloatPoint {
     float X;
     float Y;
+    UNBOUND FloatPoint() {}
+    UNBOUND FloatPoint(float x, float y): X(x), Y(y) {}
 };
 
 export union TypedPoint {
@@ -56,10 +58,10 @@ export struct AddressChain {
 static_assert(sizeof(void*) == sizeof(AddressChain::Level[0]));
 
 BEGIN_EXPORT_FLAG_ENUM(InputMethod, int)
-    None = 0,
-    DirectInput = 1 << 0,
-    GetKeyboardState = 1 << 1,
-    SendKey = 1 << 2,
+None = 0,
+DirectInput = 1 << 0,
+GetKeyboardState = 1 << 1,
+SendKey = 1 << 2,
 END_FLAG_ENUM()
 
 export enum class ScriptingMethod {

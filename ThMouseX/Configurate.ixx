@@ -64,42 +64,33 @@ public:
             stringstream lineStream(line);
             if (TestCommentLine(lineStream))
                 continue;
-            bool succeeded;
 
-            wstring processName;
-            tie(processName, succeeded) = ExtractProcessName(lineStream, lineCount);
-            if (!succeeded)
+            auto [processName, ok1] = ExtractProcessName(lineStream, lineCount);
+            if (!ok1)
                 return false;
 
-            vector<DWORD> addressOffsets;
-            ScriptingMethod scriptingMethod;
-            tie(addressOffsets, scriptingMethod, succeeded) = ExtractPositionRVA(lineStream, lineCount);
-            if (!succeeded)
+            auto [addressOffsets, scriptingMethod, ok2] = ExtractPositionRVA(lineStream, lineCount);
+            if (!ok2)
                 return false;
 
-            PointDataType dataType;
-            tie(dataType, succeeded) = ExtractDataType(lineStream, lineCount);
-            if (!succeeded)
+            auto [dataType, ok3] = ExtractDataType(lineStream, lineCount);
+            if (!ok3)
                 return false;
 
-            FloatPoint offset;
-            tie(offset, succeeded) = ExtractOffset(lineStream, lineCount);
-            if (!succeeded)
+            auto [offset, ok4] = ExtractOffset(lineStream, lineCount);
+            if (!ok4)
                 return false;
 
-            DWORD baseHeight;
-            tie(baseHeight, succeeded) = ExtractBaseHeight(lineStream, lineCount);
-            if (!succeeded)
+            auto [baseHeight, ok5] = ExtractBaseHeight(lineStream, lineCount);
+            if (!ok5)
                 return false;
 
-            FloatPoint aspectRatio;
-            tie(aspectRatio, succeeded) = ExtractAspectRatio(lineStream, lineCount);
-            if (!succeeded)
+            auto [aspectRatio, ok6] = ExtractAspectRatio(lineStream, lineCount);
+            if (!ok6)
                 return false;
 
-            InputMethod inputMethods;
-            tie(inputMethods, succeeded) = ExtractInputMethod(lineStream, lineCount);
-            if (!succeeded)
+            auto [inputMethods, ok7] = ExtractInputMethod(lineStream, lineCount);
+            if (!ok7)
                 return false;
 
             auto& gameConfig = gameConfigs.Configs[gameConfigs.Length++];
@@ -303,11 +294,8 @@ private:
             return {FloatPoint(), false};
         }
 
-        const char* convMessage;
-        FloatPoint offset{};
-
         auto offsetXStr = posOffsetStr.substr(1, commaIdx - 1);
-        tie(offset.X, convMessage) = helper::ConvertToFloat(offsetXStr);
+        auto [offsetX, convMessage] = helper::ConvertToFloat(offsetXStr);
         if (convMessage != nullptr) {
             MessageBoxA(NULL, format("Invalid offset X: {} at line {} in " GameFile ".",
                 convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
@@ -315,14 +303,14 @@ private:
         }
 
         auto offsetYStr = posOffsetStr.substr(commaIdx + 1, posOffsetStr.length() - commaIdx - 2);
-        tie(offset.Y, convMessage) = helper::ConvertToFloat(offsetYStr);
-        if (convMessage != nullptr) {
+        auto [offsetY, convMessage2] = helper::ConvertToFloat(offsetYStr);
+        if (convMessage2 != nullptr) {
             MessageBoxA(NULL, format("Invalid offset Y: {} at line {} in " GameFile ".",
-                convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+                convMessage2, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
             return {FloatPoint(), false};
         }
 
-        return {offset, true};
+        return {FloatPoint(offsetX, offsetY), true};
     }
 
     static tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount) {
@@ -349,11 +337,8 @@ private:
             return {FloatPoint(), false};
         }
 
-        FloatPoint ratio;
-        const char* convMessage;
-
         auto ratioXStr = aspectRatioStr.substr(0, colonIdx);
-        tie(ratio.X, convMessage) = helper::ConvertToFloat(ratioXStr);
+        auto [ratioX, convMessage] = helper::ConvertToFloat(ratioXStr);
         if (convMessage != nullptr) {
             MessageBoxA(NULL, format("Invalid aspectRatio X: {} at line {} in " GameFile ".",
                 convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
@@ -361,14 +346,14 @@ private:
         }
 
         auto ratioYStr = aspectRatioStr.substr(colonIdx + 1, aspectRatioStr.length() - colonIdx - 1);
-        tie(ratio.Y, convMessage) = helper::ConvertToFloat(ratioYStr);
-        if (convMessage != nullptr) {
+        auto [ratioY, convMessage2] = helper::ConvertToFloat(ratioYStr);
+        if (convMessage2 != nullptr) {
             MessageBoxA(NULL, format("Invalid aspectRatio Y: {} at line {} in " GameFile ".",
-                convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+                convMessage2, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
             return {FloatPoint(), false};
         }
 
-        return {ratio, true};
+        return {FloatPoint(ratioX, ratioY), true};
     }
 
     static tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount) {
