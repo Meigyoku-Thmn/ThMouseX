@@ -99,9 +99,12 @@ public:
             memcpy(gameConfig.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
 
             static_assert(is_same<decltype(&gameConfig.Address.Level[0]), decltype(addressOffsets.data())>());
-            memcpy(gameConfig.Address.Level, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
-            assert(addressOffsets.size() <= ARRAYSIZE(gameConfig.Address.Level));
-            gameConfig.Address.Length = addressOffsets.size();
+            if (addressOffsets.size() > 0) {
+                memcpy(gameConfig.Address.Level, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
+                assert(addressOffsets.size() <= ARRAYSIZE(gameConfig.Address.Level));
+                gameConfig.Address.Length = addressOffsets.size();
+            }
+            gameConfig.ScriptingMethodToFindAddress = scriptingMethod;
 
             gameConfig.PosDataType = dataType;
 

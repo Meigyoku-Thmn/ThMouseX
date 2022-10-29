@@ -48,9 +48,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             // We use SetWindowsHookEx, so DllMain is always called from a message loop in the target process.
             // Therefore, this is pretty thread-safe unless you hook GetMessage/PeekMessage.
             // The same thing happens for UnhookWindowsHookEx.
-            for (int i = 0; i < gs_gameConfigArray.Length; i++) {
-                if (_wcsicmp(currentProcessName, gs_gameConfigArray.Configs[i].ProcessName) == 0) {
-                    g_currentConfig = gs_gameConfigArray.Configs[i];
+            auto& gameConfigs = gs_gameConfigArray;
+            for (int i = 0; i < gameConfigs.Length; i++) {
+                if (_wcsicmp(currentProcessName, gameConfigs.Configs[i].ProcessName) == 0) {
+                    g_currentConfig = gameConfigs.Configs[i];
 
                     luajit::Initialize();
                     minhook::Initialize();

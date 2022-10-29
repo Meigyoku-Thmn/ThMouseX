@@ -195,7 +195,7 @@ CleanAndReturn:
             cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f};
         }
 
-        SystemParametersInfoA(SPI_SETCURSORSHADOW, 0, (PVOID)TRUE, SPIF_SENDCHANGE);
+        SystemParametersInfoA(SPI_SETCURSORSHADOW, 0, (PVOID)TRUE, 0);
     }
 
     HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
