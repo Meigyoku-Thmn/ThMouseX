@@ -42,8 +42,6 @@ export struct ShortPoint {
 export struct FloatPoint {
     float X;
     float Y;
-    UNBOUND FloatPoint() {}
-    UNBOUND FloatPoint(float x, float y): X(x), Y(y) {}
 };
 
 export union TypedPoint {
