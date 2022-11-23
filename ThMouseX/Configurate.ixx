@@ -195,7 +195,7 @@ public:
     }
 private:
     static bool TestCommentLine(stringstream& stream) {
-        char firstChr;
+        char firstChr{};
         stream >> ws >> firstChr;
         if (firstChr == ';' || firstChr == '\0')
             return true;

@@ -39,6 +39,8 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 14.3 ~ Impossible Spell Card
 * Touhou 15 ~ Legacy of Lunatic Kingdom (ver 1.00b)
 * Touhou 16 ~ Hidden Star in Four Seasons
+* Touhou 16.5 ~ Violet Detector
+* Touhou 17 ~ Wily Beast and Weakest Creature
 * Touhou 18 ~ Unconnected Marketeers
 * Touhou 18.5 ~ 100th Black Market
 
