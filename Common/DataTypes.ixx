@@ -3,6 +3,7 @@ module;
 #include "framework.h"
 #include "macro.h"
 #include <functional>
+#include <string_view>
 
 export module common.datatype;
 

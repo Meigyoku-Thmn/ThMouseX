@@ -31,6 +31,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     setlocale(LC_ALL, ".UTF8");
+    setlocale(LC_NUMERIC, "C");
 
     hInst = hInstance;
 

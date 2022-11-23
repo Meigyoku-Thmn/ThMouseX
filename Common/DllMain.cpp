@@ -11,7 +11,10 @@ using namespace std;
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH: {
+
             setlocale(LC_ALL, ".UTF8");
+            setlocale(LC_NUMERIC, "C");
+
             g_commonModule = hModule;
 
             GetModuleFileNameW(g_commonModule, g_currentModuleDirPath, ARRAYSIZE(g_currentModuleDirPath));
