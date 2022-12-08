@@ -74,7 +74,7 @@ Remember to compile for 32-bit, toolset v143, and make sure these files and fold
 * ThMouseX.txt
 * VirtualKeyCodes.txt
 
-If you have errors why compiling, then I use Visual Studio 2022 and a new Windows SDK.
+If you have errors while compiling, then I use Visual Studio 2022 and a new Windows SDK for the development of ThMouseX.
 
 ### How to use ThMouseX?
 1. Run ThMouseX.exe.
