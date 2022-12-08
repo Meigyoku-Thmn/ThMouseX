@@ -55,11 +55,15 @@ FAQ
 https://github.com/Meigyoku-Thmn/ThMouseX/releases
 
 ### How to compile?
-This project can be compiled via Visual Studio, or just Visual Studio Build Tools:
+This project can be compiled via Visual Studio (I use Visual Studio 2022), or just Visual Studio Build Tools:
 * [Visual Studio](https://visualstudio.microsoft.com/), select "Desktop development with C++" during installation.
 * [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools), select "Visual C++ build tools" during installation.
 
-Remember to compile for 32-bit, toolset v143, and make sure these files and folder are in the same folder:
+Also you need .NET Framework 4.8 SDK, it should be selectable in one of the aboves.
+
+You also need to setup [vcpkg](https://vcpkg.io/en/getting-started.html) and put vcpkg folder path into the PATH of environment variables.
+
+Remember to compile for 32-bit, toolset v143, .NET Framework 4.8, and make sure these files and folder are in the same folder:
 * ConfigScripts
 * 0Harmony.dll
 * Common.dll
@@ -74,7 +78,7 @@ Remember to compile for 32-bit, toolset v143, and make sure these files and fold
 * ThMouseX.txt
 * VirtualKeyCodes.txt
 
-If you have errors while compiling, then I use Visual Studio 2022 and a new Windows SDK for the development of ThMouseX.
+Due to the limitation of Visual Studio's Compiler, you might have to compile to the second time for it to work.
 
 ### How to use ThMouseX?
 1. Run ThMouseX.exe.
