@@ -9,6 +9,10 @@ This is a tool that enables mouse control for Shoot 'em ups games, intended for 
 
 Demo clip: https://www.youtube.com/watch?v=uMkzmM13qpU
 
+Download link
+---
+https://github.com/Meigyoku-Thmn/ThMouseX/releases
+
 Differences of the fork
 -----------------------
 * Support any game's resolutions
@@ -51,9 +55,6 @@ You can edit the games.txt file to add more games.
 
 FAQ
 ---
-### Download link
-https://github.com/Meigyoku-Thmn/ThMouseX/releases
-
 ### How to compile?
 This project can be compiled via Visual Studio (I use Visual Studio 2022), or just Visual Studio Build Tools:
 * [Visual Studio](https://visualstudio.microsoft.com/), select "Desktop development with C++" during installation.
