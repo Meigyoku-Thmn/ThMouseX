@@ -20,7 +20,7 @@ Drawbacks
 * Only works with 32-bit games (all games in Touhou Project are 32-bit).
 * Configuration is difficult.
 
-Compatibility
+Preconfigured games
 -------------
 This tool should be compatible with any Touhou games from 6 to the latest. Here is the list of preconfigured games in games.txt:
 * Touhou 6 ~ Embodiment of Scarlet Devil (ver v1.02h)
