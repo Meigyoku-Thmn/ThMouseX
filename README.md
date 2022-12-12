@@ -106,7 +106,7 @@ The crosshair/cursor sprite may be changed:
 3. Change the file name after "CursorTexture = " to the preferred crosshair file's name. (Don't forget the file extension name ".png".)
 
 ### Add your favorite games
-You can extend ThMouseX to support more Shoot 'em ups games by modifying the "games.txt" file.
+You can extend ThMouseX to support more Shoot 'em ups games by modifying the "games.txt" file. You can also use Lua script for advanced cases.
 
 Open the file with any text editor and try yourself.
 
