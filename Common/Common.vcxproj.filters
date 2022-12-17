@@ -52,6 +52,18 @@
     <ClCompile Include="Helper.Encoding.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ErrorMsg.DDraw.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorMsg.Cor.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorMsg.D3D.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorMsg.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="vcpkg.json" />

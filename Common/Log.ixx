@@ -13,8 +13,10 @@ export module common.log;
 
 import common.var;
 import common.helper.encoding;
+import common.errormsg;
 
 namespace encoding = common::helper::encoding;
+namespace errormsg = common::errormsg;
 
 using namespace std;
 using namespace Microsoft::WRL;
@@ -68,27 +70,23 @@ namespace common::log {
         ComPtr<IErrorInfo> errorInfo;
         GetErrorInfo(0, errorInfo.GetAddressOf());
         _com_error error(hResult, errorInfo.Get(), true);
-
-        auto detail = error.ErrorMessage();
-
         auto description = error.Description();
-        auto source = error.Source();
-
-        const char* desStr = description;
-        if (desStr == nullptr)
-            desStr = "(None)";
-        const char* srcStr = source;
-        if (srcStr == nullptr)
-            srcStr = "(None)";
-
-        ToFile("%s: %s, Description: %s, Source: %s", message, detail, desStr, srcStr);
+        if (description.length() > 0) {
+            ToFile("%s: %s", message, description);
+            return;
+        }
+        auto errorMessage = string(error.ErrorMessage());
+        ToFile("%s: %s", message, errorMessage.c_str());
+        if (errorMessage.starts_with("IDispatch error") || errorMessage.starts_with("Unknown error")) {
+            errorMessage = errormsg::GuessErrorsFromHResult(hResult);
+            if (errorMessage != "")
+                ToFile(errorMessage.c_str());
+        }
     }
 
     export DLLEXPORT void LastErrorToFile(const char* message) {
         _com_error error(GetLastError());
-
         auto detail = error.ErrorMessage();
-
         ToFile("%s: %s", message, detail);
     }
 

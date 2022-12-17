@@ -172,8 +172,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompilerConfig.cpp" />
+    <ClCompile Include="ErrorMsg.Cor.ixx" />
     <ClCompile Include="DataTypes.ixx" />
+    <ClCompile Include="ErrorMsg.D3D.ixx" />
+    <ClCompile Include="ErrorMsg.DDraw.ixx" />
     <ClCompile Include="DllMain.cpp" />
+    <ClCompile Include="ErrorMsg.ixx" />
     <ClCompile Include="Helper.Encoding.ixx" />
     <ClCompile Include="Helper.ixx" />
     <ClCompile Include="Log.ixx" />
