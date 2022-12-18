@@ -58,14 +58,6 @@ namespace dx8::hook {
     HRESULT WINAPI D3DPresent(IDirect3DDevice8* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
     decltype(&D3DPresent) OriPresent;
 
-    vector<CallbackType>& initializeCallbacks() {
-        static vector<CallbackType> backing;
-        return backing;
-    }
-    export DLLEXPORT void RegisterInitializeCallback(CallbackType callback) {
-        initializeCallbacks().push_back(callback);
-    }
-
     vector<CallbackType>& postRenderCallbacks() {
         static vector<CallbackType> backing;
         return backing;
@@ -184,9 +176,6 @@ CleanAndReturn:
         if (initialized)
             return;
         initialized = true;
-
-        for (auto& callback : initializeCallbacks())
-            callback();
 
         D3DDEVICE_CREATION_PARAMETERS params;
         device->GetCreationParameters(&params);

@@ -52,6 +52,7 @@ namespace core::messagequeuehook {
         return bShow == TRUE ? 0 : -1;
     }
 
+    bool cursorNormalized;
     int cursorVisibility;
     void ShowCursorEx(bool show) {
         if (show && cursorVisibility < 0)
@@ -74,12 +75,16 @@ namespace core::messagequeuehook {
 
     struct OnInit {
         OnInit() {
-            // Hide the mouse cursor when D3D is initialized
-            directx8::RegisterInitializeCallback(Callback);
-            directx9::RegisterInitializeCallback(Callback);
+            // Hide the mouse cursor when D3D is running, but only after cursor normalization
+            directx8::RegisterPostRenderCallbacks(Callback);
+            directx9::RegisterPostRenderCallbacks(Callback);
         }
         static void Callback() {
-            HideMousePointer();
+            static bool callbackDone = false;
+            if (cursorNormalized && !callbackDone) {
+                callbackDone = true;
+                HideMousePointer();
+            }
         }
     } _;
 
@@ -105,7 +110,8 @@ namespace core::messagequeuehook {
             else if (e->message == WM_RBUTTONUP && isRightMousePressing == true) {
                 isRightMousePressing = false;
                 g_inputEnabled = !g_inputEnabled;
-            } else if (e->message == WM_KEYDOWN) {
+            }
+            else if (e->message == WM_KEYDOWN) {
                 if (e->wParam == gs_toggleOsCursorButton) {
                     if (isCursorShow)
                         HideMousePointer();
@@ -124,7 +130,6 @@ namespace core::messagequeuehook {
                 neoLuaInitialized = true;
                 neolua::Initialize();
             }
-            static auto cursorNormalized = false;
             if (!cursorNormalized) {
                 cursorNormalized = true;
                 NormalizeCursor();
@@ -132,13 +137,15 @@ namespace core::messagequeuehook {
             auto e = (PCWPRETSTRUCT)lParam;
             if (e->message == CLEAN_MANAGED_DATA) {
                 neolua::Uninitialize();
-            } else if (e->message == WM_SETCURSOR) {
+            }
+            else if (e->message == WM_SETCURSOR) {
                 if (LOWORD(e->lParam) == HTCLIENT) {
                     if (isCursorShow)
                         ShowMousePointer();
                     else
                         HideMousePointer();
-                } else {
+                }
+                else {
                     ShowCursorEx(true);
                     DefWindowProcW(e->hwnd, e->message, e->wParam, e->lParam);
                 }
