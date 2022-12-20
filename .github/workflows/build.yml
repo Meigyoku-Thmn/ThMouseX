@@ -13,14 +13,17 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       
-    - name: Install msbuild
+    - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.1
+      
+    - name: Config vcpkg
+      run:  vcpkg integrate install
       
     - name: Install dependencies
       continue-on-error: true
       run: |
-        msbuild -p:Configuration=Release -p:Platform=x86 -restore        
+        msbuild -p:Configuration=Release -p:Platform=x86 -restore -m
         
     - name: Build the solution
       run: |
-        msbuild -p:Configuration=Release -p:Platform=x86 -restore
+        msbuild -p:Configuration=Release -p:Platform=x86 -restore -m
