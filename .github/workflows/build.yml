@@ -1,0 +1,32 @@
+name: Deployment
+
+on:
+  push:
+    branches: [ deployment ]
+  pull_request:
+    branches: [ deployment ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Install vcpkg and add it to the environment variables
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.bat
+        $env:PATH += ";$(pwd)"
+        cd ..
+      
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Install dependencies
+      continue-on-error: true
+      run: |
+        msbuild -p:Configuration=Release -p:Platform=x86 -restore        
+        
+    - name: Build the solution
+      run: |
+        msbuild -p:Configuration=Release -p:Platform=x86 -restore
