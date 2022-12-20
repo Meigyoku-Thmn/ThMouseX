@@ -23,6 +23,9 @@ jobs:
         $env:PATH += ";$(pwd)"
         echo "Get out of the folder"
         cd ..
+        
+    - name: Install .NET Framework 4.8 SDK
+      run: choco install dotnetfx -y
       
     - name: Checkout
       uses: actions/checkout@v2
