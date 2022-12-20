@@ -9,26 +9,12 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-
-    steps:
-    - name: Install vcpkg and add it to the environment variables
-      run: |
-        echo "Clone the repo"
-        git clone https://github.com/Microsoft/vcpkg.git
-        echo "Enter the folder"
-        cd vcpkg
-        echo "Setup vcpkg"
-        ./bootstrap-vcpkg.bat
-        echo "Add it to env"
-        $env:PATH += ";$(pwd)"
-        echo "Get out of the folder"
-        cd ..
-        
-    - name: Install .NET Framework 4.8 SDK
-      run: choco install dotnetfx -y
       
     - name: Checkout
       uses: actions/checkout@v2
+      
+    - name: Install msbuild
+      uses: microsoft/setup-msbuild@v1.1
       
     - name: Install dependencies
       continue-on-error: true
