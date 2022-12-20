@@ -13,10 +13,15 @@ jobs:
     steps:
     - name: Install vcpkg and add it to the environment variables
       run: |
-        git clone https://github.com/Microsoft/vcpkg.git ;
-        cd vcpkg ;
-        ./bootstrap-vcpkg.bat ;
-        $env:PATH += ";$(pwd)" ;
+        echo "Clone the repo"
+        git clone https://github.com/Microsoft/vcpkg.git
+        echo "Enter the folder"
+        cd vcpkg
+        echo "Setup vcpkg"
+        ./bootstrap-vcpkg.bat
+        echo "Add it to env"
+        $env:PATH += ";$(pwd)"
+        echo "Get out of the folder"
         cd ..
       
     - name: Checkout
