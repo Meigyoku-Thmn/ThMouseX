@@ -43,3 +43,9 @@ jobs:
         cd Release
         ls
         cd ..
+        
+    - name: Create artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Release build
+        path: Release
