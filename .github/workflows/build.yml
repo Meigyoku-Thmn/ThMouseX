@@ -29,6 +29,15 @@ jobs:
       run: |
         msbuild -p:Configuration=Release -p:Platform=x86 -restore -m
         
+    - name: Delete unnecessary files
+      run: |
+        cd Release
+        del *.exp -Force
+        del *.lib -Force
+        del *.pdb -Force
+        del de -Recurse -Force
+        cd ..
+        
     - name: List built files
       run: |
         cd Release
