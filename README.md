@@ -55,7 +55,7 @@ You can edit the games.txt file to add more games.
 
 FAQ
 ---
-### How to compile?
+### How to compile on your computer (not recommended for non-tech savvy)
 This project can be compiled via Visual Studio (I use Visual Studio 2022), or just Visual Studio Build Tools:
 * [Visual Studio](https://visualstudio.microsoft.com/), select "Desktop development with C++" during installation.
 * [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools), select "Visual C++ build tools" during installation.
@@ -81,7 +81,7 @@ Remember to compile for 32-bit, toolset v143, .NET Framework 4.8, and make sure 
 
 Due to the limitation of Visual Studio's Compiler, you might have to compile to the second time for it to work.
 
-### Another way to compile without installing anything on your computer
+### Another way to compile without installing anything on your computer (recommended way)
 - Fork the THMouseX repository
 - Go to the "Actions" tab
 - Select the "Deployment" workflow
