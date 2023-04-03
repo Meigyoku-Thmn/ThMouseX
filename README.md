@@ -81,6 +81,13 @@ Remember to compile for 32-bit, toolset v143, .NET Framework 4.8, and make sure 
 
 Due to the limitation of Visual Studio's Compiler, you might have to compile to the second time for it to work.
 
+### Another way to compile without installing anything on your computer
+- Fork the THMouseX repository
+- Go to the "Actions" tab
+- Select the "Deployment" workflow
+- Run the workflow
+- Wait for it, then download the produced zipped artifact.
+
 ### How to use ThMouseX?
 1. Run ThMouseX.exe.
 2. Run your game, or you can run your game first and then run ThMouseX.exe.
