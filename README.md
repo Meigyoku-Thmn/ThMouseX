@@ -86,7 +86,7 @@ Due to the limitation of Visual Studio's Compiler, you might have to compile to 
 - Go to the "Actions" tab
 - Select the "Deployment" workflow
 - Run the workflow (refresh the page if nothing shows up)
-- Wait for it, then download the produced zipped artifact.
+- Wait for it, then download the produced zipped artifact (shown up in the page with url form "https://github.com/<username>/ThMouseX/actions/runs/<flowid>").
 
 ### How to use ThMouseX?
 1. Run ThMouseX.exe.
