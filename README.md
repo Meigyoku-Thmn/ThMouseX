@@ -85,7 +85,7 @@ Due to the limitation of Visual Studio's Compiler, you might have to compile to 
 - Fork the THMouseX repository
 - Go to the "Actions" tab
 - Select the "Deployment" workflow
-- Run the workflow
+- Run the workflow (refresh the page if nothing shows up)
 - Wait for it, then download the produced zipped artifact.
 
 ### How to use ThMouseX?
