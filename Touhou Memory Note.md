@@ -21,7 +21,7 @@ Measurements from Touhou 11.
 
 From Touhou 6 to Touhou 9.5, ZUN used 640x480 as logical graphics coordinate.
 
-But for some reasons, int Touhou 10, he used 64000x48000 instead, but scaled down by the factor 0.01 (1/100) then reupscaled to window size when rendering (I'm discussing about sprite positions, not about texture's resolutions).
+But for some reasons, in Touhou 10, he used 64000x48000 instead, but scaled down by the factor 0.01 (1/100) then reupscaled to window size when rendering (I'm discussing about sprite positions, not about texture's resolutions).
 
 From Touhou 11, he changed to 81920x61440 and factor 0.0078125 (1/128).
 
