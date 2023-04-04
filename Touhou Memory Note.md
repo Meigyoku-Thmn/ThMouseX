@@ -27,4 +27,4 @@ From Touhou 11, he changed to 81920x61440 and factor 0.0078125 (1/128).
 
 That means in all cases, the real logical graphics coordinate is still 640x480.
 
-Maybe because floating-point type is inaccurate but DirectX still needs floating-point type, so he just made an interger type wrapper over it and maintained the real logical graphics coordinate till the time this note was written.
+Maybe because floating-point type is inaccurate but DirectX still needs floating-point type, so he just made an integer type wrapper over it and maintained the real logical graphics coordinate till the time this note was written.
