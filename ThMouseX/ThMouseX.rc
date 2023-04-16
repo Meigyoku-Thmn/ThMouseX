@@ -48,7 +48,7 @@ CAPTION "About ThMouseX"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_THMOUSEX,IDC_STATIC,14,14,20,20
-    LTEXT           "ThMouseX Version 2.0 by Meigyoku Thmn\nA fork from ThMouse Version 0.31 of HWei",IDC_STATIC,42,14,164,19,SS_NOPREFIX
+    LTEXT           "ThMouseX Version 2.0.1 by Meigyoku Thmn\nA fork from ThMouse Version 0.31 of HWei",IDC_STATIC,42,14,164,19,SS_NOPREFIX
     LTEXT           "How to use:\nRun a game. If it is supported by ThMouseX, a cross cursor will show.\n\nMouse move = move\nMouse left button = bomb\nMouse right button = turn on/off mouse control.",IDC_STATIC,7,42,199,93
     DEFPUSHBUTTON   "OK",IDOK,156,106,50,14,WS_GROUP
     PUSHBUTTON      "Quit",IDC_ExitButton,156,121,50,14
