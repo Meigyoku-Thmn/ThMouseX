@@ -119,11 +119,12 @@ Open the file with any text editor and try yourself.
 
 (To document more)
 
+### Antivirus programs' detection
+This tool uses various code injection techniques, so it's normal that some antivirus programs don't like it. You can verify the source code and build it on your own using the instructions above.
+
 ### ThMouseX doesn't work with old versions of Fantastic Danmaku Festival I (or games that use .NET Framework 2/3)
 Old (pre-Steam) versions of Fantastic Danmaku Festival use .NET Framework 2, so normally this tool will not work because it uses .NET Framework 4. But you can force the game to use .NET Framework 4 by putting this file to the same place with THMHJ.exe:
 
 https://gist.github.com/Meigyoku-Thmn/d94b41b4381867c6622e15a617cea8f3
 
 (Ensure the name of this manifest file is `THMHJ.exe.config`)
-
-### 
