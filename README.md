@@ -120,6 +120,9 @@ Open the file with any text editor and try yourself.
 
 (To document more)
 
+### Sometime ThMouseX doesn't actually work, the game's character just keeps moving to a corner or is not bound exactly to the cursor
+They are really rare bugs that I have yet found a way to fix. A workaround is to just restart ThMouseX, it should works after 1-2 times relaunching, you don't have to turn off the game, but if the bugs still exist then it's also a way to try.
+
 ### Antivirus programs' detection
 This tool uses various code injection techniques, so it's normal that some antivirus programs don't like it. You can verify the source code and build it on your own using the instructions above.
 
