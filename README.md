@@ -26,7 +26,7 @@ Drawbacks
 
 Preconfigured games
 -------------
-This tool should be compatible with any Touhou games from 6 to the latest. Here is the list of preconfigured games in games.txt:
+This tool should be compatible with any Touhou games from 6 to the latest. Here is the list of preconfigured games in [games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt):
 * Touhou 6 ~ Embodiment of Scarlet Devil (ver v1.02h)
 * Touhou 7 ~ Perfect Cherry Blossom (ver v1.00b)
 * Touhou 8 ~ Imperishable Night (ver v1.00d)
@@ -46,6 +46,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 17 ~ Wily Beast and Weakest Creature
 * Touhou 18 ~ Unconnected Marketeers
 * Touhou 18.5 ~ 100th Black Market
+* Touhou 19 ~ Unfinished Dream of All Living Ghost (ver demo) (not included in release yet)
 
 It also have preconfiguration of some other games:
 * DANMAKAI: Red Forbidden Fruit
