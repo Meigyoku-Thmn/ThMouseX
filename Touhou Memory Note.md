@@ -16,7 +16,7 @@ Measurements from Touhou 11.
 ## Range
 * X: -23552 ~ 23552, real: -184.f ~ 184.f
 * Y: 4096 ~ 55296, real: 32.f ~ 432.f
-
+---
 Measurements from Touhou 19 Demo.
 ## Bottom Right
 * X = 17920
@@ -24,7 +24,7 @@ Measurements from Touhou 19 Demo.
 ## Top Left
 * X = -17920
 * Y = 4096
-
+---
 ## Remark
 
 From Touhou 6 to Touhou 9.5, ZUN used 640x480 as logical graphics coordinate.
