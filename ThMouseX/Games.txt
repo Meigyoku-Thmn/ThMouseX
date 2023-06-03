@@ -75,7 +75,7 @@ th18            [000CF410][62C]    int        (28672,2048)   61440        4:3   
 th185           [000D7C3C][62C]    int        (40960,2048)   61440        4:3           GetKeyboardState   0
 
 ; Touhou 19 Demo
-th19            [000D49C4][658]    int        (20992,2048)   61440        4:3           GetKeyboardState   0
+th19            [00220114][658]    int        (20992,2048)   61440        4:3           GetKeyboardState   0
 
 ; DANMAKAI: Red Forbidden Fruit
 Danmakai        LuaJIT             float      (239.5,13.5)   540          16:9          SendKey            0
