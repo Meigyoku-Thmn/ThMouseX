@@ -46,7 +46,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 17 ~ Wily Beast and Weakest Creature
 * Touhou 18 ~ Unconnected Marketeers
 * Touhou 18.5 ~ 100th Black Market
-* Touhou 19 ~ Unfinished Dream of All Living Ghost (ver demo) (not included in release yet)
+* Touhou 19 ~ Unfinished Dream of All Living Ghost (ver demo with netplay) (not included in release yet)
 
 It also have preconfiguration of some other games:
 * DANMAKAI: Red Forbidden Fruit
