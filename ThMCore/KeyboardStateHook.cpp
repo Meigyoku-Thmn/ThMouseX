@@ -1,15 +1,12 @@
-module;
-
 #include "framework.h"
 #include <mmsystem.h>
 #include <vector>
 
-export module core.keyboardstatehook;
-
-import common.minhook;
-import core.inputdetermine;
-import common.var;
-import common.datatype;
+#include "KeyboardStateHook.h"
+#include "InputDetermine.h"
+#include "../Common/MinHook.h"
+#include "../Common/Variables.h"
+#include "../Common/DataTypes.h"
 
 namespace minhook = common::minhook;
 
@@ -20,7 +17,7 @@ namespace core::keyboardstatehook {
     BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState);
     decltype(&_GetKeyboardState) OriGetKeyboardState;
 
-    export vector<minhook::HookApiConfig> HookConfig() {
+    vector<minhook::HookApiConfig> HookConfig() {
         if ((g_currentConfig.InputMethods & InputMethod::GetKeyboardState) == InputMethod::None)
             return {};
         return {

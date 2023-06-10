@@ -1,5 +1,3 @@
-module;
-
 #include "framework.h"
 #include <string>
 #include "macro.h"
@@ -8,11 +6,9 @@ module;
 #include <metahost.h>
 #include <comdef.h>
 
-export module common.neolua;
-
-import common.datatype;
-import common.var;
-import common.log;
+#include "NeoLua.h"
+#include "Log.h"
+#include "Variables.h"
 
 namespace note = common::log;
 
@@ -33,20 +29,20 @@ using namespace Microsoft::WRL;
 
 void OnClose();
 decltype(&OnClose) onClose;
-DLLEXPORT_C void Common_NeoLua_SetOnClose(DWORD address) {
+void Common_NeoLua_SetOnClose(DWORD address) {
     *(PDWORD)&onClose = address;
 }
 
 DWORD positionAddress;
-DLLEXPORT_C void Common_NeoLua_SetPositionAddress(DWORD address) {
+void Common_NeoLua_SetPositionAddress(DWORD address) {
     positionAddress = address;
 }
 
-DLLEXPORT_C PointDataType Common_NeoLua_GetDataType() {
+PointDataType Common_NeoLua_GetDataType() {
     return g_currentConfig.PosDataType;
 }
 
-DLLEXPORT_C void Common_NeoLua_OpenConsole() {
+void Common_NeoLua_OpenConsole() {
     note::OpenConsole();
 }
 
@@ -54,11 +50,11 @@ DLLEXPORT_C void Common_NeoLua_OpenConsole() {
 auto _CLRCreateInstance = (decltype(&CLRCreateInstance))GetProcAddress(LoadLibraryW(L"mscoree.dll"), "CLRCreateInstance");
 
 namespace common::neolua {
-    export DWORD GetPositionAddress() {
+    DWORD GetPositionAddress() {
         return positionAddress;
     }
 
-    export DLLEXPORT void Initialize() {
+    void Initialize() {
         if (g_currentConfig.ScriptingMethodToFindAddress != ScriptingMethod::NeoLua)
             return;
         if (_CLRCreateInstance == nullptr) {
@@ -102,7 +98,7 @@ namespace common::neolua {
         IfFailedReturnWithLog(TAG, "Failed to invoke NeoLuaBootstrap.Handlers.OnInit", result);
     }
 
-    export DLLEXPORT void Uninitialize() {
+    void Uninitialize() {
         if (onClose != nullptr)
             onClose();
         onClose = nullptr;

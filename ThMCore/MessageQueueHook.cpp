@@ -1,17 +1,14 @@
-module;
-
 #include "framework.h"
-#include "macro.h"
 #include <vector>
 
-export module core.messagequeuehook;
-
-import common.minhook;
-import common.var;
-import common.helper;
-import core.directx9hook;
-import dx8.hook;
-import common.neolua;
+#include "../Common/MinHook.h"
+#include "../Common/Variables.h"
+#include "../Common/Helper.h"
+#include "../DX8Hook/Direct3D8Hook.h"
+#include "../Common/NeoLua.h"
+#include "Direct3D9Hook.h"
+#include "MessageQueueHook.h"
+#include "macro.h"
 
 namespace minhook = common::minhook;
 namespace neolua = common::neolua;
@@ -23,7 +20,7 @@ using namespace std;
 
 namespace core::messagequeuehook {
     UINT CLEAN_MANAGED_DATA = RegisterWindowMessageA("CLEAN_MANAGED_DATA {6BF7C2B8-F245-4781-AA3C-467366CA3551}");
-    export DLLEXPORT bool TestRegisteredWindowMessages() {
+    bool TestRegisteredWindowMessages() {
         if (CLEAN_MANAGED_DATA == 0) {
             MessageBoxA(NULL, "Failed to register CLEAN_MANAGED_DATA message.", "RegisterWindowMessage error", MB_OK | MB_ICONERROR);
             return false;
@@ -39,7 +36,7 @@ namespace core::messagequeuehook {
     bool isCursorShow = true;
     auto hCursor = LoadCursorA(NULL, IDC_ARROW);
 
-    export vector<minhook::HookApiConfig> HookConfig{
+    vector<minhook::HookApiConfig> HookConfig{
         {L"USER32.DLL", "SetCursor", &_SetCursor, (PVOID*)&OriSetCursor},
         {L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor},
     };
@@ -164,7 +161,7 @@ namespace core::messagequeuehook {
     HHOOK GetMsgProcHandle;
     HHOOK CallWndRetProcHandle;
 
-    export DLLEXPORT bool InstallHooks() {
+    bool InstallHooks() {
         GetMsgProcHandle = SetWindowsHookExW(WH_GETMESSAGE, GetMsgProcW, g_coreModule, NULL);
         if (!CheckHookProcHandle(GetMsgProcHandle))
             return false;
@@ -174,7 +171,7 @@ namespace core::messagequeuehook {
         return true;
     }
 
-    export DLLEXPORT void RemoveHooks() {
+    void RemoveHooks() {
         DWORD _;
         auto broadcastFlags = SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG;
         // notify targets to clean up managed data, but managed DLLs/assemblies unfortunately cannot be unloaded.

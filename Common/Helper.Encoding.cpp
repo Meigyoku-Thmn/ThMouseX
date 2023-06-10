@@ -1,15 +1,12 @@
-module;
-
 #include "framework.h"
-#include "macro.h"
 #include <string>
 
-export module common.helper.encoding;
+#include "Helper.Encoding.h"
 
 using namespace std;
 
 namespace common::helper::encoding {
-    export DLLEXPORT wstring ConvertToUtf16(const char* utf8str) {
+    wstring ConvertToUtf16(const char* utf8str) {
         auto chrCount = MultiByteToWideChar(CP_UTF8, 0, utf8str, -1, nullptr, 0);
         if (chrCount == 0)
             return wstring();
@@ -18,7 +15,7 @@ namespace common::helper::encoding {
         return output;
     }
 
-    export DLLEXPORT string ConvertToUtf8(const wchar_t* utf16str) {
+    string ConvertToUtf8(const wchar_t* utf16str) {
         auto byteCount = WideCharToMultiByte(CP_UTF8, 0, utf16str, -1, nullptr, 0, nullptr, nullptr);
         if (byteCount == 0)
             return string();

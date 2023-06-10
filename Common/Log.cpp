@@ -1,5 +1,3 @@
-module;
-
 #include "framework.h"
 #include "macro.h"
 #include <iostream>
@@ -9,11 +7,10 @@ module;
 #include <comdef.h>
 #include <wrl/client.h>
 
-export module common.log;
-
-import common.var;
-import common.helper.encoding;
-import common.errormsg;
+#include "Log.h"
+#include "Helper.Encoding.h"
+#include "ErrorMsg.h"
+#include "Variables.h"
 
 namespace encoding = common::helper::encoding;
 namespace errormsg = common::errormsg;
@@ -27,7 +24,7 @@ tm& GetTimeNow() {
 }
 
 namespace common::log {
-    export DLLEXPORT void OpenConsole() {
+    void OpenConsole() {
         if (AllocConsole() == FALSE)
             return;
 #pragma warning(push)
@@ -42,7 +39,7 @@ namespace common::log {
     FILE* logFile;
     wstring logPath;
     string processName;
-    export DLLEXPORT void ToFile(const char* _Format, ...) {
+    void ToFile(const char* _Format, ...) {
         va_list args;
         va_start(args, _Format);
         if (logFile == NULL) {
@@ -66,9 +63,9 @@ namespace common::log {
         va_end(args);
     }
 
-    export DLLEXPORT void HResultToFile(const char* message, HRESULT hResult) {
+    void HResultToFile(const char* message, HRESULT hResult) {
         ComPtr<IErrorInfo> errorInfo;
-        GetErrorInfo(0, errorInfo.GetAddressOf());
+        auto _ = GetErrorInfo(0, errorInfo.GetAddressOf());
         _com_error error(hResult, errorInfo.Get(), true);
         auto description = error.Description();
         if (description.length() > 0) {
@@ -84,13 +81,13 @@ namespace common::log {
         }
     }
 
-    export DLLEXPORT void LastErrorToFile(const char* message) {
+    void LastErrorToFile(const char* message) {
         _com_error error(GetLastError());
         auto detail = error.ErrorMessage();
         ToFile("%s: %s", message, detail);
     }
 
-    export DLLEXPORT void ToConsole(const char* _Format, ...) {
+    void ToConsole(const char* _Format, ...) {
         OpenConsole();
         va_list args;
         va_start(args, _Format);
@@ -99,7 +96,7 @@ namespace common::log {
         va_end(args);
     }
 
-    export DLLEXPORT void FpsToConsole() {
+    void FpsToConsole() {
         using namespace chrono;
         static time_point<steady_clock> oldTime = high_resolution_clock::now();
         static int fps; fps++;

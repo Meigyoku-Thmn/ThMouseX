@@ -1,24 +1,27 @@
 #pragma once
 #include <winerror.h>
 
-#define EXTERN_C extern "C"
+#ifdef COMMON_EXPORTS
 #define DLLEXPORT __declspec(dllexport)
-#define DLLEXPORT_C EXTERN_C __declspec(dllexport)
-#define UNBOUND template <typename = void>
+#define DLLEXPORT_C extern "C" __declspec(dllexport)
+#else
+#define DLLEXPORT __declspec(dllimport)
+#define DLLEXPORT_C extern "C" __declspec(dllimport)
+#endif
 
 #define BEGIN_EXPORT_FLAG_ENUM(EnumName, EnumType) \
-export enum class EnumName: EnumType; \
-export UNBOUND EnumName operator &(EnumName a, const EnumName b) { \
+enum class EnumName: EnumType; \
+inline EnumName operator &(EnumName a, const EnumName b) { \
     return (EnumName)((EnumType)a & (EnumType)b); \
 } \
-export UNBOUND EnumName operator &=(EnumName& a, const EnumName b) { \
+inline EnumName operator &=(EnumName& a, const EnumName b) { \
     (EnumType&)a &= (EnumType)b; \
     return b; \
 } \
-export UNBOUND EnumName operator |(EnumName a, const EnumName b) { \
+inline EnumName operator |(EnumName a, const EnumName b) { \
     return (EnumName)((EnumType)a | (EnumType)b); \
 } \
-export UNBOUND EnumName operator |=(EnumName& a, const EnumName b) { \
+inline EnumName operator |=(EnumName& a, const EnumName b) { \
     (EnumType&)a |= (EnumType)b; \
     return b; \
 } \

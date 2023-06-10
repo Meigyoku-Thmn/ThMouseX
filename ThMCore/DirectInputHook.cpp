@@ -1,17 +1,13 @@
-module;
-
 #include "framework.h"
-#include "macro.h"
 #include "Include/dinput.h"
 #include <string>
 #include <vector>
 
-export module core.directinputhook;
-
-import common.var;
-import core.inputdetermine;
-import common.minhook;
-import common.datatype;
+#include "../Common/Variables.h"
+#include "../Common/MinHook.h"
+#include "InputDetermine.h"
+#include "DirectInputHook.h"
+#include "macro.h"
 
 namespace minhook = common::minhook;
 
@@ -43,7 +39,7 @@ namespace core::directinputhook {
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
-    export DLLEXPORT bool PopulateMethodRVAs() {
+    bool PopulateMethodRVAs() {
         bool                    result = false;
         DWORD*                  vtable{};
         HRESULT                 rs{};
@@ -75,7 +71,7 @@ CleanAndReturn:
         return result;
     }
 
-    export vector<minhook::HookConfig> HookConfig() {
+    vector<minhook::HookConfig> HookConfig() {
         if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
             return {};
         auto baseAddress = (DWORD)GetModuleHandleA("DInput8.dll");

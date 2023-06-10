@@ -1,13 +1,10 @@
-module;
-
 #include "framework.h"
 
-export module common.helper.memory;
-
-import common.var;
+#include "Helper.Memory.h"
+#include "Variables.h"
 
 namespace common::helper::memory {
-    export DWORD ResolveAddress(DWORD* offsets, int length) {
+    DWORD ResolveAddress(DWORD* offsets, int length) {
         if (length <= 0)
             return NULL;
         auto address = offsets[0] + (DWORD)g_targetModule;

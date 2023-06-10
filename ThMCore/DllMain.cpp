@@ -1,17 +1,16 @@
 ﻿#include "framework.h"
-#include "macro.h"
 #include <shlwapi.h>
 #include <clocale>
 
-import common.minhook;
-import common.var;
-import common.datatype;
-import common.luajit;
-import core.keyboardstatehook;
-import core.messagequeuehook;
-import core.directinputhook;
-import dx8.hook;
-import core.directx9hook;
+#include "../Common/MinHook.h"
+#include "../Common/Variables.h"
+#include "../Common/LuaJIT.h"
+#include "../DX8Hook/Direct3D8Hook.h"
+#include "KeyboardStateHook.h"
+#include "MessageQueueHook.h"
+#include "DirectInputHook.h"
+#include "Direct3D9Hook.h"
+#include "macro.h"
 
 namespace minhook = common::minhook;
 namespace luajit = common::luajit;

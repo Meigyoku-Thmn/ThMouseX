@@ -1,17 +1,13 @@
-module;
-
 #include "framework.h" 
 #include <cassert>
 #include <vector>
 
-export module common.errormsg.cor;
+#include "ErrorMsg.Cor.h"
 
 using namespace std;
 
-import common.datatype;
-
 namespace common::errormsg::cor {
-    export vector<ErrorMessage> messages = {
+    vector<ErrorMessage> messages = {
         { 0x8000211d, "COR_E_AMBIGUOUSMATCH", "While late binding to a method via reflection, could not resolve between multiple overloads of a method.", "corerror.h" },
         { 0x80004002, "COR_E_INVALIDCAST", "Indicates a bad cast condition", "corerror.h" },
         { 0x80004003, "COR_E_NULLREFERENCE", "Dereferencing a null reference. In general class libraries should not throw this", "corerror.h" },

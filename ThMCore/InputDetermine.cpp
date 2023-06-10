@@ -1,26 +1,15 @@
-module;
-
 #include "framework.h"
 #include <cmath>
 
-export module core.inputdetermine;
-
-import common.var;
-import common.helper;
-import common.datatype;
+#include "InputDetermine.h"
+#include "../Common/Variables.h"
+#include "../Common/Helper.h"
+#include "../Common/DataTypes.h"
 
 namespace helper = common::helper;
 
-export constexpr auto USE_BOMB = 0b0000'0001;
-export constexpr auto USE_SPECIAL = 0b0000'0010;
-
-export constexpr auto MOVE_LEFT = 0b1000'0000;
-export constexpr auto MOVE_RIGHT = 0b0100'0000;
-export constexpr auto MOVE_UP = 0b0010'0000;
-export constexpr auto MOVE_DOWN = 0b0001'0000;
-
 namespace core::inputdetermine {
-    export DWORD DetermineGameInput() {
+    DWORD DetermineGameInput() {
         DWORD gameInput = 0;
         if (g_leftMousePressed) {
             gameInput |= USE_BOMB;
@@ -39,7 +28,7 @@ namespace core::inputdetermine {
                 auto realWidth = clientSize.height() * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
                 auto paddingX = (clientSize.width() - realWidth) / 2;
 
-                POINT playerPos;
+                POINT playerPos{};
 #define CalculatePosition(position) { \
     playerPos.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X + paddingX); \
     playerPos.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y); \

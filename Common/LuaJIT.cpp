@@ -1,17 +1,14 @@
-module;
-
 #include "framework.h"
 #include <string>
 #include <codecvt>
 #include "macro.h"
 #include "luajit/lua.hpp"
 
-export module common.luajit;
-
-import common.var;
-import common.log;
-import common.helper.memory;
-import common.helper.encoding;
+#include "LuaJIT.h"
+#include "Log.h"
+#include "Helper.Memory.h"
+#include "Helper.Encoding.h"
+#include "Variables.h"
 
 namespace note = common::log;
 namespace memory = common::helper::memory;
@@ -19,15 +16,15 @@ namespace encoding = common::helper::encoding;
 
 using namespace std;
 
-DLLEXPORT_C DWORD Common_LuaJIT_ReadUInt32(DWORD address) {
+DWORD Common_LuaJIT_ReadUInt32(DWORD address) {
     return *PDWORD(address);
 }
 
-DLLEXPORT_C DWORD Common_LuaJIT_ResolveAddress(DWORD* offsets, int length) {
+DWORD Common_LuaJIT_ResolveAddress(DWORD* offsets, int length) {
     return memory::ResolveAddress(offsets, length);
 }
 
-DLLEXPORT_C void Common_LuaJIT_OpenConsole() {
+void Common_LuaJIT_OpenConsole() {
     note::OpenConsole();
 }
 
@@ -75,7 +72,7 @@ bool CheckAndDisableIfError(lua_State *L, int r) {
 }
 
 namespace common::luajit {
-    export DLLEXPORT void Initialize() {
+    void Initialize() {
         if (g_currentConfig.ScriptingMethodToFindAddress != ScriptingMethod::LuaJIT)
             return;
 
@@ -107,7 +104,7 @@ namespace common::luajit {
         }
     }
 
-    export DWORD GetPositionAddress() {
+    DWORD GetPositionAddress() {
         if (scriptingDisabled)
             return NULL;
 
@@ -127,7 +124,7 @@ namespace common::luajit {
         return result;
     }
 
-    export DLLEXPORT void Uninitialize() {
+    void Uninitialize() {
         if (L != NULL)
             lua_close(L);
     }

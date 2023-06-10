@@ -14,19 +14,19 @@
     <ClCompile Include="DllMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Direct3D9Hook.ixx">
+    <ClCompile Include="Direct3D9Hook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DirectInputHook.ixx">
+    <ClCompile Include="DirectInputHook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KeyboardStateHook.ixx">
+    <ClCompile Include="KeyboardStateHook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MessageQueueHook.ixx">
+    <ClCompile Include="MessageQueueHook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InputDetermine.ixx">
+    <ClCompile Include="InputDetermine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CompilerConfig.cpp">
@@ -40,10 +40,22 @@
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="macro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="macro.h">
+    <ClInclude Include="Direct3D9Hook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectInputHook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InputDetermine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardStateHook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageQueueHook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

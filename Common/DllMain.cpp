@@ -1,10 +1,8 @@
 #include "framework.h"
 #include <clocale>
 #include <shlwapi.h>
-#include <string>
-#include <codecvt>
 
-import common.var;
+#include "Variables.h"
 
 using namespace std;
 

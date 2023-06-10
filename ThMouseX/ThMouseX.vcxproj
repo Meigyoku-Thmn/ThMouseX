@@ -20,13 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompilerConfig.cpp" />
-    <ClCompile Include="Configurate.ixx" />
+    <ClCompile Include="Configurate.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Configurate.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico" />

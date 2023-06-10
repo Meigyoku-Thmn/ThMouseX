@@ -1,17 +1,13 @@
-module;
-
 #include "framework.h" 
 #include <cassert>
 #include <vector>
 
-export module common.errormsg.ddraw;
+#include "ErrorMsg.DDraw.h"
 
 using namespace std;
 
-import common.datatype;
-
 namespace common::errormsg::ddraw {
-	export vector<ErrorMessage> messages = {
+	vector<ErrorMessage> messages = {
 		{ 0x80004001, "DDERR_UNSUPPORTED", nullptr, "ddraw.h" },
 		{ 0x80004005, "DDERR_GENERIC", nullptr, "ddraw.h" },
 		{ 0x800401f0, "DDERR_NOTINITIALIZED", nullptr, "ddraw.h" },

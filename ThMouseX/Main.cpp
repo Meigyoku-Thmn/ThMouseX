@@ -3,9 +3,9 @@
 #include <clocale>
 #include <iostream>
 
-import common.datatype;
-import main.config;
-import core.messagequeuehook;
+#include "../Common/DataTypes.h"
+#include "../ThMCore/MessageQueueHook.h"
+#include "Configurate.h"
 
 namespace messagequeuehook = core::messagequeuehook;
 

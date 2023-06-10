@@ -1,20 +1,17 @@
-module;
-
 #include "framework.h"
-#include "macro.h"
 #include "Include/d3d8.h"
 #include "Include/d3dx8core.h"
 #include <string>
 #include <vector>
 #include <comdef.h>
 
-export module dx8.hook;
-
-import common.datatype;
-import common.var;
-import common.helper;
-import common.minhook;
-import common.log;
+#include "../Common/DataTypes.h"
+#include "../Common/Variables.h"
+#include "../Common/Helper.h"
+#include "../Common/MinHook.h"
+#include "../Common/Log.h"
+#include "Direct3D8Hook.h"
+#include "macro.h"
 
 namespace minhook = common::minhook;
 namespace helper = common::helper;
@@ -62,11 +59,11 @@ namespace dx8::hook {
         static vector<CallbackType> backing;
         return backing;
     }
-    export DLLEXPORT void RegisterPostRenderCallbacks(CallbackType callback) {
+    void RegisterPostRenderCallbacks(CallbackType callback) {
         postRenderCallbacks().push_back(callback);
     }
 
-    export DLLEXPORT bool PopulateMethodRVAs() {
+    bool PopulateMethodRVAs() {
         bool                    result = false;
         DWORD*                  vtable{};
         HRESULT                 rs{};
@@ -114,14 +111,14 @@ namespace dx8::hook {
         gs_d3d8_Present_RVA = vtable[PresentIdx] - baseAddress;
 
         result = true;
-CleanAndReturn:
+    CleanAndReturn:
         pDevice && pDevice->Release();
         pD3D && pD3D->Release();
         tmpWnd && DestroyWindow(tmpWnd);
         return result;
     }
 
-    export DLLEXPORT vector<minhook::HookConfig> HookConfig() {
+    vector<minhook::HookConfig> HookConfig() {
         auto baseAddress = (DWORD)GetModuleHandleA("d3d8.dll");
         return {
             {PVOID(baseAddress + gs_d3d8_CreateDevice_RVA), &D3DCreateDevice, (PVOID*)&OriCreateDevice},
@@ -185,7 +182,7 @@ CleanAndReturn:
             D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f};
+            cursorPivot = { (cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f };
         }
 
         SystemParametersInfoA(SPI_SETCURSORSHADOW, 0, (PVOID)TRUE, 0);
@@ -320,10 +317,12 @@ CleanAndReturn:
             if (modulateStage == WhiteInc || modulateStage == WhiteDec) {
                 SetTextureColorStage(pDevice, 0, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_DIFFUSE);
                 cursorSprite->Draw(cursorTexture, NULL, scale, NULL, 0, &cursorPositionD3D, ModulateColor(modulate));
-            } else {
+            }
+            else {
                 cursorSprite->Draw(cursorTexture, NULL, scale, NULL, 0, &cursorPositionD3D, ModulateColor(modulate));
             }
-        } else {
+        }
+        else {
             cursorSprite->Draw(cursorTexture, NULL, scale, NULL, 0, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
         }
         cursorSprite->End();

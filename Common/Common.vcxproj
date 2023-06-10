@@ -167,25 +167,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DataTypes.h" />
+    <ClInclude Include="ErrorMsg.Cor.h" />
+    <ClInclude Include="ErrorMsg.D3D.h" />
+    <ClInclude Include="ErrorMsg.DDraw.h" />
+    <ClInclude Include="ErrorMsg.h" />
+    <ClInclude Include="Helper.Encoding.h" />
+    <ClInclude Include="Helper.h" />
+    <ClInclude Include="Helper.Memory.h" />
+    <ClInclude Include="Log.h" />
+    <ClInclude Include="LuaJIT.h" />
     <ClInclude Include="macro.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="MinHook.h" />
+    <ClInclude Include="NeoLua.h" />
+    <ClInclude Include="Variables.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompilerConfig.cpp" />
-    <ClCompile Include="ErrorMsg.Cor.ixx" />
-    <ClCompile Include="DataTypes.ixx" />
-    <ClCompile Include="ErrorMsg.D3D.ixx" />
-    <ClCompile Include="ErrorMsg.DDraw.ixx" />
+    <ClCompile Include="ErrorMsg.Cor.cpp" />
+    <ClCompile Include="ErrorMsg.D3D.cpp" />
+    <ClCompile Include="ErrorMsg.DDraw.cpp" />
     <ClCompile Include="DllMain.cpp" />
-    <ClCompile Include="ErrorMsg.ixx" />
-    <ClCompile Include="Helper.Encoding.ixx" />
-    <ClCompile Include="Helper.ixx" />
-    <ClCompile Include="Log.ixx" />
-    <ClCompile Include="Helper.Memory.ixx" />
-    <ClCompile Include="MinHook.ixx" />
-    <ClCompile Include="LuaJIT.ixx" />
-    <ClCompile Include="NeoLua.ixx" />
-    <ClCompile Include="Variables.ixx" />
+    <ClCompile Include="ErrorMsg.cpp" />
+    <ClCompile Include="Helper.Encoding.cpp" />
+    <ClCompile Include="Helper.cpp" />
+    <ClCompile Include="Log.cpp" />
+    <ClCompile Include="Helper.Memory.cpp" />
+    <ClCompile Include="MinHook.cpp" />
+    <ClCompile Include="LuaJIT.cpp" />
+    <ClCompile Include="NeoLua.cpp" />
+    <ClCompile Include="Variables.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vcpkg.json" />

@@ -1,26 +1,18 @@
-module;
-
 #include "framework.h"
 #include "macro.h"
 #include <string>
 #include <tuple>
 
-export module common.helper;
-
-import common.var;
-import common.datatype;
-import common.luajit;
-import common.neolua;
-import common.helper.memory;
-
-namespace luajit = common::luajit;
-namespace neolua = common::neolua;
-namespace memory = common::helper::memory;
+#include "Helper.h"
+#include "Helper.Memory.h"
+#include "LuaJIT.h"
+#include "NeoLua.h"
+#include "Variables.h"
 
 using namespace std;
 
 namespace common::helper {
-    export DLLEXPORT void ReportLastError(const char* title) {
+    void ReportLastError(const char* title) {
         auto flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         auto dwErr = GetLastError();
         PSTR errorMessage{};
@@ -29,7 +21,7 @@ namespace common::helper {
         LocalFree(errorMessage);
     }
 
-    export UNBOUND tuple<float, const char*> ConvertToFloat(const string& input) {
+    tuple<float, const char*> ConvertToFloat(const string& input) {
         char* endPtr;
         const char* message = nullptr;
         auto result = strtof(input.c_str(), &endPtr);
@@ -40,7 +32,7 @@ namespace common::helper {
         return tuple(result, message);
     }
 
-    export UNBOUND tuple<long, const char*> ConvertToLong(const string& input, int base) {
+    tuple<long, const char*> ConvertToLong(const string& input, int base) {
         char* endPtr;
         const char* message = nullptr;
         auto result = strtol(input.c_str(), &endPtr, base);
@@ -51,7 +43,7 @@ namespace common::helper {
         return tuple(result, message);
     }
 
-    export UNBOUND tuple<unsigned long, const char*> ConvertToULong(const string& input, int base) {
+    tuple<unsigned long, const char*> ConvertToULong(const string& input, int base) {
         char* endPtr;
         const char* message = nullptr;
         auto result = strtoul(input.c_str(), &endPtr, base);
@@ -62,7 +54,7 @@ namespace common::helper {
         return tuple(result, message);
     }
 
-    export DLLEXPORT void CalculateNextModulate(UCHAR& modulate, ModulateStage& modulateStage) {
+    void CalculateNextModulate(UCHAR& modulate, ModulateStage& modulateStage) {
         constexpr UCHAR Delta = 16;
         constexpr UCHAR WhiteIntensityLimit = 128;
         constexpr UCHAR BlackIntensityLimit = 16;
@@ -102,14 +94,14 @@ namespace common::helper {
         }
     }
 
-    export DLLEXPORT POINT GetPointerPosition() {
+    POINT GetPointerPosition() {
         POINT pointerPosition;
         GetCursorPos(&pointerPosition);
         ScreenToClient(g_hFocusWindow, &pointerPosition);
         return pointerPosition;
     }
 
-    export DLLEXPORT void RemoveWindowBorder(UINT width, UINT height) {
+    void RemoveWindowBorder(UINT width, UINT height) {
         auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
         style &= ~(WS_CAPTION | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
         auto lExStyle = GetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE);
@@ -119,8 +111,7 @@ namespace common::helper {
         SetWindowPos(g_hFocusWindow, NULL, 0, 0, width, height, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
     }
 
-    export DLLEXPORT
-        void FixWindowCoordinate(bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight) {
+    void FixWindowCoordinate(bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight) {
         if (isExclusiveMode) {
             auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
             style &= ~(WS_CAPTION | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
@@ -143,7 +134,7 @@ namespace common::helper {
     }
 
     // use for directx8
-    export DLLEXPORT bool TestFullscreenHeuristically() {
+    bool TestFullscreenHeuristically() {
         MONITORINFO monitorInfo{
             .cbSize = sizeof(MONITORINFO),
         };
@@ -158,7 +149,7 @@ namespace common::helper {
             && hwndRect.bottom == monitorInfo.rcMonitor.bottom;
     }
 
-    export DLLEXPORT DWORD CalculateAddress() {
+    DWORD CalculateAddress() {
         if (g_currentConfig.ScriptingMethodToFindAddress == ScriptingMethod::LuaJIT) {
             return luajit::GetPositionAddress();
         } else if (g_currentConfig.ScriptingMethodToFindAddress == ScriptingMethod::NeoLua) {

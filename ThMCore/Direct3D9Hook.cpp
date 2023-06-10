@@ -1,20 +1,17 @@
-module;
-
 #include "framework.h"
-#include "macro.h"
 #include "Include/d3d9.h"
 #include "Include/d3dx9core.h"
 #include <vector>
 #include <string>
 #include <comdef.h>
 
-export module core.directx9hook;
-
-import common.minhook;
-import common.var;
-import common.datatype;
-import common.helper;
-import common.log;
+#include "../Common/MinHook.h"
+#include "../Common/Variables.h"
+#include "../Common/DataTypes.h"
+#include "../Common/Helper.h"
+#include "../Common/Log.h"
+#include "Direct3D9Hook.h"
+#include "macro.h"
 
 namespace minhook = common::minhook;
 namespace helper = common::helper;
@@ -51,7 +48,7 @@ inline const char* GetD3dErrStr(const int errorCode) {
 using CallbackType = void (*)(void);
 
 namespace core::directx9hook {
-    HRESULT WINAPI D3DCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DDevice9 **ppReturnedDeviceInterface);
+    HRESULT WINAPI D3DCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
     decltype(&D3DCreateDevice) OriCreateDevice;
 
     HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
@@ -64,11 +61,11 @@ namespace core::directx9hook {
         static vector<CallbackType> backing;
         return backing;
     }
-    export DLLEXPORT void RegisterPostRenderCallbacks(CallbackType callback) {
+    void RegisterPostRenderCallbacks(CallbackType callback) {
         postRenderCallbacks().push_back(callback);
     }
 
-    export DLLEXPORT bool PopulateMethodRVAs() {
+    bool PopulateMethodRVAs() {
         bool                    result = false;
         DWORD*                  vtable{};
         HRESULT                 rs{};
@@ -112,14 +109,14 @@ namespace core::directx9hook {
         gs_d3d9_Present_RVA = vtable[PresentIdx] - baseAddress;
 
         result = true;
-CleanAndReturn:
+    CleanAndReturn:
         pDevice && pDevice->Release();
         pD3D && pD3D->Release();
         tmpWnd && DestroyWindow(tmpWnd);
         return result;
     }
 
-    export vector<minhook::HookConfig> HookConfig() {
+    vector<minhook::HookConfig> HookConfig() {
         auto baseAddress = (DWORD)GetModuleHandleA("d3d9.dll");
         return {
             {PVOID(baseAddress + gs_d3d9_CreateDevice_RVA), &D3DCreateDevice, (PVOID*)&OriCreateDevice},
@@ -152,7 +149,7 @@ CleanAndReturn:
         cursorStatePrepared = false;
     }
 
-    HRESULT WINAPI D3DCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DDevice9 **ppReturnedDeviceInterface) {
+    HRESULT WINAPI D3DCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface) {
         CleanUp();
         return OriCreateDevice(pD3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
     }
@@ -181,7 +178,7 @@ CleanAndReturn:
             D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f};
+            cursorPivot = { (cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f };
         }
 
         SystemParametersInfoA(SPI_SETCURSORSHADOW, 0, (PVOID)TRUE, 0);
@@ -330,10 +327,12 @@ CleanAndReturn:
             if (modulateStage == WhiteInc || modulateStage == WhiteDec) {
                 SetTextureColorStage(pDevice, 0, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_DIFFUSE);
                 cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, ModulateColor(modulate));
-            } else {
+            }
+            else {
                 cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, ModulateColor(modulate));
             }
-        } else {
+        }
+        else {
             cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
         }
         cursorSprite->End();
@@ -344,7 +343,7 @@ CleanAndReturn:
         pDevice->EndScene();
     }
 
-    HRESULT WINAPI D3DPresent(IDirect3DDevice9 * pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion) {
+    HRESULT WINAPI D3DPresent(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion) {
         Initialize(pDevice);
         PrepareMeasurement(pDevice);
         PrepareCursorState(pDevice);
