@@ -15,11 +15,6 @@ jobs:
     - name: Config vcpkg
       run: |
         vcpkg integrate install
-      
-    - name: Install dependencies
-      continue-on-error: true
-      run: |
-        msbuild -p:Configuration=Release -p:Platform=x86 -restore -m
         
     - name: Build the solution
       run: |
