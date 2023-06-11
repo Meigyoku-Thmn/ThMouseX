@@ -5,7 +5,7 @@
 
 DLLEXPORT_C void Common_NeoLua_SetOnClose(DWORD address);
 DLLEXPORT_C void Common_NeoLua_SetPositionAddress(DWORD address);
-PointDataType Common_NeoLua_GetDataType();
+DLLEXPORT_C PointDataType Common_NeoLua_GetDataType();
 DLLEXPORT_C void Common_NeoLua_OpenConsole();
 
 namespace common::neolua {
