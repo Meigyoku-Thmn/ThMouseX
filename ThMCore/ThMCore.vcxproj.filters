@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+	<Filter Include="ConfigScripts">
+      <UniqueIdentifier>{414e8165-770a-4036-b650-4667e5bc7051}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">
@@ -35,6 +38,9 @@
     <ClCompile Include="SendKey.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Configurate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -58,5 +64,20 @@
     <ClInclude Include="MessageQueueHook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Configurate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="Games.txt" />
+    <CopyFileToFolders Include="ThMouseX.txt" />
+    <CopyFileToFolders Include="VirtualKeyCodes.txt" />
+    <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">
+      <Filter>ConfigScripts</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ConfigScripts/THMHJ.lua">
+      <Filter>ConfigScripts</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Cursor.png" />
   </ItemGroup>
 </Project>

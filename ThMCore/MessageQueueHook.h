@@ -8,8 +8,8 @@
 namespace core::messagequeuehook {
     using namespace std;
 
-    DLLEXPORT bool TestRegisteredWindowMessages();
+    DLLEXPORT_C bool TestRegisteredWindowMessages();
     extern vector<common::minhook::HookApiConfig> HookConfig;
-    DLLEXPORT bool InstallHooks();
-    DLLEXPORT void RemoveHooks();
+    DLLEXPORT_C bool InstallHooks();
+    DLLEXPORT_C void RemoveHooks();
 }

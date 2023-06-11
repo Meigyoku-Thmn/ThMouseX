@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Configurate.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="InputDetermine.cpp" />
     <ClCompile Include="CompilerConfig.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="SendKey.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Configurate.h" />
     <ClInclude Include="Direct3D9Hook.h" />
     <ClInclude Include="DirectInputHook.h" />
     <ClInclude Include="InputDetermine.h" />
@@ -182,6 +184,18 @@
     <ProjectReference Include="..\DX8Hook\DX8Hook.vcxproj">
       <Project>{dc5fe77d-43d4-4cc6-9ad2-409716483dbf}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="Cursor.png" />
+    <CopyFileToFolders Include="Games.txt" />
+    <CopyFileToFolders Include="ThMouseX.txt" />
+    <CopyFileToFolders Include="VirtualKeyCodes.txt" />
+    <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">
+      <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ConfigScripts/THMHJ.lua">
+      <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

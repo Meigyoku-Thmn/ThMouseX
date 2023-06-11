@@ -1,4 +1,4 @@
-﻿#include "framework.h"
+#include "framework.h"
 #include <fstream>
 #include <sstream>
 #include <iomanip>
@@ -11,9 +11,10 @@
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
 #include "../DX8Hook/Direct3D8Hook.h"
-#include "../ThMCore/Direct3D9Hook.h"
-#include "../ThMCore/DirectInputHook.h"
+#include "Direct3D9Hook.h"
+#include "DirectInputHook.h"
 #include "Configurate.h"
+#include "macro.h"
 
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
@@ -41,165 +42,167 @@ tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount)
 tuple<VkCodes, bool> ReadVkCodes();
 #pragma endregion
 
-bool main::config::PopulateMethodRVAs() {
-    if (!directx8::PopulateMethodRVAs())
-        return false;
-    if (!directx9::PopulateMethodRVAs())
-        return false;
-    if (!directinput::PopulateMethodRVAs())
-        return false;
-    return true;
-}
-
-bool main::config::ReadGamesFile() {
-    ifstream gamesFile(GameFile);
-    if (!gamesFile) {
-        MessageBoxA(NULL, "Missing " GameFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
-        return false;
-    }
-    gs_gameConfigArray = {};
-    auto& gameConfigs = gs_gameConfigArray;
-
-    string line;
-    int lineCount = 0;
-    while (gameConfigs.Length < ARRAYSIZE(gameConfigs.Configs) && getline(gamesFile, line)) {
-        lineCount++;
-        stringstream lineStream(line);
-        if (TestCommentLine(lineStream))
-            continue;
-
-        auto [processName, ok1] = ExtractProcessName(lineStream, lineCount);
-        if (!ok1)
+namespace core::configurate {
+    bool PopulateMethodRVAs() {
+        if (!directx8::PopulateMethodRVAs())
             return false;
-
-        auto [addressOffsets, scriptingMethod, ok2] = ExtractPositionRVA(lineStream, lineCount);
-        if (!ok2)
+        if (!directx9::PopulateMethodRVAs())
             return false;
-
-        auto [dataType, ok3] = ExtractDataType(lineStream, lineCount);
-        if (!ok3)
+        if (!directinput::PopulateMethodRVAs())
             return false;
-
-        auto [offset, ok4] = ExtractOffset(lineStream, lineCount);
-        if (!ok4)
-            return false;
-
-        auto [baseHeight, ok5] = ExtractBaseHeight(lineStream, lineCount);
-        if (!ok5)
-            return false;
-
-        auto [aspectRatio, ok6] = ExtractAspectRatio(lineStream, lineCount);
-        if (!ok6)
-            return false;
-
-        auto [inputMethods, ok7] = ExtractInputMethod(lineStream, lineCount);
-        if (!ok7)
-            return false;
-
-        auto& gameConfig = gameConfigs.Configs[gameConfigs.Length++];
-
-        static_assert(is_same<decltype(&gameConfig.ProcessName[0]), decltype(processName.data())>());
-        memcpy(gameConfig.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
-
-        static_assert(is_same<decltype(&gameConfig.Address.Level[0]), decltype(addressOffsets.data())>());
-        if (addressOffsets.size() > 0) {
-            memcpy(gameConfig.Address.Level, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
-            assert(addressOffsets.size() <= ARRAYSIZE(gameConfig.Address.Level));
-            gameConfig.Address.Length = addressOffsets.size();
-        }
-        gameConfig.ScriptingMethodToFindAddress = scriptingMethod;
-
-        gameConfig.PosDataType = dataType;
-
-        gameConfig.BasePixelOffset = offset;
-
-        static_assert(is_same<decltype(gameConfig.BaseHeight), decltype(baseHeight)>());
-        gameConfig.BaseHeight = baseHeight;
-
-        gameConfig.AspectRatio = aspectRatio;
-
-        gameConfig.InputMethods = inputMethods;
+        return true;
     }
 
-    return true;
-}
+    bool ReadGamesFile() {
+        ifstream gamesFile(GameFile);
+        if (!gamesFile) {
+            MessageBoxA(NULL, "Missing " GameFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        gs_gameConfigArray = {};
+        auto& gameConfigs = gs_gameConfigArray;
 
-bool main::config::ReadGeneralConfigFile() {
-    auto [vkCodes, succeeded] = ReadVkCodes();
-    if (!succeeded)
-        return false;
+        string line;
+        int lineCount = 0;
+        while (gameConfigs.Length < ARRAYSIZE(gameConfigs.Configs) && getline(gamesFile, line)) {
+            lineCount++;
+            stringstream lineStream(line);
+            if (TestCommentLine(lineStream))
+                continue;
 
-    ifstream iniFile(ThMouseXFile);
-    if (!iniFile) {
-        MessageBoxA(NULL, "Missing " ThMouseXFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
-        return false;
+            auto [processName, ok1] = ExtractProcessName(lineStream, lineCount);
+            if (!ok1)
+                return false;
+
+            auto [addressOffsets, scriptingMethod, ok2] = ExtractPositionRVA(lineStream, lineCount);
+            if (!ok2)
+                return false;
+
+            auto [dataType, ok3] = ExtractDataType(lineStream, lineCount);
+            if (!ok3)
+                return false;
+
+            auto [offset, ok4] = ExtractOffset(lineStream, lineCount);
+            if (!ok4)
+                return false;
+
+            auto [baseHeight, ok5] = ExtractBaseHeight(lineStream, lineCount);
+            if (!ok5)
+                return false;
+
+            auto [aspectRatio, ok6] = ExtractAspectRatio(lineStream, lineCount);
+            if (!ok6)
+                return false;
+
+            auto [inputMethods, ok7] = ExtractInputMethod(lineStream, lineCount);
+            if (!ok7)
+                return false;
+
+            auto& gameConfig = gameConfigs.Configs[gameConfigs.Length++];
+
+            static_assert(is_same<decltype(&gameConfig.ProcessName[0]), decltype(processName.data())>());
+            memcpy(gameConfig.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
+
+            static_assert(is_same<decltype(&gameConfig.Address.Level[0]), decltype(addressOffsets.data())>());
+            if (addressOffsets.size() > 0) {
+                memcpy(gameConfig.Address.Level, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
+                assert(addressOffsets.size() <= ARRAYSIZE(gameConfig.Address.Level));
+                gameConfig.Address.Length = addressOffsets.size();
+            }
+            gameConfig.ScriptingMethodToFindAddress = scriptingMethod;
+
+            gameConfig.PosDataType = dataType;
+
+            gameConfig.BasePixelOffset = offset;
+
+            static_assert(is_same<decltype(gameConfig.BaseHeight), decltype(baseHeight)>());
+            gameConfig.BaseHeight = baseHeight;
+
+            gameConfig.AspectRatio = aspectRatio;
+
+            gameConfig.InputMethods = inputMethods;
+        }
+
+        return true;
     }
 
-    int lineCount = 0;
-    string line;
-    while (getline(iniFile, line)) {
-        lineCount++;
-        stringstream lineStream(line);
+    bool ReadGeneralConfigFile() {
+        auto [vkCodes, succeeded] = ReadVkCodes();
+        if (!succeeded)
+            return false;
 
-        string key;
-        getline(lineStream >> ws, key, '=');
-        key = key.substr(0, key.find(' '));
-        if (key.starts_with(";"))
-            continue;
+        ifstream iniFile(ThMouseXFile);
+        if (!iniFile) {
+            MessageBoxA(NULL, "Missing " ThMouseXFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
+            return false;
+        }
 
-        string value;
-        lineStream >> quoted(value);
+        int lineCount = 0;
+        string line;
+        while (getline(iniFile, line)) {
+            lineCount++;
+            stringstream lineStream(line);
 
-        if (key.empty() && value.empty())
-            continue;
-        if (key == "BombButton") {
-            auto vkCode = vkCodes.find(value);
-            if (vkCode == vkCodes.end()) {
-                MessageBoxA(NULL, ThMouseXFile ": Invalid BombButton value.", "ThMouseX", MB_OK | MB_ICONERROR);
-                return false;
+            string key;
+            getline(lineStream >> ws, key, '=');
+            key = key.substr(0, key.find(' '));
+            if (key.starts_with(";"))
+                continue;
+
+            string value;
+            lineStream >> quoted(value);
+
+            if (key.empty() && value.empty())
+                continue;
+            if (key == "BombButton") {
+                auto vkCode = vkCodes.find(value);
+                if (vkCode == vkCodes.end()) {
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid BombButton value.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_bombButton = vkCode->second;
             }
-            gs_bombButton = vkCode->second;
-        }
-        else if (key == "ExtraButton") {
-            auto vkCode = vkCodes.find(value);
-            if (vkCode == vkCodes.end()) {
-                MessageBoxA(NULL, ThMouseXFile ": Invalid ExtraButton.", "ThMouseX", MB_OK | MB_ICONERROR);
-                return false;
+            else if (key == "ExtraButton") {
+                auto vkCode = vkCodes.find(value);
+                if (vkCode == vkCodes.end()) {
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid ExtraButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_extraButton = vkCode->second;
             }
-            gs_extraButton = vkCode->second;
-        }
-        else if (key == "ToggleOsCursorButton") {
-            auto vkCode = vkCodes.find(value);
-            if (vkCode == vkCodes.end()) {
-                MessageBoxA(NULL, ThMouseXFile ": Invalid ToggleOsCursorButton.", "ThMouseX", MB_OK | MB_ICONERROR);
-                return false;
+            else if (key == "ToggleOsCursorButton") {
+                auto vkCode = vkCodes.find(value);
+                if (vkCode == vkCodes.end()) {
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid ToggleOsCursorButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_toggleOsCursorButton = vkCode->second;
             }
-            gs_toggleOsCursorButton = vkCode->second;
-        }
-        else if (key == "CursorTexture") {
-            if (value.size() == 0) {
-                MessageBoxA(NULL, ThMouseXFile ": Invalid CursorTexture.", "ThMouseX", MB_OK | MB_ICONERROR);
-                return false;
+            else if (key == "CursorTexture") {
+                if (value.size() == 0) {
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid CursorTexture.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                auto wTexturePath = encoding::ConvertToUtf16(value.c_str());
+                GetFullPathNameW(wTexturePath.c_str(), ARRAYSIZE(gs_textureFilePath), gs_textureFilePath, NULL);
             }
-            auto wTexturePath = encoding::ConvertToUtf16(value.c_str());
-            GetFullPathNameW(wTexturePath.c_str(), ARRAYSIZE(gs_textureFilePath), gs_textureFilePath, NULL);
-        }
-        else if (key == "CursorBaseHeight") {
-            auto [height, convMessage] = helper::ConvertToULong(value, 10);
-            if (convMessage != nullptr) {
-                MessageBoxA(NULL, format(ThMouseXFile ": Invalid CursorBaseHeight: {}.", convMessage).c_str(),
+            else if (key == "CursorBaseHeight") {
+                auto [height, convMessage] = helper::ConvertToULong(value, 10);
+                if (convMessage != nullptr) {
+                    MessageBoxA(NULL, format(ThMouseXFile ": Invalid CursorBaseHeight: {}.", convMessage).c_str(),
+                        "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_textureBaseHeight = height;
+            }
+            else {
+                MessageBoxA(NULL, format("Invalid attribute at line {} in " ThMouseXFile ".", lineCount).c_str(),
                     "ThMouseX", MB_OK | MB_ICONERROR);
                 return false;
             }
-            gs_textureBaseHeight = height;
         }
-        else {
-            MessageBoxA(NULL, format("Invalid attribute at line {} in " ThMouseXFile ".", lineCount).c_str(),
-                "ThMouseX", MB_OK | MB_ICONERROR);
-            return false;
-        }
+        return true;
     }
-    return true;
 }
 
 bool TestCommentLine(stringstream& stream) {
