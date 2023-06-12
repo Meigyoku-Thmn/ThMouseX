@@ -147,6 +147,14 @@ namespace core::messagequeuehook {
                     DefWindowProcW(e->hwnd, e->message, e->wParam, e->lParam);
                 }
             }
+            else if (e->message == WM_SIZE) {
+                if (e->wParam == SIZE_RESTORED) {
+                    directx8::measurementPrepared = false;
+                    directx8::cursorStatePrepared = false;
+                    directx9::measurementPrepared = false;
+                    directx9::cursorStatePrepared = false;
+                }
+            }
         }
         return CallNextHookEx(NULL, code, wParam, lParam);
     }

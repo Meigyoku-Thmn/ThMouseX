@@ -69,21 +69,34 @@ namespace common::log {
         _com_error error(hResult, errorInfo.Get(), true);
         auto description = error.Description();
         if (description.length() > 0) {
+#if _DEBUG
+            ToConsole("%s: %s", message, description);
+#endif
             ToFile("%s: %s", message, description);
             return;
         }
         auto errorMessage = string(error.ErrorMessage());
+#if _DEBUG
+        ToConsole("%s: %s", message, errorMessage.c_str());
+#endif
         ToFile("%s: %s", message, errorMessage.c_str());
         if (errorMessage.starts_with("IDispatch error") || errorMessage.starts_with("Unknown error")) {
             errorMessage = errormsg::GuessErrorsFromHResult(hResult);
-            if (errorMessage != "")
+            if (errorMessage != "") {
+#if _DEBUG
+                ToConsole("%s", errorMessage.c_str());
+#endif
                 ToFile(errorMessage.c_str());
+            }
         }
     }
 
     void LastErrorToFile(const char* message) {
         _com_error error(GetLastError());
         auto detail = error.ErrorMessage();
+#if _DEBUG
+        ToConsole("%s: %s", message, detail);
+#endif
         ToFile("%s: %s", message, detail);
     }
 
