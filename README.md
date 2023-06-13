@@ -11,22 +11,25 @@ Demo clip: https://www.youtube.com/watch?v=uMkzmM13qpU
 
 Download link
 ---
-https://github.com/Meigyoku-Thmn/ThMouseX/releases
+https://github.com/Meigyoku-Thmn/ThMouseX/releases <br>
+(Required .NET Framework 4.8 from version 2.1.0)
 
 Differences of the fork
 -----------------------
 * Support any game's resolutions
 * Support DirectX8 and DirectX9 games
-* Can be opened and closed at any time, it will automatically detect configurated games.
+* Can be opened and closed at any time, it will automatically detect configurated games
+* You can use Lua script ([LuaJIT](https://luajit.org/) or [NeoLua](https://github.com/neolithos/neolua)) to configurate further.
 
 Drawbacks
 --------
-* Only works with 32-bit games (all games in Touhou Project are 32-bit).
+* Only works with 32-bit games
+* Doesn't work well with Steam Overlay, although this is minimal.
 * Configuration is difficult.
 
 Preconfigured games
 -------------
-This tool should be compatible with any Touhou games from 6 to the latest. Here is the list of preconfigured games in [games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt):
+This tool should be compatible with any Touhou games from 6 to the latest. Here is the list of preconfigured games in [games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMCore/Games.txt):
 * Touhou 6 ~ Embodiment of Scarlet Devil (ver v1.02h)
 * Touhou 7 ~ Perfect Cherry Blossom (ver v1.00b)
 * Touhou 8 ~ Imperishable Night (ver v1.00d)
@@ -121,10 +124,23 @@ Open the file with any text editor and try yourself.
 (To document more)
 
 ### Sometime ThMouseX doesn't actually work, the game's character just keeps moving to a corner or is not bound exactly to the cursor
-They are really rare bugs that I have yet found a way to fix. A workaround is to just restart ThMouseX, it should works after 1-2 times relaunching, you don't have to turn off the game, but if the bugs still exist then it's also a way to try.
+They are really rare bugs that I have yet found a way to fix.
+
+Some workarounds:
+* Restart ThMouseX
+* Start ThMouseX FIRST, then start the game
+* When starting ThMouseX, make sure your game's window is NOT minimized (this should be fixed from version 2.1.0).
+
+### Steam Overlay stops functional, the game control is unusable too!
+This is a limitation of how this tool hooks into the game's routine. Please avoid turning off ThMouseX while Steam Overlay is visible.
+
+### Game crashes when exiting or lauching ThMouseX
+Please avoid lauching and exiting ThMouseX many times while the game is running.
+
+So far I only see this bug on .NET Framework games and it's a rare bug. It may be has something with the library Lib.Harmony which ThMouseX uses.
 
 ### Antivirus programs' detection
-This tool uses various code injection techniques, so it's normal that some antivirus programs don't like it. You can verify the source code and build it on your own using the instructions above.
+This tool uses various code injection techniques, so it's normal that some antivirus programs don't like it. You can verify the source code and build it on your own using the instructions above, or set an exception case in the antivirus program for ThMouseX (including the DLLs).
 
 ### ThMouseX doesn't work with old versions of Fantastic Danmaku Festival I (or games that use .NET Framework 2/3)
 Old (pre-Steam) versions of Fantastic Danmaku Festival use .NET Framework 2, so normally this tool will not work because it uses .NET Framework 4. But you can force the game to use .NET Framework 4 by putting this file to the same place with THMHJ.exe:
