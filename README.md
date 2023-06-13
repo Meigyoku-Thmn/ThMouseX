@@ -137,14 +137,23 @@ This is a limitation of how this tool hooks into the game's routine. Please avoi
 ### Game crashes when exiting or lauching ThMouseX
 Please avoid lauching and exiting ThMouseX many times while the game is running.
 
-So far I only see this bug on .NET Framework games and it's a rare bug. It may be has something with the library Lib.Harmony which ThMouseX uses.
+So far I only see this bug on .NET Framework games and it's a rare bug. It may has something with the library Lib.Harmony which ThMouseX uses.
 
 ### Antivirus programs' detection
 This tool uses various code injection techniques, so it's normal that some antivirus programs don't like it. You can verify the source code and build it on your own using the instructions above, or set an exception case in the antivirus program for ThMouseX (including the DLLs).
 
 ### ThMouseX doesn't work with old versions of Fantastic Danmaku Festival I (or games that use .NET Framework 2/3)
-Old (pre-Steam) versions of Fantastic Danmaku Festival use .NET Framework 2, so normally this tool will not work because it uses .NET Framework 4. But you can force the game to use .NET Framework 4 by putting this file to the same place with THMHJ.exe:
+Old (pre-Steam) versions of Fantastic Danmaku Festival use .NET Framework 2, so normally this tool will not work because it uses .NET Framework 4. But you can force the game to use .NET Framework 4 by putting this text file to the same place with THMHJ.exe:
 
-https://gist.github.com/Meigyoku-Thmn/d94b41b4381867c6622e15a617cea8f3
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <startup useLegacyV2RuntimeActivationPolicy="true"> 
+        <supportedRuntime version="v4.0"/>
+    </startup>
+</configuration>
+```
 
-(Ensure the name of this manifest file is `THMHJ.exe.config`)
+Ensure the name of this manifest file is `THMHJ.exe.config`, not `THMHJ.txt` or `THMHJ.exe.config.txt`.
+
+This can also be applied to other applications that use .NET Framework 2 too.
