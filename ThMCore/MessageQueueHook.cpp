@@ -149,10 +149,8 @@ namespace core::messagequeuehook {
             }
             else if (e->message == WM_SIZE) {
                 if (e->wParam == SIZE_RESTORED) {
-                    directx8::measurementPrepared = false;
-                    directx8::cursorStatePrepared = false;
-                    directx9::measurementPrepared = false;
-                    directx9::cursorStatePrepared = false;
+                    directx8::ClearMeasurementFlags();
+                    directx9::ClearMeasurementFlags();
                 }
             }
         }

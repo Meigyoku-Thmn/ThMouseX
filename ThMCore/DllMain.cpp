@@ -1,6 +1,8 @@
 ﻿#include "framework.h"
 #include <shlwapi.h>
 #include <clocale>
+#include <string>
+#include <delayimp.h>
 
 #include "../Common/MinHook.h"
 #include "../Common/Variables.h"
@@ -20,6 +22,27 @@ namespace directx9 = core::directx9hook;
 namespace directinput = core::directinputhook;
 namespace keyboardstate = core::keyboardstatehook;
 
+using namespace std;
+
+WCHAR currentModuleDirPath[MAX_PATH + 1];
+WCHAR lastDirPath[MAX_PATH + 1];
+
+FARPROC WINAPI delayHook(unsigned dliNotify, PDelayLoadInfo pdli)
+{
+    if (dliNotify == dliNotePreLoadLibrary) {
+        GetCurrentDirectoryW(ARRAYSIZE(lastDirPath), lastDirPath);
+        SetCurrentDirectoryW(currentModuleDirPath);
+    }
+    else {
+        if (lastDirPath[0] != '\0')
+            SetCurrentDirectoryW(lastDirPath);
+        lastDirPath[0] = '\0';
+    }
+    return NULL;
+}
+ExternC const PfnDliHook __pfnDliNotifyHook2 = delayHook;
+ExternC const PfnDliHook __pfnDliFailureHook2 = delayHook;
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH: {
@@ -28,6 +51,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
             g_coreModule = hModule;
             g_targetModule = GetModuleHandleW(NULL);
+
+            GetModuleFileNameW(hModule, currentModuleDirPath, ARRAYSIZE(currentModuleDirPath));
+            currentModuleDirPath[ARRAYSIZE(currentModuleDirPath) - 1] = '\0';
+            PathRemoveFileSpecW(currentModuleDirPath);
+
             // We don't need thread notifications for what we're doing.
             // Thus, get rid of them, thereby eliminating some of the overhead of this DLL.
             DisableThreadLibraryCalls(hModule);
@@ -42,7 +70,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             PathRemoveExtensionW(currentProcessName);
 
             // Of course we ignore the mother.
-            if (_wcsicmp(currentProcessName, L"THMouseX") == 0)
+            if (_wcsicmp(currentProcessName, L"ThMouseX") == 0)
                 return TRUE;
 
             // We use SetWindowsHookEx, so DllMain is always called from a message loop in the target process.
