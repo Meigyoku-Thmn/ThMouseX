@@ -19,6 +19,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             g_currentModuleDirPath[ARRAYSIZE(g_currentModuleDirPath) - 1] = '\0';
             PathRemoveFileSpecW(g_currentModuleDirPath);
 
+            DisableThreadLibraryCalls(hModule);
             break;
         }
         case DLL_THREAD_ATTACH:
