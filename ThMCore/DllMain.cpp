@@ -56,9 +56,9 @@ FARPROC WINAPI delayHook(unsigned dliNotify, PDelayLoadInfo pdli)
         GetCurrentDirectoryW(ARRAYSIZE(lastDirPath), lastDirPath);
         SetCurrentDirectoryW(currentModuleDirPath);
         hMod = LoadLibraryA(pdli->szDll);
-        if (stricmp(pdli->szDll, "Common.dll"))
+        if (stricmp(pdli->szDll, "Common.dll") == 0)
             commonModule = hMod;
-        else if (stricmp(pdli->szDll, "DX8Hook.dll"))
+        else if (stricmp(pdli->szDll, "DX8Hook.dll") == 0)
             dx8hookModule = hMod;
     }
     else {
