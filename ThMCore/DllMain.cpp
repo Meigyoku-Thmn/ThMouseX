@@ -27,6 +27,9 @@ using namespace std;
 WCHAR currentModuleDirPath[MAX_PATH + 1];
 WCHAR lastDirPath[MAX_PATH + 1];
 
+HMODULE commonModule;
+HMODULE dx8hookModule;
+
 void LoadCurrentModuleDirPath() {
     if (currentModuleDirPath[0] != '\0')
         return;
@@ -52,6 +55,11 @@ FARPROC WINAPI delayHook(unsigned dliNotify, PDelayLoadInfo pdli)
             return (FARPROC)hMod;
         GetCurrentDirectoryW(ARRAYSIZE(lastDirPath), lastDirPath);
         SetCurrentDirectoryW(currentModuleDirPath);
+        hMod = LoadLibraryA(pdli->szDll);
+        if (stricmp(pdli->szDll, "Common.dll"))
+            commonModule = hMod;
+        else if (stricmp(pdli->szDll, "DX8Hook.dll"))
+            dx8hookModule = hMod;
     }
     else {
         if (lastDirPath[0] != '\0')
@@ -142,6 +150,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 minhook::Uninitialize(lpReserved != 0);
                 luajit::Uninitialize();
             }
+            FreeLibrary(commonModule);
+            FreeLibrary(dx8hookModule);
             break;
     }
     return TRUE;
