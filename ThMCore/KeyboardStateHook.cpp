@@ -2,11 +2,11 @@
 #include <mmsystem.h>
 #include <vector>
 
-#include "KeyboardStateHook.h"
-#include "InputDetermine.h"
 #include "../Common/MinHook.h"
 #include "../Common/Variables.h"
 #include "../Common/DataTypes.h"
+#include "KeyboardStateHook.h"
+#include "InputDetermine.h"
 
 namespace minhook = common::minhook;
 

@@ -9,8 +9,8 @@
 
 namespace dx8::hook {
     using CallbackType = void (*)(void);
-    RUNTIME_EXPORT_FUNC(void, RegisterPostRenderCallbacks, CallbackType callback);
-    RUNTIME_EXPORT_FUNC(bool, PopulateMethodRVAs);
-    RUNTIME_EXPORT_FUNC(std::vector<common::minhook::HookConfig>, HookConfig);
-    RUNTIME_EXPORT_FUNC(void, ClearMeasurementFlags);
+    EXPORT_FUNC(void, RegisterPostRenderCallbacks, CallbackType callback);
+    EXPORT_FUNC(bool, PopulateMethodRVAs);
+    EXPORT_FUNC(std::vector<common::minhook::HookConfig>, HookConfig);
+    EXPORT_FUNC(void, ClearMeasurementFlags);
 }

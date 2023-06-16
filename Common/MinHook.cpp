@@ -29,7 +29,7 @@ namespace common::minhook {
         return true;
     }
 
-    bool CreateHook(const vector<HookApiConfig>& hookConfigs) {
+    bool CreateApiHook(const vector<HookApiConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto rs = MH_CreateHookApi(config.moduleName, config.procName, config.pDetour, config.ppOriginal);
             if (rs != MH_OK)

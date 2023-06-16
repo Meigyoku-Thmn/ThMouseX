@@ -9,6 +9,10 @@
 #define DLLEXPORT_C extern "C" __declspec(dllimport)
 #endif
 
+#define QUOTE(x) #x
+
+#define SINGLE_ARG(...) __VA_ARGS__
+
 #define BEGIN_EXPORT_FLAG_ENUM(EnumName, EnumType) \
 enum class EnumName: EnumType; \
 inline EnumName operator &(EnumName a, const EnumName b) { \

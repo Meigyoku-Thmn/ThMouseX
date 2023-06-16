@@ -166,6 +166,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DataTypes.h" />
+    <ClInclude Include="DllLoad.h" />
     <ClInclude Include="ErrorMsg.Cor.h" />
     <ClInclude Include="ErrorMsg.D3D.h" />
     <ClInclude Include="ErrorMsg.DDraw.h" />

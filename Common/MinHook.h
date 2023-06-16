@@ -3,6 +3,8 @@
 #include "macro.h"
 #include "framework.h"
 
+#include "DllLoad.h"
+
 namespace common::minhook {
     struct HookConfig {
         LPVOID  pTarget;
@@ -18,10 +20,10 @@ namespace common::minhook {
     };
 
     using CallbackType = void (*)(bool isProcessTerminating);
-    DLLEXPORT void RegisterUninitializeCallback(CallbackType callback);
-    DLLEXPORT bool Initialize();
-    DLLEXPORT bool CreateHook(const std::vector<HookConfig>& hookConfigs);
-    DLLEXPORT bool CreateHook(const std::vector<HookApiConfig>& hookConfigs);
-    DLLEXPORT bool EnableAll();
-    DLLEXPORT void Uninitialize(bool isProcessTerminating);
+    EXPORT_FUNC(void, MinHook_, RegisterUninitializeCallback, CallbackType callback);
+    EXPORT_FUNC(bool, MinHook_, Initialize);
+    EXPORT_FUNC(bool, MinHook_, CreateHook, const std::vector<HookConfig>& hookConfigs);
+    EXPORT_FUNC(bool, MinHook_, CreateApiHook, const std::vector<HookApiConfig>& hookConfigs);
+    EXPORT_FUNC(bool, MinHook_, EnableAll);
+    EXPORT_FUNC(void, MinHook_, Uninitialize, bool isProcessTerminating);
 }

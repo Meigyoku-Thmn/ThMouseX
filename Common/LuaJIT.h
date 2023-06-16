@@ -2,12 +2,16 @@
 #include "framework.h"
 #include "macro.h"
 
+#include "DllLoad.h"
+
+#ifdef COMMON_EXPORTS
 DLLEXPORT_C DWORD Common_LuaJIT_ReadUInt32(DWORD address);
 DLLEXPORT_C DWORD Common_LuaJIT_ResolveAddress(DWORD* offsets, int length);
 DLLEXPORT_C void Common_LuaJIT_OpenConsole();
+#endif
 
 namespace common::luajit {
-    DLLEXPORT void Initialize();
+    EXPORT_FUNC(void, LuaJit_, Initialize);
     DWORD GetPositionAddress();
-    DLLEXPORT void Uninitialize();
+    EXPORT_FUNC(void, LuaJit_, Uninitialize);
 }

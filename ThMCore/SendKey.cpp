@@ -1,8 +1,8 @@
 #include "framework.h"
 
-#include "../DX8Hook/Direct3D8Hook.h"
 #include "../Common/Variables.h"
 #include "../Common/MinHook.h"
+#include "../DX8Hook/Direct3D8Hook.h"
 #include "Direct3D9Hook.h"
 #include "InputDetermine.h"
 #include "macro.h"

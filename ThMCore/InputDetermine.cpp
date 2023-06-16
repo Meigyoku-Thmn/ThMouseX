@@ -1,10 +1,10 @@
 #include "framework.h"
 #include <cmath>
 
-#include "InputDetermine.h"
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
 #include "../Common/DataTypes.h"
+#include "InputDetermine.h"
 
 namespace helper = common::helper;
 

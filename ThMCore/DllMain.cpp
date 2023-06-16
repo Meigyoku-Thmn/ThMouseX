@@ -66,10 +66,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                     minhook::CreateHook(directinput::HookConfig());
 
                     // hook Joypad and GetKeyboardState for input manipulation
-                    minhook::CreateHook(keyboardstate::HookConfig());
+                    minhook::CreateApiHook(keyboardstate::HookConfig());
 
                     // hook Message Queue for additional runtime configuration
-                    minhook::CreateHook(messagequeuehook::HookConfig);
+                    minhook::CreateApiHook(messagequeuehook::HookConfig);
 
 
                     minhook::EnableAll();
@@ -89,7 +89,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 minhook::Uninitialize(lpReserved != 0);
                 luajit::Uninitialize();
             }
-            dx8::dll::Unload();
             break;
     }
     return TRUE;
