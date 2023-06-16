@@ -8,9 +8,11 @@
 namespace core::directx9hook {
     using namespace std;
 
+    extern bool measurementPrepared;
+    extern bool cursorStatePrepared;
+
     using CallbackType = void (*)(void);
     DLLEXPORT void RegisterPostRenderCallbacks(CallbackType callback);
     DLLEXPORT bool PopulateMethodRVAs();
     vector<common::minhook::HookConfig> HookConfig();
-    DLLEXPORT void ClearMeasurementFlags();
 }

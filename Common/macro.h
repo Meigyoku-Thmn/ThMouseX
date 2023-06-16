@@ -32,25 +32,3 @@ enum class EnumName: EnumType {
 #define WIN32_FROM_HRESULT(hr)  \
     (SUCCEEDED(hr) ? ERROR_SUCCESS : \
         (HRESULT_FACILITY(hr) == FACILITY_WIN32 ? HRESULT_CODE(hr) : (hr)))
-
-#ifdef COMMON_EXPORTS
-
-#define EXPORT_VARIABLE____(type, name) \
-extern type name; \
-DLLEXPORT inline type& get_ ## name() { return ::name; }
-
-#define EXPORT_VARIABLE_ARR(type, name, arrSize) \
-extern type name ## arrSize; \
-DLLEXPORT inline type (&get_ ## name())arrSize { return ::name; }
-
-#else
-
-#define EXPORT_VARIABLE____(type, name) \
-DLLEXPORT type& get_ ## name(); \
-inline type& name = get_ ## name();
-
-#define EXPORT_VARIABLE_ARR(type, name, arrSize) \
-DLLEXPORT type (&get_ ## name())arrSize; \
-inline type (&name) arrSize = get_ ## name();
-
-#endif

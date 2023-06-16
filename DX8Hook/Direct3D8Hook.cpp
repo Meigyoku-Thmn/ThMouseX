@@ -132,11 +132,6 @@ namespace dx8::hook {
     bool measurementPrepared;
     bool cursorStatePrepared;
 
-    void ClearMeasurementFlags() {
-        measurementPrepared = false;
-        cursorStatePrepared = false;
-    }
-
     // cursor and screen state
     LPDIRECT3DTEXTURE8  cursorTexture;
     LPD3DXSPRITE        cursorSprite;
