@@ -9,16 +9,11 @@
 namespace common::dll {
     using namespace std;
     inline WCHAR currentModuleDirPath[MAX_PATH + 1];
-    inline WCHAR lastDirPath[MAX_PATH + 1];
     inline HMODULE hMod;
     inline FARPROC ImportFunction(const char* functionName) {
         if (hMod == NULL) {
-            GetCurrentDirectoryW(ARRAYSIZE(lastDirPath), lastDirPath);
-            lastDirPath[ARRAYSIZE(lastDirPath) - 1] = '\0';
-            SetCurrentDirectoryW(currentModuleDirPath);
-            hMod = LoadLibraryW(L"Common.dll");
-            SetCurrentDirectoryW(lastDirPath);
-            auto lastErr = GetLastError();
+            auto modulePath = wstring(currentModuleDirPath) + L"\\" + L"Common.dll";
+            hMod = LoadLibraryExW(modulePath.c_str(), NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
         }
         if (hMod == NULL)
             return NULL;
