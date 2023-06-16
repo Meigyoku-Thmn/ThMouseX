@@ -172,6 +172,7 @@
     <ClInclude Include="Direct3D8Hook.h" />
     <ClInclude Include="macro.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="DllLoad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">

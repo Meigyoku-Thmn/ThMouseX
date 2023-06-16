@@ -5,11 +5,10 @@
 #include "DataTypes.h"
 
 namespace common::helper {
-    using namespace std;
     DLLEXPORT void ReportLastError(const char* title);
-    DLLEXPORT tuple<float, const char*> ConvertToFloat(const string& input);
-    DLLEXPORT tuple<long, const char*> ConvertToLong(const string& input, int base);
-    DLLEXPORT tuple<unsigned long, const char*> ConvertToULong(const string& input, int base);
+    DLLEXPORT std::tuple<float, const char*> ConvertToFloat(const std::string& input);
+    DLLEXPORT std::tuple<long, const char*> ConvertToLong(const std::string& input, int base);
+    DLLEXPORT std::tuple<unsigned long, const char*> ConvertToULong(const std::string& input, int base);
     DLLEXPORT void CalculateNextModulate(UCHAR& modulate, ModulateStage& modulateStage);
     DLLEXPORT POINT GetPointerPosition();
     DLLEXPORT void RemoveWindowBorder(UINT width, UINT height);

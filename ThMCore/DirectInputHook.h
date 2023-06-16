@@ -6,8 +6,6 @@
 #include "macro.h"
 
 namespace core::directinputhook {
-    using namespace std;
-
     DLLEXPORT bool PopulateMethodRVAs();
-    vector<common::minhook::HookConfig> HookConfig();
+    std::vector<common::minhook::HookConfig> HookConfig();
 }

@@ -130,6 +130,11 @@ namespace core::directx9hook {
     bool measurementPrepared;
     bool cursorStatePrepared;
 
+    void ClearMeasurementFlags() {
+        measurementPrepared = false;
+        cursorStatePrepared = false;
+    }
+
     // cursor and screen state
     LPDIRECT3DTEXTURE9  cursorTexture;
     LPD3DXSPRITE        cursorSprite;

@@ -8,4 +8,3 @@
 #define DLLEXPORT __declspec(dllimport)
 #define DLLEXPORT_C extern "C" __declspec(dllimport)
 #endif
-#define NAKED __declspec(naked)

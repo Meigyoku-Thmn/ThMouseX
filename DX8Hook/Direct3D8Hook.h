@@ -5,14 +5,12 @@
 #include "../Common/MinHook.h"
 #include "macro.h"
 
+#include "DllLoad.h"
+
 namespace dx8::hook {
-    using namespace std;
-
-    DLLEXPORT extern bool measurementPrepared;
-    DLLEXPORT extern bool cursorStatePrepared;
-
     using CallbackType = void (*)(void);
-    DLLEXPORT void RegisterPostRenderCallbacks(CallbackType callback);
-    DLLEXPORT bool PopulateMethodRVAs();
-    DLLEXPORT vector<common::minhook::HookConfig> HookConfig();
+    RUNTIME_EXPORT_FUNC(void, RegisterPostRenderCallbacks, CallbackType callback);
+    RUNTIME_EXPORT_FUNC(bool, PopulateMethodRVAs);
+    RUNTIME_EXPORT_FUNC(std::vector<common::minhook::HookConfig>, HookConfig);
+    RUNTIME_EXPORT_FUNC(void, ClearMeasurementFlags);
 }

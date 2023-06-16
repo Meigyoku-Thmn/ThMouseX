@@ -20,6 +20,9 @@
     <ClInclude Include="Direct3D8Hook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DllLoad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Direct3D8Hook.cpp">

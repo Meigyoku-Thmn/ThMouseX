@@ -89,6 +89,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 minhook::Uninitialize(lpReserved != 0);
                 luajit::Uninitialize();
             }
+            dx8::dll::Unload();
             break;
     }
     return TRUE;

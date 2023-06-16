@@ -6,10 +6,8 @@
 #include "macro.h"
 
 namespace core::messagequeuehook {
-    using namespace std;
-
     DLLEXPORT_C bool TestRegisteredWindowMessages();
-    extern vector<common::minhook::HookApiConfig> HookConfig;
+    extern std::vector<common::minhook::HookApiConfig> HookConfig;
     DLLEXPORT_C bool InstallHooks();
     DLLEXPORT_C void RemoveHooks();
 }
