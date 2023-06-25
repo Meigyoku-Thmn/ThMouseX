@@ -1,6 +1,6 @@
 #include "framework.h"
-#include "Include/d3d8.h"
-#include "Include/d3dx8core.h"
+#include <Include/d3d8.h>
+#include <Include/d3dx8core.h>
 #include <string>
 #include <vector>
 #include <comdef.h>

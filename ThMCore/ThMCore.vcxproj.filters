@@ -9,7 +9,7 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-	<Filter Include="ConfigScripts">
+    <Filter Include="ConfigScripts">
       <UniqueIdentifier>{414e8165-770a-4036-b650-4667e5bc7051}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -79,5 +79,8 @@
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="Cursor.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vcpkg.json" />
   </ItemGroup>
 </Project>
