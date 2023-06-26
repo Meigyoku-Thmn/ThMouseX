@@ -3,7 +3,8 @@
 
 // DirectX
 #include <Include/d3d8.h>
-#include <Include/d3dx8math.h>
+
+// based on https://github.com/KoMaR1911/C4USMultiHack-Metin2/blob/main/EngineX-Pro/ImGui/imgui_impl_dx8.cpp
 
 // DirectX data
 struct ImGui_ImplDX8_Data
@@ -11,11 +12,19 @@ struct ImGui_ImplDX8_Data
     LPDIRECT3DDEVICE8           pd3dDevice;
     LPDIRECT3DVERTEXBUFFER8     pVB;
     LPDIRECT3DINDEXBUFFER8      pIB;
+    LPDIRECT3DVERTEXBUFFER8     maskVB;
+    LPDIRECT3DINDEXBUFFER8      maskIB;
     LPDIRECT3DTEXTURE8          FontTexture;
     int                         VertexBufferSize;
     int                         IndexBufferSize;
+    IDirect3DSurface8* DepthBuffer;
+    IDirect3DSurface8* realDepthStencilBuffer;
 
-    ImGui_ImplDX8_Data() { memset((void*)this, 0, sizeof(*this)); VertexBufferSize = 5000; IndexBufferSize = 10000; }
+    ImGui_ImplDX8_Data() {
+        memset((void*)this, 0, sizeof(*this));
+        VertexBufferSize = 5000;
+        IndexBufferSize = 10000;
+    }
 };
 
 struct CUSTOMVERTEX
@@ -32,8 +41,6 @@ struct CUSTOMVERTEX
 #define IMGUI_COL_TO_DX8_ARGB(_COL)     (((_COL) & 0xFF00FF00) | (((_COL) & 0xFF0000) >> 16) | (((_COL) & 0xFF) << 16))
 #endif
 
-// Backend data stored in io.BackendRendererUserData to allow support for multiple Dear ImGui contexts
-// It is STRONGLY preferred that you use docking branch with multi-viewports (== single Dear ImGui context + multiple windows) instead of multiple Dear ImGui contexts.
 static ImGui_ImplDX8_Data* ImGui_ImplDX8_GetBackendData()
 {
     return ImGui::GetCurrentContext() ? (ImGui_ImplDX8_Data*)ImGui::GetIO().BackendRendererUserData : nullptr;
@@ -54,8 +61,10 @@ static void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data)
     bd->pd3dDevice->SetViewport(&vp);
 
     // Setup render state: fixed-pipeline, alpha-blending, no face culling, no depth testing, shade mode (for gradient), bilinear sampling.
+    bd->pd3dDevice->GetDepthStencilSurface(&bd->realDepthStencilBuffer);
+    bd->pd3dDevice->SetRenderTarget(nullptr, bd->DepthBuffer);
     bd->pd3dDevice->SetPixelShader(NULL);
-    bd->pd3dDevice->SetVertexShader(NULL);
+    bd->pd3dDevice->SetVertexShader(D3DFVF_CUSTOMVERTEX);
     bd->pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
     bd->pd3dDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
     bd->pd3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
@@ -66,14 +75,9 @@ static void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data)
     bd->pd3dDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
     bd->pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
     bd->pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-    //bd->pd3dDevice->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, TRUE);
-    //bd->pd3dDevice->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
-    //bd->pd3dDevice->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_INVSRCALPHA);
-    //bd->pd3dDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
     bd->pd3dDevice->SetRenderState(D3DRS_FOGENABLE, FALSE);
     bd->pd3dDevice->SetRenderState(D3DRS_RANGEFOGENABLE, FALSE);
     bd->pd3dDevice->SetRenderState(D3DRS_SPECULARENABLE, FALSE);
-    bd->pd3dDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
     bd->pd3dDevice->SetRenderState(D3DRS_CLIPPING, TRUE);
     bd->pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
     bd->pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
@@ -84,8 +88,8 @@ static void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data)
     bd->pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
     bd->pd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
     bd->pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    //bd->pd3dDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-    //bd->pd3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+    bd->pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
+    bd->pd3dDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
 
     // Setup orthographic projection matrix
     // Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right). DisplayPos is (0,0) for single viewport apps.
@@ -101,8 +105,7 @@ static void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data)
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f,
         } } };
-        D3DMATRIX mat_projection =
-        { { {
+        D3DMATRIX mat_projection = { { {
             2.0f / (R - L),    0.0f,               0.0f,  0.0f,
             0.0f,              2.0f / (T - B),     0.0f,  0.0f,
             0.0f,              0.0f,               0.5f,  0.0f,
@@ -114,31 +117,47 @@ static void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data)
     }
 }
 
-D3DVIEWPORT8 BeginClipping(IDirect3DDevice8* device, const RECT* rc) {
-    D3DVIEWPORT8 oldViewport;
-    device->GetViewport(&oldViewport);
-    D3DVIEWPORT8 clippingViewport{
-        .X = (DWORD)rc->left,
-        .Y = (DWORD)rc->top,
-        .Width = (DWORD)(rc->right - rc->left),
-        .Height = (DWORD)(rc->bottom - rc->top),
-        .MinZ = 0.0f,
-        .MaxZ = 1.0f,
-    };
-    // set a clipping rectangle
-    device->SetViewport(&clippingViewport);
-    D3DXMATRIX matTranslate;
-    // compensate the offset by a translating matrix
-    D3DXMatrixTranslation(&matTranslate, -rc->left, -rc->top, 0.0f);
-    device->SetTransform(D3DTS_WORLD, &matTranslate);
-    return oldViewport;
-}
-
-void EndClipping(IDirect3DDevice8* device, const D3DVIEWPORT8* oldViewport) {
-    device->SetViewport(oldViewport);
-    D3DXMATRIX matTranslate;
-    D3DXMatrixIdentity(&matTranslate);
-    device->SetTransform(D3DTS_WORLD, &matTranslate);
+void build_mask_vbuffer(const RECT* rect) {
+    ImGui_ImplDX8_Data* bd = ImGui_ImplDX8_GetBackendData();
+    CUSTOMVERTEX* vtx_dst;
+    bd->maskVB->Lock(0, (UINT)(6 * sizeof(CUSTOMVERTEX)), (BYTE**)&vtx_dst, 0);
+    vtx_dst[0].pos[0] = (float)rect->left;
+    vtx_dst[0].pos[1] = (float)rect->bottom;
+    vtx_dst[0].pos[2] = 0;
+    vtx_dst[1].pos[0] = (float)rect->left;
+    vtx_dst[1].pos[1] = (float)rect->top;
+    vtx_dst[1].pos[2] = 0;
+    vtx_dst[2].pos[0] = (float)rect->right;
+    vtx_dst[2].pos[1] = (float)rect->top;
+    vtx_dst[2].pos[2] = 0;
+    vtx_dst[3].pos[0] = (float)rect->left;
+    vtx_dst[3].pos[1] = (float)rect->bottom;
+    vtx_dst[3].pos[2] = 0;
+    vtx_dst[4].pos[0] = (float)rect->right;
+    vtx_dst[4].pos[1] = (float)rect->top;
+    vtx_dst[4].pos[2] = 0;
+    vtx_dst[5].pos[0] = (float)rect->right;
+    vtx_dst[5].pos[1] = (float)rect->bottom;
+    vtx_dst[5].pos[2] = 0;
+    vtx_dst[0].col = 0xFFFFFFFF;
+    vtx_dst[1].col = 0xFFFFFFFF;
+    vtx_dst[2].col = 0xFFFFFFFF;
+    vtx_dst[3].col = 0xFFFFFFFF;
+    vtx_dst[4].col = 0xFFFFFFFF;
+    vtx_dst[5].col = 0xFFFFFFFF;
+    vtx_dst[0].uv[0] = 0;
+    vtx_dst[0].uv[1] = 0;
+    vtx_dst[1].uv[0] = 0;
+    vtx_dst[1].uv[1] = 0;
+    vtx_dst[2].uv[0] = 0;
+    vtx_dst[2].uv[1] = 0;
+    vtx_dst[3].uv[0] = 0;
+    vtx_dst[3].uv[1] = 0;
+    vtx_dst[4].uv[0] = 0;
+    vtx_dst[4].uv[1] = 0;
+    vtx_dst[5].uv[0] = 0;
+    vtx_dst[5].uv[1] = 0;
+    bd->maskVB->Unlock();
 }
 
 // Render function.
@@ -152,17 +171,37 @@ void ImGui_ImplDX8_RenderDrawData(ImDrawData* draw_data)
     ImGui_ImplDX8_Data* bd = ImGui_ImplDX8_GetBackendData();
     if (!bd->pVB || bd->VertexBufferSize < draw_data->TotalVtxCount)
     {
-        if (bd->pVB) { bd->pVB->Release(); bd->pVB = nullptr; }
+        if (bd->pVB) {
+            bd->pVB->Release();
+            bd->pVB = nullptr;
+        }
         bd->VertexBufferSize = draw_data->TotalVtxCount + 5000;
         if (bd->pd3dDevice->CreateVertexBuffer(bd->VertexBufferSize * sizeof(CUSTOMVERTEX), D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFVF_CUSTOMVERTEX, D3DPOOL_DEFAULT, &bd->pVB) < 0)
             return;
     }
     if (!bd->pIB || bd->IndexBufferSize < draw_data->TotalIdxCount)
     {
-        if (bd->pIB) { bd->pIB->Release(); bd->pIB = nullptr; }
+        if (bd->pIB) {
+            bd->pIB->Release();
+            bd->pIB = nullptr;
+        }
         bd->IndexBufferSize = draw_data->TotalIdxCount + 10000;
         if (bd->pd3dDevice->CreateIndexBuffer(bd->IndexBufferSize * sizeof(ImDrawIdx), D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, sizeof(ImDrawIdx) == 2 ? D3DFMT_INDEX16 : D3DFMT_INDEX32, D3DPOOL_DEFAULT, &bd->pIB) < 0)
             return;
+    }
+
+    if (!bd->maskVB && !bd->maskIB) {
+        if (bd->pd3dDevice->CreateVertexBuffer(6 * sizeof(CUSTOMVERTEX), D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, D3DFVF_CUSTOMVERTEX, D3DPOOL_DEFAULT, &bd->maskVB) < 0) return;
+        if (bd->pd3dDevice->CreateIndexBuffer(6, D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY, sizeof(ImDrawIdx) == 2 ? D3DFMT_INDEX16 : D3DFMT_INDEX32, D3DPOOL_DEFAULT, &bd->maskIB) < 0) return;
+        ImDrawIdx* idx_dst;
+        bd->maskIB->Lock(0, 6 * sizeof(ImDrawIdx), (BYTE**)&idx_dst, D3DLOCK_DISCARD);
+        idx_dst[0] = 0;
+        idx_dst[1] = 1;
+        idx_dst[2] = 2;
+        idx_dst[3] = 0;
+        idx_dst[4] = 2;
+        idx_dst[5] = 3;
+        bd->maskIB->Unlock();
     }
 
     // Backup the DX8 state
@@ -197,9 +236,6 @@ void ImGui_ImplDX8_RenderDrawData(ImDrawData* draw_data)
     }
 
     // Copy and convert all vertices into a single contiguous buffer, convert colors to DX8 default format.
-    // FIXME-OPT: This is a minor waste of resource, the ideal is to use imconfig.h and
-    //  1) to avoid repacking colors:   #define IMGUI_USE_BGRA_PACKED_COLOR
-    //  2) to avoid repacking vertices: #define IMGUI_OVERRIDE_DRAWVERT_STRUCT_LAYOUT struct ImDrawVert { ImVec2 pos; float z; ImU32 col; ImVec2 uv; }
     for (int n = 0; n < draw_data->CmdListsCount; n++)
     {
         const ImDrawList* cmd_list = draw_data->CmdLists[n];
@@ -249,19 +285,43 @@ void ImGui_ImplDX8_RenderDrawData(ImDrawData* draw_data)
             }
             else
             {
-                // Project scissor/clipping rectangles into framebuffer space
+                // Project clipping rectangles into framebuffer space
                 ImVec2 clip_min(pcmd->ClipRect.x - clip_off.x, pcmd->ClipRect.y - clip_off.y);
                 ImVec2 clip_max(pcmd->ClipRect.z - clip_off.x, pcmd->ClipRect.w - clip_off.y);
                 if (clip_max.x <= clip_min.x || clip_max.y <= clip_min.y)
                     continue;
 
-                // Apply Scissor/clipping rectangle, Bind texture, Draw
+                // Apply clipping rectangle, Bind texture, Draw
                 const RECT r = { (LONG)clip_min.x, (LONG)clip_min.y, (LONG)clip_max.x, (LONG)clip_max.y };
                 const LPDIRECT3DTEXTURE8 texture = (LPDIRECT3DTEXTURE8)pcmd->GetTexID();
                 bd->pd3dDevice->SetTexture(0, texture);
-                const D3DVIEWPORT8 oldViewport = BeginClipping(bd->pd3dDevice, &r);
+                build_mask_vbuffer(&r);
+                bd->pd3dDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
+                bd->pd3dDevice->SetRenderState(D3DRS_ZENABLE, true);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILENABLE, true);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILWRITEMASK, 0xFF);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILMASK, 0xFF);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+                bd->pd3dDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILREF, 0xFF);
+                bd->pd3dDevice->Clear(0, NULL, D3DCLEAR_STENCIL, 0, 1.0f, 0);
+                bd->pd3dDevice->SetStreamSource(0, bd->maskVB, sizeof(CUSTOMVERTEX));
+                bd->pd3dDevice->SetIndices(bd->maskIB, 0);
+                bd->pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);
+                bd->pd3dDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2);
+                bd->pd3dDevice->SetStreamSource(0, bd->pVB, sizeof(CUSTOMVERTEX));
+                bd->pd3dDevice->SetIndices(bd->pIB, global_vtx_offset);
+                bd->pd3dDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0xF);
+                bd->pd3dDevice->SetRenderState(D3DRS_ZENABLE, false);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILENABLE, true);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILWRITEMASK, 0);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILMASK, 0xFF);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);
+                bd->pd3dDevice->SetRenderState(D3DRS_STENCILREF, 0xFF);
                 bd->pd3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, (UINT)cmd_list->VtxBuffer.Size, pcmd->IdxOffset + global_idx_offset, pcmd->ElemCount / 3);
-                EndClipping(bd->pd3dDevice, &oldViewport);
             }
         }
         global_idx_offset += cmd_list->IdxBuffer.Size;
@@ -274,6 +334,7 @@ void ImGui_ImplDX8_RenderDrawData(ImDrawData* draw_data)
     bd->pd3dDevice->SetTransform(D3DTS_PROJECTION, &last_projection);
 
     // Restore the DX8 state
+    bd->pd3dDevice->SetRenderTarget(nullptr, bd->realDepthStencilBuffer);
     bd->pd3dDevice->ApplyStateBlock(d3d8_state_block);
     bd->pd3dDevice->DeleteStateBlock(d3d8_state_block);
 }
@@ -302,7 +363,8 @@ void ImGui_ImplDX8_Shutdown()
     ImGuiIO& io = ImGui::GetIO();
 
     ImGui_ImplDX8_InvalidateDeviceObjects();
-    if (bd->pd3dDevice) { bd->pd3dDevice->Release(); }
+    if (bd->pd3dDevice)
+        bd->pd3dDevice->Release();
     io.BackendRendererName = nullptr;
     io.BackendRendererUserData = nullptr;
     io.BackendFlags &= ~ImGuiBackendFlags_RendererHasVtxOffset;
@@ -351,12 +413,35 @@ static bool ImGui_ImplDX8_CreateFontsTexture()
     return true;
 }
 
+static bool ImGui_ImplD3D8_CreateDepthStencilBuffer() {
+    ImGui_ImplDX8_Data* bd = ImGui_ImplDX8_GetBackendData();
+    if (bd->pd3dDevice == nullptr) {
+        return false;
+    }
+    if (bd->DepthBuffer == nullptr) {
+        IDirect3DSurface8* realDepth;
+        D3DSURFACE_DESC sfcDesc;
+
+        bd->pd3dDevice->GetDepthStencilSurface(&realDepth);
+        if (realDepth->GetDesc(&sfcDesc) != 0) {
+            return false;
+        }
+        if (bd->pd3dDevice->CreateDepthStencilSurface(sfcDesc.Width, sfcDesc.Height, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, &bd->DepthBuffer) != 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool ImGui_ImplDX8_CreateDeviceObjects()
 {
     ImGui_ImplDX8_Data* bd = ImGui_ImplDX8_GetBackendData();
     if (!bd || !bd->pd3dDevice)
         return false;
     if (!ImGui_ImplDX8_CreateFontsTexture())
+        return false;
+    if (!ImGui_ImplD3D8_CreateDepthStencilBuffer())
         return false;
     return true;
 }
@@ -366,9 +451,31 @@ void ImGui_ImplDX8_InvalidateDeviceObjects()
     ImGui_ImplDX8_Data* bd = ImGui_ImplDX8_GetBackendData();
     if (!bd || !bd->pd3dDevice)
         return;
-    if (bd->pVB) { bd->pVB->Release(); bd->pVB = nullptr; }
-    if (bd->pIB) { bd->pIB->Release(); bd->pIB = nullptr; }
-    if (bd->FontTexture) { bd->FontTexture->Release(); bd->FontTexture = nullptr; ImGui::GetIO().Fonts->SetTexID(0); } // We copied bd->pFontTextureView to io.Fonts->TexID so let's clear that as well.
+    if (bd->pVB) {
+        bd->pVB->Release();
+        bd->pVB = nullptr;
+    }
+    if (bd->pIB) {
+        bd->pIB->Release();
+        bd->pIB = nullptr;
+    }
+    if (bd->maskVB) {
+        bd->maskVB->Release();
+        bd->maskVB = nullptr;
+    }
+    if (bd->maskIB) {
+        bd->maskIB->Release();
+        bd->maskIB = nullptr;
+    }
+    if (bd->DepthBuffer) {
+        bd->DepthBuffer->Release();
+        bd->DepthBuffer = nullptr;
+    }
+    if (bd->FontTexture) {
+        bd->FontTexture->Release();
+        bd->FontTexture = nullptr;
+        ImGui::GetIO().Fonts->SetTexID(0);
+    } // We copied bd->pFontTextureView to io.Fonts->TexID so let's clear that as well.
 }
 
 void ImGui_ImplDX8_NewFrame()
@@ -376,6 +483,6 @@ void ImGui_ImplDX8_NewFrame()
     ImGui_ImplDX8_Data* bd = ImGui_ImplDX8_GetBackendData();
     IM_ASSERT(bd != nullptr && "Did you call ImGui_ImplDX8_Init()?");
 
-    if (!bd->FontTexture)
+    if (!bd->FontTexture || !bd->DepthBuffer)
         ImGui_ImplDX8_CreateDeviceObjects();
 }
