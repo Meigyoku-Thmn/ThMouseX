@@ -189,8 +189,6 @@ namespace dx8::hook {
             cursorTexture->GetLevelDesc(0, &cursorSize);
             cursorPivot = { (cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f };
         }
-
-        SystemParametersInfoA(SPI_SETCURSORSHADOW, 0, (PVOID)TRUE, 0);
     }
 
     HRESULT WINAPI D3DReset(IDirect3DDevice8* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {

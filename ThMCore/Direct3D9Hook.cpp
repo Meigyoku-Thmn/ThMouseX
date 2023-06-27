@@ -4,6 +4,9 @@
 #include <vector>
 #include <string>
 #include <comdef.h>
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx9.h>
 
 #include "../Common/MinHook.h"
 #include "../Common/Variables.h"
@@ -109,7 +112,7 @@ namespace core::directx9hook {
         gs_d3d9_Present_RVA = vtable[PresentIdx] - baseAddress;
 
         result = true;
-    CleanAndReturn:
+CleanAndReturn:
         pDevice && pDevice->Release();
         pD3D && pD3D->Release();
         tmpWnd && DestroyWindow(tmpWnd);
@@ -129,6 +132,7 @@ namespace core::directx9hook {
     bool initialized;
     bool measurementPrepared;
     bool cursorStatePrepared;
+    bool imGuiPrepared;
 
     void ClearMeasurementFlags() {
         measurementPrepared = false;
@@ -154,6 +158,12 @@ namespace core::directx9hook {
         cursorStatePrepared = false;
     }
 
+    void ShutdownImGui() {
+        ImGui_ImplDX9_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+    }
+
     HRESULT WINAPI D3DCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface) {
         CleanUp();
         return OriCreateDevice(pD3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
@@ -166,6 +176,7 @@ namespace core::directx9hook {
         static void Callback(bool isProcessTerminating) {
             if (isProcessTerminating)
                 return;
+            ShutdownImGui();
             CleanUp();
         }
     } _;
@@ -183,15 +194,17 @@ namespace core::directx9hook {
             D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = { (cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f };
+            cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f};
         }
-
-        SystemParametersInfoA(SPI_SETCURSORSHADOW, 0, (PVOID)TRUE, 0);
     }
 
     HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
+        ImGui_ImplDX9_InvalidateDeviceObjects();
         CleanUp();
-        return OriReset(pDevice, pPresentationParameters);
+        auto result = OriReset(pDevice, pPresentationParameters);
+        if (result == D3D_OK)
+            ImGui_ImplDX9_CreateDeviceObjects();
+        return result;
     }
 
     /*
@@ -332,12 +345,10 @@ namespace core::directx9hook {
             if (modulateStage == WhiteInc || modulateStage == WhiteDec) {
                 SetTextureColorStage(pDevice, 0, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_DIFFUSE);
                 cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, ModulateColor(modulate));
-            }
-            else {
+            } else {
                 cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, ModulateColor(modulate));
             }
-        }
-        else {
+        } else {
             cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
         }
         cursorSprite->End();
@@ -348,11 +359,43 @@ namespace core::directx9hook {
         pDevice->EndScene();
     }
 
+    void PrepareImGui(IDirect3DDevice9* pDevice) {
+        if (imGuiPrepared)
+            return;
+        imGuiPrepared = true;
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        auto& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+        ImGui::StyleColorsDark();
+        ImGui_ImplWin32_Init(g_hFocusWindow);
+        ImGui_ImplDX9_Init(pDevice);
+        auto font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", 20);
+        if (font == nullptr)
+            io.Fonts->AddFontDefault();
+    }
+
+    void RenderImGui(IDirect3DDevice9* pDevice) {
+        ImGui_ImplDX9_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow();
+        ImGui::EndFrame();
+        pDevice->BeginScene();
+        ImGui::Render();
+        ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+        pDevice->EndScene();
+    }
+
     HRESULT WINAPI D3DPresent(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion) {
         Initialize(pDevice);
         PrepareMeasurement(pDevice);
         PrepareCursorState(pDevice);
+        PrepareImGui(pDevice);
         RenderCursor(pDevice);
+        RenderImGui(pDevice);
         for (auto& callback : postRenderCallbacks())
             callback();
         return OriPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
