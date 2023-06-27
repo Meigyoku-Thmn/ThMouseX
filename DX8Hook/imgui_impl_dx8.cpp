@@ -41,13 +41,13 @@ struct CUSTOMVERTEX
 #define IMGUI_COL_TO_DX8_ARGB(_COL)     (((_COL) & 0xFF00FF00) | (((_COL) & 0xFF0000) >> 16) | (((_COL) & 0xFF) << 16))
 #endif
 
-static ImGui_ImplDX8_Data* ImGui_ImplDX8_GetBackendData()
+ImGui_ImplDX8_Data* ImGui_ImplDX8_GetBackendData()
 {
     return ImGui::GetCurrentContext() ? (ImGui_ImplDX8_Data*)ImGui::GetIO().BackendRendererUserData : nullptr;
 }
 
 // Functions
-static void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data)
+void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data)
 {
     ImGui_ImplDX8_Data* bd = ImGui_ImplDX8_GetBackendData();
 
@@ -371,7 +371,7 @@ void ImGui_ImplDX8_Shutdown()
     IM_DELETE(bd);
 }
 
-static bool ImGui_ImplDX8_CreateFontsTexture()
+bool ImGui_ImplDX8_CreateFontsTexture()
 {
     // Build texture atlas
     ImGuiIO& io = ImGui::GetIO();
@@ -413,7 +413,7 @@ static bool ImGui_ImplDX8_CreateFontsTexture()
     return true;
 }
 
-static bool ImGui_ImplD3D8_CreateDepthStencilBuffer() {
+bool ImGui_ImplD3D8_CreateDepthStencilBuffer() {
     ImGui_ImplDX8_Data* bd = ImGui_ImplDX8_GetBackendData();
     if (bd->pd3dDevice == nullptr) {
         return false;
@@ -426,6 +426,7 @@ static bool ImGui_ImplD3D8_CreateDepthStencilBuffer() {
         if (realDepth->GetDesc(&sfcDesc) != 0) {
             return false;
         }
+        realDepth->Release();
         if (bd->pd3dDevice->CreateDepthStencilSurface(sfcDesc.Width, sfcDesc.Height, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, &bd->DepthBuffer) != 0) {
             return false;
         }
