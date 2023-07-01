@@ -102,8 +102,10 @@ namespace core::messagequeuehook {
             auto e = (PMSG)lParam;
             if (g_hFocusWindow != NULL && e->message == WM_KEYDOWN && e->wParam == gs_toggleImGuiButton) {
                 g_showImGui = !g_showImGui;
-                if (g_showImGui)
+                if (g_showImGui) {
+                    g_inputEnabled = false;
                     ShowMousePointer();
+                }
                 else
                     HideMousePointer();
             }

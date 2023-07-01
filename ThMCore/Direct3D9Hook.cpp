@@ -112,7 +112,7 @@ namespace core::directx9hook {
         gs_d3d9_Present_RVA = vtable[PresentIdx] - baseAddress;
 
         result = true;
-CleanAndReturn:
+    CleanAndReturn:
         pDevice && pDevice->Release();
         pD3D && pD3D->Release();
         tmpWnd && DestroyWindow(tmpWnd);
