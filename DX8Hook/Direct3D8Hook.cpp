@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include <comdef.h>
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include "imgui_impl_dx8.h"
 
 #include "../Common/DataTypes.h"
 #include "../Common/Variables.h"
@@ -131,6 +134,7 @@ namespace dx8::hook {
     bool initialized;
     bool measurementPrepared;
     bool cursorStatePrepared;
+    bool imGuiPrepared;
 
     void ClearMeasurementFlags() {
         measurementPrepared = false;
@@ -156,6 +160,11 @@ namespace dx8::hook {
         cursorStatePrepared = false;
     }
 
+    void ShutdownImGui() {
+        ImGui_ImplDX8_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+    }
 
     HRESULT WINAPI D3DCreateDevice(IDirect3D8* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice8** ppReturnedDeviceInterface) {
         CleanUp();
@@ -170,6 +179,7 @@ namespace dx8::hook {
         static void Callback(bool isProcessTerminating) {
             if (isProcessTerminating)
                 return;
+            ShutdownImGui();
             CleanUp();
         }
     } _;
@@ -192,8 +202,12 @@ namespace dx8::hook {
     }
 
     HRESULT WINAPI D3DReset(IDirect3DDevice8* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
+        ImGui_ImplDX8_InvalidateDeviceObjects();
         CleanUp();
-        return OriReset(pDevice, pPresentationParameters);
+        auto result = OriReset(pDevice, pPresentationParameters);
+        if (result == D3D_OK)
+            ImGui_ImplDX8_CreateDeviceObjects();
+        return result;
     }
 
     /*
@@ -336,12 +350,42 @@ namespace dx8::hook {
         pDevice->EndScene();
     }
 
+    void PrepareImGui(IDirect3DDevice8* pDevice) {
+        if (imGuiPrepared)
+            return;
+        imGuiPrepared = true;
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        auto& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        ImGui::StyleColorsDark();
+        ImGui_ImplWin32_Init(g_hFocusWindow);
+        ImGui_ImplDX8_Init(pDevice);
+        auto font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", 20);
+        if (font == nullptr)
+            io.Fonts->AddFontDefault();
+    }
+
+    void RenderImGui(IDirect3DDevice8* pDevice) {
+        ImGui_ImplDX8_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow();
+        ImGui::EndFrame();
+        pDevice->BeginScene();
+        ImGui::Render();
+        ImGui_ImplDX8_RenderDrawData(ImGui::GetDrawData());
+        pDevice->EndScene();
+    }
 
     HRESULT WINAPI D3DPresent(IDirect3DDevice8* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion) {
         Initialize(pDevice);
         PrepareMeasurement(pDevice);
         PrepareCursorState(pDevice);
+        PrepareImGui(pDevice);
         RenderCursor(pDevice);
+        RenderImGui(pDevice);
         for (auto& callback : postRenderCallbacks())
             callback();
         return OriPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);

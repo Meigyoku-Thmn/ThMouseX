@@ -194,7 +194,7 @@ CleanAndReturn:
             D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f};
+            cursorPivot = { (cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f };
         }
     }
 
@@ -345,10 +345,12 @@ CleanAndReturn:
             if (modulateStage == WhiteInc || modulateStage == WhiteDec) {
                 SetTextureColorStage(pDevice, 0, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_DIFFUSE);
                 cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, ModulateColor(modulate));
-            } else {
+            }
+            else {
                 cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, ModulateColor(modulate));
             }
-        } else {
+        }
+        else {
             cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
         }
         cursorSprite->End();
@@ -368,7 +370,6 @@ CleanAndReturn:
         ImGui::CreateContext();
         auto& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
         ImGui::StyleColorsDark();
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX9_Init(pDevice);
@@ -378,6 +379,8 @@ CleanAndReturn:
     }
 
     void RenderImGui(IDirect3DDevice9* pDevice) {
+        if (!g_showImGui)
+            return;
         ImGui_ImplDX9_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();

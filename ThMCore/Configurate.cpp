@@ -170,6 +170,14 @@ namespace core::configurate {
                 }
                 gs_extraButton = vkCode->second;
             }
+            else if (key == "ToggleImGuiButton") {
+                auto vkCode = vkCodes.find(value);
+                if (vkCode == vkCodes.end()) {
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid ToggleImGuiButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    return false;
+                }
+                gs_toggleImGuiButton = vkCode->second;
+            }
             else if (key == "ToggleOsCursorButton") {
                 auto vkCode = vkCodes.find(value);
                 if (vkCode == vkCodes.end()) {

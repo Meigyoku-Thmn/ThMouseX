@@ -76,3 +76,4 @@ VK_LCONTROL     0xA2    Left CONTROL key
 VK_RCONTROL     0xA3    Right CONTROL key
 VK_LMENU        0xA4    Left ALT key
 VK_RMENU        0xA5    Right ALT key
+VK_BACK_QUOTE   0xC0    Back Quote

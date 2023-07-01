@@ -2,7 +2,7 @@
 // This needs to be used along with a Platform Backend (e.g. Win32)
 
 #pragma once
-#include "imgui.h"      // IMGUI_IMPL_API
+#include <imgui.h>      // IMGUI_IMPL_API
 
 struct IDirect3DDevice8;
 

@@ -1,8 +1,13 @@
 ; General configuration file for ThMouseX
 ; Required encoding is UTF-8 without BOM
 ; Use quotes "" for values that have spaces.
+;
+; map from left to right
 BombButton           = VK_X
 ExtraButton          = VK_C
+; map from right to left
 ToggleOsCursorButton = VK_M
+ToggleImGuiButton    = VK_BACK_QUOTE
+; other settings
 CursorTexture        = Cursor.png
 CursorBaseHeight     = 480

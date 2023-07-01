@@ -1,5 +1,6 @@
 #include "framework.h"
 #include <vector>
+#include <imgui_impl_win32.h>
 
 #include "../Common/MinHook.h"
 #include "../Common/Variables.h"
@@ -17,6 +18,8 @@ namespace directx8 = dx8::hook;
 namespace directx9 = core::directx9hook;
 
 using namespace std;
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace core::messagequeuehook {
     UINT CLEAN_MANAGED_DATA = RegisterWindowMessageA("CLEAN_MANAGED_DATA {6BF7C2B8-F245-4781-AA3C-467366CA3551}");
@@ -37,8 +40,8 @@ namespace core::messagequeuehook {
     auto hCursor = LoadCursorA(NULL, IDC_ARROW);
 
     vector<minhook::HookApiConfig> HookConfig{
-        {L"USER32.DLL", "SetCursor", &_SetCursor, (PVOID*)&OriSetCursor},
-        {L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor},
+        { L"USER32.DLL", "SetCursor", & _SetCursor, (PVOID*)&OriSetCursor },
+        { L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor },
     };
 
     HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
@@ -96,24 +99,35 @@ namespace core::messagequeuehook {
 
     LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
         if (code == HC_ACTION && g_hookApplied) {
-            static bool isRightMousePressing = false;
             auto e = (PMSG)lParam;
-            if (e->message == WM_LBUTTONDOWN)
-                g_leftMousePressed = true;
-            else if (e->message == WM_MBUTTONDOWN)
-                g_midMousePressed = true;
-            else if (e->message == WM_RBUTTONDOWN)
-                isRightMousePressing = true;
-            else if (e->message == WM_RBUTTONUP && isRightMousePressing == true) {
-                isRightMousePressing = false;
-                g_inputEnabled = !g_inputEnabled;
+            if (g_hFocusWindow != NULL && e->message == WM_KEYDOWN && e->wParam == gs_toggleImGuiButton) {
+                g_showImGui = !g_showImGui;
+                if (g_showImGui)
+                    ShowMousePointer();
+                else
+                    HideMousePointer();
             }
-            else if (e->message == WM_KEYDOWN) {
-                if (e->wParam == gs_toggleOsCursorButton) {
-                    if (isCursorShow)
-                        HideMousePointer();
-                    else
-                        ShowMousePointer();
+            if (g_showImGui)
+                ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
+            else {
+                static bool isRightMousePressing = false;
+                if (e->message == WM_LBUTTONDOWN)
+                    g_leftMousePressed = true;
+                else if (e->message == WM_MBUTTONDOWN)
+                    g_midMousePressed = true;
+                else if (e->message == WM_RBUTTONDOWN)
+                    isRightMousePressing = true;
+                else if (e->message == WM_RBUTTONUP && isRightMousePressing == true) {
+                    isRightMousePressing = false;
+                    g_inputEnabled = !g_inputEnabled;
+                }
+                else if (e->message == WM_KEYDOWN) {
+                    if (e->wParam == gs_toggleOsCursorButton) {
+                        if (isCursorShow)
+                            HideMousePointer();
+                        else
+                            ShowMousePointer();
+                    }
                 }
             }
         }

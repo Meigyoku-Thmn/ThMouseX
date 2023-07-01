@@ -23,12 +23,14 @@ EXPORT_VAR(bool, g_midMousePressed)
 EXPORT_VAR(bool, g_inputEnabled)
 EXPORT_VAR(float, g_pixelRate)
 EXPORT_VAR(FloatPoint, g_pixelOffset)
+EXPORT_VAR(bool, g_showImGui)
 
 // configuration from main exe
 EXPORT_VAR(GameConfigArray, gs_gameConfigArray)
 EXPORT_VAR(BYTE, gs_bombButton)
 EXPORT_VAR(BYTE, gs_extraButton)
 EXPORT_VAR(DWORD, gs_toggleOsCursorButton)
+EXPORT_VAR(DWORD, gs_toggleImGuiButton)
 EXPORT_VAR(WCHAR, gs_textureFilePath, [MAX_PATH])
 EXPORT_VAR(DWORD, gs_textureBaseHeight)
 
