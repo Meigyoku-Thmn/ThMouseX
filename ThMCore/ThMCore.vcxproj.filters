@@ -79,6 +79,9 @@
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="Cursor.png" />
+    <CopyFileToFolders Include="ConfigScripts\thWWW.lua">
+      <Filter>ConfigScripts</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <None Include="vcpkg.json" />

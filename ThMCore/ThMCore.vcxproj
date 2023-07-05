@@ -202,6 +202,9 @@
     <CopyFileToFolders Include="ConfigScripts/THMHJ.lua">
       <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="ConfigScripts/thWWW.lua">
+      <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <None Include="vcpkg.json" />

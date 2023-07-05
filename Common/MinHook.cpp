@@ -38,6 +38,36 @@ namespace common::minhook {
         return true;
     }
 
+    bool EnableHooks(const vector<HookApiConfig>& hookConfigs) {
+        for (auto& config : hookConfigs) {
+            auto hModule = GetModuleHandleW(config.moduleName);
+            if (hModule == NULL)
+                return false;
+            auto proc = GetProcAddress(hModule, config.procName);
+            if (proc == NULL)
+                return false;
+            auto rs = MH_EnableHook(proc);
+            if (rs != MH_OK)
+                return false;
+        }
+        return true;
+    }
+
+    bool DisableHooks(const vector<HookApiConfig>& hookConfigs) {
+        for (auto& config : hookConfigs) {
+            auto hModule = GetModuleHandleW(config.moduleName);
+            if (hModule == NULL)
+                return false;
+            auto proc = GetProcAddress(hModule, config.procName);
+            if (proc == NULL)
+                return false;
+            auto rs = MH_DisableHook(proc);
+            if (rs != MH_OK)
+                return false;
+        }
+        return true;
+    }
+
     bool EnableAll() {
         return MH_EnableHook(MH_ALL_HOOKS) == MH_OK;
     }

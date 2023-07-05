@@ -24,6 +24,8 @@ namespace common::minhook {
     EXPORT_FUNC(bool, MinHook_, Initialize);
     EXPORT_FUNC(bool, MinHook_, CreateHook, const std::vector<HookConfig>& hookConfigs);
     EXPORT_FUNC(bool, MinHook_, CreateApiHook, const std::vector<HookApiConfig>& hookConfigs);
+    EXPORT_FUNC(bool, MinHook_, EnableHooks, const std::vector<HookApiConfig>& hookConfigs);
+    EXPORT_FUNC(bool, MinHook_, DisableHooks, const std::vector<HookApiConfig>& hookConfigs);
     EXPORT_FUNC(bool, MinHook_, EnableAll);
     EXPORT_FUNC(void, MinHook_, Uninitialize, bool isProcessTerminating);
 }
