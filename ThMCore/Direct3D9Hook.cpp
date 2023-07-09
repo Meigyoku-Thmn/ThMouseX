@@ -166,7 +166,6 @@ namespace core::directx9hook {
     void CleanUp() {
         SAFE_RELEASE(cursorSprite);
         SAFE_RELEASE(cursorTexture);
-        SAFE_FREE_LIB(d3dx9_43);
         initialized = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
@@ -192,6 +191,7 @@ namespace core::directx9hook {
                 return;
             ShutdownImGui();
             CleanUp();
+            SAFE_FREE_LIB(d3dx9_43);
         }
     } _;
 
