@@ -75,6 +75,17 @@ namespace core::directx9hook {
     }
 
     bool PopulateMethodRVAs() {
+        ModuleHandle d3d9(LoadLibraryW(L"d3d9.dll"));
+        if (!d3d9) {
+            note::ToFile(TAG " Failed to load d3d9.dll.");
+            return false;
+        }
+        auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9.get(), "Direct3DCreate9");
+        if (!_Direct3DCreate9) {
+            note::ToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9.");
+            return false;
+        }
+
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
         if (!tmpWnd) {
             helper::ReportLastError(ErrorMessageTitle);
@@ -82,13 +93,13 @@ namespace core::directx9hook {
         }
 
         ComPtr<IDirect3D9> pD3D;
-        pD3D.Attach(Direct3DCreate9(D3D_SDK_VERSION));
+        pD3D.Attach(_Direct3DCreate9(D3D_SDK_VERSION));
         if (!pD3D) {
             MessageBoxA(NULL, "Failed to create an IDirect3D9 instance.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
             return false;
         }
 
-        auto baseAddress = (DWORD)GetModuleHandleA("d3d9.dll");
+        auto baseAddress = (DWORD)d3d9.get();
 
         auto vtable = *(DWORD**)pD3D.Get();
         gs_d3d9_CreateDevice_RVA = vtable[CreateDeviceIdx] - baseAddress;
@@ -118,6 +129,8 @@ namespace core::directx9hook {
 
     vector<minhook::HookConfig> HookConfig() {
         auto baseAddress = (DWORD)GetModuleHandleA("d3d9.dll");
+        if (!baseAddress)
+            return {};
         return {
             {PVOID(baseAddress + gs_d3d9_CreateDevice_RVA), &D3DCreateDevice, (PVOID*)&OriCreateDevice},
             {PVOID(baseAddress + gs_d3d9_Reset_RVA), &D3DReset, (PVOID*)&OriReset},
@@ -143,9 +156,17 @@ namespace core::directx9hook {
     D3DXVECTOR2         cursorScale;
     float               d3dScale = 1.f;
 
+    // d3dx9_43.dll
+    HMODULE d3dx9_43;
+    bool d3dx9_43_failed = false;
+    decltype(&D3DXCreateSprite) _D3DXCreateSprite;
+    decltype(&D3DXCreateTextureFromFileW) _D3DXCreateTextureFromFileW;
+    decltype(&D3DXMatrixTransformation2D) _D3DXMatrixTransformation2D;
+
     void CleanUp() {
         SAFE_RELEASE(cursorSprite);
         SAFE_RELEASE(cursorTexture);
+        SAFE_FREE_LIB(d3dx9_43);
         initialized = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
@@ -179,6 +200,34 @@ namespace core::directx9hook {
             return;
         initialized = true;
 
+        if (d3dx9_43_failed)
+            return;
+
+        d3dx9_43 = LoadLibraryW(L"d3dx9_43.dll");
+        if (!d3dx9_43) {
+            d3dx9_43_failed = true;
+            note::ToFile(TAG " Failed to load d3d11.dll.");
+            return;
+        }
+        _D3DXCreateSprite = (decltype(&D3DXCreateSprite))GetProcAddress(d3dx9_43, "D3DXCreateSprite");
+        if (!_D3DXCreateSprite) {
+            d3dx9_43_failed = true;
+            note::ToFile(TAG " Failed to import d3dx9_43.dll|D3DXCreateSprite.");
+            return;
+        }
+        _D3DXCreateTextureFromFileW = (decltype(&D3DXCreateTextureFromFileW))GetProcAddress(d3dx9_43, "D3DXCreateTextureFromFileW");
+        if (!_D3DXCreateTextureFromFileW) {
+            d3dx9_43_failed = true;
+            note::ToFile(TAG " Failed to import d3dx9_43.dll|D3DXCreateTextureFromFileW.");
+            return;
+        }
+        _D3DXMatrixTransformation2D = (decltype(&D3DXMatrixTransformation2D))GetProcAddress(d3dx9_43, "D3DXMatrixTransformation2D");
+        if (!_D3DXMatrixTransformation2D) {
+            d3dx9_43_failed = true;
+            note::ToFile(TAG " Failed to import d3dx9_43.dll|D3DXMatrixTransformation2D.");
+            return;
+        }
+
         D3DDEVICE_CREATION_PARAMETERS params;
         auto rs = device->GetCreationParameters(&params);
         if (FAILED(rs)) {
@@ -187,8 +236,8 @@ namespace core::directx9hook {
         }
         g_hFocusWindow = params.hFocusWindow;
 
-        if (gs_textureFilePath[0] && SUCCEEDED(D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture))) {
-            D3DXCreateSprite(device, &cursorSprite);
+        if (gs_textureFilePath[0] && SUCCEEDED(_D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture))) {
+            _D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
             cursorPivot = { (cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f, 0.f };
@@ -301,7 +350,7 @@ namespace core::directx9hook {
     }
 
     void RenderCursor(IDirect3DDevice9* pDevice) {
-        if (!cursorTexture)
+        if (!cursorTexture || !_D3DXMatrixTransformation2D)
             return;
 
         bool needRestoreViewport = false;
@@ -332,7 +381,7 @@ namespace core::directx9hook {
         // scale cursor sprite to match the current render resolution
         D3DXVECTOR2 scalingPivotD3D(cursorPositionD3D.x, cursorPositionD3D.y);
         D3DXMATRIX scalingMatrixD3D;
-        D3DXMatrixTransformation2D(&scalingMatrixD3D, &scalingPivotD3D, 0, &cursorScale, NULL, 0, NULL);
+        _D3DXMatrixTransformation2D(&scalingMatrixD3D, &scalingPivotD3D, 0, &cursorScale, NULL, 0, NULL);
         cursorSprite->SetTransform(&scalingMatrixD3D);
         // draw the cursor
         if (g_inputEnabled) {
