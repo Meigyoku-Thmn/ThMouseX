@@ -63,6 +63,16 @@ namespace core::directx11hook {
     }
 
     bool PopulateMethodRVAs() {
+        ModuleHandle d3d11(LoadLibraryW(L"d3d11.dll"));
+        if (!d3d11) {
+            note::ToFile(TAG " Failed to load d3d11.dll.");
+            return false;
+        }
+        auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11.get(), "D3D11CreateDeviceAndSwapChain");
+        if (!_D3D11CreateDeviceAndSwapChain) {
+            note::ToFile(TAG " Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain.");
+            return false;
+        }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
         if (!tmpWnd) {
@@ -86,13 +96,13 @@ namespace core::directx11hook {
             .SwapEffect = DXGI_SWAP_EFFECT_DISCARD,
         };
         const D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
-        auto rs = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
+        auto rs = _D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
         if (FAILED(rs)) {
             MessageBoxA(NULL, "Failed to create device and swapchain of DirectX 11.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
             return false;
         }
 
-        auto baseAddress = (DWORD)GetModuleHandleA("d3d11.dll");
+        auto baseAddress = (DWORD)d3d11.get();
         auto vtable = *(DWORD**)swap_chain.Get();
         gs_d3d11_Present_RVA = vtable[PresentIdx] - baseAddress;
         gs_d3d11_ResizeBuffers_RVA = vtable[ResizeBuffersIdx] - baseAddress;
@@ -102,6 +112,8 @@ namespace core::directx11hook {
 
     vector<minhook::HookConfig> HookConfig() {
         auto baseAddress = (DWORD)GetModuleHandleA("d3d11.dll");
+        if (!baseAddress)
+            return {};
         return {
             {PVOID(baseAddress + gs_d3d11_Present_RVA), &D3DPresent, (PVOID*)&OriPresent},
             {PVOID(baseAddress + gs_d3d11_ResizeBuffers_RVA), &D3DResizeBuffers, (PVOID*)&OriResizeBuffers},

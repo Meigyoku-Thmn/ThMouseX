@@ -85,6 +85,8 @@ namespace core::directinputhook {
         if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
             return {};
         auto baseAddress = (DWORD)GetModuleHandleA("DInput8.dll");
+        if (!baseAddress)
+            return {};
         return {
             {PVOID(baseAddress + gs_dinput8_GetDeviceState_RVA), &GetDeviceStateDInput8, (PVOID*)&OriGetDeviceStateDInput8},
         };
