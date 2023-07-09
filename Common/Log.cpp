@@ -42,7 +42,7 @@ namespace common::log {
     void ToFile(const char* _Format, ...) {
         va_list args;
         va_start(args, _Format);
-        if (logFile == NULL) {
+        if (!logFile) {
             if (logPath.size() == 0) {
                 logPath = wstring(g_currentModuleDirPath) + L"/log.txt";
                 processName = encoding::ConvertToUtf8(g_currentConfig.ProcessName);
@@ -65,7 +65,7 @@ namespace common::log {
 
     void HResultToFile(const char* message, HRESULT hResult) {
         ComPtr<IErrorInfo> errorInfo;
-        auto _ = GetErrorInfo(0, errorInfo.GetAddressOf());
+        auto _ = GetErrorInfo(0, &errorInfo);
         _com_error error(hResult, errorInfo.Get(), true);
         auto description = error.Description();
         if (description.length() > 0) {

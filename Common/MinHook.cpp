@@ -41,10 +41,10 @@ namespace common::minhook {
     bool EnableHooks(const vector<HookApiConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto hModule = GetModuleHandleW(config.moduleName);
-            if (hModule == NULL)
+            if (!hModule)
                 return false;
             auto proc = GetProcAddress(hModule, config.procName);
-            if (proc == NULL)
+            if (!proc)
                 return false;
             auto rs = MH_EnableHook(proc);
             if (rs != MH_OK)
@@ -56,10 +56,10 @@ namespace common::minhook {
     bool DisableHooks(const vector<HookApiConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto hModule = GetModuleHandleW(config.moduleName);
-            if (hModule == NULL)
+            if (!hModule)
                 return false;
             auto proc = GetProcAddress(hModule, config.procName);
-            if (proc == NULL)
+            if (!proc)
                 return false;
             auto rs = MH_DisableHook(proc);
             if (rs != MH_OK)

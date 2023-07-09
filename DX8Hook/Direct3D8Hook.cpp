@@ -2,12 +2,15 @@
 #include <Include/d3d8.h>
 #include <Include/d3dx8core.h>
 #include <string>
+#include <memory>
+#include <wrl/client.h>
 #include <vector>
 #include <comdef.h>
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #include "imgui_impl_dx8.h"
 
+#include "../Common/macro.h"
 #include "../Common/DataTypes.h"
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
@@ -36,6 +39,7 @@ constexpr auto PresentIdx = 15;
 constexpr auto ErrorMessageTitle = "D3D8 Hook Setup Error";
 
 using namespace std;
+using namespace Microsoft::WRL;
 
 inline const char* GetD3dErrStr(const int errorCode) {
     if (errorCode == D3DERR_INVALIDCALL)
@@ -68,58 +72,48 @@ namespace dx8::hook {
     }
 
     bool PopulateMethodRVAs() {
-        bool                    result = false;
-        DWORD*                  vtable{};
-        HRESULT                 rs{};
-        IDirect3D8*             pD3D{};
-        IDirect3DDevice8*       pDevice{};
-        D3DPRESENT_PARAMETERS   d3dpp{};
-        DWORD                   baseAddress = (DWORD)GetModuleHandleA("d3d8.dll");
-
-        auto tmpWnd = CreateWindowA("BUTTON", "Temp Window",
-            WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL);
-        if (tmpWnd == NULL) {
+        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window",
+            WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
+        if (!tmpWnd) {
             helper::ReportLastError(ErrorMessageTitle);
-            goto CleanAndReturn;
+            return false;
         }
 
-        pD3D = Direct3DCreate8(D3D_SDK_VERSION);
+        ComPtr<IDirect3D8> pD3D;
+        pD3D.Attach(Direct3DCreate8(D3D_SDK_VERSION));
         if (!pD3D) {
             auto message = "Failed to create an IDirect3D8 instance.";
             MessageBoxA(NULL, message, ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            goto CleanAndReturn;
+            return false;
         }
+        auto baseAddress = (DWORD)GetModuleHandleA("d3d8.dll");
 
-        vtable = *(DWORD**)pD3D;
+        auto vtable = *(DWORD**)pD3D.Get();
         gs_d3d8_CreateDevice_RVA = vtable[CreateDeviceIdx] - baseAddress;
 
-        d3dpp.Windowed = TRUE;
-        d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-        d3dpp.hDeviceWindow = tmpWnd;
-        d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
-        d3dpp.BackBufferCount = 1;
-        d3dpp.BackBufferWidth = 4;
-        d3dpp.BackBufferHeight = 4;
-        d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
-
-        rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
+        D3DPRESENT_PARAMETERS d3dpp{
+            .BackBufferWidth = 4,
+            .BackBufferHeight = 4,
+            .BackBufferFormat = D3DFMT_X8R8G8B8,
+            .BackBufferCount = 1,
+            .SwapEffect = D3DSWAPEFFECT_DISCARD,
+            .hDeviceWindow = tmpWnd.get(),
+            .Windowed = TRUE,
+        };
+        ComPtr<IDirect3DDevice8> pDevice;
+        auto rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
         if (FAILED(rs)) {
             auto d3dErr = GetD3dErrStr(rs);
             auto message = "Failed to create an IDirect3DDevice8 instance: ";
             MessageBoxA(NULL, (string(message) + d3dErr).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            goto CleanAndReturn;
+            return false;
         }
 
-        vtable = *(DWORD**)pDevice;
+        vtable = *(DWORD**)pDevice.Get();
         gs_d3d8_Reset_RVA = vtable[ResetIdx] - baseAddress;
         gs_d3d8_Present_RVA = vtable[PresentIdx] - baseAddress;
 
-        result = true;
-    CleanAndReturn:
-        pDevice && pDevice->Release();
-        pD3D && pD3D->Release();
-        tmpWnd && DestroyWindow(tmpWnd);
-        return result;
+        return true;
     }
 
     vector<minhook::HookConfig> HookConfig() {
@@ -150,12 +144,8 @@ namespace dx8::hook {
     float               d3dScale = 1.f;
 
     void CleanUp() {
-        if (cursorSprite)
-            cursorSprite->Release();
-        if (cursorTexture)
-            cursorTexture->Release();
-        cursorSprite = NULL;
-        cursorTexture = NULL;
+        SAFE_RELEASE(cursorSprite);
+        SAFE_RELEASE(cursorTexture);
         initialized = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
@@ -192,13 +182,13 @@ namespace dx8::hook {
 
         D3DDEVICE_CREATION_PARAMETERS params;
         auto rs = device->GetCreationParameters(&params);
-        if (rs != D3D_OK) {
+        if (FAILED(rs)) {
             note::HResultToFile(TAG "Initialize: device->GetCreationParameters failed", rs);
             return;
         }
         g_hFocusWindow = params.hFocusWindow;
 
-        if (gs_textureFilePath[0] && D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture) == D3D_OK) {
+        if (gs_textureFilePath[0] && SUCCEEDED(D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture))) {
             D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
@@ -210,7 +200,7 @@ namespace dx8::hook {
         ImGui_ImplDX8_InvalidateDeviceObjects();
         CleanUp();
         auto result = OriReset(pDevice, pPresentationParameters);
-        if (result == D3D_OK)
+        if (FAILED(result))
             ImGui_ImplDX8_CreateDeviceObjects();
         return result;
     }
@@ -235,17 +225,16 @@ namespace dx8::hook {
             return;
         }
 
-        IDirect3DSurface8* pSurface;
+        ComPtr<IDirect3DSurface8> pSurface;
         auto rs = pDevice->GetRenderTarget(&pSurface);
-        if (rs != D3D_OK) {
+        if (FAILED(rs)) {
             note::HResultToFile(TAG "PrepareMeasurement: pDevice->GetRenderTarget failed", rs);
             return;
         }
 
         D3DSURFACE_DESC d3dSize;
         rs = pSurface->GetDesc(&d3dSize);
-        pSurface->Release();
-        if (rs != D3D_OK) {
+        if (FAILED(rs)) {
             note::HResultToFile(TAG "PrepareMeasurement: pSurface->GetDesc failed", rs);
             return;
         }
@@ -275,17 +264,16 @@ namespace dx8::hook {
         if (!g_hFocusWindow)
             return;
 
-        IDirect3DSurface8* pSurface;
+        ComPtr<IDirect3DSurface8> pSurface;
         auto rs = pDevice->GetRenderTarget(&pSurface);
-        if (rs != D3D_OK) {
+        if (FAILED(rs)) {
             d3dScale = 0.f;
             note::HResultToFile(TAG "PrepareCursorState: pDevice->GetRenderTarget failed", rs);
             return;
         }
         D3DSURFACE_DESC d3dSize;
         rs = pSurface->GetDesc(&d3dSize);
-        pSurface->Release();
-        if (rs != D3D_OK) {
+        if (FAILED(rs)) {
             d3dScale = 0.f;
             note::HResultToFile(TAG "PrepareCursorState: pSurface->GetDesc failed", rs);
             return;
@@ -306,10 +294,10 @@ namespace dx8::hook {
             return;
 
         bool needRestoreViewport = false;
-        IDirect3DSurface8* pSurface = NULL;
+        ComPtr<IDirect3DSurface8> pSurface;
         D3DSURFACE_DESC d3dSize;
         D3DVIEWPORT8 currentViewport;
-        if (pDevice->GetRenderTarget(&pSurface) == D3D_OK && pSurface->GetDesc(&d3dSize) == D3D_OK) {
+        if (SUCCEEDED(pDevice->GetRenderTarget(&pSurface)) && SUCCEEDED(pSurface->GetDesc(&d3dSize))) {
             needRestoreViewport = true;
             pDevice->GetViewport(&currentViewport);
             D3DVIEWPORT8 myViewport{
@@ -320,8 +308,6 @@ namespace dx8::hook {
             };
             pDevice->SetViewport(&myViewport);
         }
-        if (pSurface != NULL)
-            pSurface->Release();
 
         pDevice->BeginScene();
 
@@ -378,7 +364,7 @@ namespace dx8::hook {
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX8_Init(pDevice);
         auto font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", 20);
-        if (font == nullptr)
+        if (!font)
             io.Fonts->AddFontDefault();
     }
 

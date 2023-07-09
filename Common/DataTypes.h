@@ -3,6 +3,7 @@
 #include "macro.h"
 #include <functional>
 #include <string_view>
+#include <memory>
 
 constexpr auto PROCESS_NAME_MAX_LEN = 64;
 constexpr auto ADDRESS_CHAIN_MAX_LEN = 8;
@@ -92,3 +93,21 @@ struct string_hash {
     size_t operator()(std::string_view str) const { return hash_type{}(str); }
     size_t operator()(std::string const& str) const { return hash_type{}(str); }
 };
+
+struct HMODULE_FREER {
+    typedef HMODULE pointer;
+    void operator()(HMODULE handle) const {
+        if (handle != NULL)
+            FreeLibrary(handle);
+    }
+};
+typedef std::unique_ptr<HMODULE, HMODULE_FREER> ModuleHandle;
+
+struct HWND_DESTROYER {
+    typedef HWND pointer;
+    void operator()(HWND hwnd) const {
+        if (hwnd != NULL)
+            DestroyWindow(hwnd);
+    }
+};
+typedef std::unique_ptr<HWND, HWND_DESTROYER> WindowHandle;

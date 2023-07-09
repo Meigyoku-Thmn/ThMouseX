@@ -11,11 +11,11 @@ namespace common::dll {
     inline WCHAR currentModuleDirPath[MAX_PATH + 1];
     inline HMODULE hMod;
     inline FARPROC ImportFunction(const char* functionName) {
-        if (hMod == NULL) {
+        if (!hMod) {
             auto modulePath = wstring(currentModuleDirPath) + L"\\" + L"Common.dll";
             hMod = LoadLibraryExW(modulePath.c_str(), NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
         }
-        if (hMod == NULL)
+        if (!hMod)
             return NULL;
         return GetProcAddress(hMod, functionName);
     }

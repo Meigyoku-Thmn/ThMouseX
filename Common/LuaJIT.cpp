@@ -109,7 +109,7 @@ namespace common::luajit {
             return;
 
         L = luaL_newstate();
-        if (L == NULL) {
+        if (!L) {
             note::ToFile("[LuaJIT] %s", "Failed to initialize LuaJIT.");
             scriptingDisabled = true;
             return;

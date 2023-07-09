@@ -10,7 +10,7 @@ namespace common::helper::memory {
         auto address = offsets[0] + (DWORD)g_targetModule;
         for (int i = 1; i < length; i++) {
             address = *PDWORD(address);
-            if (address == NULL)
+            if (!address)
                 break;
             address += offsets[i];
         }

@@ -6,11 +6,15 @@
 #include <directxtk/CommonStates.h>
 #include <vector>
 #include <string>
+#include <memory>
+#include <wrl/client.h>
 #include <comdef.h>
 #include <imgui.h>
 #include <imgui_impl_win32.h>
 #include "imgui_impl_dx11.h"
 
+#include "../Common/macro.h"
+#include "../Common/DataTypes.h"
 #include "../Common/MinHook.h"
 #include "../Common/Variables.h"
 #include "../Common/DataTypes.h"
@@ -39,6 +43,7 @@ constexpr auto ErrorMessageTitle = "D3D11 Hook Setup Error";
 
 using namespace std;
 using namespace DirectX;
+using namespace Microsoft::WRL;
 
 using CallbackType = void (*)(void);
 
@@ -58,13 +63,16 @@ namespace core::directx11hook {
     }
 
     bool PopulateMethodRVAs() {
-        bool                    result = false;
-        DWORD* vtable{};
-        HRESULT                 rs{};
-        ID3D11Device* device{};
-        IDXGISwapChain* swap_chain{};
-        DWORD                   baseAddress = (DWORD)GetModuleHandleA("d3d11.dll");
-        DXGI_SWAP_CHAIN_DESC    sd{
+
+        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
+        if (!tmpWnd) {
+            helper::ReportLastError(ErrorMessageTitle);
+            return false;
+        }
+
+        ComPtr<ID3D11Device> device;
+        ComPtr<IDXGISwapChain> swap_chain;
+        DXGI_SWAP_CHAIN_DESC sd{
             .BufferDesc = DXGI_MODE_DESC{
                 .Format = DXGI_FORMAT_R8G8B8A8_UNORM,
             },
@@ -73,34 +81,23 @@ namespace core::directx11hook {
             },
             .BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
             .BufferCount = 2,
+            .OutputWindow = tmpWnd.get(),
             .Windowed = TRUE,
             .SwapEffect = DXGI_SWAP_EFFECT_DISCARD,
         };
         const D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
-
-        auto tmpWnd = CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL);
-        if (tmpWnd == NULL) {
-            helper::ReportLastError(ErrorMessageTitle);
-            goto CleanAndReturn;
-        }
-        sd.OutputWindow = tmpWnd;
-
-        rs = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
+        auto rs = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
         if (FAILED(rs)) {
             MessageBoxA(NULL, "Failed to create device and swapchain of DirectX 11.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            goto CleanAndReturn;
+            return false;
         }
 
-        vtable = *(DWORD**)swap_chain;
+        auto baseAddress = (DWORD)GetModuleHandleA("d3d11.dll");
+        auto vtable = *(DWORD**)swap_chain.Get();
         gs_d3d11_Present_RVA = vtable[PresentIdx] - baseAddress;
         gs_d3d11_ResizeBuffers_RVA = vtable[ResizeBuffersIdx] - baseAddress;
 
-        result = true;
-    CleanAndReturn:
-        swap_chain&& swap_chain->Release();
-        device&& device->Release();
-        tmpWnd&& DestroyWindow(tmpWnd);
-        return result;
+        return true;
     }
 
     vector<minhook::HookConfig> HookConfig() {
@@ -134,24 +131,12 @@ namespace core::directx11hook {
     float d3dScale = 1.f;
 
     void CleanUp() {
-        if (pixelShader)
-            pixelShader->Release();
-        if (spriteBatch)
-            delete spriteBatch;
-        if (cursorTexture)
-            cursorTexture->Release();
-        if (renderTargetView)
-            renderTargetView->Release();
-        if (context)
-            context->Release();
-        if (device)
-            device->Release();
-        pixelShader = NULL;
-        spriteBatch = NULL;
-        cursorTexture = NULL;
-        renderTargetView = NULL;
-        context = NULL;
-        device = NULL;
+        SAFE_RELEASE(pixelShader);
+        SAFE_DELETE(spriteBatch);
+        SAFE_RELEASE(cursorTexture);
+        SAFE_RELEASE(renderTargetView);
+        SAFE_RELEASE(context);
+        SAFE_RELEASE(device);
         initialized = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
@@ -186,14 +171,13 @@ namespace core::directx11hook {
             return;
         }
 
-        ID3D11Texture2D* pBackBuffer{};
+        ComPtr<ID3D11Texture2D> pBackBuffer;
         rs = swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
         if (FAILED(rs)) {
             note::HResultToFile(TAG "Initialize: swapChain->GetBuffer failed", rs);
             return;
         }
-        rs = device->CreateRenderTargetView(pBackBuffer, NULL, &renderTargetView);
-        pBackBuffer->Release();
+        rs = device->CreateRenderTargetView(pBackBuffer.Get(), NULL, &renderTargetView);
         if (FAILED(rs)) {
             note::HResultToFile(TAG "Initialize: device->CreateRenderTargetView failed", rs);
             return;
@@ -218,14 +202,12 @@ namespace core::directx11hook {
         g_hFocusWindow = desc.OutputWindow;
 
         if (gs_textureFilePath[0] && SUCCEEDED(CreateWICTextureFromFile(device, gs_textureFilePath, NULL, &cursorTexture))) {
-            ID3D11Resource* resource;
+            ComPtr<ID3D11Resource> resource;
             cursorTexture->GetResource(&resource);
-            ID3D11Texture2D* pTextureInterface;
+            ComPtr<ID3D11Texture2D> pTextureInterface;
             resource->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
-            resource->Release();
             D3D11_TEXTURE2D_DESC desc;
             pTextureInterface->GetDesc(&desc);
-            pTextureInterface->Release();
             cursorPivot = { (desc.Height - 1) / 2.f, (desc.Width - 1) / 2.f, 0.f };
         }
     }
@@ -379,7 +361,7 @@ namespace core::directx11hook {
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX11_Init(device, context);
         auto font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", 20);
-        if (font == nullptr)
+        if (!font)
             io.Fonts->AddFontDefault();
     }
 
