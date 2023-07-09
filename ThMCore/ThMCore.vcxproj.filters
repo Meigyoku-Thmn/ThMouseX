@@ -41,6 +41,9 @@
     <ClCompile Include="Configurate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Direct3D11Hook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -67,6 +70,9 @@
     <ClInclude Include="Configurate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Direct3D11Hook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Games.txt" />
@@ -79,7 +85,7 @@
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="Cursor.png" />
-    <CopyFileToFolders Include="ConfigScripts\thWWW.lua">
+    <CopyFileToFolders Include="ConfigScripts/thWWW.lua">
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
   </ItemGroup>

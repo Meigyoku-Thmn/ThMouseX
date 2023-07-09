@@ -23,7 +23,7 @@ namespace core::inputdetermine {
             auto address = helper::CalculateAddress();
             if (address != 0) {
                 // support borderless mode (except the DOT by DOT mode from Touhou 18 which I gave up)
-                RECTSIZE clientSize;
+                RECTSIZE clientSize{};
                 GetClientRect(g_hFocusWindow, &clientSize);
                 auto realWidth = clientSize.height() * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
                 auto paddingX = (clientSize.width() - realWidth) / 2;

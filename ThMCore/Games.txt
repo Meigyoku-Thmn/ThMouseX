@@ -82,3 +82,6 @@ Danmakai        LuaJIT             float      (239.5,13.5)   540          16:9  
 
 ; Fantastic Danmaku Festival I & II
 THMHJ           NeoLua             float      (-0.5,-1.5)    480          4:3           GetKeyboardState
+
+; Wonderful Waking World
+thWWW           LuaJIT             float      (155.5,20.5)  540          16:9          SendKey

@@ -10,6 +10,7 @@
 #include "MessageQueueHook.h"
 #include "DirectInputHook.h"
 #include "Direct3D9Hook.h"
+#include "Direct3D11Hook.h"
 #include "macro.h"
 
 namespace minhook = common::minhook;
@@ -17,6 +18,7 @@ namespace luajit = common::luajit;
 namespace messagequeuehook = core::messagequeuehook;
 namespace directx8 = dx8::hook;
 namespace directx9 = core::directx9hook;
+namespace directx11 = core::directx11hook;
 namespace directinput = core::directinputhook;
 namespace keyboardstate = core::keyboardstatehook;
 
@@ -53,14 +55,17 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 if (_wcsicmp(currentProcessName, gameConfigs.Configs[i].ProcessName) == 0) {
                     g_currentConfig = gameConfigs.Configs[i];
 
-                    luajit::Initialize();
                     minhook::Initialize();
+                    luajit::Initialize();
 
                     // hook DirectX 8 for crosshair cursor and collect window measurement
                     minhook::CreateHook(directx8::HookConfig());
 
                     // hook DirectX 9 for crosshair cursor and collect window measurement
                     minhook::CreateHook(directx9::HookConfig());
+
+                    // hook DirectX 11 for crosshair cursor and collect window measurement
+                    minhook::CreateHook(directx11::HookConfig());
 
                     // hook DirectInput8 for input manipulation
                     minhook::CreateHook(directinput::HookConfig());

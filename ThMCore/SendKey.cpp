@@ -4,6 +4,7 @@
 #include "../Common/MinHook.h"
 #include "../DX8Hook/Direct3D8Hook.h"
 #include "Direct3D9Hook.h"
+#include "Direct3D11Hook.h"
 #include "InputDetermine.h"
 #include "macro.h"
 
@@ -12,6 +13,7 @@ using namespace core::inputdetermine;
 namespace minhook = common::minhook;
 namespace directx8 = dx8::hook;
 namespace directx9 = core::directx9hook;
+namespace directx11 = core::directx11hook;
 
 struct LastState {
     bool bomb;
@@ -83,6 +85,7 @@ struct OnInit {
     OnInit() {
         directx8::RegisterPostRenderCallbacks(TestInputAndSendKeys);
         directx9::RegisterPostRenderCallbacks(TestInputAndSendKeys);
+        directx11::RegisterPostRenderCallbacks(TestInputAndSendKeys);
         minhook::RegisterUninitializeCallback(CleanUp);
     }
 } _;

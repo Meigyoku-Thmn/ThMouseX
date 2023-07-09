@@ -34,6 +34,9 @@ EXPORT_VAR(DWORD, gs_toggleImGuiButton)
 EXPORT_VAR(WCHAR, gs_textureFilePath, [MAX_PATH])
 EXPORT_VAR(DWORD, gs_textureBaseHeight)
 
+EXPORT_VAR(DWORD, gs_d3d11_ResizeBuffers_RVA)
+EXPORT_VAR(DWORD, gs_d3d11_Present_RVA)
+
 EXPORT_VAR(DWORD, gs_d3d9_CreateDevice_RVA)
 EXPORT_VAR(DWORD, gs_d3d9_Reset_RVA)
 EXPORT_VAR(DWORD, gs_d3d9_Present_RVA)

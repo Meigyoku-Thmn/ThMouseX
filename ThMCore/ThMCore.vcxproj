@@ -71,16 +71,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)\ThirdPartyLibraries\DirectX9</LibraryPath>
+    <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</IncludePath>
+    <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)\ThirdPartyLibraries\DirectX9</LibraryPath>
+    <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</IncludePath>
+    <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -100,6 +100,7 @@
       <SDLCheck>false</SDLCheck>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeaderFile />
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,6 +136,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeaderFile />
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -164,6 +166,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Configurate.cpp" />
+    <ClCompile Include="Direct3D11Hook.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="InputDetermine.cpp" />
     <ClCompile Include="CompilerConfig.cpp" />
@@ -175,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configurate.h" />
+    <ClInclude Include="Direct3D11Hook.h" />
     <ClInclude Include="Direct3D9Hook.h" />
     <ClInclude Include="DirectInputHook.h" />
     <ClInclude Include="InputDetermine.h" />

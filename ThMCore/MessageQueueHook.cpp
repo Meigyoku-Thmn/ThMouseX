@@ -8,6 +8,7 @@
 #include "../Common/NeoLua.h"
 #include "../DX8Hook/Direct3D8Hook.h"
 #include "Direct3D9Hook.h"
+#include "Direct3D11Hook.h"
 #include "MessageQueueHook.h"
 #include "macro.h"
 
@@ -16,6 +17,7 @@ namespace neolua = common::neolua;
 namespace helper = common::helper;
 namespace directx8 = dx8::hook;
 namespace directx9 = core::directx9hook;
+namespace directx11 = core::directx11hook;
 
 using namespace std;
 
@@ -78,6 +80,7 @@ namespace core::messagequeuehook {
             // Hide the mouse cursor when D3D is running, but only after cursor normalization
             directx8::RegisterPostRenderCallbacks(Callback);
             directx9::RegisterPostRenderCallbacks(Callback);
+            directx11::RegisterPostRenderCallbacks(Callback);
         }
         static void Callback() {
             static bool callbackDone = false;
@@ -167,6 +170,7 @@ namespace core::messagequeuehook {
                 if (e->wParam == SIZE_RESTORED) {
                     directx8::ClearMeasurementFlags();
                     directx9::ClearMeasurementFlags();
+                    directx11::ClearMeasurementFlags();
                 }
             }
         }

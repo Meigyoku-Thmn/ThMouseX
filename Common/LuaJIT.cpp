@@ -2,16 +2,18 @@
 #include <string>
 #include <codecvt>
 #include "macro.h"
-#include "luajit/lua.hpp"
+#include <luajit/lua.hpp>
 
 #include "MinHook.h"
 #include "LuaJIT.h"
 #include "Log.h"
+#include "Helper.h"
 #include "Helper.Memory.h"
 #include "Helper.Encoding.h"
 #include "Variables.h"
 
 namespace note = common::log;
+namespace helper = common::helper;
 namespace memory = common::helper::memory;
 namespace encoding = common::helper::encoding;
 namespace minhook = common::minhook;
@@ -47,7 +49,7 @@ string GetPreparationScript() {
             void     Common_LuaJIT_OpenConsole    ();
         ]]
 
-        local ThMouseX = ffi.load()" Common_Lib_Path R"()
+        local ThMouseX = ffi.load(")" Common_Lib_Path R"(")
 
         function OpenConsole()
             return ThMouseX.Common_LuaJIT_OpenConsole()
@@ -65,10 +67,9 @@ string GetPreparationScript() {
             return ffi.new(unpack({...}))
         end
     )");
-    auto keywordPos = preparationScript.find(keyword);
-    auto keywordLen = strlen(keyword);
     auto commonDllPath = encoding::ConvertToUtf8(MakeCommonDllPathW().c_str());
-    preparationScript.replace(keywordPos, keywordLen, commonDllPath);
+    helper::Replace(commonDllPath, "\\", "\\\\");
+    helper::Replace(preparationScript, keyword, commonDllPath.c_str());
     return preparationScript;
 }
 
@@ -97,7 +98,7 @@ namespace common::luajit {
 
     HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto commonDllPath = MakeCommonDllPathW();
-        if (strcmp(lpLibFileName, encoding::ConvertToUtf8(commonDllPath.c_str()).c_str()))
+        if (strcmp(lpLibFileName, encoding::ConvertToUtf8(commonDllPath.c_str()).c_str()) == 0)
             return LoadLibraryExW(commonDllPath.c_str(), hFile, dwFlags);
         else
             return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
@@ -117,12 +118,12 @@ namespace common::luajit {
         luaL_openlibs(L);
 
         if (!minhook::CreateApiHook(HookConfig)) {
-            note::ToFile("[LuaJIT] Failed to hook LoadLibraryExA.");
+            note::ToFile("[LuaJIT] Failed to hook LoadLibraryExA (CreateApiHook).");
             return;
         }
 
         if (!minhook::EnableHooks(HookConfig)) {
-            note::ToFile("[LuaJIT] Failed to hook LoadLibraryExA.");
+            note::ToFile("[LuaJIT] Failed to hook LoadLibraryExA (EnableHooks).");
             return;
         }
 

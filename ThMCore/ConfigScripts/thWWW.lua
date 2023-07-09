@@ -1,21 +1,24 @@
 -- Script to search player's position in Wonderful Waking World 
 -- This game was made in GameMaker Studio
-local Obj_Player = 232
+local ffi = require("ffi")
 
 ffi.cdef [[
     typedef int* (*getObjectFromId)(int id);
 ]]
 
-local getObjectFromId = ffi.cast("getObjectFromId", ResolveAddress(AllocNew('int[1]', {0x00077EF0}), 1))
+local Obj_Player_Id = 232
+local getObjectFromId = ffi.cast("getObjectFromId", ResolveAddress(AllocNew('uint32_t[1]', {0x34A30}), 1))
 
 -- native code will call into this function for each frame
 function getPositionAddress()
-    local object = getObjectFromId(Obj_Player)
-    if (object == nil)
+    local object = getObjectFromId(Obj_Player_Id)
+    if (object == nil) then
         return 0
+    end
     objInner = ffi.cast("int*", object[17])
-    if (objInner == nil or objInner[2] == 0)
+    if (objInner == nil or objInner[2] == 0) then
         return 0
-    instance = ffi.cast("float*", objInner[2])
-    return instance + 44;
+    end
+    instance = ffi.cast("int", objInner[2])
+    return tonumber(instance + 44 * 4)
 end

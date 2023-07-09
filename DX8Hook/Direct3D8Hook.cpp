@@ -22,7 +22,8 @@ namespace note = common::log;
 
 #define TAG "[DirectX8] "
 
-#define ModulateColor(i) D3DCOLOR_RGBA(i, i, i, 255)
+#define ToneColor(i) D3DCOLOR_RGBA(i, i, i, 255)
+
 #define SetTextureColorStage(dev, i, op, arg1, arg2)      \
     dev->SetTextureStageState(i, D3DTSS_COLOROP, op);     \
     dev->SetTextureStageState(i, D3DTSS_COLORARG1, arg1); \
@@ -190,7 +191,11 @@ namespace dx8::hook {
         initialized = true;
 
         D3DDEVICE_CREATION_PARAMETERS params;
-        device->GetCreationParameters(&params);
+        auto rs = device->GetCreationParameters(&params);
+        if (rs != D3D_OK) {
+            note::HResultToFile(TAG "Initialize: device->GetCreationParameters failed", rs);
+            return;
+        }
         g_hFocusWindow = params.hFocusWindow;
 
         if (gs_textureFilePath[0] && D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture) == D3D_OK) {
@@ -221,16 +226,19 @@ namespace dx8::hook {
             return;
         measurementPrepared = true;
 
-        RECTSIZE clientSize;
+        if (!g_hFocusWindow)
+            return;
+
+        RECTSIZE clientSize{};
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-            note::LastErrorToFile(TAG "GetClientRect failed");
+            note::LastErrorToFile(TAG "PrepareMeasurement: GetClientRect failed (1)");
             return;
         }
 
         IDirect3DSurface8* pSurface;
         auto rs = pDevice->GetRenderTarget(&pSurface);
         if (rs != D3D_OK) {
-            note::HResultToFile(TAG "pDevice->GetRenderTarget failed", rs);
+            note::HResultToFile(TAG "PrepareMeasurement: pDevice->GetRenderTarget failed", rs);
             return;
         }
 
@@ -238,7 +246,7 @@ namespace dx8::hook {
         rs = pSurface->GetDesc(&d3dSize);
         pSurface->Release();
         if (rs != D3D_OK) {
-            note::HResultToFile(TAG "pSurface->GetDesc failed", rs);
+            note::HResultToFile(TAG "PrepareMeasurement: pSurface->GetDesc failed", rs);
             return;
         }
 
@@ -248,7 +256,7 @@ namespace dx8::hook {
             d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
 
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-            note::LastErrorToFile(TAG "GetClientRect failed");
+            note::LastErrorToFile(TAG "PrepareMeasurement: GetClientRect failed (2)");
             return;
         }
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
@@ -263,11 +271,15 @@ namespace dx8::hook {
         if (cursorStatePrepared)
             return;
         cursorStatePrepared = true;
+
+        if (!g_hFocusWindow)
+            return;
+
         IDirect3DSurface8* pSurface;
         auto rs = pDevice->GetRenderTarget(&pSurface);
         if (rs != D3D_OK) {
             d3dScale = 0.f;
-            note::HResultToFile(TAG "pDevice->GetRenderTarget failed", rs);
+            note::HResultToFile(TAG "PrepareCursorState: pDevice->GetRenderTarget failed", rs);
             return;
         }
         D3DSURFACE_DESC d3dSize;
@@ -275,15 +287,15 @@ namespace dx8::hook {
         pSurface->Release();
         if (rs != D3D_OK) {
             d3dScale = 0.f;
-            note::HResultToFile(TAG "pSurface->GetDesc failed", rs);
+            note::HResultToFile(TAG "PrepareCursorState: pSurface->GetDesc failed", rs);
             return;
         }
         auto scale = float(d3dSize.Height) / gs_textureBaseHeight;
         cursorScale = D3DXVECTOR2(scale, scale);
 
-        RECTSIZE clientSize;
+        RECTSIZE clientSize{};
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-            note::LastErrorToFile(TAG "GetClientRect failed");
+            note::LastErrorToFile(TAG "PrepareCursorState: GetClientRect failed");
             return;
         }
         d3dScale = float(clientSize.width()) / d3dSize.Width;
@@ -324,23 +336,23 @@ namespace dx8::hook {
         cursorPositionD3D.y -= cursorPivot.y;
 
         cursorSprite->Begin();
-        auto scale = cursorStatePrepared ? &cursorScale : NULL;
-        scale = NULL;
         // draw the cursor and scale cursor sprite to match the current render resolution
         if (g_inputEnabled) {
-            static UCHAR modulate = 0;
-            static auto modulateStage = WhiteInc;
-            helper::CalculateNextModulate(_ref modulate, _ref modulateStage);
-            if (modulateStage == WhiteInc || modulateStage == WhiteDec) {
+            static UCHAR tone = 0;
+            static auto toneStage = WhiteInc;
+            helper::CalculateNextTone(_ref tone, _ref toneStage);
+            if (toneStage == WhiteInc || toneStage == WhiteDec) {
+                // default behaviour: texture color * diffuse color
+                // this:              texture color + diffuse color (except alpha)
                 SetTextureColorStage(pDevice, 0, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_DIFFUSE);
-                cursorSprite->Draw(cursorTexture, NULL, scale, NULL, 0, &cursorPositionD3D, ModulateColor(modulate));
+                cursorSprite->Draw(cursorTexture, NULL, &cursorScale, NULL, 0, &cursorPositionD3D, ToneColor(tone));
             }
             else {
-                cursorSprite->Draw(cursorTexture, NULL, scale, NULL, 0, &cursorPositionD3D, ModulateColor(modulate));
+                cursorSprite->Draw(cursorTexture, NULL, &cursorScale, NULL, 0, &cursorPositionD3D, ToneColor(tone));
             }
         }
         else {
-            cursorSprite->Draw(cursorTexture, NULL, scale, NULL, 0, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
+            cursorSprite->Draw(cursorTexture, NULL, &cursorScale, NULL, 0, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
         }
         cursorSprite->End();
 
@@ -354,6 +366,9 @@ namespace dx8::hook {
         if (imGuiPrepared)
             return;
         imGuiPrepared = true;
+
+        if (!g_hFocusWindow)
+            return;
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();

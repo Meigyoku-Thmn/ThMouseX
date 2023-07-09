@@ -12,6 +12,7 @@
 #include "../Common/Helper.Encoding.h"
 #include "../DX8Hook/Direct3D8Hook.h"
 #include "Direct3D9Hook.h"
+#include "Direct3D11Hook.h"
 #include "DirectInputHook.h"
 #include "Configurate.h"
 #include "macro.h"
@@ -20,6 +21,7 @@ namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace directx8 = dx8::hook;
 namespace directx9 = core::directx9hook;
+namespace directx11 = core::directx11hook;
 namespace directinput = core::directinputhook;
 
 #define GameFile "Games.txt"
@@ -47,6 +49,8 @@ namespace core::configurate {
         if (!directx8::PopulateMethodRVAs())
             return false;
         if (!directx9::PopulateMethodRVAs())
+            return false;
+        if (!directx11::PopulateMethodRVAs())
             return false;
         if (!directinput::PopulateMethodRVAs())
             return false;
