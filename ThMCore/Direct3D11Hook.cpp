@@ -1,6 +1,5 @@
 #include "framework.h"
 #include <d3d11.h>
-#include <d3dcompiler.h>
 #include <DirectXMath.h>
 #include <directxtk/SpriteBatch.h>
 #include <directxtk/WICTextureLoader.h>
@@ -10,7 +9,7 @@
 #include <comdef.h>
 #include <imgui.h>
 #include <imgui_impl_win32.h>
-#include <imgui_impl_dx11.h>
+#include "imgui_impl_dx11.h"
 
 #include "../Common/MinHook.h"
 #include "../Common/Variables.h"
@@ -19,6 +18,8 @@
 #include "../Common/Log.h"
 #include "Direct3D11Hook.h"
 #include "macro.h"
+
+#include "AdditiveToneShader.h"
 
 namespace minhook = common::minhook;
 namespace helper = common::helper;
@@ -35,19 +36,6 @@ namespace note = common::log;
 constexpr auto ResizeBuffersIdx = 13;
 constexpr auto PresentIdx = 8;
 constexpr auto ErrorMessageTitle = "D3D11 Hook Setup Error";
-
-constexpr auto AdditiveToneShader = R"(
-    Texture2D<float4> Texture : register(t0);
-    sampler TextureSampler : register(s0);
-
-    float4 main(float4 color : COLOR0, float2 texCoord : TEXCOORD0) : SV_Target0
-    {
-        float4 out_color = Texture.Sample(TextureSampler, texCoord);
-        out_color.rgb = out_color.rgb + color.rgb;
-        out_color.a = out_color.a * color.a;
-        return out_color;
-    }
-)";
 
 using namespace std;
 using namespace DirectX;
@@ -175,8 +163,6 @@ namespace core::directx11hook {
         ImGui::DestroyContext();
     }
 
-    ID3DBlob* psBlob;
-
     struct OnInit {
         OnInit() {
             minhook::RegisterUninitializeCallback(Callback);
@@ -186,7 +172,6 @@ namespace core::directx11hook {
                 return;
             ShutdownImGui();
             CleanUp();
-            psBlob&& psBlob->Release();
         }
     } _;
 
@@ -218,14 +203,7 @@ namespace core::directx11hook {
 
         spriteBatch = new SpriteBatch(context);
 
-        if (!psBlob) {
-            rs = D3DCompile(AdditiveToneShader, strlen(AdditiveToneShader), NULL, NULL, NULL, "main", "ps_5_0", 0, 0, &psBlob, NULL);
-            if (FAILED(rs)) {
-                note::HResultToFile(TAG "Initialize: D3DCompile failed", rs);
-                return;
-            }
-        }
-        rs = device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), NULL, &pixelShader);
+        rs = device->CreatePixelShader(additiveToneShaderBlob, ARRAYSIZE(additiveToneShaderBlob), NULL, &pixelShader);
         if (FAILED(rs)) {
             note::HResultToFile(TAG "Initialize: device->CreatePixelShader failed", rs);
             return;
