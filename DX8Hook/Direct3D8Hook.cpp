@@ -72,6 +72,17 @@ namespace dx8::hook {
     }
 
     bool PopulateMethodRVAs() {
+        ModuleHandle d3d8(LoadLibraryW(L"d3d8.dll"));
+        if (!d3d8) {
+            note::ToFile(TAG " Failed to load d3d8.dll.");
+            return false;
+        }
+        auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8.get(), "Direct3DCreate8");
+        if (!_Direct3DCreate8) {
+            note::ToFile(TAG " Failed to import d3d8.dll|Direct3DCreate8.");
+            return false;
+        }
+
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window",
             WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
         if (!tmpWnd) {
@@ -80,13 +91,14 @@ namespace dx8::hook {
         }
 
         ComPtr<IDirect3D8> pD3D;
-        pD3D.Attach(Direct3DCreate8(D3D_SDK_VERSION));
+        pD3D.Attach(_Direct3DCreate8(D3D_SDK_VERSION));
         if (!pD3D) {
             auto message = "Failed to create an IDirect3D8 instance.";
             MessageBoxA(NULL, message, ErrorMessageTitle, MB_OK | MB_ICONERROR);
             return false;
         }
-        auto baseAddress = (DWORD)GetModuleHandleA("d3d8.dll");
+
+        auto baseAddress = (DWORD)d3d8.get();
 
         auto vtable = *(DWORD**)pD3D.Get();
         gs_d3d8_CreateDevice_RVA = vtable[CreateDeviceIdx] - baseAddress;
@@ -118,6 +130,8 @@ namespace dx8::hook {
 
     vector<minhook::HookConfig> HookConfig() {
         auto baseAddress = (DWORD)GetModuleHandleA("d3d8.dll");
+        if (!baseAddress)
+            return {};
         return {
             {PVOID(baseAddress + gs_d3d8_CreateDevice_RVA), &D3DCreateDevice, (PVOID*)&OriCreateDevice},
             {PVOID(baseAddress + gs_d3d8_Reset_RVA), &D3DReset, (PVOID*)&OriReset},
