@@ -23,7 +23,7 @@
 #include "Direct3D11Hook.h"
 #include "macro.h"
 
-#include "AdditiveToneShader.h"
+#include "AdditiveToneShader.hshader"
 
 namespace minhook = common::minhook;
 namespace helper = common::helper;
@@ -84,18 +84,18 @@ namespace core::directx11hook {
         ComPtr<IDXGISwapChain> swap_chain;
         DXGI_SWAP_CHAIN_DESC sd{
             .BufferDesc = DXGI_MODE_DESC{
-                .Format = DXGI_FORMAT_R8G8B8A8_UNORM,
+                .Format = DXGI_FORMAT_R8G8B8A8_UNORM
             },
-            .SampleDesc = DXGI_SAMPLE_DESC {
-                .Count = 1,
+            .SampleDesc = DXGI_SAMPLE_DESC{
+                .Count = 1
             },
             .BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
             .BufferCount = 2,
             .OutputWindow = tmpWnd.get(),
             .Windowed = TRUE,
-            .SwapEffect = DXGI_SWAP_EFFECT_DISCARD,
+            .SwapEffect = DXGI_SWAP_EFFECT_DISCARD
         };
-        const D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
+        const D3D_FEATURE_LEVEL feature_levels[] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
         auto rs = _D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
         if (FAILED(rs)) {
             MessageBoxA(NULL, "Failed to create device and swapchain of DirectX 11.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
@@ -132,15 +132,15 @@ namespace core::directx11hook {
     }
 
     // cursor and screen state
-    ID3D11Device* device;
-    ID3D11DeviceContext* context;
-    ID3D11RenderTargetView* renderTargetView;
-    SpriteBatch* spriteBatch;
-    ID3D11PixelShader* pixelShader;
-    ID3D11ShaderResourceView* cursorTexture;
-    XMVECTORF32 cursorPivot;
-    XMVECTORF32 cursorScale;
-    float d3dScale = 1.f;
+    ID3D11Device*               device;
+    ID3D11DeviceContext*        context;
+    ID3D11RenderTargetView*     renderTargetView;
+    SpriteBatch*                spriteBatch;
+    ID3D11PixelShader*          pixelShader;
+    ID3D11ShaderResourceView*   cursorTexture;
+    XMVECTORF32                 cursorPivot;
+    XMVECTORF32                 cursorScale;
+    float                       d3dScale = 1.f;
 
     void CleanUp() {
         SAFE_RELEASE(pixelShader);
@@ -220,7 +220,7 @@ namespace core::directx11hook {
             resource->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
             D3D11_TEXTURE2D_DESC desc;
             pTextureInterface->GetDesc(&desc);
-            cursorPivot = { (desc.Height - 1) / 2.f, (desc.Width - 1) / 2.f, 0.f };
+            cursorPivot = {(desc.Height - 1) / 2.f, (desc.Width - 1) / 2.f, 0.f};
         }
     }
 
@@ -291,7 +291,7 @@ namespace core::directx11hook {
         }
 
         auto scale = float(desc.BufferDesc.Height) / gs_textureBaseHeight;
-        cursorScale = XMVECTORF32{ scale, scale };
+        cursorScale = XMVECTORF32{scale, scale};
 
         RECTSIZE clientSize{};
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
@@ -324,7 +324,7 @@ namespace core::directx11hook {
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         POINT pointerPosition = helper::GetPointerPosition();
-        XMVECTOR cursorPositionD3D = XMVECTORF32{ float(pointerPosition.x), float(pointerPosition.y) };
+        XMVECTOR cursorPositionD3D = XMVECTORF32{float(pointerPosition.x), float(pointerPosition.y)};
         if (d3dScale != 0.f && d3dScale != 1.f) {
             cursorPositionD3D = XMVectorScale(cursorPositionD3D, d3dScale);
         }

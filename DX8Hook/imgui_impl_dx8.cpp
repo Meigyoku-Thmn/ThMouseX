@@ -16,8 +16,8 @@ struct ImGui_ImplDX8_Data {
     LPDIRECT3DTEXTURE8          FontTexture;
     int                         VertexBufferSize;
     int                         IndexBufferSize;
-    IDirect3DSurface8* DepthBuffer;
-    IDirect3DSurface8* realDepthStencilBuffer;
+    IDirect3DSurface8*          DepthBuffer;
+    IDirect3DSurface8*          realDepthStencilBuffer;
 
     ImGui_ImplDX8_Data() {
         memset((void*)this, 0, sizeof(*this));
@@ -95,18 +95,18 @@ void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data) {
         float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x + 0.5f;
         float T = draw_data->DisplayPos.y + 0.5f;
         float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y + 0.5f;
-        D3DMATRIX mat_identity = { { {
+        D3DMATRIX mat_identity = {{{
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f,
-        } } };
-        D3DMATRIX mat_projection = { { {
-            2.0f / (R - L),    0.0f,               0.0f,  0.0f,
-            0.0f,              2.0f / (T - B),     0.0f,  0.0f,
-            0.0f,              0.0f,               0.5f,  0.0f,
-            (L + R) / (L - R), (T + B) / (B - T),  0.5f,  1.0f,
-        } } };
+        }}};
+        D3DMATRIX mat_projection = {{{
+            2.0f / (R - L), 0.0f, 0.0f, 0.0f,
+            0.0f, 2.0f / (T - B), 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f, 0.0f,
+            (L + R) / (L - R), (T + B) / (B - T), 0.5f, 1.0f,
+        }}};
         bd->pd3dDevice->SetTransform(D3DTS_WORLD, &mat_identity);
         bd->pd3dDevice->SetTransform(D3DTS_VIEW, &mat_identity);
         bd->pd3dDevice->SetTransform(D3DTS_PROJECTION, &mat_projection);
@@ -276,7 +276,7 @@ void ImGui_ImplDX8_RenderDrawData(ImDrawData* draw_data) {
                     continue;
 
                 // Apply clipping rectangle, Bind texture, Draw
-                const RECT r = { (LONG)clip_min.x, (LONG)clip_min.y, (LONG)clip_max.x, (LONG)clip_max.y };
+                const RECT r = {(LONG)clip_min.x, (LONG)clip_min.y, (LONG)clip_max.x, (LONG)clip_max.y};
                 const LPDIRECT3DTEXTURE8 texture = (LPDIRECT3DTEXTURE8)pcmd->GetTexID();
                 bd->pd3dDevice->SetTexture(0, texture);
                 build_mask_vbuffer(&r);

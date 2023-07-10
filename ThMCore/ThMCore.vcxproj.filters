@@ -79,16 +79,7 @@
     <ClInclude Include="Direct3D11Hook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AdditiveToneShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="imgui_impl_dx11.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiPixelShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiVertexShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
