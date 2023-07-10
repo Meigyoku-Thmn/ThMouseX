@@ -73,7 +73,6 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
-    <TargetName>ThMouseX</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -82,7 +81,6 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
-    <TargetName>ThMouseX</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -108,6 +106,10 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -148,6 +150,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\DX8Hook\DX8.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -168,34 +174,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Configurate.cpp" />
-    <ClCompile Include="Direct3D11Hook.cpp" />
-    <ClCompile Include="Direct3D8Hook.cpp" />
+    <ClCompile Include="Configuration.cpp" />
+    <ClCompile Include="Direct3D11.cpp" />
+    <ClCompile Include="Direct3D8.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="imgui_impl_dx11.cpp" />
     <ClCompile Include="imgui_impl_dx8.cpp" />
     <ClCompile Include="InputDetermine.cpp" />
     <ClCompile Include="CompilerConfig.cpp" />
-    <ClCompile Include="Direct3D9Hook.cpp" />
-    <ClCompile Include="DirectInputHook.cpp" />
-    <ClCompile Include="KeyboardStateHook.cpp" />
-    <ClCompile Include="MessageQueueHook.cpp" />
+    <ClCompile Include="Direct3D9.cpp" />
+    <ClCompile Include="DirectInput.cpp" />
+    <ClCompile Include="KeyboardState.cpp" />
+    <ClCompile Include="MessageQueue.cpp" />
     <ClCompile Include="SendKey.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Configurate.h" />
-    <ClInclude Include="Direct3D11Hook.h" />
-    <ClInclude Include="Direct3D8Hook.h" />
-    <ClInclude Include="Direct3D9Hook.h" />
-    <ClInclude Include="DirectInputHook.h" />
+    <ClInclude Include="Configuration.h" />
+    <ClInclude Include="Direct3D11.h" />
+    <ClInclude Include="Direct3D8.h" />
+    <ClInclude Include="Direct3D9.h" />
+    <ClInclude Include="DirectInput.h" />
     <ClInclude Include="Initialization.h" />
     <ClInclude Include="imgui_impl_dx11.h" />
     <ClInclude Include="imgui_impl_dx8.h" />
     <ClInclude Include="InputDetermine.h" />
-    <ClInclude Include="KeyboardStateHook.h" />
+    <ClInclude Include="KeyboardState.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="MessageQueueHook.h" />
+    <ClInclude Include="MessageQueue.h" />
     <ClInclude Include="SendKey.h" />
   </ItemGroup>
   <ItemGroup>

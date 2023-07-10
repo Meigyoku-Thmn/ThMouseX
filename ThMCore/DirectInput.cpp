@@ -10,13 +10,12 @@
 #include "../Common/MinHook.h"
 #include "../Common/Log.h"
 #include "InputDetermine.h"
-#include "DirectInputHook.h"
+#include "DirectInput.h"
 
 namespace minhook = common::minhook;
 namespace note = common::log;
 
 constexpr auto GetDeviceStateIdx = 9;
-constexpr auto ErrorMessageTitle = "DInput Hook Setup Error";
 
 using namespace std;
 using namespace core::inputdetermine;
@@ -42,53 +41,47 @@ inline const char* GetDInputErrStr(const int errorCode) {
     return "Unknown error.";
 }
 
-namespace core::directinputhook {
+namespace core::directinput {
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
-    bool PopulateMethodRVAs() {
+    void Initialize() {
+        if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
+            return;
+
         ModuleHandle dinput8(LoadLibraryW(L"DInput8.dll"));
-        if (!dinput8) {
-            note::LastErrorToFile(TAG "Failed to load DInput8.dll.");
-            return false;
-        }
+        if (!dinput8)
+            return;
+
         auto _DirectInput8Create = (decltype(&DirectInput8Create))GetProcAddress(dinput8.get(), "DirectInput8Create");
         if (!_DirectInput8Create) {
             note::LastErrorToFile(TAG "Failed to import DInput8.dll|DirectInput8Create.");
-            return false;
+            return;
         }
 
         ComPtr<IDirectInput8A> pDInput8;
         auto rs = _DirectInput8Create(GetModuleHandleA(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8A, (PVOID*)&pDInput8, NULL);
         if (FAILED(rs)) {
-            MessageBoxA(NULL, (string("Failed to create an IDirectInput8 instance:") + GetDInputErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            return false;
+            auto message = TAG "Failed to create an IDirectInput8 instance:";
+            note::ToFile((string(message) + GetDInputErrStr(rs)).c_str());
+            return;
         }
 
         ComPtr<IDirectInputDevice8A> pDevice8;
         rs = pDInput8->CreateDevice(GUID_SysKeyboard, &pDevice8, NULL);
         if (FAILED(rs)) {
-            MessageBoxA(NULL, (string("Failed to create an IDirectInputDevice8 instance:") + GetDInputErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            return false;
+            auto message = TAG "Failed to create an IDirectInputDevice8 instance:";
+            note::ToFile((string(message) + GetDInputErrStr(rs)).c_str());
+            return;
         }
 
         auto vtable = *(DWORD**)pDevice8.Get();
         auto baseAddress = (DWORD)dinput8.get();
 
-        gs_dinput8_GetDeviceState_RVA = vtable[GetDeviceStateIdx] - baseAddress;
-
-        return true;
-    }
-
-    vector<minhook::HookConfig> HookConfig() {
-        if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
-            return {};
-        auto baseAddress = (DWORD)GetModuleHandleA("DInput8.dll");
-        if (!baseAddress)
-            return {};
-        return {
-            {PVOID(baseAddress + gs_dinput8_GetDeviceState_RVA), &GetDeviceStateDInput8, (PVOID*)&OriGetDeviceStateDInput8},
+        vector<minhook::HookConfig> hookConfigs{
+            {PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, (PVOID*)&OriGetDeviceStateDInput8},
         };
+        minhook::CreateHook(hookConfigs);
     }
 
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData) {

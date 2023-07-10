@@ -21,7 +21,7 @@
 #include "../Common/DataTypes.h"
 #include "../Common/Helper.h"
 #include "../Common/Log.h"
-#include "Direct3D11Hook.h"
+#include "Direct3D11.h"
 
 #include "AdditiveToneShader.hshader"
 
@@ -40,7 +40,6 @@ namespace note = common::log;
 
 constexpr auto ResizeBuffersIdx = 13;
 constexpr auto PresentIdx = 8;
-constexpr auto ErrorMessageTitle = "D3D11 Hook Setup Error";
 
 using namespace std;
 using namespace DirectX;
@@ -48,70 +47,12 @@ using namespace Microsoft::WRL;
 
 using CallbackType = void (*)(void);
 
-namespace core::directx11hook {
+namespace core::directx11 {
     HRESULT WINAPI D3DResizeBuffers(IDXGISwapChain* swapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
     decltype(&D3DResizeBuffers) OriResizeBuffers;
 
     HRESULT WINAPI D3DPresent(IDXGISwapChain* swapChain, UINT SyncInterval, UINT Flags);
     decltype(&D3DPresent) OriPresent;
-
-    bool PopulateMethodRVAs() {
-        ModuleHandle d3d11(LoadLibraryW(L"d3d11.dll"));
-        if (!d3d11) {
-            note::LastErrorToFile(TAG "Failed to load d3d11.dll.");
-            return false;
-        }
-        auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11.get(), "D3D11CreateDeviceAndSwapChain");
-        if (!_D3D11CreateDeviceAndSwapChain) {
-            note::LastErrorToFile(TAG "Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain.");
-            return false;
-        }
-
-        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
-        if (!tmpWnd) {
-            helper::ReportLastError(ErrorMessageTitle);
-            return false;
-        }
-
-        ComPtr<ID3D11Device> device;
-        ComPtr<IDXGISwapChain> swap_chain;
-        DXGI_SWAP_CHAIN_DESC sd{
-            .BufferDesc = DXGI_MODE_DESC{
-                .Format = DXGI_FORMAT_R8G8B8A8_UNORM
-            },
-            .SampleDesc = DXGI_SAMPLE_DESC{
-                .Count = 1
-            },
-            .BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
-            .BufferCount = 2,
-            .OutputWindow = tmpWnd.get(),
-            .Windowed = TRUE,
-            .SwapEffect = DXGI_SWAP_EFFECT_DISCARD
-        };
-        const D3D_FEATURE_LEVEL feature_levels[] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
-        auto rs = _D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
-        if (FAILED(rs)) {
-            MessageBoxA(NULL, "Failed to create device and swapchain of DirectX 11.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            return false;
-        }
-
-        auto baseAddress = (DWORD)d3d11.get();
-        auto vtable = *(DWORD**)swap_chain.Get();
-        gs_d3d11_Present_RVA = vtable[PresentIdx] - baseAddress;
-        gs_d3d11_ResizeBuffers_RVA = vtable[ResizeBuffersIdx] - baseAddress;
-
-        return true;
-    }
-
-    vector<minhook::HookConfig> HookConfig() {
-        auto baseAddress = (DWORD)GetModuleHandleA("d3d11.dll");
-        if (!baseAddress)
-            return {};
-        return {
-            {PVOID(baseAddress + gs_d3d11_Present_RVA), &D3DPresent, (PVOID*)&OriPresent},
-            {PVOID(baseAddress + gs_d3d11_ResizeBuffers_RVA), &D3DResizeBuffers, (PVOID*)&OriResizeBuffers},
-        };
-    }
 
     // job flags
     bool firstStepPrepared;
@@ -161,8 +102,55 @@ namespace core::directx11hook {
     }
 
     void Initialize() {
+        ModuleHandle d3d11(LoadLibraryW(L"d3d11.dll"));
+        if (!d3d11)
+            return;
+
+        auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11.get(), "D3D11CreateDeviceAndSwapChain");
+        if (!_D3D11CreateDeviceAndSwapChain) {
+            note::LastErrorToFile(TAG "Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain.");
+            return;
+        }
+
+        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
+        if (!tmpWnd) {
+            note::LastErrorToFile(TAG "Failed to create a temporary window.");
+            return;
+        }
+
+        ComPtr<ID3D11Device> device;
+        ComPtr<IDXGISwapChain> swap_chain;
+        DXGI_SWAP_CHAIN_DESC sd{
+            .BufferDesc = DXGI_MODE_DESC{
+                .Format = DXGI_FORMAT_R8G8B8A8_UNORM
+            },
+            .SampleDesc = DXGI_SAMPLE_DESC{
+                .Count = 1
+            },
+            .BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
+            .BufferCount = 2,
+            .OutputWindow = tmpWnd.get(),
+            .Windowed = TRUE,
+            .SwapEffect = DXGI_SWAP_EFFECT_DISCARD
+        };
+        const D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
+        auto rs = _D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
+        if (FAILED(rs)) {
+            note::HResultToFile("Failed to create device and swapchain of DirectX 11.", rs);
+            return;
+        }
+
+        auto baseAddress = (DWORD)d3d11.get();
+        auto vtable = *(DWORD**)swap_chain.Get();
+
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
+
+        vector<minhook::HookConfig> hookConfigs{
+            { PVOID(vtable[PresentIdx]), & D3DPresent, (PVOID*)&OriPresent },
+            { PVOID(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, (PVOID*)&OriResizeBuffers },
+        };
+        minhook::CreateHook(hookConfigs);
     }
 
     void PrepareFirstStep(IDXGISwapChain* swapChain) {
@@ -213,7 +201,7 @@ namespace core::directx11hook {
             resource->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
             D3D11_TEXTURE2D_DESC desc;
             pTextureInterface->GetDesc(&desc);
-            cursorPivot = {(desc.Height - 1) / 2.f, (desc.Width - 1) / 2.f, 0.f};
+            cursorPivot = { (desc.Height - 1) / 2.f, (desc.Width - 1) / 2.f, 0.f };
         }
     }
 
@@ -284,7 +272,7 @@ namespace core::directx11hook {
         }
 
         auto scale = float(desc.BufferDesc.Height) / gs_textureBaseHeight;
-        cursorScale = XMVECTORF32{scale, scale};
+        cursorScale = XMVECTORF32{ scale, scale };
 
         RECTSIZE clientSize{};
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
@@ -317,7 +305,7 @@ namespace core::directx11hook {
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         POINT pointerPosition = helper::GetPointerPosition();
-        XMVECTOR cursorPositionD3D = XMVECTORF32{float(pointerPosition.x), float(pointerPosition.y)};
+        XMVECTOR cursorPositionD3D = XMVECTORF32{ float(pointerPosition.x), float(pointerPosition.y) };
         if (d3dScale != 0.f && d3dScale != 1.f) {
             cursorPositionD3D = XMVectorScale(cursorPositionD3D, d3dScale);
         }

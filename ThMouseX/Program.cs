@@ -12,13 +12,11 @@ namespace ThMouseX
     {
         const string ThMCore = "ThMCore.dll";
         [DllImport(ThMCore, CallingConvention = CallingConvention.Cdecl)]
-        static extern bool TestRegisteredWindowMessages();
+        static extern bool RegisterCleanManagedDataMessage();
         [DllImport(ThMCore, CallingConvention = CallingConvention.Cdecl)]
         static extern bool InstallHooks();
         [DllImport(ThMCore, CallingConvention = CallingConvention.Cdecl)]
         static extern void RemoveHooks();
-        [DllImport(ThMCore, CallingConvention = CallingConvention.Cdecl)]
-        static extern bool PopulateMethodRVAs();
         [DllImport(ThMCore, CallingConvention = CallingConvention.Cdecl)]
         static extern bool ReadGamesFile();
         [DllImport(ThMCore, CallingConvention = CallingConvention.Cdecl)]
@@ -37,10 +35,7 @@ namespace ThMouseX
                 Environment.Exit(1);
             }
 
-            if (!TestRegisteredWindowMessages())
-                Environment.Exit(1);
-
-            if (!PopulateMethodRVAs())
+            if (!RegisterCleanManagedDataMessage())
                 Environment.Exit(1);
 
             if (!ReadGamesFile())

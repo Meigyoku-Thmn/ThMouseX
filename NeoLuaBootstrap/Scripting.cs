@@ -15,13 +15,13 @@ namespace NeoLuaBootstrap
 {
     static class Scripting
     {
-        [DllImport("ThMouseX.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("ThMCore.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void NeoLua_SetPositionAddress(IntPtr address);
 
-        [DllImport("ThMouseX.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("ThMCore.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern PointDataType NeoLua_GetDataType();
 
-        [DllImport("ThMouseX.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("ThMCore.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void NeoLua_OpenConsole();
 
         static readonly List<Delegate> DelegateStore = new List<Delegate>();

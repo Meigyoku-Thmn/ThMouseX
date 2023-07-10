@@ -9,7 +9,7 @@
 #include "../Common/NeoLua.h"
 #include "../Common/CallbackStore.h"
 #include "Initialization.h"
-#include "MessageQueueHook.h"
+#include "MessageQueue.h"
 
 namespace minhook = common::minhook;
 namespace neolua = common::neolua;
@@ -20,9 +20,10 @@ using namespace std;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-namespace core::messagequeuehook {
-    UINT CLEAN_MANAGED_DATA = RegisterWindowMessageA("CLEAN_MANAGED_DATA {6BF7C2B8-F245-4781-AA3C-467366CA3551}");
-    bool TestRegisteredWindowMessages() {
+namespace core::messagequeue {
+    UINT CLEAN_MANAGED_DATA;
+    bool RegisterCleanManagedDataMessage() {
+        CLEAN_MANAGED_DATA = RegisterWindowMessageA("CLEAN_MANAGED_DATA {6BF7C2B8-F245-4781-AA3C-467366CA3551}");
         if (CLEAN_MANAGED_DATA == 0) {
             MessageBoxA(NULL, "Failed to register CLEAN_MANAGED_DATA message.", "RegisterWindowMessage error", MB_OK | MB_ICONERROR);
             return false;
@@ -37,11 +38,6 @@ namespace core::messagequeuehook {
 
     bool isCursorShow = true;
     auto hCursor = LoadCursorA(NULL, IDC_ARROW);
-
-    vector<minhook::HookApiConfig> HookConfig{
-        { L"USER32.DLL", "SetCursor", & _SetCursor, (PVOID*)&OriSetCursor },
-        { L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor },
-    };
 
     HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
         return NULL;
@@ -199,5 +195,11 @@ namespace core::messagequeuehook {
     void Initialize() {
         // Hide the mouse cursor when D3D is running, but only after cursor normalization
         callbackstore::RegisterPostRenderCallback(PostRenderCallback);
+
+        vector<minhook::HookApiConfig> HookConfig{
+            { L"USER32.DLL", "SetCursor", & _SetCursor, (PVOID*)&OriSetCursor },
+            { L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor },
+        };
+        minhook::CreateApiHook(HookConfig);
     }
 }

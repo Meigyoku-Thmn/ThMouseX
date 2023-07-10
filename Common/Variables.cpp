@@ -29,19 +29,6 @@ DWORD               gs_toggleOsCursorButton = 0x4D; // VK_M
 DWORD               gs_toggleImGuiButton = 0xC0; // VK_BACK_QUOTE
 WCHAR               gs_textureFilePath[MAX_PATH]{};
 DWORD               gs_textureBaseHeight = 480;
-
-DWORD               gs_d3d11_ResizeBuffers_RVA{};
-DWORD               gs_d3d11_Present_RVA{};
-
-DWORD               gs_d3d9_CreateDevice_RVA{};
-DWORD               gs_d3d9_Reset_RVA{};
-DWORD               gs_d3d9_Present_RVA{};
-
-DWORD               gs_d3d8_CreateDevice_RVA{};
-DWORD               gs_d3d8_Reset_RVA{};
-DWORD               gs_d3d8_Present_RVA{};
-
-DWORD               gs_dinput8_GetDeviceState_RVA{};
 #pragma data_seg()
 // make the above segment shared across processes
 #pragma comment(linker, "/SECTION:.SHRCONF,RWS")

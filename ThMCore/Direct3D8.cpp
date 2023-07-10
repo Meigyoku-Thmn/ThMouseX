@@ -18,7 +18,7 @@
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
 #include "../Common/Log.h"
-#include "Direct3D8Hook.h"
+#include "Direct3D8.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
@@ -38,7 +38,6 @@ constexpr auto CreateDeviceIdx = 15;
 
 constexpr auto ResetIdx = 14;
 constexpr auto PresentIdx = 15;
-constexpr auto ErrorMessageTitle = "D3D8 Hook Setup Error";
 
 using namespace std;
 using namespace Microsoft::WRL;
@@ -55,7 +54,7 @@ inline const char* GetD3dErrStr(const int errorCode) {
 
 using CallbackType = void (*)(void);
 
-namespace core::directx8hook {
+namespace core::directx8 {
     HRESULT WINAPI D3DCreateDevice(IDirect3D8* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice8** ppReturnedDeviceInterface);
     decltype(&D3DCreateDevice) OriCreateDevice;
 
@@ -64,74 +63,6 @@ namespace core::directx8hook {
 
     HRESULT WINAPI D3DPresent(IDirect3DDevice8* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
     decltype(&D3DPresent) OriPresent;
-
-    bool PopulateMethodRVAs() {
-        ModuleHandle d3d8(LoadLibraryW(L"d3d8.dll"));
-        if (!d3d8) {
-            note::LastErrorToFile(TAG "Failed to load d3d8.dll.");
-            return false;
-        }
-        auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8.get(), "Direct3DCreate8");
-        if (!_Direct3DCreate8) {
-            note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8.");
-            return false;
-        }
-
-        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window",
-            WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
-        if (!tmpWnd) {
-            helper::ReportLastError(ErrorMessageTitle);
-            return false;
-        }
-
-        ComPtr<IDirect3D8> pD3D;
-        pD3D.Attach(_Direct3DCreate8(D3D_SDK_VERSION));
-        if (!pD3D) {
-            auto message = "Failed to create an IDirect3D8 instance.";
-            MessageBoxA(NULL, message, ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            return false;
-        }
-
-        auto baseAddress = (DWORD)d3d8.get();
-
-        auto vtable = *(DWORD**)pD3D.Get();
-        gs_d3d8_CreateDevice_RVA = vtable[CreateDeviceIdx] - baseAddress;
-
-        D3DPRESENT_PARAMETERS d3dpp{
-            .BackBufferWidth = 4,
-            .BackBufferHeight = 4,
-            .BackBufferFormat = D3DFMT_X8R8G8B8,
-            .BackBufferCount = 1,
-            .SwapEffect = D3DSWAPEFFECT_DISCARD,
-            .hDeviceWindow = tmpWnd.get(),
-            .Windowed = TRUE,
-        };
-        ComPtr<IDirect3DDevice8> pDevice;
-        auto rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
-        if (FAILED(rs)) {
-            auto d3dErr = GetD3dErrStr(rs);
-            auto message = "Failed to create an IDirect3DDevice8 instance: ";
-            MessageBoxA(NULL, (string(message) + d3dErr).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            return false;
-        }
-
-        vtable = *(DWORD**)pDevice.Get();
-        gs_d3d8_Reset_RVA = vtable[ResetIdx] - baseAddress;
-        gs_d3d8_Present_RVA = vtable[PresentIdx] - baseAddress;
-
-        return true;
-    }
-
-    vector<minhook::HookConfig> HookConfig() {
-        auto baseAddress = (DWORD)GetModuleHandleA("d3d8.dll");
-        if (!baseAddress)
-            return {};
-        return {
-            {PVOID(baseAddress + gs_d3d8_CreateDevice_RVA), &D3DCreateDevice, (PVOID*)&OriCreateDevice},
-            {PVOID(baseAddress + gs_d3d8_Reset_RVA), &D3DReset, (PVOID*)&OriReset},
-            {PVOID(baseAddress + gs_d3d8_Present_RVA), &D3DPresent, (PVOID*)&OriPresent},
-        };
-    }
 
     // job flags
     bool firstStepPrepared;
@@ -179,8 +110,60 @@ namespace core::directx8hook {
     }
 
     void Initialize() {
+        ModuleHandle d3d8(LoadLibraryW(L"d3d8.dll"));
+        if (!d3d8)
+            return;
+
+        auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8.get(), "Direct3DCreate8");
+        if (!_Direct3DCreate8) {
+            note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8.");
+            return;
+        }
+
+        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window",
+            WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
+        if (!tmpWnd) {
+            note::LastErrorToFile(TAG "Failed to create a temporary window.");
+            return;
+        }
+
+        ComPtr<IDirect3D8> pD3D;
+        pD3D.Attach(_Direct3DCreate8(D3D_SDK_VERSION));
+        if (!pD3D) {
+            note::ToFile(TAG "Failed to create an IDirect3D8 instance.");
+            return;
+        }
+
+        D3DPRESENT_PARAMETERS d3dpp{
+            .BackBufferWidth = 4,
+            .BackBufferHeight = 4,
+            .BackBufferFormat = D3DFMT_X8R8G8B8,
+            .BackBufferCount = 1,
+            .SwapEffect = D3DSWAPEFFECT_DISCARD,
+            .hDeviceWindow = tmpWnd.get(),
+            .Windowed = TRUE,
+        };
+        ComPtr<IDirect3DDevice8> pDevice;
+        auto rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
+        if (FAILED(rs)) {
+            auto message = TAG "Failed to create an IDirect3DDevice8 instance: ";
+            note::ToFile((string(message) + GetD3dErrStr(rs)).c_str());
+            return;
+        }
+
+        auto baseAddress = (DWORD)d3d8.get();
+        auto vtable = *(DWORD**)pD3D.Get();
+        auto vtable2 = *(DWORD**)pDevice.Get();
+
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
+
+        vector<minhook::HookConfig> hookConfig{
+            { PVOID(vtable[CreateDeviceIdx]), & D3DCreateDevice, (PVOID*)&OriCreateDevice },
+            { PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset },
+            { PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent },
+        };
+        minhook::CreateHook(hookConfig);
     }
 
     void PrepareFirstStep(IDirect3DDevice8* device) {
@@ -200,7 +183,7 @@ namespace core::directx8hook {
             D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f};
+            cursorPivot = { (cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f };
         }
     }
 

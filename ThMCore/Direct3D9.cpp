@@ -17,7 +17,7 @@
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
 #include "../Common/Log.h"
-#include "Direct3D9Hook.h"
+#include "Direct3D9.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
@@ -37,7 +37,6 @@ constexpr auto CreateDeviceIdx = 16;
 
 constexpr auto ResetIdx = 16;
 constexpr auto PresentIdx = 17;
-constexpr auto ErrorMessageTitle = "D3D9 Hook Setup Error";
 
 using namespace std;
 using namespace Microsoft::WRL;
@@ -56,7 +55,7 @@ inline const char* GetD3dErrStr(const int errorCode) {
 
 using CallbackType = void (*)(void);
 
-namespace core::directx9hook {
+namespace core::directx9 {
     HRESULT WINAPI D3DCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface);
     decltype(&D3DCreateDevice) OriCreateDevice;
 
@@ -65,70 +64,6 @@ namespace core::directx9hook {
 
     HRESULT WINAPI D3DPresent(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
     decltype(&D3DPresent) OriPresent;
-
-    bool PopulateMethodRVAs() {
-        ModuleHandle d3d9(LoadLibraryW(L"d3d9.dll"));
-        if (!d3d9) {
-            note::LastErrorToFile(TAG " Failed to load d3d9.dll.");
-            return false;
-        }
-        auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9.get(), "Direct3DCreate9");
-        if (!_Direct3DCreate9) {
-            note::LastErrorToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9.");
-            return false;
-        }
-
-        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
-        if (!tmpWnd) {
-            helper::ReportLastError(ErrorMessageTitle);
-            return false;
-        }
-
-        ComPtr<IDirect3D9> pD3D;
-        pD3D.Attach(_Direct3DCreate9(D3D_SDK_VERSION));
-        if (!pD3D) {
-            MessageBoxA(NULL, "Failed to create an IDirect3D9 instance.", ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            return false;
-        }
-
-        auto baseAddress = (DWORD)d3d9.get();
-
-        auto vtable = *(DWORD**)pD3D.Get();
-        gs_d3d9_CreateDevice_RVA = vtable[CreateDeviceIdx] - baseAddress;
-
-        D3DPRESENT_PARAMETERS d3dpp{
-            .BackBufferWidth = 4,
-            .BackBufferHeight = 4,
-            .BackBufferFormat = D3DFMT_X8R8G8B8,
-            .BackBufferCount = 1,
-            .SwapEffect = D3DSWAPEFFECT_DISCARD,
-            .hDeviceWindow = tmpWnd.get(),
-            .Windowed = TRUE,
-        };
-        ComPtr<IDirect3DDevice9> pDevice;
-        auto rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
-        if (FAILED(rs)) {
-            MessageBoxA(NULL, (string("Failed to create an IDirect3DDevice9 instance:") + GetD3dErrStr(rs)).c_str(), ErrorMessageTitle, MB_OK | MB_ICONERROR);
-            return false;
-        }
-
-        vtable = *(DWORD**)pDevice.Get();
-        gs_d3d9_Reset_RVA = vtable[ResetIdx] - baseAddress;
-        gs_d3d9_Present_RVA = vtable[PresentIdx] - baseAddress;
-
-        return true;
-    }
-
-    vector<minhook::HookConfig> HookConfig() {
-        auto baseAddress = (DWORD)GetModuleHandleA("d3d9.dll");
-        if (!baseAddress)
-            return {};
-        return {
-            {PVOID(baseAddress + gs_d3d9_CreateDevice_RVA), &D3DCreateDevice, (PVOID*)&OriCreateDevice},
-            {PVOID(baseAddress + gs_d3d9_Reset_RVA), &D3DReset, (PVOID*)&OriReset},
-            {PVOID(baseAddress + gs_d3d9_Present_RVA), &D3DPresent, (PVOID*)&OriPresent},
-        };
-    }
 
     // job flags
     bool firstStepPrepared;
@@ -183,8 +118,59 @@ namespace core::directx9hook {
     }
 
     void Initialize() {
+        ModuleHandle d3d9(LoadLibraryW(L"d3d9.dll"));
+        if (!d3d9)
+            return;
+
+        auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9.get(), "Direct3DCreate9");
+        if (!_Direct3DCreate9) {
+            note::LastErrorToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9.");
+            return;
+        }
+
+        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
+        if (!tmpWnd) {
+            note::LastErrorToFile(TAG "Failed to create a temporary window.");
+            return;
+        }
+
+        ComPtr<IDirect3D9> pD3D;
+        pD3D.Attach(_Direct3DCreate9(D3D_SDK_VERSION));
+        if (!pD3D) {
+            note::ToFile(TAG "Failed to create an IDirect3D9 instance.");
+            return;
+        }
+
+        D3DPRESENT_PARAMETERS d3dpp{
+            .BackBufferWidth = 4,
+            .BackBufferHeight = 4,
+            .BackBufferFormat = D3DFMT_X8R8G8B8,
+            .BackBufferCount = 1,
+            .SwapEffect = D3DSWAPEFFECT_DISCARD,
+            .hDeviceWindow = tmpWnd.get(),
+            .Windowed = TRUE,
+        };
+        ComPtr<IDirect3DDevice9> pDevice;
+        auto rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
+        if (FAILED(rs)) {
+            auto message = TAG "Failed to create an IDirect3DDevice9 instance: ";
+            note::ToFile((string(message) + GetD3dErrStr(rs)).c_str());
+            return;
+        }
+
+        auto baseAddress = (DWORD)d3d9.get();
+        auto vtable = *(DWORD**)pD3D.Get();
+        auto vtable2 = *(DWORD**)pDevice.Get();
+
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
+
+        vector<minhook::HookConfig> hookConfigs{
+            { PVOID(vtable[CreateDeviceIdx]), & D3DCreateDevice, (PVOID*)&OriCreateDevice },
+            { PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset },
+            { PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent },
+        };
+        minhook::CreateHook(hookConfigs);
     }
 
     void PrepareFirstStep(IDirect3DDevice9* device) {

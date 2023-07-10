@@ -10,25 +10,25 @@
 #include "../Common/Variables.h"
 #include "../Common/LuaJIT.h"
 #include "../Common/NeoLua.h"
-#include "KeyboardStateHook.h"
+#include "KeyboardState.h"
 #include "SendKey.h"
-#include "MessageQueueHook.h"
-#include "DirectInputHook.h"
-#include "Direct3D8Hook.h"
-#include "Direct3D9Hook.h"
-#include "Direct3D11Hook.h"
+#include "MessageQueue.h"
+#include "DirectInput.h"
+#include "Direct3D8.h"
+#include "Direct3D9.h"
+#include "Direct3D11.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
 namespace luajit = common::luajit;
 namespace neolua = common::neolua;
-namespace messagequeuehook = core::messagequeuehook;
+namespace messagequeue = core::messagequeue;
 namespace sendkey = core::sendkey;
-namespace directx8 = core::directx8hook;
-namespace directx9 = core::directx9hook;
-namespace directx11 = core::directx11hook;
-namespace directinput = core::directinputhook;
-namespace keyboardstate = core::keyboardstatehook;
+namespace directx8 = core::directx8;
+namespace directx9 = core::directx9;
+namespace directx11 = core::directx11;
+namespace directinput = core::directinput;
+namespace keyboardstate = core::keyboardstate;
 
 namespace core {
     void Initialize() {
@@ -58,20 +58,17 @@ namespace core {
 
                 minhook::Initialize();
                 luajit::Initialize();
-                messagequeuehook::Initialize();
+                messagequeue::Initialize();
                 neolua::Initialize();
                 sendkey::Initialize();
 
                 directx8::Initialize();
-                minhook::CreateHook(directx8::HookConfig());
                 directx9::Initialize();
-                minhook::CreateHook(directx9::HookConfig());
                 directx11::Initialize();
-                minhook::CreateHook(directx11::HookConfig());
 
-                minhook::CreateHook(directinput::HookConfig());
-                minhook::CreateApiHook(keyboardstate::HookConfig());
-                minhook::CreateApiHook(messagequeuehook::HookConfig);
+                directinput::Initialize();
+                keyboardstate::Initialize();
+                messagequeue::Initialize();
 
                 minhook::EnableAll();
                 g_hookApplied = true;
@@ -79,5 +76,10 @@ namespace core {
                 break;
             }
         }
+    }
+
+    void Uninitialize(bool isProcessTerminating) {
+        if (g_hookApplied)
+            callbackstore::TriggerUninitializeCallbacks(isProcessTerminating);
     }
 }

@@ -37,7 +37,7 @@ void LuaJIT_OpenConsole() {
 }
 
 wstring MakeCommonDllPathW() {
-    return wstring(g_currentModuleDirPath) + L"\\" + L"ThMouseX.dll";
+    return wstring(g_currentModuleDirPath) + L"\\" + L"ThMCore.dll";
 }
 
 string GetPreparationScript() {

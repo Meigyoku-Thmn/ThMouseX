@@ -52,8 +52,6 @@ void HandleTriggerKey(DWORD gameInput, bool& lastState, BYTE vkCode) {
 }
 
 void TestInputAndSendKeys() {
-    if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::None)
-        return;
     auto gameInput = DetermineGameInput();
     HandleTriggerKey(gameInput & USE_BOMB, _ref lastState.bomb, gs_bombButton);
     HandleTriggerKey(gameInput & USE_SPECIAL, _ref lastState.extra, gs_extraButton);
@@ -64,8 +62,6 @@ void TestInputAndSendKeys() {
 }
 
 void CleanUp(bool isProcessTerminating) {
-    if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::None)
-        return;
     if (isProcessTerminating)
         return;
     SendKeyUp(gs_bombButton);
@@ -78,6 +74,8 @@ void CleanUp(bool isProcessTerminating) {
 
 namespace core::sendkey {
     void Initialize() {
+        if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::None)
+            return;
         callbackstore::RegisterPostRenderCallback(TestInputAndSendKeys);
         callbackstore::RegisterUninitializeCallback(CleanUp);
     }

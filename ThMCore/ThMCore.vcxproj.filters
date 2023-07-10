@@ -20,16 +20,16 @@
     <ClCompile Include="DllMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Direct3D9Hook.cpp">
+    <ClCompile Include="Direct3D9.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DirectInputHook.cpp">
+    <ClCompile Include="DirectInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KeyboardStateHook.cpp">
+    <ClCompile Include="KeyboardState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MessageQueueHook.cpp">
+    <ClCompile Include="MessageQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputDetermine.cpp">
@@ -41,16 +41,16 @@
     <ClCompile Include="SendKey.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Configurate.cpp">
+    <ClCompile Include="Configuration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Direct3D11Hook.cpp">
+    <ClCompile Include="Direct3D11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui_impl_dx11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Direct3D8Hook.cpp">
+    <ClCompile Include="Direct3D8.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui_impl_dx8.cpp">
@@ -64,31 +64,31 @@
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Direct3D9Hook.h">
+    <ClInclude Include="Direct3D9.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DirectInputHook.h">
+    <ClInclude Include="DirectInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InputDetermine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KeyboardStateHook.h">
+    <ClInclude Include="KeyboardState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MessageQueueHook.h">
+    <ClInclude Include="MessageQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Configurate.h">
+    <ClInclude Include="Configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Direct3D11Hook.h">
+    <ClInclude Include="Direct3D11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imgui_impl_dx11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Direct3D8Hook.h">
+    <ClInclude Include="Direct3D8.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imgui_impl_dx8.h">

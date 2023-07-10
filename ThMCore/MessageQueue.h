@@ -5,9 +5,8 @@
 #include "../Common/MinHook.h"
 #include "../Common/macro.h"
 
-namespace core::messagequeuehook {
-    DLLEXPORT_C bool TestRegisteredWindowMessages();
-    extern std::vector<common::minhook::HookApiConfig> HookConfig;
+namespace core::messagequeue {
+    DLLEXPORT_C bool RegisterCleanManagedDataMessage();
     DLLEXPORT_C bool InstallHooks();
     DLLEXPORT_C void RemoveHooks();
     void Initialize();

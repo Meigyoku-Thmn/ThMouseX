@@ -11,18 +11,18 @@
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
-#include "Direct3D8Hook.h"
-#include "Direct3D9Hook.h"
-#include "Direct3D11Hook.h"
-#include "DirectInputHook.h"
-#include "Configurate.h"
+#include "Direct3D8.h"
+#include "Direct3D9.h"
+#include "Direct3D11.h"
+#include "DirectInput.h"
+#include "Configuration.h"
 
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
-namespace directx8 = core::directx8hook;
-namespace directx9 = core::directx9hook;
-namespace directx11 = core::directx11hook;
-namespace directinput = core::directinputhook;
+namespace directx8 = core::directx8;
+namespace directx9 = core::directx9;
+namespace directx11 = core::directx11;
+namespace directinput = core::directinput;
 
 #define GameFile "Games.txt"
 #define ThMouseXFile "ThMouseX.txt"
@@ -44,19 +44,7 @@ tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount)
 tuple<VkCodes, bool> ReadVkCodes();
 #pragma endregion
 
-namespace core::configurate {
-    bool PopulateMethodRVAs() {
-        if (!directx8::PopulateMethodRVAs())
-            return false;
-        if (!directx9::PopulateMethodRVAs())
-            return false;
-        if (!directx11::PopulateMethodRVAs())
-            return false;
-        if (!directinput::PopulateMethodRVAs())
-            return false;
-        return true;
-    }
-
+namespace core::configuration {
     bool ReadGamesFile() {
         ifstream gamesFile(GameFile);
         if (!gamesFile) {
@@ -437,7 +425,7 @@ tuple<VkCodes, bool> ReadVkCodes() {
                 convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
             return { move(vkCodes), false };
         }
-        vkCodes[key] = value;
+        vkCodes[key] = (BYTE)value;
     }
 
     return { move(vkCodes), true };

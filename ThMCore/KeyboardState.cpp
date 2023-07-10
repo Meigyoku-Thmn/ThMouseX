@@ -5,7 +5,7 @@
 #include "../Common/MinHook.h"
 #include "../Common/Variables.h"
 #include "../Common/DataTypes.h"
-#include "KeyboardStateHook.h"
+#include "KeyboardState.h"
 #include "InputDetermine.h"
 
 namespace minhook = common::minhook;
@@ -13,17 +13,18 @@ namespace minhook = common::minhook;
 using namespace std;
 using namespace core::inputdetermine;
 
-namespace core::keyboardstatehook {
+namespace core::keyboardstate {
     BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState);
     decltype(&_GetKeyboardState) OriGetKeyboardState;
 
-    vector<minhook::HookApiConfig> HookConfig() {
+    void Initialize() {
         if ((g_currentConfig.InputMethods & InputMethod::GetKeyboardState) == InputMethod::None)
-            return {};
-        return {
+            return;
+        vector<minhook::HookApiConfig> hookConfigs{
             {L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, (PVOID*)&OriGetKeyboardState},
         };
-    };
+        minhook::CreateApiHook(hookConfigs);
+    }
 
     BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState) {
         auto rs = OriGetKeyboardState(lpKeyState);
