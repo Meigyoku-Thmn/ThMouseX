@@ -13,6 +13,7 @@
 #include "../Common/macro.h"
 #include "../Common/DataTypes.h"
 #include "../Common/MinHook.h"
+#include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
 #include "../Common/DataTypes.h"
 #include "../Common/Helper.h"
@@ -21,6 +22,7 @@
 #include "macro.h"
 
 namespace minhook = common::minhook;
+namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
 namespace note = common::log;
 
@@ -184,7 +186,7 @@ namespace core::directx9hook {
 
     struct OnInit {
         OnInit() {
-            minhook::RegisterUninitializeCallback(Callback);
+            callbackstore::RegisterUninitializeCallback(Callback);
         }
         static void Callback(bool isProcessTerminating) {
             if (isProcessTerminating)

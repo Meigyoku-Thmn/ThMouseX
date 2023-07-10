@@ -13,5 +13,4 @@ DLLEXPORT_C void Common_LuaJIT_OpenConsole();
 namespace common::luajit {
     EXPORT_FUNC(void, LuaJit_, Initialize);
     DWORD GetPositionAddress();
-    EXPORT_FUNC(void, LuaJit_, Uninitialize);
 }

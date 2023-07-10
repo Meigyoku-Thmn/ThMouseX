@@ -1,7 +1,7 @@
 #include "framework.h"
 
 #include "../Common/Variables.h"
-#include "../Common/MinHook.h"
+#include "../Common/CallbackStore.h"
 #include "../DX8Hook/Direct3D8Hook.h"
 #include "Direct3D9Hook.h"
 #include "Direct3D11Hook.h"
@@ -10,7 +10,7 @@
 
 using namespace core::inputdetermine;
 
-namespace minhook = common::minhook;
+namespace callbackstore = common::callbackstore;
 namespace directx8 = dx8::hook;
 namespace directx9 = core::directx9hook;
 namespace directx11 = core::directx11hook;
@@ -86,6 +86,6 @@ struct OnInit {
         directx8::RegisterPostRenderCallbacks(TestInputAndSendKeys);
         directx9::RegisterPostRenderCallbacks(TestInputAndSendKeys);
         directx11::RegisterPostRenderCallbacks(TestInputAndSendKeys);
-        minhook::RegisterUninitializeCallback(CleanUp);
+        callbackstore::RegisterUninitializeCallback(CleanUp);
     }
 } _;

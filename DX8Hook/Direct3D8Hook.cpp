@@ -15,10 +15,12 @@
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
 #include "../Common/MinHook.h"
+#include "../Common/CallbackStore.h"
 #include "../Common/Log.h"
 #include "Direct3D8Hook.h"
 #include "macro.h"
 
+namespace callbackstore = common::callbackstore;
 namespace minhook = common::minhook;
 namespace helper = common::helper;
 namespace note = common::log;
@@ -179,7 +181,7 @@ namespace dx8::hook {
 
     struct OnInit {
         OnInit() {
-            minhook::RegisterUninitializeCallback(Callback);
+            callbackstore::RegisterUninitializeCallback(Callback);
         }
         static void Callback(bool isProcessTerminating) {
             if (isProcessTerminating)

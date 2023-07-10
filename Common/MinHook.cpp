@@ -3,21 +3,20 @@
 #include "macro.h"
 
 #include "MinHook.h"
+#include "CallbackStore.h"
 
 using namespace std;
 
 namespace common::minhook {
-    vector<CallbackType>& uninitializeCallbacks() {
-        static vector<CallbackType> backing;
-        return backing;
-    }
-
-    void RegisterUninitializeCallback(CallbackType callback) {
-        uninitializeCallbacks().push_back(callback);
+    void Uninitialize(bool isProcessTerminating) {
+        MH_Uninitialize();
     }
 
     bool Initialize() {
-        return MH_Initialize() == MH_OK;
+        if (MH_Initialize() != MH_OK)
+            return false;
+        callbackstore::RegisterUninitializeCallback(Uninitialize);
+        return true;
     }
 
     bool CreateHook(const vector<HookConfig>& hookConfigs) {
@@ -70,11 +69,5 @@ namespace common::minhook {
 
     bool EnableAll() {
         return MH_EnableHook(MH_ALL_HOOKS) == MH_OK;
-    }
-
-    void Uninitialize(bool isProcessTerminating) {
-        for (auto& callback : uninitializeCallbacks())
-            callback(isProcessTerminating);
-        MH_Uninitialize();
     }
 }

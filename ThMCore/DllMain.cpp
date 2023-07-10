@@ -3,6 +3,7 @@
 #include <clocale>
 
 #include "../Common/MinHook.h"
+#include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
 #include "../Common/LuaJIT.h"
 #include "../DX8Hook/Direct3D8Hook.h"
@@ -14,6 +15,7 @@
 #include "macro.h"
 
 namespace minhook = common::minhook;
+namespace callbackstore = common::callbackstore;
 namespace luajit = common::luajit;
 namespace messagequeuehook = core::messagequeuehook;
 namespace directx8 = dx8::hook;
@@ -88,8 +90,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             break;
         case DLL_PROCESS_DETACH:
             if (g_hookApplied) {
-                minhook::Uninitialize(lpReserved != 0);
-                luajit::Uninitialize();
+                callbackstore::TriggerUninitializeCallbacks(lpReserved != 0);
             }
             break;
     }

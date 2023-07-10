@@ -182,6 +182,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="MinHook.h" />
     <ClInclude Include="NeoLua.h" />
+    <ClInclude Include="CallbackStore.h" />
     <ClInclude Include="Variables.h" />
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +199,7 @@
     <ClCompile Include="MinHook.cpp" />
     <ClCompile Include="LuaJIT.cpp" />
     <ClCompile Include="NeoLua.cpp" />
+    <ClCompile Include="CallbackStore.cpp" />
     <ClCompile Include="Variables.cpp" />
   </ItemGroup>
   <ItemGroup>

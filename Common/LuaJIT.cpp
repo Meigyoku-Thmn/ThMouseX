@@ -5,6 +5,7 @@
 #include <luajit/lua.hpp>
 
 #include "MinHook.h"
+#include "CallbackStore.h"
 #include "LuaJIT.h"
 #include "Log.h"
 #include "Helper.h"
@@ -17,6 +18,7 @@ namespace helper = common::helper;
 namespace memory = common::helper::memory;
 namespace encoding = common::helper::encoding;
 namespace minhook = common::minhook;
+namespace callbackstore = common::callbackstore;
 
 using namespace std;
 
@@ -104,6 +106,11 @@ namespace common::luajit {
             return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
     }
 
+    void Uninitialize(bool isProcessTerminating) {
+        if (L != NULL)
+            lua_close(L);
+    }
+
     void Initialize() {
         if (g_currentConfig.ScriptingMethodToFindAddress != ScriptingMethod::LuaJIT)
             return;
@@ -114,6 +121,8 @@ namespace common::luajit {
             scriptingDisabled = true;
             return;
         }
+
+        callbackstore::RegisterUninitializeCallback(Uninitialize);
 
         luaL_openlibs(L);
 
@@ -167,10 +176,5 @@ namespace common::luajit {
         auto result = (DWORD)lua_tointeger(L, -1);
         lua_pop(L, 1);
         return result;
-    }
-
-    void Uninitialize() {
-        if (L != NULL)
-            lua_close(L);
     }
 }
