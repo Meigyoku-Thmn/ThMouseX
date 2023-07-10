@@ -12,7 +12,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
             setlocale(LC_ALL, ".UTF8");
             setlocale(LC_NUMERIC, "C");
-            DisableThreadLibraryCalls(hModule);
 
             g_commonModule = hModule;
 

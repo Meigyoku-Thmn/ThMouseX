@@ -30,9 +30,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
             g_coreModule = hModule;
             g_targetModule = GetModuleHandleW(NULL);
-            // We don't need thread notifications for what we're doing.
-            // Thus, get rid of them, thereby eliminating some of the overhead of this DLL.
-            DisableThreadLibraryCalls(hModule);
 
             WCHAR currentProcessName[MAX_PATH + 1];
             // Only hook the APIs if we have a configuation of the process.

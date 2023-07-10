@@ -6,6 +6,7 @@
 #include <metahost.h>
 #include <comdef.h>
 
+#include "DataTypes.h"
 #include "NeoLua.h"
 #include "Log.h"
 #include "Variables.h"
