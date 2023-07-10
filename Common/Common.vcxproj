@@ -200,9 +200,6 @@
     <ClCompile Include="CallbackStore.cpp" />
     <ClCompile Include="Variables.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="vcpkg.json" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

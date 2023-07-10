@@ -108,9 +108,6 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vcpkg.json" />
-  </ItemGroup>
-  <ItemGroup>
     <FxCompile Include="AdditiveToneShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
