@@ -116,11 +116,15 @@ namespace core::directx9 {
         CleanUp();
         SAFE_FREE_LIB(d3dx9_43);
     }
-
+    
+    bool initialized;
     void Initialize() {
+        if (initialized)
+            return;
         ModuleHandle d3d9(LoadLibraryW(L"d3d9.dll"));
         if (!d3d9)
             return;
+        initialized = true;
 
         auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9.get(), "Direct3DCreate9");
         if (!_Direct3DCreate9) {

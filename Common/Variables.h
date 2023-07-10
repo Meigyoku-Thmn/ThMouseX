@@ -3,7 +3,7 @@
 #include "framework.h"
 #include "DataTypes.h"
 
-extern WCHAR    g_currentModuleDirPath[MAX_PATH + 1];
+extern WCHAR    g_currentModuleDirPath[MAX_PATH];
 
 // single game config
 extern GameConfig g_currentConfig;

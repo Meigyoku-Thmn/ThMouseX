@@ -3,7 +3,7 @@
 
 #include "Variables.h"
 
-WCHAR   g_currentModuleDirPath[MAX_PATH + 1];
+WCHAR   g_currentModuleDirPath[MAX_PATH];
 
 // single game config
 GameConfig      g_currentConfig;

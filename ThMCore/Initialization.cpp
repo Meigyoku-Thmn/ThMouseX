@@ -3,6 +3,7 @@
 #include "framework.h"
 #include <shlwapi.h>
 #include <clocale>
+#include <vector>
 
 #include "../Common/macro.h"
 #include "../Common/MinHook.h"
@@ -31,6 +32,9 @@ namespace directinput = core::directinput;
 namespace keyboardstate = core::keyboardstate;
 
 namespace core {
+    HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
+    decltype(&_LoadLibraryExW) OriLoadLibraryExW;
+
     void Initialize() {
         setlocale(LC_ALL, ".UTF8");
         setlocale(LC_NUMERIC, "C");
@@ -38,13 +42,10 @@ namespace core {
         g_targetModule = GetModuleHandleW(NULL);
 
         GetModuleFileNameW(g_coreModule, g_currentModuleDirPath, ARRAYSIZE(g_currentModuleDirPath));
-        g_currentModuleDirPath[ARRAYSIZE(g_currentModuleDirPath) - 1] = '\0';
         PathRemoveFileSpecW(g_currentModuleDirPath);
 
-        WCHAR currentProcessName[MAX_PATH + 1];
-
+        WCHAR currentProcessName[MAX_PATH];
         GetModuleFileNameW(g_targetModule, currentProcessName, ARRAYSIZE(currentProcessName));
-        currentProcessName[ARRAYSIZE(currentProcessName) - 1] = '\0';
         PathStripPathW(currentProcessName);
         PathRemoveExtensionW(currentProcessName);
 
@@ -70,12 +71,33 @@ namespace core {
                 keyboardstate::Initialize();
                 messagequeue::Initialize();
 
+                std::vector<minhook::HookApiConfig> hookConfigs = {
+                    { L"KERNEL32.DLL", "LoadLibraryExW", &_LoadLibraryExW, (PVOID*)&OriLoadLibraryExW },
+                };
+                minhook::CreateApiHook(hookConfigs);
+
                 minhook::EnableAll();
                 g_hookApplied = true;
 
                 break;
             }
         }
+    }
+
+    HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
+        auto rs = OriLoadLibraryExW(lpLibFileName, hFile, dwFlags);
+        if (rs != NULL) {
+            auto fileName = PathFindFileNameW(lpLibFileName);
+            if (_wcsicmp(fileName, L"d3d8.dll") == 0)
+                directx8::Initialize();
+            else if (_wcsicmp(fileName, L"d3d9.dll") == 0)
+                directx9::Initialize();
+            else if (_wcsicmp(fileName, L"d3d11.dll") == 0)
+                directx11::Initialize();
+            else if (_wcsicmp(fileName, L"DInput8.dll") == 0)
+                directinput::Initialize();
+        }
+        return rs;
     }
 
     void Uninitialize(bool isProcessTerminating) {

@@ -101,10 +101,14 @@ namespace core::directx11 {
         CleanUp();
     }
 
+    bool initialized;
     void Initialize() {
+        if (initialized)
+            return;
         ModuleHandle d3d11(LoadLibraryW(L"d3d11.dll"));
         if (!d3d11)
             return;
+        initialized = true;
 
         auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11.get(), "D3D11CreateDeviceAndSwapChain");
         if (!_D3D11CreateDeviceAndSwapChain) {

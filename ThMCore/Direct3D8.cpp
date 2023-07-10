@@ -109,10 +109,14 @@ namespace core::directx8 {
         CleanUp();
     }
 
+    bool initialized;
     void Initialize() {
+        if (initialized)
+            return;
         ModuleHandle d3d8(LoadLibraryW(L"d3d8.dll"));
         if (!d3d8)
             return;
+        initialized = true;
 
         auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8.get(), "Direct3DCreate8");
         if (!_Direct3DCreate8) {

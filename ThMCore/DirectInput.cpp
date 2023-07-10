@@ -45,13 +45,16 @@ namespace core::directinput {
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
+    bool initialized;
     void Initialize() {
+        if (initialized)
+            return;
         if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
             return;
-
         ModuleHandle dinput8(LoadLibraryW(L"DInput8.dll"));
         if (!dinput8)
             return;
+        initialized = true;
 
         auto _DirectInput8Create = (decltype(&DirectInput8Create))GetProcAddress(dinput8.get(), "DirectInput8Create");
         if (!_DirectInput8Create) {
