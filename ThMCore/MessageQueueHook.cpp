@@ -6,7 +6,7 @@
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
 #include "../Common/NeoLua.h"
-#include "../DX8Hook/Direct3D8Hook.h"
+#include "Direct3D8Hook.h"
 #include "Direct3D9Hook.h"
 #include "Direct3D11Hook.h"
 #include "MessageQueueHook.h"
@@ -15,7 +15,7 @@
 namespace minhook = common::minhook;
 namespace neolua = common::neolua;
 namespace helper = common::helper;
-namespace directx8 = dx8::hook;
+namespace directx8 = core::directx8hook;
 namespace directx9 = core::directx9hook;
 namespace directx11 = core::directx11hook;
 

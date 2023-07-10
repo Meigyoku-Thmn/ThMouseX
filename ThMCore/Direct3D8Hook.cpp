@@ -1,10 +1,10 @@
 #include "framework.h"
-#include <Include/d3d8.h>
-#include <Include/d3dx8core.h>
+#include <DirectX8/Include/d3d8.h>
+#include <DirectX8/Include/d3dx8core.h>
+#include <vector>
 #include <string>
 #include <memory>
 #include <wrl/client.h>
-#include <vector>
 #include <comdef.h>
 #include <imgui.h>
 #include <imgui_impl_win32.h>
@@ -12,16 +12,16 @@
 
 #include "../Common/macro.h"
 #include "../Common/DataTypes.h"
-#include "../Common/Variables.h"
-#include "../Common/Helper.h"
 #include "../Common/MinHook.h"
 #include "../Common/CallbackStore.h"
+#include "../Common/Variables.h"
+#include "../Common/Helper.h"
 #include "../Common/Log.h"
 #include "Direct3D8Hook.h"
 #include "macro.h"
 
-namespace callbackstore = common::callbackstore;
 namespace minhook = common::minhook;
+namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
 namespace note = common::log;
 
@@ -55,7 +55,7 @@ inline const char* GetD3dErrStr(const int errorCode) {
 
 using CallbackType = void (*)(void);
 
-namespace dx8::hook {
+namespace core::directx8hook {
     HRESULT WINAPI D3DCreateDevice(IDirect3D8* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice8** ppReturnedDeviceInterface);
     decltype(&D3DCreateDevice) OriCreateDevice;
 

@@ -1,6 +1,6 @@
 #include "framework.h"
-#include <Include/d3d9.h>
-#include <Include/d3dx9core.h>
+#include <DirectX9/Include/d3d9.h>
+#include <DirectX9/Include/d3dx9core.h>
 #include <vector>
 #include <string>
 #include <memory>
@@ -15,7 +15,6 @@
 #include "../Common/MinHook.h"
 #include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
-#include "../Common/DataTypes.h"
 #include "../Common/Helper.h"
 #include "../Common/Log.h"
 #include "Direct3D9Hook.h"

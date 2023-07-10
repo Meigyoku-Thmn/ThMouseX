@@ -10,7 +10,7 @@
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
-#include "../DX8Hook/Direct3D8Hook.h"
+#include "Direct3D8Hook.h"
 #include "Direct3D9Hook.h"
 #include "Direct3D11Hook.h"
 #include "DirectInputHook.h"
@@ -19,7 +19,7 @@
 
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
-namespace directx8 = dx8::hook;
+namespace directx8 = core::directx8hook;
 namespace directx9 = core::directx9hook;
 namespace directx11 = core::directx11hook;
 namespace directinput = core::directinputhook;

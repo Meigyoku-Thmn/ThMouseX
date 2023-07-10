@@ -2,7 +2,7 @@
 #include "imgui_impl_dx8.h"
 
 // DirectX
-#include <Include/d3d8.h>
+#include <DirectX8/Include/d3d8.h>
 
 // based on https://github.com/KoMaR1911/C4USMultiHack-Metin2/blob/main/EngineX-Pro/ImGui/imgui_impl_dx8.cpp
 

@@ -71,16 +71,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</IncludePath>
-    <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</LibraryPath>
+    <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
+    <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</IncludePath>
-    <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries\DirectX9</LibraryPath>
+    <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
+    <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -167,8 +167,10 @@
   <ItemGroup>
     <ClCompile Include="Configurate.cpp" />
     <ClCompile Include="Direct3D11Hook.cpp" />
+    <ClCompile Include="Direct3D8Hook.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="imgui_impl_dx11.cpp" />
+    <ClCompile Include="imgui_impl_dx8.cpp" />
     <ClCompile Include="InputDetermine.cpp" />
     <ClCompile Include="CompilerConfig.cpp" />
     <ClCompile Include="Direct3D9Hook.cpp" />
@@ -180,9 +182,11 @@
   <ItemGroup>
     <ClInclude Include="Configurate.h" />
     <ClInclude Include="Direct3D11Hook.h" />
+    <ClInclude Include="Direct3D8Hook.h" />
     <ClInclude Include="Direct3D9Hook.h" />
     <ClInclude Include="DirectInputHook.h" />
     <ClInclude Include="imgui_impl_dx11.h" />
+    <ClInclude Include="imgui_impl_dx8.h" />
     <ClInclude Include="InputDetermine.h" />
     <ClInclude Include="KeyboardStateHook.h" />
     <ClInclude Include="macro.h" />
@@ -192,9 +196,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{47c2ee88-18d4-4367-8e67-6daa01ab4451}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\DX8Hook\DX8Hook.vcxproj">
-      <Project>{dc5fe77d-43d4-4cc6-9ad2-409716483dbf}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,1 +1,0 @@
-#pragma comment(lib, "Lib/D3dx8.lib")
