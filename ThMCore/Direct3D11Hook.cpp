@@ -22,7 +22,6 @@
 #include "../Common/Helper.h"
 #include "../Common/Log.h"
 #include "Direct3D11Hook.h"
-#include "macro.h"
 
 #include "AdditiveToneShader.hshader"
 

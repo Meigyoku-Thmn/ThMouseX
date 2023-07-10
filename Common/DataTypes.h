@@ -59,7 +59,7 @@ struct AddressChain {
 };
 static_assert(sizeof(void*) == sizeof(AddressChain::Level[0]));
 
-BEGIN_EXPORT_FLAG_ENUM(InputMethod, int)
+BEGIN_FLAG_ENUM(InputMethod, int)
 None = 0,
 DirectInput = 1 << 0,
 GetKeyboardState = 1 << 1,

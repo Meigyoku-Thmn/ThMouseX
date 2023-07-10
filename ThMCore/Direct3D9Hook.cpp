@@ -18,7 +18,6 @@
 #include "../Common/Helper.h"
 #include "../Common/Log.h"
 #include "Direct3D9Hook.h"
-#include "macro.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;

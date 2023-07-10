@@ -30,20 +30,20 @@ using namespace Microsoft::WRL;
 
 void OnClose();
 decltype(&OnClose) onClose;
-void Common_NeoLua_SetOnClose(DWORD address) {
+void NeoLua_SetOnClose(DWORD address) {
     *(PDWORD)&onClose = address;
 }
 
 DWORD positionAddress;
-void Common_NeoLua_SetPositionAddress(DWORD address) {
+void NeoLua_SetPositionAddress(DWORD address) {
     positionAddress = address;
 }
 
-PointDataType Common_NeoLua_GetDataType() {
+PointDataType NeoLua_GetDataType() {
     return g_currentConfig.PosDataType;
 }
 
-void Common_NeoLua_OpenConsole() {
+void NeoLua_OpenConsole() {
     note::OpenConsole();
 }
 

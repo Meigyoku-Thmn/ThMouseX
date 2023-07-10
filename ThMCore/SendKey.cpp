@@ -1,12 +1,12 @@
 #include "framework.h"
 
+#include "../Common/macro.h"
 #include "../Common/Variables.h"
 #include "../Common/CallbackStore.h"
 #include "Direct3D8Hook.h"
 #include "Direct3D9Hook.h"
 #include "Direct3D11Hook.h"
 #include "InputDetermine.h"
-#include "macro.h"
 
 using namespace core::inputdetermine;
 

@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "../Common/MinHook.h"
-#include "macro.h"
+#include "../Common/macro.h"
 
 namespace core::messagequeuehook {
     DLLEXPORT_C bool TestRegisteredWindowMessages();

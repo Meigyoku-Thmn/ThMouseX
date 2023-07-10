@@ -73,6 +73,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
+    <TargetName>ThMouseX</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -81,6 +82,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
+    <TargetName>ThMouseX</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -144,6 +146,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\DX8Hook\DX8.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -189,7 +192,6 @@
     <ClInclude Include="imgui_impl_dx8.h" />
     <ClInclude Include="InputDetermine.h" />
     <ClInclude Include="KeyboardStateHook.h" />
-    <ClInclude Include="macro.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MessageQueueHook.h" />
   </ItemGroup>

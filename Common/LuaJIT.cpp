@@ -24,20 +24,20 @@ using namespace std;
 
 #define Common_Lib_Path "%Common_Lib_Path%"
 
-DWORD Common_LuaJIT_ReadUInt32(DWORD address) {
+DWORD LuaJIT_ReadUInt32(DWORD address) {
     return *PDWORD(address);
 }
 
-DWORD Common_LuaJIT_ResolveAddress(DWORD* offsets, int length) {
+DWORD LuaJIT_ResolveAddress(DWORD* offsets, int length) {
     return memory::ResolveAddress(offsets, length);
 }
 
-void Common_LuaJIT_OpenConsole() {
+void LuaJIT_OpenConsole() {
     note::OpenConsole();
 }
 
 wstring MakeCommonDllPathW() {
-    return wstring(g_currentModuleDirPath) + L"\\" + L"Common.dll";
+    return wstring(g_currentModuleDirPath) + L"\\" + L"ThMouseX.dll";
 }
 
 string GetPreparationScript() {
@@ -46,23 +46,23 @@ string GetPreparationScript() {
         local ffi = require("ffi")
 
         ffi.cdef [[
-            uint32_t Common_LuaJIT_ReadUInt32     (uint32_t address);
-            uint32_t Common_LuaJIT_ResolveAddress (uint32_t* offsets, int length);
-            void     Common_LuaJIT_OpenConsole    ();
+            uint32_t LuaJIT_ReadUInt32     (uint32_t address);
+            uint32_t LuaJIT_ResolveAddress (uint32_t* offsets, int length);
+            void     LuaJIT_OpenConsole    ();
         ]]
 
         local ThMouseX = ffi.load(")" Common_Lib_Path R"(")
 
         function OpenConsole()
-            return ThMouseX.Common_LuaJIT_OpenConsole()
+            return ThMouseX.LuaJIT_OpenConsole()
         end
 
         function ReadUInt32(address)
-            return ThMouseX.Common_LuaJIT_ReadUInt32(address)
+            return ThMouseX.LuaJIT_ReadUInt32(address)
         end
 
         function ResolveAddress(addressChain, length)
-            return ThMouseX.Common_LuaJIT_ResolveAddress(addressChain, length)
+            return ThMouseX.LuaJIT_ResolveAddress(addressChain, length)
         end
 
         function AllocNew(...)

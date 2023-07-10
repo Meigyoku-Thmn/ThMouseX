@@ -3,8 +3,6 @@
 #include "macro.h"
 #include "framework.h"
 
-#include "DllLoad.h"
-
 namespace common::minhook {
     struct HookConfig {
         LPVOID  pTarget;
@@ -19,10 +17,10 @@ namespace common::minhook {
         LPVOID* ppOriginal;
     };
 
-    EXPORT_FUNC(bool, MinHook_, Initialize);
-    EXPORT_FUNC(bool, MinHook_, CreateHook, const std::vector<HookConfig>& hookConfigs);
-    EXPORT_FUNC(bool, MinHook_, CreateApiHook, const std::vector<HookApiConfig>& hookConfigs);
-    EXPORT_FUNC(bool, MinHook_, EnableHooks, const std::vector<HookApiConfig>& hookConfigs);
-    EXPORT_FUNC(bool, MinHook_, DisableHooks, const std::vector<HookApiConfig>& hookConfigs);
-    EXPORT_FUNC(bool, MinHook_, EnableAll);
+    bool Initialize();
+    bool CreateHook(const std::vector<HookConfig>& hookConfigs);
+    bool CreateApiHook(const std::vector<HookApiConfig>& hookConfigs);
+    bool EnableHooks(const std::vector<HookApiConfig>& hookConfigs);
+    bool DisableHooks(const std::vector<HookApiConfig>& hookConfigs);
+    bool EnableAll();
 }

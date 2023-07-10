@@ -3,7 +3,6 @@
 
 #include "Variables.h"
 
-HMODULE g_commonModule;
 WCHAR   g_currentModuleDirPath[MAX_PATH + 1];
 
 // single game config

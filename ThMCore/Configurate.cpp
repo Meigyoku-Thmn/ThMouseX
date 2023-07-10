@@ -7,6 +7,7 @@
 #include <tuple>
 #include <cassert>
 
+#include "../Common/macro.h"
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
@@ -15,7 +16,6 @@
 #include "Direct3D11Hook.h"
 #include "DirectInputHook.h"
 #include "Configurate.h"
-#include "macro.h"
 
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;

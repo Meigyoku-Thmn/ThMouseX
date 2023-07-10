@@ -1,5 +1,5 @@
 #pragma once
-#include "macro.h"
+#include "../Common/macro.h"
 
 namespace core::configurate {
     DLLEXPORT_C bool PopulateMethodRVAs();

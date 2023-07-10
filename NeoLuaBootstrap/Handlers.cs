@@ -7,8 +7,8 @@ namespace NeoLuaBootstrap
     using DelegateMap = Dictionary<string, (Delegate Delegate, GCHandle Handle)>;
     public static class Handlers
     {
-        [DllImport("Common", CallingConvention = CallingConvention.Cdecl)]
-        static extern void Common_NeoLua_SetOnClose(IntPtr address);
+        [DllImport("ThMouseX.dll", CallingConvention = CallingConvention.Cdecl)]
+        static extern void NeoLua_SetOnClose(IntPtr address);
 
         static readonly DelegateMap EventDelegates = new DelegateMap();
 
@@ -25,7 +25,7 @@ namespace NeoLuaBootstrap
             {
                 Scripting.Uninitialize();
                 Scripting.Initialize(scriptPath);
-                Common_NeoLua_SetOnClose(Marshal.GetFunctionPointerForDelegate(EventDelegates[nameof(OnClose)].Delegate));
+                NeoLua_SetOnClose(Marshal.GetFunctionPointerForDelegate(EventDelegates[nameof(OnClose)].Delegate));
                 return 0;
             }
             catch (Exception e)

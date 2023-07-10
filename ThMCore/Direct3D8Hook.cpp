@@ -11,6 +11,7 @@
 #include "imgui_impl_dx8.h"
 
 #include "../Common/macro.h"
+#include "../Common/macro.h"
 #include "../Common/DataTypes.h"
 #include "../Common/MinHook.h"
 #include "../Common/CallbackStore.h"
@@ -18,7 +19,6 @@
 #include "../Common/Helper.h"
 #include "../Common/Log.h"
 #include "Direct3D8Hook.h"
-#include "macro.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;

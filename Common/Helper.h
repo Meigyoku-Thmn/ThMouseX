@@ -5,19 +5,17 @@
 #include <string>
 #include "DataTypes.h"
 
-#include "DllLoad.h"
-
 namespace common::helper {
-    EXPORT_FUNC(void, Helper_, ReportLastError, const char* title);
-    EXPORT_FUNC(std::string&, Helper_, Replace, std::string& input, const char* keyword, const char* replacement);
-    EXPORT_FUNC(SINGLE_ARG(std::tuple<float, const char*>), Helper_, ConvertToFloat, const std::string& input);
-    EXPORT_FUNC(SINGLE_ARG(std::tuple<long, const char*>), Helper_, ConvertToLong, const std::string& input, int base);
-    EXPORT_FUNC(SINGLE_ARG(std::tuple<unsigned long, const char*>), Helper_, ConvertToULong, const std::string& input, int base);
-    EXPORT_FUNC(void, Helper_, CalculateNextTone, UCHAR& tone, ModulateStage& toneStage);
-    EXPORT_FUNC(POINT, Helper_, GetPointerPosition);
-    EXPORT_FUNC(void, Helper_, RemoveWindowBorder, UINT width, UINT height);
-    EXPORT_FUNC(void, Helper_, FixWindowCoordinate, bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight);
+    void ReportLastError(const char* title);
+    std::string& Replace(std::string& input, const char* keyword, const char* replacement);
+    std::tuple<float, const char*> ConvertToFloat(const std::string& input);
+    std::tuple<long, const char*> ConvertToLong(const std::string& input, int base);
+    std::tuple<unsigned long, const char*> ConvertToULong(const std::string& input, int base);
+    void CalculateNextTone(UCHAR& tone, ModulateStage& toneStage);
+    POINT GetPointerPosition();
+    void RemoveWindowBorder(UINT width, UINT height);
+    void FixWindowCoordinate(bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight);
     // use for directx8
-    EXPORT_FUNC(bool, Helper_, TestFullscreenHeuristically);
-    EXPORT_FUNC(DWORD, Helper_, CalculateAddress);
+    bool TestFullscreenHeuristically();
+    DWORD CalculateAddress();
 }

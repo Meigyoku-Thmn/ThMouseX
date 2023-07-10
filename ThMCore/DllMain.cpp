@@ -2,6 +2,7 @@
 #include <shlwapi.h>
 #include <clocale>
 
+#include "../Common/macro.h"
 #include "../Common/MinHook.h"
 #include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
@@ -12,7 +13,6 @@
 #include "Direct3D8Hook.h"
 #include "Direct3D9Hook.h"
 #include "Direct3D11Hook.h"
-#include "macro.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
@@ -32,6 +32,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
             g_coreModule = hModule;
             g_targetModule = GetModuleHandleW(NULL);
+
+            GetModuleFileNameW(g_coreModule, g_currentModuleDirPath, ARRAYSIZE(g_currentModuleDirPath));
+            g_currentModuleDirPath[ARRAYSIZE(g_currentModuleDirPath) - 1] = '\0';
+            PathRemoveFileSpecW(g_currentModuleDirPath);
 
             WCHAR currentProcessName[MAX_PATH + 1];
             // Only hook the APIs if we have a configuation of the process.

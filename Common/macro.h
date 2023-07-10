@@ -1,19 +1,16 @@
 #pragma once
 #include <winerror.h>
 
-#ifdef COMMON_EXPORTS
+#define _ref
+
 #define DLLEXPORT __declspec(dllexport)
 #define DLLEXPORT_C extern "C" __declspec(dllexport)
-#else
-#define DLLEXPORT __declspec(dllimport)
-#define DLLEXPORT_C extern "C" __declspec(dllimport)
-#endif
 
 #define QUOTE(x) #x
 
 #define SINGLE_ARG(...) __VA_ARGS__
 
-#define BEGIN_EXPORT_FLAG_ENUM(EnumName, EnumType) \
+#define BEGIN_FLAG_ENUM(EnumName, EnumType) \
 enum class EnumName: EnumType; \
 inline EnumName operator &(EnumName a, const EnumName b) { \
     return (EnumName)((EnumType)a & (EnumType)b); \

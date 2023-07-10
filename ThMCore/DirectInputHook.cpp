@@ -11,7 +11,6 @@
 #include "../Common/Log.h"
 #include "InputDetermine.h"
 #include "DirectInputHook.h"
-#include "macro.h"
 
 namespace minhook = common::minhook;
 namespace note = common::log;

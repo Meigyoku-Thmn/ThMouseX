@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "../Common/MinHook.h"
-#include "macro.h"
 
 namespace core::directx11hook {
     using CallbackType = void (*)(void);

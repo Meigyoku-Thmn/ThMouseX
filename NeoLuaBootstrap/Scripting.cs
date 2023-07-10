@@ -15,14 +15,14 @@ namespace NeoLuaBootstrap
 {
     static class Scripting
     {
-        [DllImport("Common", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void Common_NeoLua_SetPositionAddress(IntPtr address);
+        [DllImport("ThMouseX.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void NeoLua_SetPositionAddress(IntPtr address);
 
-        [DllImport("Common", CallingConvention = CallingConvention.Cdecl)]
-        public static extern PointDataType Common_NeoLua_GetDataType();
+        [DllImport("ThMouseX.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern PointDataType NeoLua_GetDataType();
 
-        [DllImport("Common", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void Common_NeoLua_OpenConsole();
+        [DllImport("ThMouseX.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void NeoLua_OpenConsole();
 
         static readonly List<Delegate> DelegateStore = new List<Delegate>();
         static readonly FieldInfo DelegateStoreField = AccessTools.Field(typeof(Scripting), nameof(DelegateStore));
@@ -38,7 +38,7 @@ namespace NeoLuaBootstrap
         {
             None, Int, Float, Short
         };
-        static readonly PointDataType DataType = Common_NeoLua_GetDataType();
+        static readonly PointDataType DataType = NeoLua_GetDataType();
         public static readonly object Pos = DataType == PointDataType.Int ? new Position<int>() :
                                             DataType == PointDataType.Float ? new Position<float>() :
                                             DataType == PointDataType.Short ? new Position<short>() : new object();
@@ -102,7 +102,7 @@ namespace NeoLuaBootstrap
         {
             try
             {
-                Common_NeoLua_SetPositionAddress(IntPtr.Zero);
+                NeoLua_SetPositionAddress(IntPtr.Zero);
                 HarmonyInst.UnpatchAll(HarmonyId);
                 PrefixStore.Clear();
                 PostfixStore.Clear();
@@ -121,7 +121,7 @@ namespace NeoLuaBootstrap
             Traverse = _Traverse
             const Scripting typpeof NeoLuaBootstrap.Scripting
             Position = Scripting.Pos
-            OpenConsole = Scripting.Common_NeoLua_OpenConsole
+            OpenConsole = Scripting.NeoLua_OpenConsole
         ";
 
         static public void Initialize(string scriptPath)
@@ -130,7 +130,7 @@ namespace NeoLuaBootstrap
             {
                 if (Pos == null)
                     return;
-                Common_NeoLua_SetPositionAddress(PosHandle.AddrOfPinnedObject());
+                NeoLua_SetPositionAddress(PosHandle.AddrOfPinnedObject());
 
                 L = new Lua();
                 var g = L.CreateEnvironment();

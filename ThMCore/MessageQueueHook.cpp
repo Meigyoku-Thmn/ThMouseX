@@ -2,6 +2,7 @@
 #include <vector>
 #include <imgui_impl_win32.h>
 
+#include "../Common/macro.h"
 #include "../Common/MinHook.h"
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
@@ -10,7 +11,6 @@
 #include "Direct3D9Hook.h"
 #include "Direct3D11Hook.h"
 #include "MessageQueueHook.h"
-#include "macro.h"
 
 namespace minhook = common::minhook;
 namespace neolua = common::neolua;
