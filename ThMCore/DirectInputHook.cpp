@@ -49,12 +49,12 @@ namespace core::directinputhook {
     bool PopulateMethodRVAs() {
         ModuleHandle dinput8(LoadLibraryW(L"DInput8.dll"));
         if (!dinput8) {
-            note::ToFile(TAG " Failed to load DInput8.dll.");
+            note::LastErrorToFile(TAG "Failed to load DInput8.dll.");
             return false;
         }
         auto _DirectInput8Create = (decltype(&DirectInput8Create))GetProcAddress(dinput8.get(), "DirectInput8Create");
         if (!_DirectInput8Create) {
-            note::ToFile(TAG " Failed to import DInput8.dll|DirectInput8Create.");
+            note::LastErrorToFile(TAG "Failed to import DInput8.dll|DirectInput8Create.");
             return false;
         }
 

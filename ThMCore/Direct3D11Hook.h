@@ -8,4 +8,5 @@ namespace core::directx11hook {
     using CallbackType = void (*)(void);
     bool PopulateMethodRVAs();
     std::vector<common::minhook::HookConfig> HookConfig();
+    void Initialize();
 }

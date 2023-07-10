@@ -69,12 +69,12 @@ namespace core::directx9hook {
     bool PopulateMethodRVAs() {
         ModuleHandle d3d9(LoadLibraryW(L"d3d9.dll"));
         if (!d3d9) {
-            note::ToFile(TAG " Failed to load d3d9.dll.");
+            note::LastErrorToFile(TAG " Failed to load d3d9.dll.");
             return false;
         }
         auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9.get(), "Direct3DCreate9");
         if (!_Direct3DCreate9) {
-            note::ToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9.");
+            note::LastErrorToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9.");
             return false;
         }
 
@@ -131,7 +131,7 @@ namespace core::directx9hook {
     }
 
     // job flags
-    bool initialized;
+    bool firstStepPrepared;
     bool measurementPrepared;
     bool cursorStatePrepared;
     bool imGuiPrepared;
@@ -158,7 +158,7 @@ namespace core::directx9hook {
     void CleanUp() {
         SAFE_RELEASE(cursorSprite);
         SAFE_RELEASE(cursorTexture);
-        initialized = false;
+        firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
     }
@@ -174,24 +174,23 @@ namespace core::directx9hook {
         return OriCreateDevice(pD3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
     }
 
-    struct OnInit {
-        OnInit() {
-            callbackstore::RegisterUninitializeCallback(Callback);
-            callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
-        }
-        static void Callback(bool isProcessTerminating) {
-            if (isProcessTerminating)
-                return;
-            ShutdownImGui();
-            CleanUp();
-            SAFE_FREE_LIB(d3dx9_43);
-        }
-    } _;
-
-    void Initialize(IDirect3DDevice9* device) {
-        if (initialized)
+    void TearDownCallback(bool isProcessTerminating) {
+        if (isProcessTerminating)
             return;
-        initialized = true;
+        ShutdownImGui();
+        CleanUp();
+        SAFE_FREE_LIB(d3dx9_43);
+    }
+
+    void Initialize() {
+        callbackstore::RegisterUninitializeCallback(TearDownCallback);
+        callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
+    }
+
+    void PrepareFirstStep(IDirect3DDevice9* device) {
+        if (firstStepPrepared)
+            return;
+        firstStepPrepared = true;
 
         if (d3dx9_43_failed)
             return;
@@ -199,32 +198,32 @@ namespace core::directx9hook {
         d3dx9_43 = LoadLibraryW(L"d3dx9_43.dll");
         if (!d3dx9_43) {
             d3dx9_43_failed = true;
-            note::ToFile(TAG " Failed to load d3d11.dll.");
+            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to load d3d11.dll.");
             return;
         }
         _D3DXCreateSprite = (decltype(&D3DXCreateSprite))GetProcAddress(d3dx9_43, "D3DXCreateSprite");
         if (!_D3DXCreateSprite) {
             d3dx9_43_failed = true;
-            note::ToFile(TAG " Failed to import d3dx9_43.dll|D3DXCreateSprite.");
+            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateSprite.");
             return;
         }
         _D3DXCreateTextureFromFileW = (decltype(&D3DXCreateTextureFromFileW))GetProcAddress(d3dx9_43, "D3DXCreateTextureFromFileW");
         if (!_D3DXCreateTextureFromFileW) {
             d3dx9_43_failed = true;
-            note::ToFile(TAG " Failed to import d3dx9_43.dll|D3DXCreateTextureFromFileW.");
+            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateTextureFromFileW.");
             return;
         }
         _D3DXMatrixTransformation2D = (decltype(&D3DXMatrixTransformation2D))GetProcAddress(d3dx9_43, "D3DXMatrixTransformation2D");
         if (!_D3DXMatrixTransformation2D) {
             d3dx9_43_failed = true;
-            note::ToFile(TAG " Failed to import d3dx9_43.dll|D3DXMatrixTransformation2D.");
+            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXMatrixTransformation2D.");
             return;
         }
 
         D3DDEVICE_CREATION_PARAMETERS params;
         auto rs = device->GetCreationParameters(&params);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "Initialize: device->GetCreationParameters failed", rs);
+            note::HResultToFile(TAG "PrepareFirstStep: device->GetCreationParameters failed", rs);
             return;
         }
         g_hFocusWindow = params.hFocusWindow;
@@ -437,7 +436,7 @@ namespace core::directx9hook {
     }
 
     HRESULT WINAPI D3DPresent(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion) {
-        Initialize(pDevice);
+        PrepareFirstStep(pDevice);
         PrepareMeasurement(pDevice);
         PrepareCursorState(pDevice);
         PrepareImGui(pDevice);

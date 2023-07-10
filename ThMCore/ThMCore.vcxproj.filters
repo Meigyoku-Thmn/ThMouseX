@@ -97,6 +97,9 @@
     <ClInclude Include="Initialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SendKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Games.txt" />

@@ -58,12 +58,12 @@ namespace core::directx11hook {
     bool PopulateMethodRVAs() {
         ModuleHandle d3d11(LoadLibraryW(L"d3d11.dll"));
         if (!d3d11) {
-            note::ToFile(TAG " Failed to load d3d11.dll.");
+            note::LastErrorToFile(TAG "Failed to load d3d11.dll.");
             return false;
         }
         auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11.get(), "D3D11CreateDeviceAndSwapChain");
         if (!_D3D11CreateDeviceAndSwapChain) {
-            note::ToFile(TAG " Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain.");
+            note::LastErrorToFile(TAG "Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain.");
             return false;
         }
 
@@ -114,7 +114,7 @@ namespace core::directx11hook {
     }
 
     // job flags
-    bool initialized;
+    bool firstStepPrepared;
     bool measurementPrepared;
     bool cursorStatePrepared;
     bool imGuiPrepared;
@@ -142,7 +142,7 @@ namespace core::directx11hook {
         SAFE_RELEASE(renderTargetView);
         SAFE_RELEASE(context);
         SAFE_RELEASE(device);
-        initialized = false;
+        firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
     }
@@ -153,39 +153,38 @@ namespace core::directx11hook {
         ImGui::DestroyContext();
     }
 
-    struct OnInit {
-        OnInit() {
-            callbackstore::RegisterUninitializeCallback(Callback);
-            callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
-        }
-        static void Callback(bool isProcessTerminating) {
-            if (isProcessTerminating)
-                return;
-            ShutdownImGui();
-            CleanUp();
-        }
-    } _;
-
-    void Initialize(IDXGISwapChain* swapChain) {
-        if (initialized)
+    void TearDownCallback(bool isProcessTerminating) {
+        if (isProcessTerminating)
             return;
-        initialized = true;
+        ShutdownImGui();
+        CleanUp();
+    }
+
+    void Initialize() {
+        callbackstore::RegisterUninitializeCallback(TearDownCallback);
+        callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
+    }
+
+    void PrepareFirstStep(IDXGISwapChain* swapChain) {
+        if (firstStepPrepared)
+            return;
+        firstStepPrepared = true;
 
         auto rs = swapChain->GetDevice(IID_PPV_ARGS(&device));
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "Initialize: swapChain->GetDevice failed", rs);
+            note::HResultToFile(TAG "PrepareFirstStep: swapChain->GetDevice failed", rs);
             return;
         }
 
         ComPtr<ID3D11Texture2D> pBackBuffer;
         rs = swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "Initialize: swapChain->GetBuffer failed", rs);
+            note::HResultToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
             return;
         }
         rs = device->CreateRenderTargetView(pBackBuffer.Get(), NULL, &renderTargetView);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "Initialize: device->CreateRenderTargetView failed", rs);
+            note::HResultToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
             return;
         }
 
@@ -195,14 +194,14 @@ namespace core::directx11hook {
 
         rs = device->CreatePixelShader(additiveToneShaderBlob, ARRAYSIZE(additiveToneShaderBlob), NULL, &pixelShader);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "Initialize: device->CreatePixelShader failed", rs);
+            note::HResultToFile(TAG "PrepareFirstStep: device->CreatePixelShader failed", rs);
             return;
         }
 
         DXGI_SWAP_CHAIN_DESC desc{};
         rs = swapChain->GetDesc(&desc);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "Initialize: swapChain->GetDesc failed", rs);
+            note::HResultToFile(TAG "PrepareFirstStep: swapChain->GetDesc failed", rs);
             return;
         }
         g_hFocusWindow = desc.OutputWindow;
@@ -385,7 +384,7 @@ namespace core::directx11hook {
     }
 
     HRESULT WINAPI D3DPresent(IDXGISwapChain* swapChain, UINT SyncInterval, UINT Flags) {
-        Initialize(swapChain);
+        PrepareFirstStep(swapChain);
         PrepareMeasurement(swapChain);
         PrepareCursorState(swapChain);
         PrepareImGui();

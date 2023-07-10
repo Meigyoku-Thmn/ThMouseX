@@ -72,20 +72,6 @@ namespace core::messagequeuehook {
         isCursorShow = true;
     }
 
-    struct OnInit {
-        OnInit() {
-            // Hide the mouse cursor when D3D is running, but only after cursor normalization
-            callbackstore::RegisterPostRenderCallback(Callback);
-        }
-        static void Callback() {
-            static bool callbackDone = false;
-            if (cursorNormalized && !callbackDone) {
-                callbackDone = true;
-                HideMousePointer();
-            }
-        }
-    } _;
-
     void NormalizeCursor() {
         // Set cursor visibility to -1, reset cursor to a normal arrow,
         // to ensure that there is a visible mouse cursor on the game's config dialog
@@ -200,5 +186,18 @@ namespace core::messagequeuehook {
         UnhookWindowsHookEx(CallWndRetProcHandle);
         // force all top-level windows to process a message, therefore force all processes to unload the DLL.
         SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, broadcastFlags, 1000, &_);
+    }
+
+    void PostRenderCallback() {
+        static bool callbackDone = false;
+        if (cursorNormalized && !callbackDone) {
+            callbackDone = true;
+            HideMousePointer();
+        }
+    }
+
+    void Initialize() {
+        // Hide the mouse cursor when D3D is running, but only after cursor normalization
+        callbackstore::RegisterPostRenderCallback(PostRenderCallback);
     }
 }

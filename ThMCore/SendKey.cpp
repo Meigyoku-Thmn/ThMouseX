@@ -1,3 +1,4 @@
+#include "SendKey.h"
 #include "framework.h"
 
 #include "../Common/macro.h"
@@ -75,9 +76,9 @@ void CleanUp(bool isProcessTerminating) {
     SendKeyUp(VK_DOWN);
 }
 
-struct OnInit {
-    OnInit() {
+namespace core::sendkey {
+    void Initialize() {
         callbackstore::RegisterPostRenderCallback(TestInputAndSendKeys);
         callbackstore::RegisterUninitializeCallback(CleanUp);
     }
-} _;
+}

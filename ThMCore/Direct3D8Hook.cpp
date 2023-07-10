@@ -68,12 +68,12 @@ namespace core::directx8hook {
     bool PopulateMethodRVAs() {
         ModuleHandle d3d8(LoadLibraryW(L"d3d8.dll"));
         if (!d3d8) {
-            note::ToFile(TAG " Failed to load d3d8.dll.");
+            note::LastErrorToFile(TAG "Failed to load d3d8.dll.");
             return false;
         }
         auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8.get(), "Direct3DCreate8");
         if (!_Direct3DCreate8) {
-            note::ToFile(TAG " Failed to import d3d8.dll|Direct3DCreate8.");
+            note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8.");
             return false;
         }
 
@@ -134,7 +134,7 @@ namespace core::directx8hook {
     }
 
     // job flags
-    bool initialized;
+    bool firstStepPrepared;
     bool measurementPrepared;
     bool cursorStatePrepared;
     bool imGuiPrepared;
@@ -154,7 +154,7 @@ namespace core::directx8hook {
     void CleanUp() {
         SAFE_RELEASE(cursorSprite);
         SAFE_RELEASE(cursorTexture);
-        initialized = false;
+        firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
     }
@@ -171,28 +171,27 @@ namespace core::directx8hook {
             pD3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
     }
 
-    struct OnInit {
-        OnInit() {
-            callbackstore::RegisterUninitializeCallback(Callback);
-            callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
-        }
-        static void Callback(bool isProcessTerminating) {
-            if (isProcessTerminating)
-                return;
-            ShutdownImGui();
-            CleanUp();
-        }
-    } _;
-
-    void Initialize(IDirect3DDevice8* device) {
-        if (initialized)
+    void TearDownCallback(bool isProcessTerminating) {
+        if (isProcessTerminating)
             return;
-        initialized = true;
+        ShutdownImGui();
+        CleanUp();
+    }
+
+    void Initialize() {
+        callbackstore::RegisterUninitializeCallback(TearDownCallback);
+        callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
+    }
+
+    void PrepareFirstStep(IDirect3DDevice8* device) {
+        if (firstStepPrepared)
+            return;
+        firstStepPrepared = true;
 
         D3DDEVICE_CREATION_PARAMETERS params;
         auto rs = device->GetCreationParameters(&params);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "Initialize: device->GetCreationParameters failed", rs);
+            note::HResultToFile(TAG "PrepareFirstStep: device->GetCreationParameters failed", rs);
             return;
         }
         g_hFocusWindow = params.hFocusWindow;
@@ -390,7 +389,7 @@ namespace core::directx8hook {
     }
 
     HRESULT WINAPI D3DPresent(IDirect3DDevice8* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion) {
-        Initialize(pDevice);
+        PrepareFirstStep(pDevice);
         PrepareMeasurement(pDevice);
         PrepareCursorState(pDevice);
         PrepareImGui(pDevice);

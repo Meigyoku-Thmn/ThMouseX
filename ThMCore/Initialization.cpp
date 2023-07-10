@@ -11,6 +11,7 @@
 #include "../Common/LuaJIT.h"
 #include "../Common/NeoLua.h"
 #include "KeyboardStateHook.h"
+#include "SendKey.h"
 #include "MessageQueueHook.h"
 #include "DirectInputHook.h"
 #include "Direct3D8Hook.h"
@@ -22,6 +23,7 @@ namespace callbackstore = common::callbackstore;
 namespace luajit = common::luajit;
 namespace neolua = common::neolua;
 namespace messagequeuehook = core::messagequeuehook;
+namespace sendkey = core::sendkey;
 namespace directx8 = core::directx8hook;
 namespace directx9 = core::directx9hook;
 namespace directx11 = core::directx11hook;
@@ -56,15 +58,19 @@ namespace core {
 
                 minhook::Initialize();
                 luajit::Initialize();
+                messagequeuehook::Initialize();
                 neolua::Initialize();
+                sendkey::Initialize();
 
+                directx8::Initialize();
                 minhook::CreateHook(directx8::HookConfig());
+                directx9::Initialize();
                 minhook::CreateHook(directx9::HookConfig());
+                directx11::Initialize();
                 minhook::CreateHook(directx11::HookConfig());
 
                 minhook::CreateHook(directinput::HookConfig());
                 minhook::CreateApiHook(keyboardstate::HookConfig());
-
                 minhook::CreateApiHook(messagequeuehook::HookConfig);
 
                 minhook::EnableAll();

@@ -10,4 +10,5 @@ namespace core::messagequeuehook {
     extern std::vector<common::minhook::HookApiConfig> HookConfig;
     DLLEXPORT_C bool InstallHooks();
     DLLEXPORT_C void RemoveHooks();
+    void Initialize();
 }

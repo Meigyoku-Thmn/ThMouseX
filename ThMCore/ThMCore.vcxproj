@@ -196,6 +196,7 @@
     <ClInclude Include="KeyboardStateHook.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MessageQueueHook.h" />
+    <ClInclude Include="SendKey.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">
