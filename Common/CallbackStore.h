@@ -4,7 +4,13 @@
 #include "DataTypes.h"
 
 namespace common::callbackstore {
-    using CallbackType = void (*)(bool isProcessTerminating);
-    void RegisterUninitializeCallback(CallbackType callback);
+    using UninitializeCallbackType = void (*)(bool isProcessTerminating);
+    using CallbackType = void (*)(void);
+    void RegisterUninitializeCallback(UninitializeCallbackType callback);
+    void RegisterPostRenderCallback(CallbackType callback);
+    void RegisterClearMeasurementFlagsCallback(CallbackType callback);
     void TriggerUninitializeCallbacks(bool isProcessTerminating);
+    void TriggerPostRenderCallbacks();
+    void TriggerClearMeasurementFlagsCallbacks();
+
 }

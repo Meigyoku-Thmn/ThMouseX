@@ -66,14 +66,6 @@ namespace core::directx9hook {
     HRESULT WINAPI D3DPresent(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
     decltype(&D3DPresent) OriPresent;
 
-    vector<CallbackType>& postRenderCallbacks() {
-        static vector<CallbackType> backing;
-        return backing;
-    }
-    void RegisterPostRenderCallbacks(CallbackType callback) {
-        postRenderCallbacks().push_back(callback);
-    }
-
     bool PopulateMethodRVAs() {
         ModuleHandle d3d9(LoadLibraryW(L"d3d9.dll"));
         if (!d3d9) {
@@ -185,6 +177,7 @@ namespace core::directx9hook {
     struct OnInit {
         OnInit() {
             callbackstore::RegisterUninitializeCallback(Callback);
+            callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
         }
         static void Callback(bool isProcessTerminating) {
             if (isProcessTerminating)
@@ -450,8 +443,7 @@ namespace core::directx9hook {
         PrepareImGui(pDevice);
         RenderCursor(pDevice);
         RenderImGui(pDevice);
-        for (auto& callback : postRenderCallbacks())
-            callback();
+        callbackstore::TriggerPostRenderCallbacks();
         return OriPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
     }
 }

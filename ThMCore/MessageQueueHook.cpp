@@ -7,17 +7,14 @@
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
 #include "../Common/NeoLua.h"
-#include "Direct3D8Hook.h"
-#include "Direct3D9Hook.h"
-#include "Direct3D11Hook.h"
+#include "../Common/CallbackStore.h"
+#include "Initialization.h"
 #include "MessageQueueHook.h"
 
 namespace minhook = common::minhook;
 namespace neolua = common::neolua;
 namespace helper = common::helper;
-namespace directx8 = core::directx8hook;
-namespace directx9 = core::directx9hook;
-namespace directx11 = core::directx11hook;
+namespace callbackstore = common::callbackstore;
 
 using namespace std;
 
@@ -78,9 +75,7 @@ namespace core::messagequeuehook {
     struct OnInit {
         OnInit() {
             // Hide the mouse cursor when D3D is running, but only after cursor normalization
-            directx8::RegisterPostRenderCallbacks(Callback);
-            directx9::RegisterPostRenderCallbacks(Callback);
-            directx11::RegisterPostRenderCallbacks(Callback);
+            callbackstore::RegisterPostRenderCallback(Callback);
         }
         static void Callback() {
             static bool callbackDone = false;
@@ -141,10 +136,10 @@ namespace core::messagequeuehook {
 
     LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
         if (code == HC_ACTION && g_hookApplied) {
-            static auto neoLuaInitialized = false;
-            if (!neoLuaInitialized) {
-                neoLuaInitialized = true;
-                neolua::Initialize();
+            static auto initialized = false;
+            if (!initialized) {
+                initialized = true;
+                core::Initialize();
             }
             if (!cursorNormalized) {
                 cursorNormalized = true;
@@ -168,9 +163,7 @@ namespace core::messagequeuehook {
             }
             else if (e->message == WM_SIZE) {
                 if (e->wParam == SIZE_RESTORED) {
-                    directx8::ClearMeasurementFlags();
-                    directx9::ClearMeasurementFlags();
-                    directx11::ClearMeasurementFlags();
+                    callbackstore::TriggerClearMeasurementFlagsCallbacks();
                 }
             }
         }

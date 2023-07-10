@@ -55,14 +55,6 @@ namespace core::directx11hook {
     HRESULT WINAPI D3DPresent(IDXGISwapChain* swapChain, UINT SyncInterval, UINT Flags);
     decltype(&D3DPresent) OriPresent;
 
-    vector<CallbackType>& postRenderCallbacks() {
-        static vector<CallbackType> backing;
-        return backing;
-    }
-    void RegisterPostRenderCallbacks(CallbackType callback) {
-        postRenderCallbacks().push_back(callback);
-    }
-
     bool PopulateMethodRVAs() {
         ModuleHandle d3d11(LoadLibraryW(L"d3d11.dll"));
         if (!d3d11) {
@@ -164,6 +156,7 @@ namespace core::directx11hook {
     struct OnInit {
         OnInit() {
             callbackstore::RegisterUninitializeCallback(Callback);
+            callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
         }
         static void Callback(bool isProcessTerminating) {
             if (isProcessTerminating)
@@ -398,8 +391,7 @@ namespace core::directx11hook {
         PrepareImGui();
         RenderCursor(swapChain);
         RenderImGui();
-        for (auto& callback : postRenderCallbacks())
-            callback();
+        callbackstore::TriggerPostRenderCallbacks();
         return OriPresent(swapChain, SyncInterval, Flags);
     }
 }

@@ -3,17 +3,11 @@
 #include "../Common/macro.h"
 #include "../Common/Variables.h"
 #include "../Common/CallbackStore.h"
-#include "Direct3D8Hook.h"
-#include "Direct3D9Hook.h"
-#include "Direct3D11Hook.h"
 #include "InputDetermine.h"
 
 using namespace core::inputdetermine;
 
 namespace callbackstore = common::callbackstore;
-namespace directx8 = core::directx8hook;
-namespace directx9 = core::directx9hook;
-namespace directx11 = core::directx11hook;
 
 struct LastState {
     bool bomb;
@@ -83,9 +77,7 @@ void CleanUp(bool isProcessTerminating) {
 
 struct OnInit {
     OnInit() {
-        directx8::RegisterPostRenderCallbacks(TestInputAndSendKeys);
-        directx9::RegisterPostRenderCallbacks(TestInputAndSendKeys);
-        directx11::RegisterPostRenderCallbacks(TestInputAndSendKeys);
+        callbackstore::RegisterPostRenderCallback(TestInputAndSendKeys);
         callbackstore::RegisterUninitializeCallback(CleanUp);
     }
 } _;
