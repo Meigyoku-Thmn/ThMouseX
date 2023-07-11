@@ -1,20 +1,31 @@
 #include <MinHook.h>
 #include <vector>
 #include "macro.h"
+#include <nameof.hpp>
 
 #include "MinHook.h"
 #include "CallbackStore.h"
+#include "Log.h"
+
+namespace note = common::log;
 
 using namespace std;
 
 namespace common::minhook {
     void Uninitialize(bool isProcessTerminating) {
-        MH_Uninitialize();
+        auto rs = MH_Uninitialize();
+        auto errName = string(NAMEOF_ENUM(rs));
+        if (!isProcessTerminating && rs != MH_OK)
+            note::ToFile("Failed to uninitialize MinHook: %s", errName.c_str());
     }
 
     bool Initialize() {
-        if (MH_Initialize() != MH_OK)
+        auto rs = MH_Initialize();
+        auto errName = string(NAMEOF_ENUM(rs));
+        if (rs != MH_OK) {
+            note::ToFile("Failed to initialize MinHook: %s", errName.c_str());
             return false;
+        }
         callbackstore::RegisterUninitializeCallback(Uninitialize);
         return true;
     }
@@ -22,8 +33,11 @@ namespace common::minhook {
     bool CreateHook(const vector<HookConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto rs = MH_CreateHook(config.pTarget, config.pDetour, config.ppOriginal);
-            if (rs != MH_OK)
+            auto errName = string(NAMEOF_ENUM(rs));
+            if (rs != MH_OK) {
+                note::ToFile("Failed to create hook for target %p: %s", config.pTarget, errName.c_str());
                 return false;
+            }
         }
         return true;
     }
@@ -31,8 +45,11 @@ namespace common::minhook {
     bool CreateApiHook(const vector<HookApiConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto rs = MH_CreateHookApi(config.moduleName, config.procName, config.pDetour, config.ppOriginal);
-            if (rs != MH_OK)
+            auto errName = string(NAMEOF_ENUM(rs));
+            if (rs != MH_OK) {
+                note::ToFile("Failed to create hook for api %s|%s: %s", config.moduleName, config.procName, errName.c_str());
                 return false;
+            }
         }
         return true;
     }
@@ -68,6 +85,11 @@ namespace common::minhook {
     }
 
     bool EnableAll() {
-        return MH_EnableHook(MH_ALL_HOOKS) == MH_OK;
+        auto rs = MH_EnableHook(MH_ALL_HOOKS);
+        auto errName = string(NAMEOF_ENUM(rs));
+        if (rs != MH_OK) {
+            note::ToFile("Failed to enable all hooks: %s", errName.c_str());
+            return false;
+        }
     }
 }

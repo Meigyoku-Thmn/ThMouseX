@@ -35,6 +35,8 @@ namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
     decltype(&_LoadLibraryExW) OriLoadLibraryExW;
 
+    HMODULE KERNELBASE;
+
     void Initialize() {
         setlocale(LC_ALL, ".UTF8");
         setlocale(LC_NUMERIC, "C");
@@ -71,6 +73,7 @@ namespace core {
                 keyboardstate::Initialize();
                 messagequeue::Initialize();
 
+                KERNELBASE = LoadLibraryW(L"KERNELBASE.dll");
                 std::vector<minhook::HookApiConfig> hookConfigs = {
                     { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, (PVOID*)&OriLoadLibraryExW },
                 };
@@ -101,7 +104,9 @@ namespace core {
     }
 
     void Uninitialize(bool isProcessTerminating) {
-        if (g_hookApplied)
+        if (g_hookApplied) {
+            SAFE_FREE_LIB(KERNELBASE);
             callbackstore::TriggerUninitializeCallbacks(isProcessTerminating);
+        }
     }
 }
