@@ -72,7 +72,7 @@ namespace core {
                 messagequeue::Initialize();
 
                 std::vector<minhook::HookApiConfig> hookConfigs = {
-                    { L"KERNEL32.DLL", "LoadLibraryExW", &_LoadLibraryExW, (PVOID*)&OriLoadLibraryExW },
+                    { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, (PVOID*)&OriLoadLibraryExW },
                 };
                 minhook::CreateApiHook(hookConfigs);
 
