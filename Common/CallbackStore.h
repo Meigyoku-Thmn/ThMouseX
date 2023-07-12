@@ -12,5 +12,4 @@ namespace common::callbackstore {
     void TriggerUninitializeCallbacks(bool isProcessTerminating);
     void TriggerPostRenderCallbacks();
     void TriggerClearMeasurementFlagsCallbacks();
-
 }
