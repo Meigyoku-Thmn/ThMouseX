@@ -52,10 +52,9 @@ namespace core {
         if (_wcsicmp(currentProcessName, L"ThMouseX") == 0)
             return;
 
-        auto& gameConfigs = gs_gameConfigArray;
-        for (int i = 0; i < gameConfigs.Length; i++) {
-            if (_wcsicmp(currentProcessName, gameConfigs.Configs[i].ProcessName) == 0) {
-                g_currentConfig = gameConfigs.Configs[i];
+        for (size_t i = 0; i < gs_gameConfigs.length(); i++) {
+            if (_wcsicmp(currentProcessName, gs_gameConfigs[i].ProcessName) == 0) {
+                g_currentConfig = gs_gameConfigs[i];
 
                 minhook::Initialize();
                 luajit::Initialize();

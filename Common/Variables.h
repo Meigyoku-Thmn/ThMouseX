@@ -6,7 +6,7 @@
 extern WCHAR    g_currentModuleDirPath[MAX_PATH];
 
 // single game config
-extern GameConfig g_currentConfig;
+extern GameConfig  g_currentConfig;
 
 // global game state
 extern bool        g_hookApplied;
@@ -21,10 +21,10 @@ extern FloatPoint  g_pixelOffset;
 extern bool        g_showImGui;
 
 // configuration from main exe
-extern GameConfigArray gs_gameConfigArray;
-extern BYTE            gs_bombButton;
-extern BYTE            gs_extraButton;
-extern DWORD           gs_toggleOsCursorButton;
-extern DWORD           gs_toggleImGuiButton;
-extern WCHAR           gs_textureFilePath[MAX_PATH];
-extern DWORD           gs_textureBaseHeight;
+extern GameConfigs  gs_gameConfigs;
+extern BYTE         gs_bombButton;
+extern BYTE         gs_extraButton;
+extern DWORD        gs_toggleOsCursorButton;
+extern DWORD        gs_toggleImGuiButton;
+extern WCHAR        gs_textureFilePath[MAX_PATH];
+extern DWORD        gs_textureBaseHeight;

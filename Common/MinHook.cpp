@@ -91,5 +91,6 @@ namespace common::minhook {
             note::ToFile("Failed to enable all hooks: %s", errName.c_str());
             return false;
         }
+        return true;
     }
 }

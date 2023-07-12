@@ -51,12 +51,11 @@ namespace core::configuration {
             MessageBoxA(NULL, "Missing " GameFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
             return false;
         }
-        gs_gameConfigArray = {};
-        auto& gameConfigs = gs_gameConfigArray;
+        gs_gameConfigs.fill({});
 
         string line;
         int lineCount = 0;
-        while (gameConfigs.Length < ARRAYSIZE(gameConfigs.Configs) && getline(gamesFile, line)) {
+        while (gs_gameConfigs.length() < gs_gameConfigs.capacity() && getline(gamesFile, line)) {
             lineCount++;
             stringstream lineStream(line);
             if (TestCommentLine(lineStream))
@@ -90,7 +89,7 @@ namespace core::configuration {
             if (!ok7)
                 return false;
 
-            auto& gameConfig = gameConfigs.Configs[gameConfigs.Length++];
+            auto& gameConfig = gs_gameConfigs.add_new();
 
             static_assert(is_same<decltype(&gameConfig.ProcessName[0]), decltype(processName.data())>());
             memcpy(gameConfig.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
@@ -220,7 +219,7 @@ tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount) {
     stream >> quoted(processName);
     auto wProcessName = encoding::ConvertToUtf16(processName.c_str());
 
-    auto maxSize = ARRAYSIZE(gs_gameConfigArray.Configs[0].ProcessName) - 1;
+    auto maxSize = ARRAYSIZE(gs_gameConfigs[0].ProcessName) - 1;
     if (wProcessName.size() > maxSize) {
         MessageBoxA(NULL, format("processName longer than {} characters at line {} in " GameFile ".",
             maxSize, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
@@ -240,7 +239,7 @@ tuple<vector<DWORD>, ScriptingMethod, bool> ExtractPositionRVA(stringstream& str
     else if (_stricmp(pointerChainStr.c_str(), "NeoLua") == 0)
         scriptingEngine = ScriptingMethod::NeoLua;
     else {
-        auto maxSize = ARRAYSIZE(gs_gameConfigArray.Configs[0].Address.Level);
+        auto maxSize = ARRAYSIZE(gs_gameConfigs[0].Address.Level);
         addressOffsets.reserve(maxSize);
         size_t leftBoundIdx = 0, rightBoundIdx = -1;
         for (size_t addrLevelIdx = 0; addrLevelIdx < maxSize; addrLevelIdx++) {
