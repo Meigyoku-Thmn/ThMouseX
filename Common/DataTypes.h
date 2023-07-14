@@ -16,6 +16,9 @@ struct ErrorMessage {
     LPCSTR symbolicName;
     LPCSTR description;
     LPCSTR sourceHeader;
+    ErrorMessage(unsigned int code, const char* symbolicName, const char* description, const char* sourceHeader):
+        code(code), symbolicName(symbolicName), description(description), sourceHeader(sourceHeader) {
+    }
 };
 
 enum ModulateStage {

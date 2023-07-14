@@ -7,7 +7,7 @@
 using namespace std;
 
 namespace common::errormsg::ddraw {
-    vector<ErrorMessage> messages = {
+    vector<ErrorMessage> messages{
         { 0x80004001, "DDERR_UNSUPPORTED", nullptr, "ddraw.h" },
         { 0x80004005, "DDERR_GENERIC", nullptr, "ddraw.h" },
         { 0x800401f0, "DDERR_NOTINITIALIZED", nullptr, "ddraw.h" },

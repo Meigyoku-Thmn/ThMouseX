@@ -7,7 +7,7 @@
 using namespace std;
 
 namespace common::errormsg::d3d {
-    vector<ErrorMessage> messages = {
+    vector<ErrorMessage> messages{
         { 0x8876017c, "D3DERR_OUTOFVIDEOMEMORY", nullptr, "d3d9.h" },
         { 0x8876021c, "D3DERR_WASSTILLDRAWING", nullptr, "d3d9.h" },
         { 0x887602bc, "D3DERR_BADMAJORVERSION", nullptr, "d3d.h" },

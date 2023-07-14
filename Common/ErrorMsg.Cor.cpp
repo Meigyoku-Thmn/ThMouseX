@@ -6,1156 +6,1156 @@
 
 using namespace std;
 
+#define ADD messages.emplace_back
+
 namespace common::errormsg::cor {
-    vector<ErrorMessage> messages = {
-        { 0x8000211d, "COR_E_AMBIGUOUSMATCH", "While late binding to a method via reflection, could not resolve between multiple overloads of a method.", "corerror.h" },
-        { 0x80004002, "COR_E_INVALIDCAST", "Indicates a bad cast condition", "corerror.h" },
-        { 0x80004003, "COR_E_NULLREFERENCE", "Dereferencing a null reference. In general class libraries should not throw this", "corerror.h" },
-        { 0x8002000e, "COR_E_TARGETPARAMCOUNT", "There was a mismatch between number of arguments provided and the number expected", "corerror.h" },
-        { 0x80020012, "COR_E_DIVIDEBYZERO", "Attempted to divide a number by zero.", "corerror.h" },
-        { 0x8004dead, "E_SYM_DESTROYED", nullptr, "corsym.h" },
-        { 0x80070002, "COR_E_FILENOTFOUND", nullptr, "corerror.h" },
-        { 0x80070003, "COR_E_DIRECTORYNOTFOUND", "The specified path couldn't be found.", "corerror.h" },
-        { 0x80070005, "COR_E_UNAUTHORIZEDACCESS", "Access is denied.", "corerror.h" },
-        { 0x8007000b, "COR_E_BADIMAGEFORMAT", "The format of DLL or executable being loaded is invalid.", "corerror.h" },
-        { 0x8007000e, "COR_E_OUTOFMEMORY", "The EE thows this exception when no more memory is avaible to continue execution", "corerror.h" },
-        { 0x80070026, "COR_E_ENDOFSTREAM", "Thrown when the End of file is reached", "corerror.h" },
-        { 0x80070057, "COR_E_ARGUMENT", "An argument does not meet the contract of the method.", "corerror.h" },
-        { 0x800700a1, "ERROR_BAD_PATHNAME", "The specified path is invalid.", "corerror.h" },
-        { 0x800700ce, "COR_E_PATHTOOLONG", "The specified path was too long.", "corerror.h" },
-        { 0x80070216, "COR_E_ARITHMETIC", "Overflow or underflow in mathematical operations.", "corerror.h" },
-        { 0x800703e9, "COR_E_STACKOVERFLOW", "Is raised by the EE when the execution stack overflows as it is attempting to ex", "corerror.h" },
-        { 0x80131001, "CEE_E_CVTRES_NOT_FOUND", "cannot find cvtres.exe", "corerror.h" },
-        { 0x80131010, "MSEE_E_LOADLIBFAILED", "Failed to delay load library %s (Win32 error: %d).", "corerror.h" },
-        { 0x80131011, "MSEE_E_GETPROCFAILED", "Failed to get entry point %s (Win32 error: %d).", "corerror.h" },
-        { 0x80131012, "MSEE_E_MULTCOPIESLOADED", "Multiple copies of MSCOREE.dll have been loaded by the same process.", "corerror.h" },
-        { 0x80131013, "COR_E_TYPEUNLOADED", "The type had been unloaded.", "corerror.h" },
-        { 0x80131013, "COR_E_TYPEUNLOADED", nullptr, "corerror.h" },
-        { 0x80131014, "COR_E_APPDOMAINUNLOADED", "access unloaded appdomain", "corerror.h" },
-        { 0x80131015, "COR_E_CANNOTUNLOADAPPDOMAIN", "Error while unloading an appdomain", "corerror.h" },
-        { 0x80131016, "MSEE_E_ASSEMBLYLOADINPROGRESS", "Assembly is being currently being loaded", "corerror.h" },
-        { 0x80131017, "MSEE_E_CANNOTCREATEAPPDOMAIN", "Attempt to create appdomain failed", "corerror.h" },
-        { 0x80131018, "COR_E_ASSEMBLYEXPECTED", "The module was expected to contain an assembly manifest.", "corerror.h" },
-        { 0x80131018, "COR_E_ASSEMBLYEXPECTED", nullptr, "corerror.h" },
-        { 0x80131019, "COR_E_FIXUPSINEXE", "Attempt to load an unverifiable exe with fixups (IAT with more than 2 sections or a TLS section)", "corerror.h" },
-        { 0x8013101a, "COR_E_NO_LOADLIBRARY_ALLOWED", "Attempt to LoadLibrary a managed image in an improper way (only assemblies with EAT's area allowed.)", "corerror.h" },
-        { 0x8013101b, "COR_E_NEWER_RUNTIME", "The assembly is built by a runtime newer than the currently loaded runtime, and cannot be loaded.", "corerror.h" },
-        { 0x8013101c, "COR_E_CANNOT_SET_POLICY", "Unable to set app domain security policy after non-GAC domain neutral assemblies are loaded", "corerror.h" },
-        { 0x8013101d, "COR_E_CANNOT_SPECIFY_EVIDENCE", "Unable to use assembly evidence after non-GAC domain neutral assemblies are loaded", "corerror.h" },
-        { 0x80131020, "HOST_E_DEADLOCK", "Host detects deadlock on a blocking operation", "corerror.h" },
-        { 0x80131021, "HOST_E_INTERRUPTED", "Host interrupts a wait, similar to APC", "corerror.h" },
-        { 0x80131022, "HOST_E_INVALIDOPERATION", "The operation is invalid", "corerror.h" },
-        { 0x80131023, "HOST_E_CLRNOTAVAILABLE", "CLR has been disabled due to unrecoverable error", "corerror.h" },
-        { 0x80131024, "HOST_E_TIMEOUT", "A wait times out", "corerror.h" },
-        { 0x80131025, "HOST_E_NOT_OWNER", nullptr, "corerror.h" },
-        { 0x80131026, "HOST_E_ABANDONED", "An event is abandoned", "corerror.h" },
-        { 0x80131027, "HOST_E_EXITPROCESS_THREADABORT", "ExitProcess due to ThreadAbort escalation", "corerror.h" },
-        { 0x80131028, "HOST_E_EXITPROCESS_ADUNLOAD", "ExitProcess due to AD Unload escalation", "corerror.h" },
-        { 0x80131029, "HOST_E_EXITPROCESS_TIMEOUT", "ExitProcess due to Timeout escalation", "corerror.h" },
-        { 0x8013102a, "HOST_E_EXITPROCESS_OUTOFMEMORY", "ExitProcess due to OutOfMemory escalation", "corerror.h" },
-        { 0x8013102b, "HOST_E_EXITPROCESS_STACKOVERFLOW", "ExitProcess due to StackOverflow escalation", "corerror.h" },
-        { 0x80131039, "COR_E_MODULE_HASH_CHECK_FAILED", "The check of the module's hash failed.", "corerror.h" },
-        { 0x80131040, "FUSION_E_REF_DEF_MISMATCH", "The located assembly's manifest definition does not match the assembly reference.", "corerror.h" },
-        { 0x80131041, "FUSION_E_INVALID_PRIVATE_ASM_LOCATION", "The private assembly was located outside the appbase directory.", "corerror.h" },
-        { 0x80131042, "FUSION_E_ASM_MODULE_MISSING", "A module specified in the manifest was not found.", "corerror.h" },
-        { 0x80131043, "FUSION_E_UNEXPECTED_MODULE_FOUND", "Modules which are not in the manifest were streamed in.", "corerror.h" },
-        { 0x80131044, "FUSION_E_PRIVATE_ASM_DISALLOWED", "A strongly-named assembly is required.", "corerror.h" },
-        { 0x80131045, "FUSION_E_SIGNATURE_CHECK_FAILED", "The check of the signature failed.", "corerror.h" },
-        { 0x80131046, "FUSION_E_DATABASE_ERROR", "An unexpected error was encountered in the Assembly Cache database.", "corerror.h" },
-        { 0x80131047, "FUSION_E_INVALID_NAME", "The given assembly name or codebase was invalid.", "corerror.h" },
-        { 0x80131048, "FUSION_E_CODE_DOWNLOAD_DISABLED", "HTTP download of assemblies has been disabled for this appdomain.", "corerror.h" },
-        { 0x80131049, "FUSION_E_UNINSTALL_DISALLOWED", "Uninstall of given assembly is not allowed.", "corerror.h" },
-        { 0x80131050, "FUSION_E_HOST_GAC_ASM_MISMATCH", "Assembly in host store has a different signature than assembly in GAC", "corerror.h" },
-        { 0x80131051, "FUSION_E_LOADFROM_BLOCKED", "Hosted environment doesn't permit loading by location", "corerror.h" },
-        { 0x80131052, "FUSION_E_CACHEFILE_FAILED", "Failed to add file to AppDomain cache", "corerror.h" },
-        { 0x80131100, "CLDB_E_FILE_BADREAD", "Error occured during a read.", "corerror.h" },
-        { 0x80131101, "CLDB_E_FILE_BADWRITE", "Error occured during a write.", "corerror.h" },
-        { 0x80131103, "CLDB_E_FILE_READONLY", "File is read only.", "corerror.h" },
-        { 0x80131105, "CLDB_E_NAME_ERROR", "An ill-formed name was given.", "corerror.h" },
-        { 0x80131106, "CLDB_E_TRUNCATION", "ERROR:  Data value was truncated.", "corerror.h" },
-        { 0x80131107, "CLDB_E_FILE_OLDVER", "Old version error.", "corerror.h" },
-        { 0x80131108, "CLDB_E_RELOCATED", "A shared mem open failed to open at the originally", "corerror.h" },
-        { 0x8013110a, "CLDB_E_SMDUPLICATE", "Create of shared memory failed.  A memory mapping of the same name already exists.", "corerror.h" },
-        { 0x8013110b, "CLDB_E_NO_DATA", "There isn't .CLB data in the memory or stream.", "corerror.h" },
-        { 0x8013110c, "CLDB_E_READONLY", "Database is read only.", "corerror.h" },
-        { 0x8013110d, "CLDB_E_INCOMPATIBLE", "The importing scope is not comptabile with the emitting scope", "corerror.h" },
-        { 0x8013110e, "CLDB_E_FILE_CORRUPT", "File is corrupt.", "corerror.h" },
-        { 0x8013110f, "CLDB_E_SCHEMA_VERNOTFOUND", "Version %d of schema '%s' not found.", "corerror.h" },
-        { 0x80131110, "CLDB_E_BADUPDATEMODE", "cannot open a incrementally build scope for full update", "corerror.h" },
-        { 0x80131121, "CLDB_E_INDEX_NONULLKEYS", "Null value not allowed in unique index or primary key.", "corerror.h" },
-        { 0x80131122, "CLDB_E_INDEX_DUPLICATE", "Unique index %s has been violated.", "corerror.h" },
-        { 0x80131123, "CLDB_E_INDEX_BADTYPE", "The columns data type is not allowed in an index.", "corerror.h" },
-        { 0x80131124, "CLDB_E_INDEX_NOTFOUND", "Index %s not found.", "corerror.h" },
-        { 0x80131130, "CLDB_E_RECORD_NOTFOUND", "Record wasn't found on lookup.", "corerror.h" },
-        { 0x80131131, "CLDB_E_RECORD_OVERFLOW", "Too many records were returned for criteria.", "corerror.h" },
-        { 0x80131132, "CLDB_E_RECORD_DUPLICATE", "Record is a duplicate.", "corerror.h" },
-        { 0x80131133, "CLDB_E_RECORD_PKREQUIRED", "Primary key value is required.", "corerror.h" },
-        { 0x80131134, "CLDB_E_RECORD_DELETED", "Record is valid but deleted.", "corerror.h" },
-        { 0x80131135, "CLDB_E_RECORD_OUTOFORDER", "Record is emitted out of order.", "corerror.h" },
-        { 0x80131140, "CLDB_E_COLUMN_OVERFLOW", "Data too large.", "corerror.h" },
-        { 0x80131141, "CLDB_E_COLUMN_READONLY", "Column cannot be changed.", "corerror.h" },
-        { 0x80131142, "CLDB_E_COLUMN_SPECIALCOL", "Too many RID or primary key columns, 1 is max.", "corerror.h" },
-        { 0x80131143, "CLDB_E_COLUMN_PKNONULLS", "Primary key column %s may not allow the null value.", "corerror.h" },
-        { 0x80131150, "CLDB_E_TABLE_CANTDROP", "Can't auto-drop table while open.", "corerror.h" },
-        { 0x80131151, "CLDB_E_OBJECT_NOTFOUND", "Object was not found in the database.", "corerror.h" },
-        { 0x80131152, "CLDB_E_OBJECT_COLNOTFOUND", "The column was not found.", "corerror.h" },
-        { 0x80131153, "CLDB_E_VECTOR_BADINDEX", "The index given was invalid.", "corerror.h" },
-        { 0x80131154, "CLDB_E_TOO_BIG", "A blob or string was too big.", "corerror.h" },
-        { 0x8013115f, "META_E_INVALID_TOKEN_TYPE", "A token of the wrong type passed to a metadata function.", "corerror.h" },
-        { 0x80131160, "TLBX_E_INVALID_TYPEINFO", "Typelib import: invalid type, not converted.", "corerror.h" },
-        { 0x80131161, "TLBX_E_INVALID_TYPEINFO_UNNAMED", "Typelib import: invalid type, not converted -- name unknown.", "corerror.h" },
-        { 0x80131162, "TLBX_E_CTX_NESTED", "Typelib export: Format string for nested contexts.", "corerror.h" },
-        { 0x80131163, "TLBX_E_ERROR_MESSAGE", "Typelib export: Error message wrapper.", "corerror.h" },
-        { 0x80131164, "TLBX_E_CANT_SAVE", "Typelib export: cant nullptrSaveAllChanges()nullptr", "corerror.h" },
-        { 0x80131165, "TLBX_W_LIBNOTREGISTERED", "Typelib export: type library is not registered.", "corerror.h" },
-        { 0x80131166, "TLBX_E_CANTLOADLIBRARY", "Typelib export: type library cannot be loaded.", "corerror.h" },
-        { 0x80131167, "TLBX_E_BAD_VT_TYPE", "Typelib import: invalid VT_*, not converted.", "corerror.h" },
-        { 0x80131168, "TLBX_E_NO_MSCOREE_TLB", "Typelib export: can't load mscoree.tlb", "corerror.h" },
-        { 0x80131169, "TLBX_E_BAD_MSCOREE_TLB", "Typelib export: can't get a required typeinfo from mscoree.tlb.", "corerror.h" },
-        { 0x8013116a, "TLBX_E_TLB_EXCEPTION", "Typelib import: fault reading a typelib.", "corerror.h" },
-        { 0x8013116b, "TLBX_E_MULTIPLE_LCIDS", "Typelib import: Multiple LCID's parameters on a method.", "corerror.h" },
-        { 0x8013116d, "TLBX_E_AMBIGUOUS_RETURN", "Typelib import: duplicate or ambiguous return types.", "corerror.h" },
-        { 0x8013116e, "TLBX_E_DUPLICATE_TYPE_NAME", "Typelib import: duplicate name (due to user-defined name).", "corerror.h" },
-        { 0x80131172, "TLBX_I_NONSEQUENTIALSTRUCT", "Typelib export: Can't convert non-sequential structs.", "corerror.h" },
-        { 0x80131174, "TLBX_I_RESOLVEREFFAILED", "Typelib import: The resolve ref call failed.", "corerror.h" },
-        { 0x80131175, "TLBX_E_ASANY", "Typelib export: Encounterd nullptrAsAnynullptr -- ignored.", "corerror.h" },
-        { 0x80131176, "TLBX_E_INVALIDLCIDPARAM", "Typelib export: Encounterd an LCID attribute set to an invalid param.", "corerror.h" },
-        { 0x80131177, "TLBX_E_LCIDONDISPONLYITF", "Typelib export: Encounterd an LCID attribute on a disp only interface.", "corerror.h" },
-        { 0x80131178, "TLBX_E_NONPUBLIC_FIELD", "Typelib export: Non-public field in public struct.", "corerror.h" },
-        { 0x8013117b, "TLBX_E_BAD_NAMES", "Typelib export: bad names list.", "corerror.h" },
-        { 0x8013117d, "TLBX_E_GENERICINST_SIGNATURE", "TypeLib export: generic type instance in signature.", "corerror.h" },
-        { 0x8013117e, "TLBX_E_GENERICPAR_SIGNATURE", "TypeLib export: generic type parameter in signature.", "corerror.h" },
-        { 0x80131180, "META_E_DUPLICATE", "Attempt to define an object that already exists.", "corerror.h" },
-        { 0x80131181, "META_E_GUID_REQUIRED", "A guid was not provided where one was required.", "corerror.h" },
-        { 0x80131182, "META_E_TYPEDEF_MISMATCH", "Merge: an import typedef matched ns.name, but not version and guid.", "corerror.h" },
-        { 0x80131183, "META_E_MERGE_COLLISION", "Merge: conflict between import and emit", "corerror.h" },
-        { 0x80131186, "TLBX_E_NO_SAFEHANDLE_ARRAYS", "TypeLib export: detected array of SafeHandles", "corerror.h" },
-        { 0x80131187, "META_E_METHD_NOT_FOUND", "Merge: Class already in emit scope, but member not found", "corerror.h" },
-        { 0x80131188, "META_E_FIELD_NOT_FOUND", "Merge: Class already in emit scope, but member not found", "corerror.h" },
-        { 0x80131189, "META_E_PARAM_MISMATCH", "Merge: Parameter information mismatched.", "corerror.h" },
-        { 0x8013118a, "META_E_BADMETADATA", "Merge: Inconsistency in meta data import scope", "corerror.h" },
-        { 0x8013118b, "META_E_INTFCEIMPL_NOT_FOUND", "Merge: Class already in emit scope, but interfaceimpl not found", "corerror.h" },
-        { 0x8013118c, "TLBX_E_NO_CRITICALHANDLE_ARRAYS", "TypeLib export: detected array of CriticalHandles", "corerror.h" },
-        { 0x8013118d, "META_E_CLASS_LAYOUT_INCONSISTENT", "Merge: Class is duplicated but class layout information is not consistent", "corerror.h" },
-        { 0x8013118e, "META_E_FIELD_MARSHAL_NOT_FOUND", "Merge: Field is duplicated but we cannot find the matching FieldMarshal information", "corerror.h" },
-        { 0x8013118f, "META_E_METHODSEM_NOT_FOUND", "Merge:", "corerror.h" },
-        { 0x80131190, "META_E_EVENT_NOT_FOUND", "Merge: Method is duplicated but we cannot find the matching event info.", "corerror.h" },
-        { 0x80131191, "META_E_PROP_NOT_FOUND", "Merge: Method is duplicated but we cannot find the maching property info.", "corerror.h" },
-        { 0x80131192, "META_E_BAD_SIGNATURE", "Bad binary signature", "corerror.h" },
-        { 0x80131193, "META_E_BAD_INPUT_PARAMETER", "Bad input parameters", "corerror.h" },
-        { 0x80131194, "META_E_METHDIMPL_INCONSISTENT", "Merge: duplicated methods have inconsistent ImplFlags", "corerror.h" },
-        { 0x80131195, "META_E_MD_INCONSISTENCY", "Merge: Inconsistency in meta data", "corerror.h" },
-        { 0x80131196, "META_E_CANNOTRESOLVETYPEREF", "Cannot resolve typeref", "corerror.h" },
-        { 0x80131198, "META_E_STRINGSPACE_FULL", "No logical space left to create more user strings.", "corerror.h" },
-        { 0x80131199, "META_E_UNEXPECTED_REMAP", "A TokenRemap occurred which we weren't prepared to handle.", "corerror.h" },
-        { 0x8013119a, "META_E_HAS_UNMARKALL", "Unmark all has been called already", "corerror.h" },
-        { 0x8013119b, "META_E_MUST_CALL_UNMARKALL", "Must call UnmarkAll first before marking.", "corerror.h" },
-        { 0x8013119c, "META_E_GENERICPARAM_INCONSISTENT", "Merge: duplicated types/methods have inconsistent GenericParams", "corerror.h" },
-        { 0x8013119d, "META_E_EVENT_COUNTS", "Merge: different event counts in import and emit scopes.", "corerror.h" },
-        { 0x8013119e, "META_E_PROPERTY_COUNTS", "Merge: different property counts in import and emit scopes.", "corerror.h" },
-        { 0x8013119f, "META_E_TYPEDEF_MISSING", "Merge: An input scope has a TypeRef which should but doesn't have a matching TypeDef.", "corerror.h" },
-        { 0x801311a0, "TLBX_E_CANT_LOAD_MODULE", "TypeLib export: can't open the module to export.", "corerror.h" },
-        { 0x801311a1, "TLBX_E_CANT_LOAD_CLASS", "TypeLib export: can't load a class.", "corerror.h" },
-        { 0x801311a2, "TLBX_E_NULL_MODULE", "TypeLib export: the hMod of a loaded class is 0; can't export it.", "corerror.h" },
-        { 0x801311a3, "TLBX_E_NO_CLSID_KEY", "TypeLib export: no CLSID or Interface subkey to HKCR.", "corerror.h" },
-        { 0x801311a4, "TLBX_E_CIRCULAR_EXPORT", "TypeLib export: attempt to export a CLB imported from a TLB.", "corerror.h" },
-        { 0x801311a5, "TLBX_E_CIRCULAR_IMPORT", "TypeLib import: attempt to import a TLB exported from a CLB.", "corerror.h" },
-        { 0x801311a6, "TLBX_E_BAD_NATIVETYPE", "TypeLib export: bad Native type in method signature.", "corerror.h" },
-        { 0x801311a7, "TLBX_E_BAD_VTABLE", "TypeLib import: non-increasing vtable (duplicate slots).", "corerror.h" },
-        { 0x801311a8, "TLBX_E_CRM_NON_STATIC", "TypeLib export: the COM register method is non static.", "corerror.h" },
-        { 0x801311a9, "TLBX_E_CRM_INVALID_SIG", "TypeLib export: the specified COM register method does not have the correct signature.", "corerror.h" },
-        { 0x801311aa, "TLBX_E_CLASS_LOAD_EXCEPTION", "TypeLib export: can't load, have the class load exception.", "corerror.h" },
-        { 0x801311ab, "TLBX_E_UNKNOWN_SIGNATURE", "TypeLib export: unknown element in signature.", "corerror.h" },
-        { 0x801311ac, "TLBX_E_REFERENCED_TYPELIB", "TypeLib import: reference to an external typelib.", "corerror.h" },
-        { 0x801311ad, "TLBX_E_INVALID_NAMESPACE", "TypeLib import: an imported typelib has an invalid namespace name.", "corerror.h" },
-        { 0x801311ae, "TLBX_E_LAYOUT_ERROR", "Typelib export: an error on Layout()", "corerror.h" },
-        { 0x801311af, "TLBX_E_NOTIUNKNOWN", "Typelib import: Interface not derived from IUnknown.", "corerror.h" },
-        { 0x801311b0, "TLBX_E_NONVISIBLEVALUECLASS", "Typelib export: Non COM visible value type in method signature.", "corerror.h" },
-        { 0x801311b1, "TLBX_E_LPTSTR_NOT_ALLOWED", "Typelib export: Types which contain the native type NATIVE_TYPE_LPTSTR are not allowed to be exported to COM.", "corerror.h" },
-        { 0x801311b2, "TLBX_E_AUTO_CS_NOT_ALLOWED", "Typelib export: Types with a char set of auto are not allowed to be exported to COM.", "corerror.h" },
-        { 0x801311b5, "TLBX_E_ENUM_VALUE_INVALID", "Typelib export: The enum value is not legal for a typelib.", "corerror.h" },
-        { 0x801311b6, "TLBX_E_DUPLICATE_IID", "Typelib export: Duplicate IID", "corerror.h" },
-        { 0x801311b7, "TLBX_E_NO_NESTED_ARRAYS", "Tyeplib export: detected nested arrays.", "corerror.h" },
-        { 0x801311b8, "TLBX_E_PARAM_ERROR_NAMED", "Typelib import: param type couldn't be converted.", "corerror.h" },
-        { 0x801311b9, "TLBX_E_PARAM_ERROR_UNNAMED", "Typelib import: param type couldn't be converted -- param name unknown.", "corerror.h" },
-        { 0x801311ba, "TLBX_E_AGNOST_SIGNATURE", "TypeLib export: size agnostic element in signature.", "corerror.h" },
-        { 0x801311bb, "TLBX_E_CONVERT_FAIL", "TypeLib export: exporter failed.", "corerror.h" },
-        { 0x801311bc, "TLBX_W_DUAL_NOT_DISPATCH", "Typelib import: [dual] interface not derived from IDispatch.", "corerror.h" },
-        { 0x801311bd, "TLBX_E_BAD_SIGNATURE", "Typelib export: unconvertable signature (use specific error for reporting!)", "corerror.h" },
-        { 0x801311be, "TLBX_E_ARRAY_NEEDS_NT_FIXED", "Typelib export: non-fixed/non-safearray array in struct", "corerror.h" },
-        { 0x801311bf, "TLBX_E_CLASS_NEEDS_NT_INTF", "Typelib export: non-interface class in struct", "corerror.h" },
-        { 0x801311c0, "META_E_CA_INVALID_TARGET", "Known custom attribute on invalid target.", "corerror.h" },
-        { 0x801311c1, "META_E_CA_INVALID_VALUE", "Known custom attribute had invalid value.", "corerror.h" },
-        { 0x801311c2, "META_E_CA_INVALID_BLOB", "Known custom attribute blob is bad format.", "corerror.h" },
-        { 0x801311c3, "META_E_CA_REPEATED_ARG", "Known custom attribute blob has repeated named argument.", "corerror.h" },
-        { 0x801311c4, "META_E_CA_UNKNOWN_ARGUMENT", "Known custom attrubte named arg not recognized.", "corerror.h" },
-        { 0x801311c5, "META_E_CA_VARIANT_NYI", "Known attribute named argument doesn't support variant.", "corerror.h" },
-        { 0x801311c6, "META_E_CA_ARRAY_NYI", "Known attribute named argument doesn't support array.", "corerror.h" },
-        { 0x801311c7, "META_E_CA_UNEXPECTED_TYPE", "Known attribute parser found unexpected type.", "corerror.h" },
-        { 0x801311c8, "META_E_CA_INVALID_ARGTYPE", "Known attribute parser only handles fields -- no properties.", "corerror.h" },
-        { 0x801311c9, "META_E_CA_INVALID_ARG_FOR_TYPE", "Known attribute parser found an argument that is invalid for the object it is applied to.", "corerror.h" },
-        { 0x801311ca, "META_E_CA_INVALID_UUID", "The format of the UUID was invalid.", "corerror.h" },
-        { 0x801311cb, "META_E_CA_INVALID_MARSHALAS_FIELDS", "The MarshalAs attribute has fields set that are not valid for the specified unmanaged type.", "corerror.h" },
-        { 0x801311cc, "META_E_CA_NT_FIELDONLY", "The specified unmanaged type is only valid on fields.", "corerror.h" },
-        { 0x801311cd, "META_E_CA_NEGATIVE_PARAMINDEX", "The parameter index cannot be negative.", "corerror.h" },
-        { 0x801311ce, "META_E_CA_NEGATIVE_MULTIPLIER", "The multiplier cannot be negative.", "corerror.h" },
-        { 0x801311cf, "META_E_CA_NEGATIVE_CONSTSIZE", "The constant size cannot be negative.", "corerror.h" },
-        { 0x801311d0, "META_E_CA_FIXEDSTR_SIZE_REQUIRED", "A fixed string requires a size.", "corerror.h" },
-        { 0x801311d1, "META_E_CA_CUSTMARSH_TYPE_REQUIRED", "A custom marshaler requires the custom marshaler type.", "corerror.h" },
-        { 0x801311d2, "META_E_CA_FILENAME_REQUIRED", "A DllImport attribute requires a filename.", "corerror.h" },
-        { 0x801311d3, "TLBX_W_NO_PROPS_IN_EVENTS", "TypeLib import: Detected properties in a source dispinterface.", "corerror.h" },
-        { 0x801311d4, "META_E_NOT_IN_ENC_MODE", "SaveDelta was called without being in EnC mode", "corerror.h" },
-        { 0x801311d6, "META_E_METHOD_COUNTS", "Merge: different method counts in import and emit scopes.", "corerror.h" },
-        { 0x801311d7, "META_E_FIELD_COUNTS", "Merge: different field counts in import and emit scopes.", "corerror.h" },
-        { 0x801311d8, "META_E_PARAM_COUNTS", "Merge: different param counts in import and emit scopes.", "corerror.h" },
-        { 0x801311da, "TLBX_E_TYPED_REF", "TypeLib export: Exporting a TypedReference.", "corerror.h" },
-        { 0x801311e1, "TLBX_E_BITNESS_MISMATCH", "TypeLib export: bitness of assembly doesn't match bitness of output type library", "corerror.h" },
-        { 0x801311e2, "TLBX_E_EVENT_WITH_NEWENUM", "TypeLib import: source interface with NewEnum member.", "corerror.h" },
-        { 0x801311e3, "TLBX_E_PROPGET_WITHOUT_RETURN", "TypeLib import: propget without return type", "corerror.h" },
-        { 0x801311e4, "META_E_MISMATCHED_VISIBLITY", "Merge - Match found for type/method/etc but differs in visiblity ", "corerror.h" },
-        { 0x801311e5, "META_E_CA_BAD_FRIENDS_ARGS", "InternalsVisibileTo can't have a version, culture, or processor architecture ", "corerror.h" },
-        { 0x801311e6, "META_E_CA_FRIENDS_SN_REQUIRED", "Strong-name signed assemblies can only grant friend access to strong name-signed assemblies", "corerror.h" },
-        { 0x80131203, "VLDTR_E_RID_OUTOFRANGE", "Rid is out of range.", "corerror.h" },
-        { 0x80131204, "VLDTR_E_CDTKN_OUTOFRANGE", "Coded token type is out of range.", "corerror.h" },
-        { 0x80131205, "VLDTR_E_CDRID_OUTOFRANGE", "Coded rid is out of range.", "corerror.h" },
-        { 0x80131206, "VLDTR_E_STRING_INVALID", "String offset is invalid.", "corerror.h" },
-        { 0x80131207, "VLDTR_E_GUID_INVALID", "GUID offset is invalid.", "corerror.h" },
-        { 0x80131208, "VLDTR_E_BLOB_INVALID", "Blob offset if invalid.", "corerror.h" },
-        { 0x80131209, "VLDTR_E_MOD_MULTI", "Multiple module records found.", "corerror.h" },
-        { 0x8013120a, "VLDTR_E_MOD_NULLMVID", "Module has null MVID.", "corerror.h" },
-        { 0x8013120b, "VLDTR_E_TR_NAMENULL", "TypeRef name is NULL.", "corerror.h" },
-        { 0x8013120c, "VLDTR_E_TR_DUP", "TypeRef has a dup.", "corerror.h" },
-        { 0x8013120d, "VLDTR_E_TD_NAMENULL", "TypeDef name is NULL.", "corerror.h" },
-        { 0x8013120e, "VLDTR_E_TD_DUPNAME", "TypeDef has a dup based on name+namespace.", "corerror.h" },
-        { 0x8013120f, "VLDTR_E_TD_DUPGUID", "TypeDef has a dup based on GUID.", "corerror.h" },
-        { 0x80131210, "VLDTR_E_TD_NOTIFACEOBJEXTNULL", "TypeDef that's not an Interface and not System.Object extends nil parent.", "corerror.h" },
-        { 0x80131211, "VLDTR_E_TD_OBJEXTENDSNONNULL", "System.Object extends a non-nil parent.", "corerror.h" },
-        { 0x80131212, "VLDTR_E_TD_EXTENDSSEALED", "TypeDef extends sealed class.", "corerror.h" },
-        { 0x80131213, "VLDTR_E_TD_DLTNORTSPCL", "TypeDef is Deleted but not marked with RTSpecialName.", "corerror.h" },
-        { 0x80131214, "VLDTR_E_TD_RTSPCLNOTDLT", "TypeDef is marked RTSpecialName, but is not a Deleted record.", "corerror.h" },
-        { 0x80131215, "VLDTR_E_MI_DECLPRIV", "MethodImpl's Decl is private", "corerror.h" },
-        { 0x80131216, "VLDTR_E_AS_BADNAME", "Assembly [Ref] name has path and/or extension.", "corerror.h" },
-        { 0x80131217, "VLDTR_E_FILE_SYSNAME", "File has a system name (con, com, aux, etc.).", "corerror.h" },
-        { 0x80131218, "VLDTR_E_MI_BODYSTATIC", "MethodImpl's body is static.", "corerror.h" },
-        { 0x80131219, "VLDTR_E_TD_IFACENOTABS", "TypeDef is marked Interface but not Abstract.", "corerror.h" },
-        { 0x8013121a, "VLDTR_E_TD_IFACEPARNOTNIL", "TypeDef is marked Interface but parent is not Nil.", "corerror.h" },
-        { 0x8013121b, "VLDTR_E_TD_IFACEGUIDNULL", "TypeDef is marked Interface but GUID is NULL.", "corerror.h" },
-        { 0x8013121c, "VLDTR_E_MI_DECLFINAL", "TMethodImpl's Decl is final.", "corerror.h" },
-        { 0x8013121d, "VLDTR_E_TD_VTNOTSEAL", "TypeDef is marked ValueType but not marked Sealed.", "corerror.h" },
-        { 0x8013121e, "VLDTR_E_PD_BADFLAGS", "Param has extra bits in flags.", "corerror.h" },
-        { 0x8013121f, "VLDTR_E_IFACE_DUP", "InterfaceImpl has a dup.", "corerror.h" },
-        { 0x80131220, "VLDTR_E_MR_NAMENULL", "MemberRef name is NULL.", "corerror.h" },
-        { 0x80131221, "VLDTR_E_MR_VTBLNAME", "MemberRef has an invalid name, _VtblGap*.", "corerror.h" },
-        { 0x80131222, "VLDTR_E_MR_DELNAME", "MemberRef has an invalid name, _Deleted*.", "corerror.h" },
-        { 0x80131223, "VLDTR_E_MR_PARNIL", "MemberRef parent Nil in a PE file.", "corerror.h" },
-        { 0x80131224, "VLDTR_E_MR_BADCALLINGCONV", "MemberRef has invalid calling convention.", "corerror.h" },
-        { 0x80131225, "VLDTR_E_MR_NOTVARARG", "MemberRef has Method parent but calling convention is not VARARG.", "corerror.h" },
-        { 0x80131226, "VLDTR_E_MR_NAMEDIFF", "MemberRef name different from parent MethodDef.", "corerror.h" },
-        { 0x80131227, "VLDTR_E_MR_SIGDIFF", "MemberRef signature different from parent MethodDef.", "corerror.h" },
-        { 0x80131228, "VLDTR_E_MR_DUP", "MemberRef has a dup.", "corerror.h" },
-        { 0x80131229, "VLDTR_E_CL_TDAUTO", "ClassLayout parent TypeDef is marked AutoLayout.", "corerror.h" },
-        { 0x8013122a, "VLDTR_E_CL_BADPCKSZ", "ClassLayout has bad PackingSize.", "corerror.h" },
-        { 0x8013122b, "VLDTR_E_CL_DUP", "ClassLayout has dup.", "corerror.h" },
-        { 0x8013122c, "VLDTR_E_FL_BADOFFSET", "FieldLayout2 has bad offset.", "corerror.h" },
-        { 0x8013122d, "VLDTR_E_FL_TDNIL", "FieldLayout2 has field with nil parent.", "corerror.h" },
-        { 0x8013122e, "VLDTR_E_FL_NOCL", "FieldLayout2 has no ClassLayout record.", "corerror.h" },
-        { 0x8013122f, "VLDTR_E_FL_TDNOTEXPLCT", "FieldLayout2 parent TypeDef is not marked with ExplicitLayout.", "corerror.h" },
-        { 0x80131230, "VLDTR_E_FL_FLDSTATIC", "FieldLayout2 has field marked Static.", "corerror.h" },
-        { 0x80131231, "VLDTR_E_FL_DUP", "FieldLayout2 has a dup.", "corerror.h" },
-        { 0x80131232, "VLDTR_E_MODREF_NAMENULL", "ModuleRef name is NULL.", "corerror.h" },
-        { 0x80131233, "VLDTR_E_MODREF_DUP", "ModuleRef has a dup.", "corerror.h" },
-        { 0x80131234, "VLDTR_E_TR_BADSCOPE", "TypeRef has a bad resolution scope.", "corerror.h" },
-        { 0x80131235, "VLDTR_E_TD_NESTEDNOENCL", "TypeDef marked nested has no encloser.", "corerror.h" },
-        { 0x80131236, "VLDTR_E_TD_EXTTRRES", "TypeDef extends a TypeRef which resolves to a TypeDef in the same module.", "corerror.h" },
-        { 0x80131237, "VLDTR_E_SIGNULL", "Signature specified is zero-sized.", "corerror.h" },
-        { 0x80131238, "VLDTR_E_SIGNODATA", "Signature does not have enough data at specified byte.", "corerror.h" },
-        { 0x80131239, "VLDTR_E_MD_BADCALLINGCONV", "Method signature has invalid calling convention.", "corerror.h" },
-        { 0x8013123a, "VLDTR_E_MD_THISSTATIC", "Method is marked static but has HASTHIS/EXPLICITTHIS set on the calling convention.", "corerror.h" },
-        { 0x8013123b, "VLDTR_E_MD_NOTTHISNOTSTATIC", "Method is not marked static but is not HASTHIS/EXPLICITTHIS.", "corerror.h" },
-        { 0x8013123c, "VLDTR_E_MD_NOARGCNT", "Method signature is missing the argument count.", "corerror.h" },
-        { 0x8013123d, "VLDTR_E_SIG_MISSELTYPE", "Signature missing element type.", "corerror.h" },
-        { 0x8013123e, "VLDTR_E_SIG_MISSTKN", "Signature missing token.", "corerror.h" },
-        { 0x8013123f, "VLDTR_E_SIG_TKNBAD", "Signature has bad token.", "corerror.h" },
-        { 0x80131240, "VLDTR_E_SIG_MISSFPTR", "Signature is missing function pointer.", "corerror.h" },
-        { 0x80131241, "VLDTR_E_SIG_MISSFPTRARGCNT", "Signature has function pointer missing argument count.", "corerror.h" },
-        { 0x80131242, "VLDTR_E_SIG_MISSRANK", "Signature is missing rank specification.", "corerror.h" },
-        { 0x80131243, "VLDTR_E_SIG_MISSNSIZE", "Signature is missing count of sized dimensions.", "corerror.h" },
-        { 0x80131244, "VLDTR_E_SIG_MISSSIZE", "Signature is missing size of dimension.", "corerror.h" },
-        { 0x80131245, "VLDTR_E_SIG_MISSNLBND", "Signature is missing count of lower bounds.", "corerror.h" },
-        { 0x80131246, "VLDTR_E_SIG_MISSLBND", "Signature is missing a lower bound.", "corerror.h" },
-        { 0x80131247, "VLDTR_E_SIG_BADELTYPE", "Signature has bad element type.", "corerror.h" },
-        { 0x80131248, "VLDTR_E_SIG_MISSVASIZE", "Signature has value array missing size.", "corerror.h" },
-        { 0x80131249, "VLDTR_E_FD_BADCALLINGCONV", "Field signature has invalid calling convention.", "corerror.h" },
-        { 0x8013124a, "VLDTR_E_MD_NAMENULL", "Method name is NULL.", "corerror.h" },
-        { 0x8013124b, "VLDTR_E_MD_PARNIL", "Method has parent NIL.", "corerror.h" },
-        { 0x8013124c, "VLDTR_E_MD_DUP", "Method has dup.", "corerror.h" },
-        { 0x8013124d, "VLDTR_E_FD_NAMENULL", "Field name is NULL.", "corerror.h" },
-        { 0x8013124e, "VLDTR_E_FD_PARNIL", "Field parent is Nil.", "corerror.h" },
-        { 0x8013124f, "VLDTR_E_FD_DUP", "Field has dup.", "corerror.h" },
-        { 0x80131250, "VLDTR_E_AS_MULTI", "Multiple Assembly records found.", "corerror.h" },
-        { 0x80131251, "VLDTR_E_AS_NAMENULL", "Assembly name is NULL.", "corerror.h" },
-        { 0x80131252, "VLDTR_E_SIG_TOKTYPEMISMATCH", "E_T_VALUETYPE<class token> or E_T_CLASS<vtype token>.", "corerror.h" },
-        { 0x80131253, "VLDTR_E_CL_TDINTF", "Class layout on an Interface.", "corerror.h" },
-        { 0x80131254, "VLDTR_E_ASOS_OSPLTFRMIDINVAL", "AssemblyOS platform ID invalid.", "corerror.h" },
-        { 0x80131255, "VLDTR_E_AR_NAMENULL", "AssemblyRef name is NULL.", "corerror.h" },
-        { 0x80131256, "VLDTR_E_TD_ENCLNOTNESTED", "TypeDef not nested has encloser.", "corerror.h" },
-        { 0x80131257, "VLDTR_E_AROS_OSPLTFRMIDINVAL", "AssemblyRefOS has invalid platform ID.", "corerror.h" },
-        { 0x80131258, "VLDTR_E_FILE_NAMENULL", "File name is NULL.", "corerror.h" },
-        { 0x80131259, "VLDTR_E_CT_NAMENULL", "ExportedType name is NULL.", "corerror.h" },
-        { 0x8013125a, "VLDTR_E_TD_EXTENDSCHILD", "TypeDef extends its own child.", "corerror.h" },
-        { 0x8013125b, "VLDTR_E_MAR_NAMENULL", "ManifestResource name is NULL.", "corerror.h" },
-        { 0x8013125c, "VLDTR_E_FILE_DUP", "File has dup.", "corerror.h" },
-        { 0x8013125d, "VLDTR_E_FILE_NAMEFULLQLFD", "File name is fully qualified.", "corerror.h" },
-        { 0x8013125e, "VLDTR_E_CT_DUP", "ExportedType has dup.", "corerror.h" },
-        { 0x8013125f, "VLDTR_E_MAR_DUP", "ManifestResource has dup.", "corerror.h" },
-        { 0x80131260, "VLDTR_E_MAR_NOTPUBPRIV", "ManifestResource is neither Public not Private.", "corerror.h" },
-        { 0x80131261, "VLDTR_E_TD_ENUMNOVALUE", "Enum has no nullptrvalue__nullptr field.", "corerror.h" },
-        { 0x80131262, "VLDTR_E_TD_ENUMVALSTATIC", "Enum's nullptrvalue__nullptr field is static.", "corerror.h" },
-        { 0x80131263, "VLDTR_E_TD_ENUMVALNOTSN", "Enum's nullptrvalue__nullptr field is not SpecialName.", "corerror.h" },
-        { 0x80131264, "VLDTR_E_TD_ENUMFLDNOTST", "Enum's field is not static.", "corerror.h" },
-        { 0x80131265, "VLDTR_E_TD_ENUMFLDNOTLIT", "Enum's field is not literal.", "corerror.h" },
-        { 0x80131266, "VLDTR_E_TD_ENUMNOLITFLDS", "Enum has no literal fields.", "corerror.h" },
-        { 0x80131267, "VLDTR_E_TD_ENUMFLDSIGMISMATCH", "Enum's field sig does not match value__ sig.", "corerror.h" },
-        { 0x80131268, "VLDTR_E_TD_ENUMVALNOT1ST", "Enum's nullptrvalue__nullptr field is not first.", "corerror.h" },
-        { 0x80131269, "VLDTR_E_FD_NOTVALUERTSN", "Field is RTSpecialName but name is not nullptrvalue__nullptr.", "corerror.h" },
-        { 0x8013126a, "VLDTR_E_FD_VALUEPARNOTENUM", "Field nullptrvalue__nullptr in not Enum class.", "corerror.h" },
-        { 0x8013126b, "VLDTR_E_FD_INSTINIFACE", "Instance field in interface.", "corerror.h" },
-        { 0x8013126c, "VLDTR_E_FD_NOTPUBINIFACE", "Non-public field in interface.", "corerror.h" },
-        { 0x8013126d, "VLDTR_E_FMD_GLOBALNOTPUBPRIVSC", "Global field/method neither Public nor PrivateScope.", "corerror.h" },
-        { 0x8013126e, "VLDTR_E_FMD_GLOBALNOTSTATIC", "Global field/method not static.", "corerror.h" },
-        { 0x8013126f, "VLDTR_E_FD_GLOBALNORVA", "Global field has no RVA.", "corerror.h" },
-        { 0x80131270, "VLDTR_E_MD_CTORZERORVA", ".ctor,.cctor has zero RVA.", "corerror.h" },
-        { 0x80131271, "VLDTR_E_FD_MARKEDNOMARSHAL", "Field is marked marshaled but has no marshaling rec.", "corerror.h" },
-        { 0x80131272, "VLDTR_E_FD_MARSHALNOTMARKED", "Field has marshaling rec but is not marked marshaled.", "corerror.h" },
-        { 0x80131273, "VLDTR_E_FD_MARKEDNODEFLT", "Field is marked HasDefault but has no const value.", "corerror.h" },
-        { 0x80131274, "VLDTR_E_FD_DEFLTNOTMARKED", "Field has const value rec but is not marked HasDefault.", "corerror.h" },
-        { 0x80131275, "VLDTR_E_FMD_MARKEDNOSECUR", "Field/method is marked HasSecurity but has no security rec.", "corerror.h" },
-        { 0x80131276, "VLDTR_E_FMD_SECURNOTMARKED", "Field/method has security rec but is not marked HasSecurity.", "corerror.h" },
-        { 0x80131277, "VLDTR_E_FMD_PINVOKENOTSTATIC", "Field/method is PInvoke but is not marked Static.", "corerror.h" },
-        { 0x80131278, "VLDTR_E_FMD_MARKEDNOPINVOKE", "Field/method is marked PInvoke but has no ImplMap.", "corerror.h" },
-        { 0x80131279, "VLDTR_E_FMD_PINVOKENOTMARKED", "Field/method has ImplMap but is not marked PInvoke.", "corerror.h" },
-        { 0x8013127a, "VLDTR_E_FMD_BADIMPLMAP", "Field/method has invalid ImplMap", "corerror.h" },
-        { 0x8013127b, "VLDTR_E_IMAP_BADMODREF", "ImplMap has invalid ModuleRef", "corerror.h" },
-        { 0x8013127c, "VLDTR_E_IMAP_BADMEMBER", "ImplMap has invalid MemberForwarded", "corerror.h" },
-        { 0x8013127d, "VLDTR_E_IMAP_BADIMPORTNAME", "ImplMap has invalid ImportName", "corerror.h" },
-        { 0x8013127e, "VLDTR_E_IMAP_BADCALLCONV", "ImplMap has invalid call conv", "corerror.h" },
-        { 0x8013127f, "VLDTR_E_FMD_BADACCESSFLAG", "Field/method has invalid access flag", "corerror.h" },
-        { 0x80131280, "VLDTR_E_FD_INITONLYANDLITERAL", "Field is InitOnly and Literal", "corerror.h" },
-        { 0x80131281, "VLDTR_E_FD_LITERALNOTSTATIC", "Field is Literal but not Static", "corerror.h" },
-        { 0x80131282, "VLDTR_E_FMD_RTSNNOTSN", "Field/method is RTSpec.Name but not Spec.Name", "corerror.h" },
-        { 0x80131283, "VLDTR_E_MD_ABSTPARNOTABST", "Method is abstract, parent is not", "corerror.h" },
-        { 0x80131284, "VLDTR_E_MD_NOTSTATABSTININTF", "Method not static or abstract in interface", "corerror.h" },
-        { 0x80131285, "VLDTR_E_MD_NOTPUBININTF", "Method not public in interface", "corerror.h" },
-        { 0x80131286, "VLDTR_E_MD_CTORININTF", "ctor in interface", "corerror.h" },
-        { 0x80131287, "VLDTR_E_MD_GLOBALCTORCCTOR", "global ctor or cctor", "corerror.h" },
-        { 0x80131288, "VLDTR_E_MD_CTORSTATIC", "static ctor", "corerror.h" },
-        { 0x80131289, "VLDTR_E_MD_CTORNOTSNRTSN", "ctor,cctor not marked SpecialName,RTSpecialName", "corerror.h" },
-        { 0x8013128a, "VLDTR_E_MD_CTORVIRT", "virtual ctor,cctor", "corerror.h" },
-        { 0x8013128b, "VLDTR_E_MD_CTORABST", "abstract ctor,cctor", "corerror.h" },
-        { 0x8013128c, "VLDTR_E_MD_CCTORNOTSTATIC", "instance cctor", "corerror.h" },
-        { 0x8013128d, "VLDTR_E_MD_ZERORVA", "RVA=0, method not abstract or pinvoke or runtime, or reverse", "corerror.h" },
-        { 0x8013128e, "VLDTR_E_MD_FINNOTVIRT", "Method is final and not virtual", "corerror.h" },
-        { 0x8013128f, "VLDTR_E_MD_STATANDFINORVIRT", "Method is static and final or virtual", "corerror.h" },
-        { 0x80131290, "VLDTR_E_MD_ABSTANDFINAL", "Method is abstract and final", "corerror.h" },
-        { 0x80131291, "VLDTR_E_MD_ABSTANDIMPL", "Method is abstract and implemented", "corerror.h" },
-        { 0x80131292, "VLDTR_E_MD_ABSTANDPINVOKE", "Method is abstract and pinvoke", "corerror.h" },
-        { 0x80131293, "VLDTR_E_MD_ABSTNOTVIRT", "Method is abstract and not virtual", "corerror.h" },
-        { 0x80131294, "VLDTR_E_MD_NOTABSTNOTIMPL", "Method is not abstract and not implemented", "corerror.h" },
-        { 0x80131295, "VLDTR_E_MD_NOTABSTBADFLAGSRVA", "Method is not abstract and not (RVA!=0 or pinvoke or runtime)", "corerror.h" },
-        { 0x80131296, "VLDTR_E_MD_PRIVSCOPENORVA", "Method is PrivateScope and has RVA==0", "corerror.h" },
-        { 0x80131297, "VLDTR_E_MD_GLOBALABSTORVIRT", "Global method is abstract or virtual", "corerror.h" },
-        { 0x80131298, "VLDTR_E_SIG_LONGFORM", "Signature uses long form", "corerror.h" },
-        { 0x80131299, "VLDTR_E_MD_MULTIPLESEMANTICS", "Method has multiple semantics (warning)", "corerror.h" },
-        { 0x8013129a, "VLDTR_E_MD_INVALIDSEMANTICS", "Method has invalid semantics (not event or prop)", "corerror.h" },
-        { 0x8013129b, "VLDTR_E_MD_SEMANTICSNOTEXIST", "Method has semantics assoc that does not exist", "corerror.h" },
-        { 0x8013129c, "VLDTR_E_MI_DECLNOTVIRT", "MethodImpl's Decl is not virtual", "corerror.h" },
-        { 0x8013129d, "VLDTR_E_FMD_GLOBALITEM", "Global field/method (warning,CLS)", "corerror.h" },
-        { 0x8013129e, "VLDTR_E_MD_MULTSEMANTICFLAGS", "Method has multiple semantic flags set", "corerror.h" },
-        { 0x8013129f, "VLDTR_E_MD_NOSEMANTICFLAGS", "Method has no semantic flags set", "corerror.h" },
-        { 0x801312a0, "VLDTR_E_FD_FLDINIFACE", "Field in Interface (warning, CLS)", "corerror.h" },
-        { 0x801312a1, "VLDTR_E_AS_HASHALGID", "Unrecognized Hash Alg ID (warning)", "corerror.h" },
-        { 0x801312a2, "VLDTR_E_AS_PROCID", "Unrecognized Processor ID in Assembly(warning)", "corerror.h" },
-        { 0x801312a3, "VLDTR_E_AR_PROCID", "Unrecognized Processor ID in AssemblyRef(warning)", "corerror.h" },
-        { 0x801312a4, "VLDTR_E_CN_PARENTRANGE", "Constant: parent token out of range", "corerror.h" },
-        { 0x801312a5, "VLDTR_E_AS_BADFLAGS", "Invalid flags in Assembly", "corerror.h" },
-        { 0x801312a6, "VLDTR_E_TR_HASTYPEDEF", "There is TypeDef with same name as TypeRef (warning)", "corerror.h" },
-        { 0x801312a7, "VLDTR_E_IFACE_BADIMPL", "In InterfaceImpl, the implementing token is not TypeDef", "corerror.h" },
-        { 0x801312a8, "VLDTR_E_IFACE_BADIFACE", "In InterfaceImpl, the implemented token is not TypeDef or TypeRef", "corerror.h" },
-        { 0x801312a9, "VLDTR_E_TD_SECURNOTMARKED", "TypeDef has security rec but not marked HasSecurity", "corerror.h" },
-        { 0x801312aa, "VLDTR_E_TD_MARKEDNOSECUR", "TypeDef marked HasSecurity but has no security rec", "corerror.h" },
-        { 0x801312ab, "VLDTR_E_MD_CCTORHASARGS", ".cctor has arguments", "corerror.h" },
-        { 0x801312ac, "VLDTR_E_CT_BADIMPL", "ExportedType has invalid Implementation", "corerror.h" },
-        { 0x801312ad, "VLDTR_E_MI_ALIENBODY", "MethodImpl has body from other class", "corerror.h" },
-        { 0x801312ae, "VLDTR_E_MD_CCTORCALLCONV", ".cctor has invalid calling convention", "corerror.h" },
-        { 0x801312af, "VLDTR_E_MI_BADCLASS", "MethodImpl has invalid Class token", "corerror.h" },
-        { 0x801312b0, "VLDTR_E_MI_CLASSISINTF", "MethodImpl declared in Interface", "corerror.h" },
-        { 0x801312b1, "VLDTR_E_MI_BADDECL", "MethodImpl has invalid MethodDeclaration token", "corerror.h" },
-        { 0x801312b2, "VLDTR_E_MI_BADBODY", "MethodImpl has invalid MethodBody token", "corerror.h" },
-        { 0x801312b3, "VLDTR_E_MI_DUP", "MethodImpl has duplicate", "corerror.h" },
-        { 0x801312b4, "VLDTR_E_FD_BADPARENT", "Bad field parent", "corerror.h" },
-        { 0x801312b5, "VLDTR_E_MD_PARAMOUTOFSEQ", "Param out of sequence (warning)", "corerror.h" },
-        { 0x801312b6, "VLDTR_E_MD_PARASEQTOOBIG", "Param's sequence num exceeds num of args", "corerror.h" },
-        { 0x801312b7, "VLDTR_E_MD_PARMMARKEDNOMARSHAL", "Param marked HasMarshal, has no marshaling info", "corerror.h" },
-        { 0x801312b8, "VLDTR_E_MD_PARMMARSHALNOTMARKED", "Param has marshaling info, not marked HasMarshal", "corerror.h" },
-        { 0x801312ba, "VLDTR_E_MD_PARMMARKEDNODEFLT", "Param marked HasDefault, has no const value", "corerror.h" },
-        { 0x801312bb, "VLDTR_E_MD_PARMDEFLTNOTMARKED", "Param has const value, not marked HasDefault", "corerror.h" },
-        { 0x801312bc, "VLDTR_E_PR_BADSCOPE", "Prop has invalid scope", "corerror.h" },
-        { 0x801312bd, "VLDTR_E_PR_NONAME", "Prop has no name", "corerror.h" },
-        { 0x801312be, "VLDTR_E_PR_NOSIG", "Prop has no signature", "corerror.h" },
-        { 0x801312bf, "VLDTR_E_PR_DUP", "Prop has a duplicate", "corerror.h" },
-        { 0x801312c0, "VLDTR_E_PR_BADCALLINGCONV", "Prop has bad calling convention", "corerror.h" },
-        { 0x801312c1, "VLDTR_E_PR_MARKEDNODEFLT", "Prop marked HasDefault, has no const value", "corerror.h" },
-        { 0x801312c2, "VLDTR_E_PR_DEFLTNOTMARKED", "Prop has const value, not marked HasDefault", "corerror.h" },
-        { 0x801312c3, "VLDTR_E_PR_BADSEMANTICS", "Prop has method not (Setter,Getter, or Other)", "corerror.h" },
-        { 0x801312c4, "VLDTR_E_PR_BADMETHOD", "Prop has method with invalid token", "corerror.h" },
-        { 0x801312c5, "VLDTR_E_PR_ALIENMETHOD", "Prop has method from another class", "corerror.h" },
-        { 0x801312c6, "VLDTR_E_CN_BLOBNOTNULL", "Const has non-null blob when it should not", "corerror.h" },
-        { 0x801312c7, "VLDTR_E_CN_BLOBNULL", "Const has null value blob", "corerror.h" },
-        { 0x801312c8, "VLDTR_E_EV_BADSCOPE", "Event has invalid scope", "corerror.h" },
-        { 0x801312ca, "VLDTR_E_EV_NONAME", "Event has no name", "corerror.h" },
-        { 0x801312cb, "VLDTR_E_EV_DUP", "Event has a duplicate", "corerror.h" },
-        { 0x801312cc, "VLDTR_E_EV_BADEVTYPE", "Event has invalid EventType", "corerror.h" },
-        { 0x801312cd, "VLDTR_E_EV_EVTYPENOTCLASS", "Event's EventType is not a class", "corerror.h" },
-        { 0x801312ce, "VLDTR_E_EV_BADSEMANTICS", "Event has method not (AddOn,RemoveOn,Fire,Other)", "corerror.h" },
-        { 0x801312cf, "VLDTR_E_EV_BADMETHOD", "Event has method with invalid token", "corerror.h" },
-        { 0x801312d0, "VLDTR_E_EV_ALIENMETHOD", "Event has method from another class", "corerror.h" },
-        { 0x801312d1, "VLDTR_E_EV_NOADDON", "Event has no AddOn method", "corerror.h" },
-        { 0x801312d2, "VLDTR_E_EV_NOREMOVEON", "Event has no RemoveOn method", "corerror.h" },
-        { 0x801312d3, "VLDTR_E_CT_DUPTDNAME", "ExportedType has same name as TypeDef", "corerror.h" },
-        { 0x801312d4, "VLDTR_E_MAR_BADOFFSET", "MRes refers to non-PE file with offset !=0", "corerror.h" },
-        { 0x801312d5, "VLDTR_E_DS_BADOWNER", "Decl.security has invalid owner token", "corerror.h" },
-        { 0x801312d6, "VLDTR_E_DS_BADFLAGS", "Decl.security has invalid action flags", "corerror.h" },
-        { 0x801312d7, "VLDTR_E_DS_NOBLOB", "Decl.security has no permission blob", "corerror.h" },
-        { 0x801312d8, "VLDTR_E_MAR_BADIMPL", "Manifest resource has invalid Implementation", "corerror.h" },
-        { 0x801312da, "VLDTR_E_MR_VARARGCALLINGCONV", "MemberRef has VARARG calling conv. (CLS warning)", "corerror.h" },
-        { 0x801312db, "VLDTR_E_MD_CTORNOTVOID", ".ctor,.cctor returning not void", "corerror.h" },
-        { 0x801312dc, "VLDTR_E_EV_FIRENOTVOID", "Fire method returning not void", "corerror.h" },
-        { 0x801312dd, "VLDTR_E_AS_BADLOCALE", "Invalid locale", "corerror.h" },
-        { 0x801312de, "VLDTR_E_CN_PARENTTYPE", "Constant has parent of invalid type", "corerror.h" },
-        { 0x801312df, "VLDTR_E_SIG_SENTINMETHODDEF", "E_T_SENTINEL in MethodDef signature", "corerror.h" },
-        { 0x801312e0, "VLDTR_E_SIG_SENTMUSTVARARG", "E_T_SENTINEL <=> VARARG", "corerror.h" },
-        { 0x801312e1, "VLDTR_E_SIG_MULTSENTINELS", "Multiple E_T_SENTINELs", "corerror.h" },
-        { 0x801312e2, "VLDTR_E_SIG_LASTSENTINEL", "E_T_SENTINEL not followed by type", "corerror.h" },
-        { 0x801312e3, "VLDTR_E_SIG_MISSARG", "Signature missing argument", "corerror.h" },
-        { 0x801312e4, "VLDTR_E_SIG_BYREFINFIELD", "Field of ByRef type", "corerror.h" },
-        { 0x801312e5, "VLDTR_E_MD_SYNCMETHODINVTYPE", "Synchronized method in value class", "corerror.h" },
-        { 0x801312e6, "VLDTR_E_TD_NAMETOOLONG", "TypeDef name too long", "corerror.h" },
-        { 0x801312e7, "VLDTR_E_AS_PROCDUP", "Duplicate Assembly Processor", "corerror.h" },
-        { 0x801312e8, "VLDTR_E_ASOS_DUP", "Duplicate Assembly OS (ID+ver.major+ver.minor)", "corerror.h" },
-        { 0x801312e9, "VLDTR_E_MAR_BADFLAGS", "Manifest Resource has bad flags", "corerror.h" },
-        { 0x801312ea, "VLDTR_E_CT_NOTYPEDEFID", "ExportedType has nil TypeDefId", "corerror.h" },
-        { 0x801312eb, "VLDTR_E_FILE_BADFLAGS", "File has bad flags", "corerror.h" },
-        { 0x801312ec, "VLDTR_E_FILE_NULLHASH", "File has no hash blob", "corerror.h" },
-        { 0x801312ed, "VLDTR_E_MOD_NONAME", "Module has no name", "corerror.h" },
-        { 0x801312ee, "VLDTR_E_MOD_NAMEFULLQLFD", "Module has fully-qualified name", "corerror.h" },
-        { 0x801312ef, "VLDTR_E_TD_RTSPCLNOTSPCL", "TypeDef is tdRTSpecialName but not tdSpecialName", "corerror.h" },
-        { 0x801312f0, "VLDTR_E_TD_EXTENDSIFACE", "TypeDef extends interface", "corerror.h" },
-        { 0x801312f1, "VLDTR_E_MD_CTORPINVOKE", ".ctor,.cctor is PInvokeImpl", "corerror.h" },
-        { 0x801312f2, "VLDTR_E_TD_SYSENUMNOTCLASS", "System.Enum is not a class", "corerror.h" },
-        { 0x801312f3, "VLDTR_E_TD_SYSENUMNOTEXTVTYPE", "System.Enum extends not System.ValueType", "corerror.h" },
-        { 0x801312f4, "VLDTR_E_MI_SIGMISMATCH", "MethodImpl's Decl and Body signatures mismatch", "corerror.h" },
-        { 0x801312f5, "VLDTR_E_TD_ENUMHASMETHODS", "TypeDef extends System.Enum but has methods", "corerror.h" },
-        { 0x801312f6, "VLDTR_E_TD_ENUMIMPLIFACE", "TypeDef extends System.Enum but impls interface(s)", "corerror.h" },
-        { 0x801312f7, "VLDTR_E_TD_ENUMHASPROP", "TypeDef extends System.Enum but has prop(s)", "corerror.h" },
-        { 0x801312f8, "VLDTR_E_TD_ENUMHASEVENT", "TypeDef extends System.Enum but has event(s)", "corerror.h" },
-        { 0x801312f9, "VLDTR_E_TD_BADMETHODLST", "TypeDef has MethodList > Nmethods+1", "corerror.h" },
-        { 0x801312fa, "VLDTR_E_TD_BADFIELDLST", "TypeDef has FieldList > Nfields+1", "corerror.h" },
-        { 0x801312fb, "VLDTR_E_CN_BADTYPE", "Constant has wrong type", "corerror.h" },
-        { 0x801312fc, "VLDTR_E_TD_ENUMNOINSTFLD", "Enum has no instance fields", "corerror.h" },
-        { 0x801312fd, "VLDTR_E_TD_ENUMMULINSTFLD", "Enum has multiple instance fields", "corerror.h" },
-        { 0x801312fe, "VLDTR_E_INTERRUPTED", "Validator has been interrupted by the VEHandler.", "corerror.h" },
-        { 0x801312ff, "VLDTR_E_NOTINIT", "Validator failed to initialize correctly.", "corerror.h" },
-        { 0x80131300, "CORDBG_E_UNRECOVERABLE_ERROR", "Unrecoverable API error.", "corerror.h" },
-        { 0x80131301, "CORDBG_E_PROCESS_TERMINATED", "Process was terminated.", "corerror.h" },
-        { 0x80131302, "CORDBG_E_PROCESS_NOT_SYNCHRONIZED", "Process not synchronized.", "corerror.h" },
-        { 0x80131303, "CORDBG_E_CLASS_NOT_LOADED", "A class is not loaded.", "corerror.h" },
-        { 0x80131304, "CORDBG_E_IL_VAR_NOT_AVAILABLE", "An IL variable is not available at the", "corerror.h" },
-        { 0x80131305, "CORDBG_E_BAD_REFERENCE_VALUE", "A reference value was found to be bad", "corerror.h" },
-        { 0x80131306, "CORDBG_E_FIELD_NOT_AVAILABLE", "A field in a class is not available, ", "corerror.h" },
-        { 0x80131307, "CORDBG_E_NON_NATIVE_FRAME", "\"Native frame only\" operation on", "corerror.h" },
-        { 0x80131308, "CORDBG_E_NONCONTINUABLE_EXCEPTION", "Continue on non-continuable exception", "corerror.h" },
-        { 0x80131309, "CORDBG_E_CODE_NOT_AVAILABLE", "The code is currently unavailable", "corerror.h" },
-        { 0x8013130a, "CORDBG_E_FUNCTION_NOT_IL", "Attempt to get a ICorDebugFunction for", "corerror.h" },
-        { 0x8013130e, "CORDBG_E_CANT_SET_IP_INTO_FINALLY", "SetIP isn't possible, because SetIP would", "corerror.h" },
-        { 0x8013130f, "CORDBG_E_CANT_SET_IP_OUT_OF_FINALLY", "SetIP isn't possible because it would move", "corerror.h" },
-        { 0x80131310, "CORDBG_E_CANT_SET_IP_INTO_CATCH", "SetIP isn't possible, because SetIP would", "corerror.h" },
-        { 0x80131311, "CORDBG_E_SET_IP_NOT_ALLOWED_ON_NONLEAF_FRAME", "Setip cannot be done on any frame except", "corerror.h" },
-        { 0x80131312, "CORDBG_E_SET_IP_IMPOSSIBLE", "SetIP isn't allowed. For example, there is", "corerror.h" },
-        { 0x80131313, "CORDBG_E_FUNC_EVAL_BAD_START_POINT", "Func eval can't work if we're, for example, ", "corerror.h" },
-        { 0x80131314, "CORDBG_E_INVALID_OBJECT", "This object value is no longer valid.", "corerror.h" },
-        { 0x80131315, "CORDBG_E_FUNC_EVAL_NOT_COMPLETE", "If you call CordbEval::GetResult before the", "corerror.h" },
-        { 0x80131318, "CORDBG_E_INPROC_NOT_IMPL", "The inproc version of the debugging API", "corerror.h" },
-        { 0x8013131a, "CORDBG_E_STATIC_VAR_NOT_AVAILABLE", "A static variable isn't available because", "corerror.h" },
-        { 0x8013131b, "CORDBG_E_OBJECT_IS_NOT_COPYABLE_VALUE_CLASS", "Can't copy a VC with object refs in it.", "corerror.h" },
-        { 0x8013131c, "CORDBG_E_CANT_SETIP_INTO_OR_OUT_OF_FILTER", "SetIP can't leave or enter a filter", "corerror.h" },
-        { 0x8013131d, "CORDBG_E_CANT_CHANGE_JIT_SETTING_FOR_ZAP_MODULE", "You can't change JIT settings for ZAP", "corerror.h" },
-        { 0x8013131e, "CORDBG_E_CANT_SET_IP_OUT_OF_FINALLY_ON_WIN64", "SetIP isn't possible because it would move", "corerror.h" },
-        { 0x8013131f, "CORDBG_E_CANT_SET_IP_OUT_OF_CATCH_ON_WIN64", "SetIP isn't possible because it would move", "corerror.h" },
-        { 0x80131320, "CORDBG_E_REMOTE_CONNECTION_CONN_RESET", "The remote device closed the connection.", "corerror.h" },
-        { 0x80131321, "CORDBG_E_REMOTE_CONNECTION_KEEP_ALIVE", "The connection was closed due to akeep alive failure.", "corerror.h" },
-        { 0x80131322, "CORDBG_E_REMOTE_CONNECTION_FATAL_ERROR", "Generic error that the device connection has been broken with no chance for recovery.", "corerror.h" },
-        { 0x80131323, "CORDBG_E_CANT_SET_TO_JMC", "Can't use JMC on this code (likely wrong jit settings).", "corerror.h" },
-        { 0x8013132d, "CORDBG_E_BAD_THREAD_STATE", "The state of the thread is invalid.", "corerror.h" },
-        { 0x8013132e, "CORDBG_E_DEBUGGER_ALREADY_ATTACHED", "This process has already been attached to", "corerror.h" },
-        { 0x8013132f, "CORDBG_E_SUPERFLOUS_CONTINUE", "Returned from a call to Continue that was", "corerror.h" },
-        { 0x80131330, "CORDBG_E_SET_VALUE_NOT_ALLOWED_ON_NONLEAF_FRAME", "Can't perfrom SetValue on non-leaf frames.", "corerror.h" },
-        { 0x80131331, "CORDBG_E_ENC_EH_MAX_NESTING_LEVEL_CANT_INCREASE", "When doing EnC, some JITters don't let you", "corerror.h" },
-        { 0x80131332, "CORDBG_E_ENC_MODULE_NOT_ENC_ENABLED", "Tried to do EnC on a module that wasn't", "corerror.h" },
-        { 0x80131333, "CORDBG_E_SET_IP_NOT_ALLOWED_ON_EXCEPTION", "Setip cannot be done on any exception", "corerror.h" },
-        { 0x80131334, "CORDBG_E_VARIABLE_IS_ACTUALLY_LITERAL", "The 'variable' doesn't exist because it is a", "corerror.h" },
-        { 0x80131335, "CORDBG_E_PROCESS_DETACHED", "Process has been detached from", "corerror.h" },
-        { 0x80131336, "CORDBG_E_ENC_METHOD_SIG_CHANGED", "Not allowed to change the signature of an", "corerror.h" },
-        { 0x80131337, "CORDBG_E_ENC_METHOD_NO_LOCAL_SIG", "Can't get the local signature for the method", "corerror.h" },
-        { 0x80131338, "CORDBG_E_ENC_CANT_ADD_FIELD_TO_VALUE_OR_LAYOUT_CLASS", "Adding a field to a value or layout class is prohibitted, ", "corerror.h" },
-        { 0x80131339, "CORDBG_E_ENC_CANT_CHANGE_FIELD", "Once you've got a field, you're not allowed to change", "corerror.h" },
-        { 0x8013133a, "CORDBG_E_ENC_CANT_ADD_NON_PRIVATE_MEMBER", "Only support addition of private members.", "corerror.h" },
-        { 0x8013133b, "CORDBG_E_FIELD_NOT_STATIC", "Returned if someone tries to call GetStaticFieldValue", "corerror.h" },
-        { 0x8013133c, "CORDBG_E_FIELD_NOT_INSTANCE", "Returned if someone tries to call GetStaticFieldValue", "corerror.h" },
-        { 0x8013133d, "CORDBG_E_ENC_ZAPPED_WITHOUT_ENC", "If a zap file was created without the EnC flag set, then", "corerror.h" },
-        { 0x8013133e, "CORDBG_E_ENC_BAD_METHOD_INFO", "Lacking information about method.", "corerror.h" },
-        { 0x8013133f, "CORDBG_E_ENC_JIT_CANT_UPDATE", "The JIT is unable to update the method.", "corerror.h" },
-        { 0x80131340, "CORDBG_E_ENC_MISSING_CLASS", "An internal structure about the class is missing", "corerror.h" },
-        { 0x80131341, "CORDBG_E_ENC_INTERNAL_ERROR", "Generic message for nullptrSomething user doesn't control went wrongnullptr message.", "corerror.h" },
-        { 0x80131342, "CORDBG_E_ENC_HANGING_FIELD", "The field was added via enc after the class was loaded, and so instead of", "corerror.h" },
-        { 0x80131343, "CORDBG_E_MODULE_NOT_LOADED", "If the module isn't loaded, including if it's been unloaded.", "corerror.h" },
-        { 0x80131344, "CORDBG_E_ENC_CANT_CHANGE_SUPERCLASS", "Not allowed to change which class something inherits from", "corerror.h" },
-        { 0x80131345, "CORDBG_E_UNABLE_TO_SET_BREAKPOINT", "Can't set a breakpoint here.", "corerror.h" },
-        { 0x80131346, "CORDBG_E_DEBUGGING_NOT_POSSIBLE", "Debugging isn't possible due to an incompatability within the CLR implementation.", "corerror.h" },
-        { 0x80131347, "CORDBG_E_KERNEL_DEBUGGER_ENABLED", "Debugging isn't possible because a kernel debugger is enabled on the system.", "corerror.h" },
-        { 0x80131348, "CORDBG_E_KERNEL_DEBUGGER_PRESENT", "Debugging isn't possible because a kernel debugger is present on the system.", "corerror.h" },
-        { 0x80131349, "CORDBG_E_HELPER_THREAD_DEAD", "The debugger's internal helper thread is dead.", "corerror.h" },
-        { 0x8013134a, "CORDBG_E_INTERFACE_INHERITANCE_CANT_CHANGE", "Not allowed to change interface inheritance.", "corerror.h" },
-        { 0x8013134b, "CORDBG_E_INCOMPATIBLE_PROTOCOL", "The debugger's protocol is incompatible with the debuggee.", "corerror.h" },
-        { 0x8013134c, "CORDBG_E_TOO_MANY_PROCESSES", "The debugger can only handle a finite number of debuggees.", "corerror.h" },
-        { 0x8013134d, "CORDBG_E_INTEROP_NOT_SUPPORTED", "Interop is not allowed on a win9x platform", "corerror.h" },
-        { 0x8013134e, "CORDBG_E_NO_REMAP_BREAKPIONT", "Cannot call RemapFunction until have received RemapBreakpoint", "corerror.h" },
-        { 0x8013134f, "CORDBG_E_OBJECT_NEUTERED", "Object has been neutered (it's in a zombie state).", "corerror.h" },
-        { 0x80131350, "CORPROF_E_FUNCTION_NOT_COMPILED", "Function not yet compiled.", "corerror.h" },
-        { 0x80131351, "CORPROF_E_DATAINCOMPLETE", "The ID is not fully loaded/defined yet.", "corerror.h" },
-        { 0x80131352, "CORPROF_E_NOT_REJITABLE_METHODS", "The Module is not configured for updateable methods.", "corerror.h" },
-        { 0x80131353, "CORPROF_E_CANNOT_UPDATE_METHOD", "The Method could not be updated for re-jit.", "corerror.h" },
-        { 0x80131354, "CORPROF_E_FUNCTION_NOT_IL", "The Method has no associated IL", "corerror.h" },
-        { 0x80131355, "CORPROF_E_NOT_MANAGED_THREAD", "The thread has never run managed code before", "corerror.h" },
-        { 0x80131356, "CORPROF_E_CALL_ONLY_FROM_INIT", "The function may only be called during profiler init", "corerror.h" },
-        { 0x80131357, "CORPROF_E_INPROC_NOT_ENABLED", "Inprocess debugging must be enabled during init", "corerror.h" },
-        { 0x80131358, "CORPROF_E_JITMAPS_NOT_ENABLED", "Can't get a JIT map becuase they are not enabled", "corerror.h" },
-        { 0x80131359, "CORPROF_E_INPROC_ALREADY_BEGUN", "If a profiler tries to call BeginInprocDebugging more than", "corerror.h" },
-        { 0x8013135a, "CORPROF_E_INPROC_NOT_AVAILABLE", "States that inprocess debugging not allowed at this point", "corerror.h" },
-        { 0x8013135b, "CORPROF_E_NOT_YET_AVAILABLE", "This is a general error used to indicated that the information", "corerror.h" },
-        { 0x8013135c, "CORPROF_E_TYPE_IS_PARAMETERIZED", "The given type is a generic and cannot be used with this method.", "corerror.h" },
-        { 0x8013135d, "CORPROF_E_FUNCTION_IS_PARAMETERIZED", "The given function is a generic and cannot be used with this method.", "corerror.h" },
-        { 0x8013135e, "CORPROF_E_STACKSNAPSHOT_INVALID_TGT_THREAD", "A profiler tried to walk the stack of an invalid thread", "corerror.h" },
-        { 0x8013135f, "CORPROF_E_STACKSNAPSHOT_UNMANAGED_CTX", "A profiler can not walk a thread that is currently executing unmanaged code", "corerror.h" },
-        { 0x80131360, "CORPROF_E_STACKSNAPSHOT_UNSAFE", "A stackwalk at this point may cause dead locks or data corruption", "corerror.h" },
-        { 0x80131361, "CORPROF_E_STACKSNAPSHOT_ABORTED", "Stackwalking callback requested the walk to abort", "corerror.h" },
-        { 0x80131362, "CORPROF_E_LITERALS_HAVE_NO_ADDRESS", "Returned when asked for the address of a static that is a literal.", "corerror.h" },
-        { 0x80131363, "CORPROF_E_UNSUPPORTED_CALL_SEQUENCE", "A call was made at an unsupported time (e.g., API illegally called asynchronously)", "corerror.h" },
-        { 0x80131364, "CORPROF_E_ASYNCHRONOUS_UNSAFE", "A legal asynchronous call was made at an unsafe time (e.g., CLR locks are held) ", "corerror.h" },
-        { 0x80131365, "CORPROF_E_CLASSID_IS_ARRAY", "The specified ClassID cannot be inspected by this function because it is an array", "corerror.h" },
-        { 0x80131366, "CORPROF_E_CLASSID_IS_COMPOSITE", "The specified ClassID is a non-array composite type (e.g., ref) and cannot be inspected", "corerror.h" },
-        { 0x80131400, "SECURITY_E_XML_TO_ASN_ENCODING", "Failed to convert XML to ASN", "corerror.h" },
-        { 0x80131401, "SECURITY_E_INCOMPATIBLE_SHARE", "Loading this assembly would produce a different grant set from other instances", "corerror.h" },
-        { 0x80131402, "SECURITY_E_UNVERIFIABLE", "Unverifable code failed policy check", "corerror.h" },
-        { 0x80131403, "SECURITY_E_INCOMPATIBLE_EVIDENCE", "Assembly already loaded without additional security evidence.", "corerror.h" },
-        { 0x80131410, "CORSEC_E_DECODE_SET", "Failure decoding permission set", "corerror.h" },
-        { 0x80131411, "CORSEC_E_ENCODE_SET", "Failure encoding permission set", "corerror.h" },
-        { 0x80131412, "CORSEC_E_UNSUPPORTED_FORMAT", "Unrecognized encoding format", "corerror.h" },
-        { 0x80131413, "SN_CRYPTOAPI_CALL_FAILED", "StrongName APIs not supported on system", "corerror.h" },
-        { 0x80131413, "CORSEC_E_CRYPTOAPI_CALL_FAILED", "StrongName APIs not supported on system", "corerror.h" },
-        { 0x80131414, "SN_NO_SUITABLE_CSP", "StrongName APIs couldn't locate a matching CSP", "corerror.h" },
-        { 0x80131414, "CORSEC_E_NO_SUITABLE_CSP", "StrongName APIs couldn't locate a matching CSP", "corerror.h" },
-        { 0x80131415, "CORSEC_E_INVALID_ATTR", "Invalid security custom attribute", "corerror.h" },
-        { 0x80131416, "CORSEC_E_POLICY_EXCEPTION", "PolicyException thrown", "corerror.h" },
-        { 0x80131417, "CORSEC_E_MIN_GRANT_FAIL", "Failed to grant minimum permission requests", "corerror.h" },
-        { 0x80131418, "CORSEC_E_NO_EXEC_PERM", "Failed to grant permission to execute", "corerror.h" },
-        { 0x80131419, "CORSEC_E_XMLSYNTAX", "XML Syntax error", "corerror.h" },
-        { 0x8013141a, "CORSEC_E_INVALID_STRONGNAME", "Strong name validation failed", "corerror.h" },
-        { 0x8013141b, "CORSEC_E_MISSING_STRONGNAME", "Assembly is not strong named", "corerror.h" },
-        { 0x8013141c, "CORSEC_E_CONTAINER_NOT_FOUND", "Strong name key container not found", "corerror.h" },
-        { 0x8013141d, "CORSEC_E_INVALID_IMAGE_FORMAT", "Invalid assembly file format", "corerror.h" },
-        { 0x8013141e, "CORSEC_E_INVALID_PUBLICKEY", "Invalid assembly public key", "corerror.h" },
-        { 0x80131420, "CORSEC_E_SIGNATURE_MISMATCH", "Signature size mismatch", "corerror.h" },
-        { 0x80131430, "CORSEC_E_CRYPTO", "generic CryptographicException", "corerror.h" },
-        { 0x80131431, "CORSEC_E_CRYPTO_UNEX_OPER", "generic CryptographicUnexpectedOperationException", "corerror.h" },
-        { 0x8013143a, "CORSECATTR_E_BAD_ATTRIBUTE", "Generic problem with a custom attribute", "corerror.h" },
-        { 0x8013143b, "CORSECATTR_E_MISSING_CONSTRUCTOR", "Missing a required constructor", "corerror.h" },
-        { 0x8013143c, "CORSECATTR_E_FAILED_TO_CREATE_PERM", "Unable to create a permission for this attribute", "corerror.h" },
-        { 0x8013143d, "CORSECATTR_E_BAD_ACTION_ASM", "SecurityAction type invalid on assembly", "corerror.h" },
-        { 0x8013143e, "CORSECATTR_E_BAD_ACTION_OTHER", "SecurityAction type invalid on types and methods", "corerror.h" },
-        { 0x8013143f, "CORSECATTR_E_BAD_PARENT", "Security custom attribute attached to invalid parent", "corerror.h" },
-        { 0x80131440, "CORSECATTR_E_TRUNCATED", "Bad custom attribute serialized blob", "corerror.h" },
-        { 0x80131441, "CORSECATTR_E_BAD_VERSION", "Bad custom attribute serialized blob version", "corerror.h" },
-        { 0x80131442, "CORSECATTR_E_BAD_ACTION", "Invalid security action code", "corerror.h" },
-        { 0x80131443, "CORSECATTR_E_NO_SELF_REF", "CA ref to CA def'd in same assembly", "corerror.h" },
-        { 0x80131444, "CORSECATTR_E_BAD_NONCAS", "Use of non-CAS perm with invalid action", "corerror.h" },
-        { 0x80131445, "CORSECATTR_E_ASSEMBLY_LOAD_FAILED", "Failed to load assembly containing CA (or req'd CA type)", "corerror.h" },
-        { 0x80131446, "CORSECATTR_E_ASSEMBLY_LOAD_FAILED_EX", "Failed to load assembly containing CA (or req'd CA type)", "corerror.h" },
-        { 0x80131447, "CORSECATTR_E_TYPE_LOAD_FAILED", "Failed to load CA type (or reqd CA type)", "corerror.h" },
-        { 0x80131448, "CORSECATTR_E_TYPE_LOAD_FAILED_EX", "Failed to load CA type (or reqd CA type)", "corerror.h" },
-        { 0x80131449, "CORSECATTR_E_ABSTRACT", "CA type is abstract", "corerror.h" },
-        { 0x8013144a, "CORSECATTR_E_UNSUPPORTED_TYPE", "Unsupported type for field/property setter", "corerror.h" },
-        { 0x8013144b, "CORSECATTR_E_UNSUPPORTED_ENUM_TYPE", "Unsupported base type for enum field/property", "corerror.h" },
-        { 0x8013144c, "CORSECATTR_E_NO_FIELD", "Couldn't find a CA field", "corerror.h" },
-        { 0x8013144d, "CORSECATTR_E_NO_PROPERTY", "Couldn't find a CA property", "corerror.h" },
-        { 0x8013144e, "CORSECATTR_E_EXCEPTION", "Unexpected exception", "corerror.h" },
-        { 0x8013144f, "CORSECATTR_E_EXCEPTION_HR", "Unexpected exception", "corerror.h" },
-        { 0x80131450, "ISS_E_ISOSTORE", nullptr, "corerror.h" },
-        { 0x80131450, "ISS_E_ISOSTORE_START", nullptr, "corerror.h" },
-        { 0x80131460, "ISS_E_OPEN_STORE_FILE", nullptr, "corerror.h" },
-        { 0x80131461, "ISS_E_OPEN_FILE_MAPPING", nullptr, "corerror.h" },
-        { 0x80131462, "ISS_E_MAP_VIEW_OF_FILE", nullptr, "corerror.h" },
-        { 0x80131463, "ISS_E_GET_FILE_SIZE", nullptr, "corerror.h" },
-        { 0x80131464, "ISS_E_CREATE_MUTEX", nullptr, "corerror.h" },
-        { 0x80131465, "ISS_E_LOCK_FAILED", nullptr, "corerror.h" },
-        { 0x80131466, "ISS_E_FILE_WRITE", nullptr, "corerror.h" },
-        { 0x80131467, "ISS_E_SET_FILE_POINTER", nullptr, "corerror.h" },
-        { 0x80131468, "ISS_E_CREATE_DIR", nullptr, "corerror.h" },
-        { 0x80131469, "ISS_E_STORE_NOT_OPEN", nullptr, "corerror.h" },
-        { 0x80131480, "ISS_E_CORRUPTED_STORE_FILE", nullptr, "corerror.h" },
-        { 0x80131481, "ISS_E_STORE_VERSION", nullptr, "corerror.h" },
-        { 0x80131482, "ISS_E_FILE_NOT_MAPPED", nullptr, "corerror.h" },
-        { 0x80131483, "ISS_E_BLOCK_SIZE_TOO_SMALL", nullptr, "corerror.h" },
-        { 0x80131484, "ISS_E_ALLOC_TOO_LARGE", nullptr, "corerror.h" },
-        { 0x80131485, "ISS_E_USAGE_WILL_EXCEED_QUOTA", nullptr, "corerror.h" },
-        { 0x80131486, "ISS_E_TABLE_ROW_NOT_FOUND", nullptr, "corerror.h" },
-        { 0x801314a0, "ISS_E_DEPRECATE", nullptr, "corerror.h" },
-        { 0x801314a1, "ISS_E_CALLER", nullptr, "corerror.h" },
-        { 0x801314a2, "ISS_E_PATH_LENGTH", nullptr, "corerror.h" },
-        { 0x801314a3, "ISS_E_MACHINE", nullptr, "corerror.h" },
-        { 0x801314a4, "ISS_E_MACHINE_DACL", nullptr, "corerror.h" },
-        { 0x801314ff, "ISS_E_ISOSTORE_END", nullptr, "corerror.h" },
-        { 0x80131500, "COR_E_EXCEPTION", "Base class for all exceptions in the runtime", "corerror.h" },
-        { 0x80131500, "COR_E_EXCEPTION", nullptr, "corerror.h" },
-        { 0x80131501, "COR_E_SYSTEM", "The base class for the runtime's nullptrless seriousnullptr exceptions", "corerror.h" },
-        { 0x80131501, "COR_E_SYSTEM", nullptr, "corerror.h" },
-        { 0x80131502, "COR_E_ARGUMENTOUTOFRANGE", "An argument was out of its legal range.", "corerror.h" },
-        { 0x80131502, "COR_E_ARGUMENTOUTOFRANGE", nullptr, "corerror.h" },
-        { 0x80131503, "COR_E_ARRAYTYPEMISMATCH", "Attempted to store an object of the wrong type in an array", "corerror.h" },
-        { 0x80131503, "COR_E_ARRAYTYPEMISMATCH", nullptr, "corerror.h" },
-        { 0x80131504, "COR_E_CONTEXTMARSHAL", nullptr, "corerror.h" },
-        { 0x80131504, "COR_E_CONTEXTMARSHAL", nullptr, "corerror.h" },
-        { 0x80131505, "COR_E_TIMEOUT", nullptr, "corerror.h" },
-        { 0x80131505, "COR_E_TIMEOUT", nullptr, "corerror.h" },
-        { 0x80131506, "COR_E_EXECUTIONENGINE", "An internal error happened in the Common Language Runtime's Execution Engine", "corerror.h" },
-        { 0x80131506, "COR_E_EXECUTIONENGINE", nullptr, "corerror.h" },
-        { 0x80131507, "COR_E_FIELDACCESS", "Access to this field is denied.", "corerror.h" },
-        { 0x80131507, "COR_E_FIELDACCESS", nullptr, "corerror.h" },
-        { 0x80131508, "COR_E_INDEXOUTOFRANGE", "Attempted to access an element within an array by using an index that is not within the bound of that array.", "corerror.h" },
-        { 0x80131508, "COR_E_INDEXOUTOFRANGE", nullptr, "corerror.h" },
-        { 0x80131509, "COR_E_INVALIDOPERATION", "An operation is not legal in the current state.", "corerror.h" },
-        { 0x80131509, "COR_E_INVALIDOPERATION", nullptr, "corerror.h" },
-        { 0x8013150a, "COR_E_SECURITY", "An error relating to security occured.", "corerror.h" },
-        { 0x8013150a, "COR_E_SECURITY", nullptr, "corerror.h" },
-        { 0x8013150b, "COR_E_REMOTING", "An error relating to remoting occurred.", "corerror.h" },
-        { 0x8013150b, "COR_E_REMOTING", nullptr, "corerror.h" },
-        { 0x8013150c, "COR_E_SERIALIZATION", nullptr, "corerror.h" },
-        { 0x8013150d, "COR_E_VERIFICATION", "A verification failure occurred", "corerror.h" },
-        { 0x8013150d, "COR_E_VERIFICATION", nullptr, "corerror.h" },
-        { 0x8013150e, "COR_E_SERVER", nullptr, "corerror.h" },
-        { 0x8013150f, "COR_E_SERVICEDCOMPONENT", "An error relating to ServicedComponent occurred.", "corerror.h" },
-        { 0x8013150f, "COR_E_SERVICEDCOMPONENT", nullptr, "corerror.h" },
-        { 0x80131510, "COR_E_METHODACCESS", "Access to this method is denied.", "corerror.h" },
-        { 0x80131510, "COR_E_METHODACCESS", nullptr, "corerror.h" },
-        { 0x80131511, "COR_E_MISSINGFIELD", "An attempt was made to dynamically access a field that does not exist.", "corerror.h" },
-        { 0x80131511, "COR_E_MISSINGFIELD", nullptr, "corerror.h" },
-        { 0x80131512, "COR_E_MISSINGMEMBER", "An attempt was made to dynamically invoke or access a field or method that does not exist.", "corerror.h" },
-        { 0x80131512, "COR_E_MISSINGMEMBER", nullptr, "corerror.h" },
-        { 0x80131513, "COR_E_MISSINGMETHOD", "An attempt was made to dynamically invoke a method that does not exist", "corerror.h" },
-        { 0x80131513, "COR_E_MISSINGMETHOD", nullptr, "corerror.h" },
-        { 0x80131514, "COR_E_MULTICASTNOTSUPPORTED", "Attempted to combine delegates that are not multicast", "corerror.h" },
-        { 0x80131514, "COR_E_MULTICASTNOTSUPPORTED", nullptr, "corerror.h" },
-        { 0x80131515, "COR_E_NOTSUPPORTED", "The operation is not supported", "corerror.h" },
-        { 0x80131515, "COR_E_NOTSUPPORTED", nullptr, "corerror.h" },
-        { 0x80131516, "COR_E_OVERFLOW", "An arithmetic, casting, or conversion operation overflowed or underflowed.", "corerror.h" },
-        { 0x80131516, "COR_E_OVERFLOW", nullptr, "corerror.h" },
-        { 0x80131517, "COR_E_RANK", "An array has the wrong number of dimensions for a particular operation.", "corerror.h" },
-        { 0x80131517, "COR_E_RANK", nullptr, "corerror.h" },
-        { 0x80131518, "COR_E_SYNCHRONIZATIONLOCK", "Wait(), Notify() or NotifyAll() was called from an unsynchronized ** block of c", "corerror.h" },
-        { 0x80131518, "COR_E_SYNCHRONIZATIONLOCK", nullptr, "corerror.h" },
-        { 0x80131519, "COR_E_THREADINTERRUPTED", "Indicates that the thread was interrupted from a waiting state", "corerror.h" },
-        { 0x80131519, "COR_E_THREADINTERRUPTED", nullptr, "corerror.h" },
-        { 0x8013151a, "COR_E_MEMBERACCESS", "Access to this member is denied.", "corerror.h" },
-        { 0x8013151a, "COR_E_MEMBERACCESS", nullptr, "corerror.h" },
-        { 0x80131520, "COR_E_THREADSTATE", "Indicate that the Thread class is in an invalid state for the method call", "corerror.h" },
-        { 0x80131520, "COR_E_THREADSTATE", nullptr, "corerror.h" },
-        { 0x80131521, "COR_E_THREADSTOP", "Thrown into a thread to cause it to stop. This exception is typically not caught", "corerror.h" },
-        { 0x80131521, "COR_E_THREADSTOP", nullptr, "corerror.h" },
-        { 0x80131522, "COR_E_TYPELOAD", "Could not find or load a specific type (class, enum, etc).", "corerror.h" },
-        { 0x80131522, "COR_E_TYPELOAD", nullptr, "corerror.h" },
-        { 0x80131523, "COR_E_ENTRYPOINTNOTFOUND", "Could not find the specified DllImport entry point", "corerror.h" },
-        { 0x80131523, "COR_E_ENTRYPOINTNOTFOUND", nullptr, "corerror.h" },
-        { 0x80131524, "COR_E_DLLNOTFOUND", "Could not find the specified DllImport DLL.", "corerror.h" },
-        { 0x80131524, "COR_E_DLLNOTFOUND", nullptr, "corerror.h" },
-        { 0x80131525, "COR_E_THREADSTART", "Indicate that a user thread fails to start.", "corerror.h" },
-        { 0x80131525, "COR_E_THREADSTART", nullptr, "corerror.h" },
-        { 0x80131527, "COR_E_INVALIDCOMOBJECT", "An invalid __ComObject has been used.", "corerror.h" },
-        { 0x80131527, "COR_E_INVALIDCOMOBJECT", nullptr, "corerror.h" },
-        { 0x80131528, "COR_E_NOTFINITENUMBER", "Thrown if value (a floating point number) is either the not a number value (NaN) or +- infinity value VB needs this stuff", "corerror.h" },
-        { 0x80131528, "COR_E_NOTFINITENUMBER", nullptr, "corerror.h" },
-        { 0x80131529, "COR_E_DUPLICATEWAITOBJECT", "An object appears more than once in the wait objects array.", "corerror.h" },
-        { 0x80131529, "COR_E_DUPLICATEWAITOBJECT", nullptr, "corerror.h" },
-        { 0x8013152b, "COR_E_SEMAPHOREFULL", "Adding the given count to the semaphore would cause it to exceed its maximum count.", "corerror.h" },
-        { 0x8013152b, "COR_E_SEMAPHOREFULL", nullptr, "corerror.h" },
-        { 0x8013152c, "COR_E_WAITHANDLECANNOTBEOPENED", "No Semaphore of the given name exists.", "corerror.h" },
-        { 0x8013152c, "COR_E_WAITHANDLECANNOTBEOPENED", nullptr, "corerror.h" },
-        { 0x8013152d, "COR_E_ABANDONEDMUTEX", "The wait completed due to an abandoned mutex.", "corerror.h" },
-        { 0x8013152d, "COR_E_ABANDONEDMUTEX", nullptr, "corerror.h" },
-        { 0x80131530, "COR_E_THREADABORTED", "Thrown into a thread to cause it to abort. Not catchable.", "corerror.h" },
-        { 0x80131530, "COR_E_THREADABORTED", nullptr, "corerror.h" },
-        { 0x80131531, "COR_E_INVALIDOLEVARIANTTYPE", "The type of an OLE variant that was passed into the runtime is invalid.", "corerror.h" },
-        { 0x80131531, "COR_E_INVALIDOLEVARIANTTYPE", nullptr, "corerror.h" },
-        { 0x80131532, "COR_E_MISSINGMANIFESTRESOURCE", "An expected resource in the assembly manifest was missing.", "corerror.h" },
-        { 0x80131532, "COR_E_MISSINGMANIFESTRESOURCE", nullptr, "corerror.h" },
-        { 0x80131533, "COR_E_SAFEARRAYTYPEMISMATCH", "A mismatch has occured between the runtime type of the array and the sub type recorded in the metadata.", "corerror.h" },
-        { 0x80131533, "COR_E_SAFEARRAYTYPEMISMATCH", nullptr, "corerror.h" },
-        { 0x80131534, "COR_E_TYPEINITIALIZATION", "An exception was thrown by a type's initializer (.cctor).", "corerror.h" },
-        { 0x80131534, "COR_E_TYPEINITIALIZATION", nullptr, "corerror.h" },
-        { 0x80131535, "COR_E_MARSHALDIRECTIVE", "The marshaling directives are invalid.", "corerror.h" },
-        { 0x80131535, "COR_E_MARSHALDIRECTIVE", nullptr, "corerror.h" },
-        { 0x80131536, "COR_E_MISSINGSATELLITEASSEMBLY", "An expected satellite assembly containing the ultimate fallback resources for a given culture was not found or couldn't be loaded.  Setup problem?", "corerror.h" },
-        { 0x80131536, "COR_E_MISSINGSATELLITEASSEMBLY", nullptr, "corerror.h" },
-        { 0x80131537, "COR_E_FORMAT", "The format of one arguments does not meet the contract of the method.", "corerror.h" },
-        { 0x80131537, "COR_E_FORMAT", nullptr, "corerror.h" },
-        { 0x80131538, "COR_E_SAFEARRAYRANKMISMATCH", "A mismatch has occured between the runtime rank of the array and the rank recorded in the metadata.", "corerror.h" },
-        { 0x80131538, "COR_E_SAFEARRAYRANKMISMATCH", nullptr, "corerror.h" },
-        { 0x80131539, "COR_E_PLATFORMNOTSUPPORTED", "The method is not supported on this platform", "corerror.h" },
-        { 0x80131539, "COR_E_PLATFORMNOTSUPPORTED", nullptr, "corerror.h" },
-        { 0x8013153a, "COR_E_INVALIDPROGRAM", "A program contained invalid IL or bad metadata.  Usually this is a compiler bug.", "corerror.h" },
-        { 0x8013153a, "COR_E_INVALIDPROGRAM", nullptr, "corerror.h" },
-        { 0x8013153b, "COR_E_OPERATIONCANCELED", "The operation was cancelled.", "corerror.h" },
-        { 0x8013153b, "COR_E_OPERATIONCANCELED", nullptr, "corerror.h" },
-        { 0x8013153d, "COR_E_INSUFFICIENTMEMORY", "Not enough memory was available for an operation. This may not be potentially fatal (vs. an OutOfMemoryException).", "corerror.h" },
-        { 0x8013153d, "COR_E_INSUFFICIENTMEMORY", nullptr, "corerror.h" },
-        { 0x8013153e, "COR_E_RUNTIMEWRAPPED", "An object that does not derive from System.Exception has been wrapped in a RuntimeWrappedException.", "corerror.h" },
-        { 0x8013153e, "COR_E_RUNTIMEWRAPPED", nullptr, "corerror.h" },
-        { 0x80131540, "COR_E_DEVICESNOTSUPPORTED", nullptr, "corerror.h" },
-        { 0x80131540, "COR_E_DEVICESNOTSUPPORTED", nullptr, "corerror.h" },
-        { 0x80131541, "COR_E_DATAMISALIGNED", "A datatype misalignment was detected in a load or store instruction.", "corerror.h" },
-        { 0x80131541, "COR_E_DATAMISALIGNED", nullptr, "corerror.h" },
-        { 0x80131577, "COR_E_KEYNOTFOUND", nullptr, "corerror.h" },
-        { 0x80131577, "COR_E_KEYNOTFOUND", nullptr, "corerror.h" },
-        { 0x80131600, "COR_E_APPLICATION", "The base class for all nullptrless seriousnullptr exceptions.", "corerror.h" },
-        { 0x80131600, "COR_E_APPLICATION", nullptr, "corerror.h" },
-        { 0x80131601, "COR_E_INVALIDFILTERCRITERIA", "The given filter criteria does not match the filter contract.", "corerror.h" },
-        { 0x80131601, "COR_E_INVALIDFILTERCRITERIA", nullptr, "corerror.h" },
-        { 0x80131602, "COR_E_REFLECTIONTYPELOAD", "Could not find or load a specific class that was requested through Reflection", "corerror.h" },
-        { 0x80131602, "COR_E_REFLECTIONTYPELOAD", nullptr, "corerror.h" },
-        { 0x80131603, "COR_E_TARGET", nullptr, "corerror.h" },
-        { 0x80131603, "COR_E_TARGET", nullptr, "corerror.h" },
-        { 0x80131604, "COR_E_TARGETINVOCATION", "If the method called throws an exception", "corerror.h" },
-        { 0x80131604, "COR_E_TARGETINVOCATION", nullptr, "corerror.h" },
-        { 0x80131605, "COR_E_CUSTOMATTRIBUTEFORMAT", "If the binary format of a custom attribute is invalid.", "corerror.h" },
-        { 0x80131605, "COR_E_CUSTOMATTRIBUTEFORMAT", nullptr, "corerror.h" },
-        { 0x80131620, "COR_E_IO", "Some sort of I/O error.", "corerror.h" },
-        { 0x80131620, "COR_E_IO", nullptr, "corerror.h" },
-        { 0x80131621, "COR_E_FILELOAD", nullptr, "corerror.h" },
-        { 0x80131621, "COR_E_FILELOAD", nullptr, "corerror.h" },
-        { 0x80131622, "COR_E_OBJECTDISPOSED", "The object has already been disposed.", "corerror.h" },
-        { 0x80131622, "COR_E_OBJECTDISPOSED", nullptr, "corerror.h" },
-        { 0x80131623, "COR_E_FAILFAST", "Runtime operation halted by call to System.Environment.FailFast().", "corerror.h" },
-        { 0x80131623, "COR_E_FAILFAST", nullptr, "corerror.h" },
-        { 0x80131640, "COR_E_HOSTPROTECTION", "Attempted to perform an operation that was forbidden by the host.", "corerror.h" },
-        { 0x80131640, "COR_E_HOSTPROTECTION", nullptr, "corerror.h" },
-        { 0x80131641, "COR_E_ILLEGAL_REENTRANCY", "Attempted to call into managed code when executing inside a low level extensibility point.", "corerror.h" },
-        { 0x80131641, "COR_E_ILLEGAL_REENTRANCY", nullptr, "corerror.h" },
-        { 0x80131700, "CLR_E_SHIM_RUNTIMELOAD", "Failed to load the runtime", "corerror.h" },
-        { 0x80131701, "CLR_E_SHIM_RUNTIMEEXPORT", "Failed to find a required export in the runtime", "corerror.h" },
-        { 0x80131702, "CLR_E_SHIM_INSTALLROOT", "Install root is not defined", "corerror.h" },
-        { 0x80131703, "CLR_E_SHIM_INSTALLCOMP", "Expected component of the runtime is not available", "corerror.h" },
-        { 0x80131801, "VER_E_HRESULT", nullptr, "corerror.h" },
-        { 0x80131802, "VER_E_OFFSET", nullptr, "corerror.h" },
-        { 0x80131803, "VER_E_OPCODE", nullptr, "corerror.h" },
-        { 0x80131804, "VER_E_OPERAND", nullptr, "corerror.h" },
-        { 0x80131805, "VER_E_TOKEN", nullptr, "corerror.h" },
-        { 0x80131806, "VER_E_EXCEPT", nullptr, "corerror.h" },
-        { 0x80131807, "VER_E_STACK_SLOT", nullptr, "corerror.h" },
-        { 0x80131808, "VER_E_LOC", nullptr, "corerror.h" },
-        { 0x80131809, "VER_E_ARG", nullptr, "corerror.h" },
-        { 0x8013180a, "VER_E_FOUND", nullptr, "corerror.h" },
-        { 0x8013180b, "VER_E_EXPECTED", nullptr, "corerror.h" },
-        { 0x8013180c, "VER_E_LOC_BYNAME", nullptr, "corerror.h" },
-        { 0x80131810, "VER_E_UNKNOWN_OPCODE", nullptr, "corerror.h" },
-        { 0x80131811, "VER_E_SIG_CALLCONV", nullptr, "corerror.h" },
-        { 0x80131812, "VER_E_SIG_ELEMTYPE", nullptr, "corerror.h" },
-        { 0x80131814, "VER_E_RET_SIG", nullptr, "corerror.h" },
-        { 0x80131815, "VER_E_FIELD_SIG", nullptr, "corerror.h" },
-        { 0x80131818, "VER_E_INTERNAL", nullptr, "corerror.h" },
-        { 0x80131819, "VER_E_STACK_TOO_LARGE", nullptr, "corerror.h" },
-        { 0x8013181a, "VER_E_ARRAY_NAME_LONG", nullptr, "corerror.h" },
-        { 0x80131820, "VER_E_FALLTHRU", nullptr, "corerror.h" },
-        { 0x80131821, "VER_E_TRY_GTEQ_END", nullptr, "corerror.h" },
-        { 0x80131822, "VER_E_TRYEND_GT_CS", nullptr, "corerror.h" },
-        { 0x80131823, "VER_E_HND_GTEQ_END", nullptr, "corerror.h" },
-        { 0x80131824, "VER_E_HNDEND_GT_CS", nullptr, "corerror.h" },
-        { 0x80131825, "VER_E_FLT_GTEQ_CS", nullptr, "corerror.h" },
-        { 0x80131826, "VER_E_TRY_START", nullptr, "corerror.h" },
-        { 0x80131827, "VER_E_HND_START", nullptr, "corerror.h" },
-        { 0x80131828, "VER_E_FLT_START", nullptr, "corerror.h" },
-        { 0x80131829, "VER_E_TRY_OVERLAP", nullptr, "corerror.h" },
-        { 0x8013182a, "VER_E_TRY_EQ_HND_FIL", nullptr, "corerror.h" },
-        { 0x8013182b, "VER_E_TRY_SHARE_FIN_FAL", nullptr, "corerror.h" },
-        { 0x8013182c, "VER_E_HND_OVERLAP", nullptr, "corerror.h" },
-        { 0x8013182d, "VER_E_HND_EQ", nullptr, "corerror.h" },
-        { 0x8013182e, "VER_E_FIL_OVERLAP", nullptr, "corerror.h" },
-        { 0x8013182f, "VER_E_FIL_EQ", nullptr, "corerror.h" },
-        { 0x80131830, "VER_E_FIL_CONT_TRY", nullptr, "corerror.h" },
-        { 0x80131831, "VER_E_FIL_CONT_HND", nullptr, "corerror.h" },
-        { 0x80131832, "VER_E_FIL_CONT_FIL", nullptr, "corerror.h" },
-        { 0x80131833, "VER_E_FIL_GTEQ_CS", nullptr, "corerror.h" },
-        { 0x80131834, "VER_E_FIL_START", nullptr, "corerror.h" },
-        { 0x80131835, "VER_E_FALLTHRU_EXCEP", nullptr, "corerror.h" },
-        { 0x80131836, "VER_E_FALLTHRU_INTO_HND", nullptr, "corerror.h" },
-        { 0x80131837, "VER_E_FALLTHRU_INTO_FIL", nullptr, "corerror.h" },
-        { 0x80131838, "VER_E_LEAVE", nullptr, "corerror.h" },
-        { 0x80131839, "VER_E_RETHROW", nullptr, "corerror.h" },
-        { 0x8013183a, "VER_E_ENDFINALLY", nullptr, "corerror.h" },
-        { 0x8013183b, "VER_E_ENDFILTER", nullptr, "corerror.h" },
-        { 0x8013183c, "VER_E_ENDFILTER_MISSING", nullptr, "corerror.h" },
-        { 0x8013183d, "VER_E_BR_INTO_TRY", nullptr, "corerror.h" },
-        { 0x8013183e, "VER_E_BR_INTO_HND", nullptr, "corerror.h" },
-        { 0x8013183f, "VER_E_BR_INTO_FIL", nullptr, "corerror.h" },
-        { 0x80131840, "VER_E_BR_OUTOF_TRY", nullptr, "corerror.h" },
-        { 0x80131841, "VER_E_BR_OUTOF_HND", nullptr, "corerror.h" },
-        { 0x80131842, "VER_E_BR_OUTOF_FIL", nullptr, "corerror.h" },
-        { 0x80131843, "VER_E_BR_OUTOF_FIN", nullptr, "corerror.h" },
-        { 0x80131844, "VER_E_RET_FROM_TRY", nullptr, "corerror.h" },
-        { 0x80131845, "VER_E_RET_FROM_HND", nullptr, "corerror.h" },
-        { 0x80131846, "VER_E_RET_FROM_FIL", nullptr, "corerror.h" },
-        { 0x80131847, "VER_E_BAD_JMP_TARGET", nullptr, "corerror.h" },
-        { 0x80131848, "VER_E_PATH_LOC", nullptr, "corerror.h" },
-        { 0x80131849, "VER_E_PATH_THIS", nullptr, "corerror.h" },
-        { 0x8013184a, "VER_E_PATH_STACK", nullptr, "corerror.h" },
-        { 0x8013184b, "VER_E_PATH_STACK_DEPTH", nullptr, "corerror.h" },
-        { 0x8013184c, "VER_E_THIS", nullptr, "corerror.h" },
-        { 0x8013184d, "VER_E_THIS_UNINIT_EXCEP", nullptr, "corerror.h" },
-        { 0x8013184e, "VER_E_THIS_UNINIT_STORE", nullptr, "corerror.h" },
-        { 0x8013184f, "VER_E_THIS_UNINIT_RET", nullptr, "corerror.h" },
-        { 0x80131850, "VER_E_THIS_UNINIT_V_RET", nullptr, "corerror.h" },
-        { 0x80131851, "VER_E_THIS_UNINIT_BR", nullptr, "corerror.h" },
-        { 0x80131852, "VER_E_LDFTN_CTOR", nullptr, "corerror.h" },
-        { 0x80131853, "VER_E_STACK_NOT_EQ", nullptr, "corerror.h" },
-        { 0x80131854, "VER_E_STACK_UNEXPECTED", nullptr, "corerror.h" },
-        { 0x80131855, "VER_E_STACK_EXCEPTION", nullptr, "corerror.h" },
-        { 0x80131856, "VER_E_STACK_OVERFLOW", nullptr, "corerror.h" },
-        { 0x80131857, "VER_E_STACK_UNDERFLOW", nullptr, "corerror.h" },
-        { 0x80131858, "VER_E_STACK_EMPTY", nullptr, "corerror.h" },
-        { 0x80131859, "VER_E_STACK_UNINIT", nullptr, "corerror.h" },
-        { 0x8013185a, "VER_E_STACK_I_I4_I8", nullptr, "corerror.h" },
-        { 0x8013185b, "VER_E_STACK_R_R4_R8", nullptr, "corerror.h" },
-        { 0x8013185c, "VER_E_STACK_NO_R_I8", nullptr, "corerror.h" },
-        { 0x8013185d, "VER_E_STACK_NUMERIC", nullptr, "corerror.h" },
-        { 0x8013185e, "VER_E_STACK_OBJREF", nullptr, "corerror.h" },
-        { 0x8013185f, "VER_E_STACK_P_OBJREF", nullptr, "corerror.h" },
-        { 0x80131860, "VER_E_STACK_BYREF", nullptr, "corerror.h" },
-        { 0x80131861, "VER_E_STACK_METHOD", nullptr, "corerror.h" },
-        { 0x80131862, "VER_E_STACK_ARRAY_SD", nullptr, "corerror.h" },
-        { 0x80131863, "VER_E_STACK_VALCLASS", nullptr, "corerror.h" },
-        { 0x80131864, "VER_E_STACK_P_VALCLASS", nullptr, "corerror.h" },
-        { 0x80131865, "VER_E_STACK_NO_VALCLASS", nullptr, "corerror.h" },
-        { 0x80131866, "VER_E_LOC_DEAD", nullptr, "corerror.h" },
-        { 0x80131867, "VER_E_LOC_NUM", nullptr, "corerror.h" },
-        { 0x80131868, "VER_E_ARG_NUM", nullptr, "corerror.h" },
-        { 0x80131869, "VER_E_TOKEN_RESOLVE", nullptr, "corerror.h" },
-        { 0x8013186a, "VER_E_TOKEN_TYPE", nullptr, "corerror.h" },
-        { 0x8013186b, "VER_E_TOKEN_TYPE_MEMBER", nullptr, "corerror.h" },
-        { 0x8013186c, "VER_E_TOKEN_TYPE_FIELD", nullptr, "corerror.h" },
-        { 0x8013186d, "VER_E_TOKEN_TYPE_SIG", nullptr, "corerror.h" },
-        { 0x8013186e, "VER_E_UNVERIFIABLE", nullptr, "corerror.h" },
-        { 0x8013186f, "VER_E_LDSTR_OPERAND", nullptr, "corerror.h" },
-        { 0x80131870, "VER_E_RET_PTR_TO_STACK", nullptr, "corerror.h" },
-        { 0x80131871, "VER_E_RET_VOID", nullptr, "corerror.h" },
-        { 0x80131872, "VER_E_RET_MISSING", nullptr, "corerror.h" },
-        { 0x80131873, "VER_E_RET_EMPTY", nullptr, "corerror.h" },
-        { 0x80131874, "VER_E_RET_UNINIT", nullptr, "corerror.h" },
-        { 0x80131875, "VER_E_ARRAY_ACCESS", nullptr, "corerror.h" },
-        { 0x80131876, "VER_E_ARRAY_V_STORE", nullptr, "corerror.h" },
-        { 0x80131877, "VER_E_ARRAY_SD", nullptr, "corerror.h" },
-        { 0x80131878, "VER_E_ARRAY_SD_PTR", nullptr, "corerror.h" },
-        { 0x80131879, "VER_E_ARRAY_FIELD", nullptr, "corerror.h" },
-        { 0x8013187a, "VER_E_ARGLIST", nullptr, "corerror.h" },
-        { 0x8013187b, "VER_E_VALCLASS", nullptr, "corerror.h" },
-        { 0x8013187c, "VER_E_METHOD_ACCESS", nullptr, "corerror.h" },
-        { 0x8013187d, "VER_E_FIELD_ACCESS", nullptr, "corerror.h" },
-        { 0x8013187e, "VER_E_DEAD", nullptr, "corerror.h" },
-        { 0x8013187f, "VER_E_FIELD_STATIC", nullptr, "corerror.h" },
-        { 0x80131880, "VER_E_FIELD_NO_STATIC", nullptr, "corerror.h" },
-        { 0x80131881, "VER_E_ADDR", nullptr, "corerror.h" },
-        { 0x80131882, "VER_E_ADDR_BYREF", nullptr, "corerror.h" },
-        { 0x80131883, "VER_E_ADDR_LITERAL", nullptr, "corerror.h" },
-        { 0x80131884, "VER_E_INITONLY", nullptr, "corerror.h" },
-        { 0x80131885, "VER_E_THROW", nullptr, "corerror.h" },
-        { 0x80131886, "VER_E_CALLVIRT_VALCLASS", nullptr, "corerror.h" },
-        { 0x80131887, "VER_E_CALL_SIG", nullptr, "corerror.h" },
-        { 0x80131888, "VER_E_CALL_STATIC", nullptr, "corerror.h" },
-        { 0x80131889, "VER_E_CTOR", nullptr, "corerror.h" },
-        { 0x8013188a, "VER_E_CTOR_VIRT", nullptr, "corerror.h" },
-        { 0x8013188b, "VER_E_CTOR_OR_SUPER", nullptr, "corerror.h" },
-        { 0x8013188c, "VER_E_CTOR_MUL_INIT", nullptr, "corerror.h" },
-        { 0x8013188d, "VER_E_SIG", nullptr, "corerror.h" },
-        { 0x8013188e, "VER_E_SIG_ARRAY", nullptr, "corerror.h" },
-        { 0x8013188f, "VER_E_SIG_ARRAY_PTR", nullptr, "corerror.h" },
-        { 0x80131890, "VER_E_SIG_ARRAY_BYREF", nullptr, "corerror.h" },
-        { 0x80131891, "VER_E_SIG_ELEM_PTR", nullptr, "corerror.h" },
-        { 0x80131892, "VER_E_SIG_VARARG", nullptr, "corerror.h" },
-        { 0x80131893, "VER_E_SIG_VOID", nullptr, "corerror.h" },
-        { 0x80131894, "VER_E_SIG_BYREF_BYREF", nullptr, "corerror.h" },
-        { 0x80131896, "VER_E_CODE_SIZE_ZERO", nullptr, "corerror.h" },
-        { 0x80131897, "VER_E_BAD_VARARG", nullptr, "corerror.h" },
-        { 0x80131898, "VER_E_TAIL_CALL", nullptr, "corerror.h" },
-        { 0x80131899, "VER_E_TAIL_BYREF", nullptr, "corerror.h" },
-        { 0x8013189a, "VER_E_TAIL_RET", nullptr, "corerror.h" },
-        { 0x8013189b, "VER_E_TAIL_RET_VOID", nullptr, "corerror.h" },
-        { 0x8013189c, "VER_E_TAIL_RET_TYPE", nullptr, "corerror.h" },
-        { 0x8013189d, "VER_E_TAIL_STACK_EMPTY", nullptr, "corerror.h" },
-        { 0x8013189e, "VER_E_METHOD_END", nullptr, "corerror.h" },
-        { 0x8013189f, "VER_E_BAD_BRANCH", nullptr, "corerror.h" },
-        { 0x801318a0, "VER_E_FIN_OVERLAP", nullptr, "corerror.h" },
-        { 0x801318a1, "VER_E_LEXICAL_NESTING", nullptr, "corerror.h" },
-        { 0x801318a2, "VER_E_VOLATILE", nullptr, "corerror.h" },
-        { 0x801318a3, "VER_E_UNALIGNED", nullptr, "corerror.h" },
-        { 0x801318a4, "VER_E_INNERMOST_FIRST", nullptr, "corerror.h" },
-        { 0x801318a5, "VER_E_CALLI_VIRTUAL", nullptr, "corerror.h" },
-        { 0x801318a6, "VER_E_CALL_ABSTRACT", nullptr, "corerror.h" },
-        { 0x801318a7, "VER_E_STACK_UNEXP_ARRAY", nullptr, "corerror.h" },
-        { 0x801318a8, "VER_E_NOT_IN_GC_HEAP", nullptr, "corerror.h" },
-        { 0x801318a9, "VER_E_TRY_N_EMPTY_STACK", nullptr, "corerror.h" },
-        { 0x801318aa, "VER_E_DLGT_CTOR", nullptr, "corerror.h" },
-        { 0x801318ab, "VER_E_DLGT_BB", nullptr, "corerror.h" },
-        { 0x801318ac, "VER_E_DLGT_PATTERN", nullptr, "corerror.h" },
-        { 0x801318ad, "VER_E_DLGT_LDFTN", nullptr, "corerror.h" },
-        { 0x801318ae, "VER_E_FTN_ABSTRACT", nullptr, "corerror.h" },
-        { 0x801318af, "VER_E_SIG_C_VC", nullptr, "corerror.h" },
-        { 0x801318b0, "VER_E_SIG_VC_C", nullptr, "corerror.h" },
-        { 0x801318b1, "VER_E_BOX_PTR_TO_STACK", nullptr, "corerror.h" },
-        { 0x801318b2, "VER_E_SIG_BYREF_TB_AH", nullptr, "corerror.h" },
-        { 0x801318b3, "VER_E_SIG_ARRAY_TB_AH", nullptr, "corerror.h" },
-        { 0x801318b4, "VER_E_ENDFILTER_STACK", nullptr, "corerror.h" },
-        { 0x801318b5, "VER_E_DLGT_SIG_I", nullptr, "corerror.h" },
-        { 0x801318b6, "VER_E_DLGT_SIG_O", nullptr, "corerror.h" },
-        { 0x801318b7, "VER_E_RA_PTR_TO_STACK", nullptr, "corerror.h" },
-        { 0x801318b8, "VER_E_CATCH_VALUE_TYPE", nullptr, "corerror.h" },
-        { 0x801318b9, "VER_E_CATCH_BYREF", nullptr, "corerror.h" },
-        { 0x801318ba, "VER_E_FIL_PRECEED_HND", nullptr, "corerror.h" },
-        { 0x801318bb, "VER_E_LDVIRTFTN_STATIC", nullptr, "corerror.h" },
-        { 0x801318bc, "VER_E_CALLVIRT_STATIC", nullptr, "corerror.h" },
-        { 0x801318bd, "VER_E_INITLOCALS", nullptr, "corerror.h" },
-        { 0x801318be, "VER_E_BR_TO_EXCEPTION", nullptr, "corerror.h" },
-        { 0x801318bf, "VER_E_CALL_CTOR", nullptr, "corerror.h" },
-        { 0x801318c0, "VER_E_VALCLASS_OBJREF_VAR", nullptr, "corerror.h" },
-        { 0x801318c1, "VER_E_STACK_P_VALCLASS_OBJREF_VAR", nullptr, "corerror.h" },
-        { 0x801318c2, "VER_E_SIG_VAR_PARAM", nullptr, "corerror.h" },
-        { 0x801318c3, "VER_E_SIG_MVAR_PARAM", nullptr, "corerror.h" },
-        { 0x801318c4, "VER_E_SIG_VAR_ARG", nullptr, "corerror.h" },
-        { 0x801318c5, "VER_E_SIG_MVAR_ARG", nullptr, "corerror.h" },
-        { 0x801318c6, "VER_E_SIG_GENERICINST", nullptr, "corerror.h" },
-        { 0x801318c7, "VER_E_SIG_METHOD_INST", nullptr, "corerror.h" },
-        { 0x801318c8, "VER_E_SIG_METHOD_PARENT_INST", nullptr, "corerror.h" },
-        { 0x801318c9, "VER_E_SIG_FIELD_PARENT_INST", nullptr, "corerror.h" },
-        { 0x801318ca, "VER_E_CALLCONV_NOT_GENERICINST", nullptr, "corerror.h" },
-        { 0x801318cb, "VER_E_TOKEN_BAD_METHOD_SPEC", nullptr, "corerror.h" },
-        { 0x801318cc, "VER_E_BAD_READONLY_PREFIX", nullptr, "corerror.h" },
-        { 0x801318cd, "VER_E_BAD_CONSTRAINED_PREFIX", nullptr, "corerror.h" },
-        { 0x801318ce, "VER_E_CIRCULAR_VAR_CONSTRAINTS", nullptr, "corerror.h" },
-        { 0x801318cf, "VER_E_CIRCULAR_MVAR_CONSTRAINTS", nullptr, "corerror.h" },
-        { 0x801318d0, "VER_E_UNSATISFIED_METHOD_INST", nullptr, "corerror.h" },
-        { 0x801318d1, "VER_E_UNSATISFIED_METHOD_PARENT_INST", nullptr, "corerror.h" },
-        { 0x801318d2, "VER_E_UNSATISFIED_FIELD_PARENT_INST", nullptr, "corerror.h" },
-        { 0x801318d3, "VER_E_UNSATISFIED_BOX_OPERAND", nullptr, "corerror.h" },
-        { 0x801318d4, "VER_E_CONSTRAINED_CALL_WITH_NON_BYREF_THIS", nullptr, "corerror.h" },
-        { 0x801318d5, "VER_E_CONSTRAINED_OF_NON_VARIABLE_TYPE", nullptr, "corerror.h" },
-        { 0x801318d6, "VER_E_READONLY_UNEXPECTED_CALLEE", nullptr, "corerror.h" },
-        { 0x801318d7, "VER_E_READONLY_ILLEGAL_WRITE", nullptr, "corerror.h" },
-        { 0x801318d8, "VER_E_READONLY_IN_MKREFANY", nullptr, "corerror.h" },
-        { 0x801318d9, "VER_E_UNALIGNED_ALIGNMENT", nullptr, "corerror.h" },
-        { 0x801318da, "VER_E_TAILCALL_INSIDE_EH", nullptr, "corerror.h" },
-        { 0x801318db, "VER_E_BACKWARD_BRANCH", nullptr, "corerror.h" },
-        { 0x801318dc, "VER_E_CALL_TO_VTYPE_BASE", nullptr, "corerror.h" },
-        { 0x801318dd, "VER_E_NEWOBJ_OF_ABSTRACT_CLASS", nullptr, "corerror.h" },
-        { 0x801318de, "VER_E_UNMANAGED_POINTER", nullptr, "corerror.h" },
-        { 0x801318df, "VER_E_LDFTN_NON_FINAL_VIRTUAL", nullptr, "corerror.h" },
-        { 0x801318e0, "VER_E_FIELD_OVERLAP", nullptr, "corerror.h" },
-        { 0x801318e1, "VER_E_THIS_MISMATCH", nullptr, "corerror.h" },
-        { 0x801318e2, "VER_E_STACK_I_I4", nullptr, "corerror.h" },
-        { 0x801318f0, "VER_E_BAD_PE", nullptr, "corerror.h" },
-        { 0x801318f1, "VER_E_BAD_MD", nullptr, "corerror.h" },
-        { 0x801318f2, "VER_E_BAD_APPDOMAIN", nullptr, "corerror.h" },
-        { 0x801318f3, "VER_E_TYPELOAD", nullptr, "corerror.h" },
-        { 0x801318f4, "VER_E_PE_LOAD", nullptr, "corerror.h" },
-        { 0x801318f5, "VER_E_WRITE_RVA_STATIC", nullptr, "corerror.h" },
-        { 0x80131904, "COR_E_SqlException", "System.Data.SqlClient.SqlClientException", "corerror.h" },
-        { 0x80131920, "COR_E_Data", nullptr, "corerror.h" },
-        { 0x80131921, "COR_E_DataDeletedRowInaccessible", nullptr, "corerror.h" },
-        { 0x80131922, "COR_E_DataDuplicateName", nullptr, "corerror.h" },
-        { 0x80131923, "COR_E_DataInRowChangingEvent", nullptr, "corerror.h" },
-        { 0x80131924, "COR_E_DataInvalidConstraint", nullptr, "corerror.h" },
-        { 0x80131925, "COR_E_DataMissingPrimaryKey", nullptr, "corerror.h" },
-        { 0x80131926, "COR_E_DataNoNullAllowed", nullptr, "corerror.h" },
-        { 0x80131927, "COR_E_DataReadOnly", nullptr, "corerror.h" },
-        { 0x80131928, "COR_E_DataRowNotInTable", nullptr, "corerror.h" },
-        { 0x80131929, "COR_E_DataVersionNotFound", nullptr, "corerror.h" },
-        { 0x8013192a, "COR_E_DataConstraint", nullptr, "corerror.h" },
-        { 0x8013192b, "COR_E_StrongTyping", nullptr, "corerror.h" },
-        { 0x80131930, "COR_E_SqlType", nullptr, "corerror.h" },
-        { 0x80131931, "COR_E_SqlNullValue", nullptr, "corerror.h" },
-        { 0x80131932, "COR_E_SqlTruncate", nullptr, "corerror.h" },
-        { 0x80131933, "COR_E_AdapterMapping", nullptr, "corerror.h" },
-        { 0x80131934, "COR_E_DataAdapter", nullptr, "corerror.h" },
-        { 0x80131935, "COR_E_DBConcurrency", nullptr, "corerror.h" },
-        { 0x80131936, "COR_E_OperationAborted", nullptr, "corerror.h" },
-        { 0x80131937, "COR_E_InvalidUdt", nullptr, "corerror.h" },
-        { 0x80131937, "COR_E_OdbcException", "System.Data.Odbc.OdbcException", "corerror.h" },
-        { 0x80131938, "COR_E_OracleException", "System.Data.OracleClient.OracleException", "corerror.h" },
-        { 0x80131940, "COR_E_Xml", nullptr, "corerror.h" },
-        { 0x80131941, "COR_E_XmlSchema", nullptr, "corerror.h" },
-        { 0x80131942, "COR_E_XmlXslt", nullptr, "corerror.h" },
-        { 0x80131943, "COR_E_XmlXPath", nullptr, "corerror.h" },
-        { 0x80131944, "COR_E_XmlQuery", nullptr, "corerror.h" },
-        { 0x80131b00, "VLDTR_E_IFACE_NOTIFACE", "Interface in InterfaceImpl is not marked tdInterface", "corerror.h" },
-        { 0x80131b01, "VLDTR_E_FD_RVAHASNORVA", "Field marked fdHasFieldRVA but has no RVA rec", "corerror.h" },
-        { 0x80131b02, "VLDTR_E_FD_RVAHASZERORVA", "Field marked fdHasFieldRVA has RVA =0", "corerror.h" },
-        { 0x80131b03, "VLDTR_E_MD_RVAANDIMPLMAP", "Method has both RVA !=0 and ImplMap", "corerror.h" },
-        { 0x80131b04, "VLDTR_E_TD_EXTRAFLAGS", "TypeDef has extraneous bits in flags", "corerror.h" },
-        { 0x80131b05, "VLDTR_E_TD_EXTENDSITSELF", "TypeDef extends itself", "corerror.h" },
-        { 0x80131b06, "VLDTR_E_TD_SYSVTNOTEXTOBJ", "System.ValueType does not extend System.Object", "corerror.h" },
-        { 0x80131b07, "VLDTR_E_TD_EXTTYPESPEC", "Class extends TypeSpec (warning)", "corerror.h" },
-        { 0x80131b09, "VLDTR_E_TD_VTNOSIZE", "Value Class has zero size", "corerror.h" },
-        { 0x80131b0a, "VLDTR_E_TD_IFACESEALED", "Interface is sealed", "corerror.h" },
-        { 0x80131b0b, "VLDTR_E_NC_BADNESTED", "Bad nullptrnestednullptr token in NestedClass", "corerror.h" },
-        { 0x80131b0c, "VLDTR_E_NC_BADENCLOSER", "Bad nullptrenclosingnullptr token in NestedClass", "corerror.h" },
-        { 0x80131b0d, "VLDTR_E_NC_DUP", "Duplicate NestedClass record", "corerror.h" },
-        { 0x80131b0e, "VLDTR_E_NC_DUPENCLOSER", "Duplicate NestedClass with different encloser", "corerror.h" },
-        { 0x80131b0f, "VLDTR_E_FRVA_ZERORVA", "RVA=0 in FieldRVA record", "corerror.h" },
-        { 0x80131b10, "VLDTR_E_FRVA_BADFIELD", "Invalid field token in FieldRVA record", "corerror.h" },
-        { 0x80131b11, "VLDTR_E_FRVA_DUPRVA", "Duplicate RVA in FieldRVA record", "corerror.h" },
-        { 0x80131b12, "VLDTR_E_FRVA_DUPFIELD", "Duplicate field in FieldRVA record", "corerror.h" },
-        { 0x80131b13, "VLDTR_E_EP_BADTOKEN", "Bad token as entry point in CLR header", "corerror.h" },
-        { 0x80131b14, "VLDTR_E_EP_INSTANCE", "Entry point in CLR header is a token of instance method", "corerror.h" },
-        { 0x80131b15, "VLDTR_E_TD_ENUMFLDBADTYPE", "Enum has non-integral underlying type", "corerror.h" },
-        { 0x80131b16, "VLDTR_E_MD_BADRVA", "Method has bogus RVA", "corerror.h" },
-        { 0x80131b17, "VLDTR_E_FD_LITERALNODEFAULT", "Literal field has no const value", "corerror.h" },
-        { 0x80131b18, "VLDTR_E_IFACE_METHNOTIMPL", "Class implementing an interface doesn't impl.one of methods", "corerror.h" },
-        { 0x80131b19, "VLDTR_E_CA_BADPARENT", "CA has invalid owner", "corerror.h" },
-        { 0x80131b1a, "VLDTR_E_CA_BADTYPE", "CA has invalid type", "corerror.h" },
-        { 0x80131b1b, "VLDTR_E_CA_NOTCTOR", "CA type is not .ctor", "corerror.h" },
-        { 0x80131b1c, "VLDTR_E_CA_BADSIG", "CA type has bad signature", "corerror.h" },
-        { 0x80131b1d, "VLDTR_E_CA_NOSIG", "CA type has no signature", "corerror.h" },
-        { 0x80131b1e, "VLDTR_E_CA_BADPROLOG", "CA blob has bad prolog (not 0x01 0x00)", "corerror.h" },
-        { 0x80131b1f, "VLDTR_E_MD_BADLOCALSIGTOK", "Method has invalid LocalSig token", "corerror.h" },
-        { 0x80131b20, "VLDTR_E_MD_BADHEADER", "Method has invalid header", "corerror.h" },
-        { 0x80131b21, "VLDTR_E_EP_TOOMANYARGS", "Entry point has more than one arg", "corerror.h" },
-        { 0x80131b22, "VLDTR_E_EP_BADRET", "Entry point has bad return type", "corerror.h" },
-        { 0x80131b23, "VLDTR_E_EP_BADARG", "Entry point has bad argument", "corerror.h" },
-        { 0x80131b24, "VLDTR_E_SIG_BADVOID", "Illegal nullptrvoidnullptr in signature", "corerror.h" },
-        { 0x80131b25, "VLDTR_E_IFACE_METHMULTIMPL", "Multiple implementation of method", "corerror.h" },
-        { 0x80131b26, "VLDTR_E_GP_NAMENULL", "GenericParam name is NULL", "corerror.h" },
-        { 0x80131b27, "VLDTR_E_GP_OWNERNIL", "GenericParam has nil owner.", "corerror.h" },
-        { 0x80131b28, "VLDTR_E_GP_DUPNAME", "GenericParam has duplicate by owner and name.", "corerror.h" },
-        { 0x80131b29, "VLDTR_E_GP_DUPNUMBER", "GenericParam has duplicate by owner and number.", "corerror.h" },
-        { 0x80131b2a, "VLDTR_E_GP_NONSEQ_BY_OWNER", "GenericParam is non sequential by owner", "corerror.h" },
-        { 0x80131b2b, "VLDTR_E_GP_NONSEQ_BY_NUMBER", "GenericParam is non sequential by number", "corerror.h" },
-        { 0x80131b2c, "VLDTR_E_GP_UNEXPECTED_OWNER_FOR_VARIANT_VAR", "GenericParam has variance but its owner is not an interface or delegate", "corerror.h" },
-        { 0x80131b2d, "VLDTR_E_GP_ILLEGAL_VARIANT_MVAR", "GenericParam is a method type parameter and must be non-variant", "corerror.h" },
-        { 0x80131b2e, "VLDTR_E_GP_ILLEGAL_VARIANCE_FLAGS", "GenericParam has illegal value for variance flags", "corerror.h" },
-        { 0x80131b2f, "VLDTR_E_GP_REFANDVALUETYPE", "GenericParam has incompatible special constraints reference type and valuetype", "corerror.h" },
-        { 0x80131b30, "VLDTR_E_GPC_OWNERNIL", "GenericParamConstraint has nil owner", "corerror.h" },
-        { 0x80131b31, "VLDTR_E_GPC_DUP", "GenericParamConstraint has duplicate by owner and constraint", "corerror.h" },
-        { 0x80131b32, "VLDTR_E_GPC_NONCONTIGUOUS", "GenericParamConstraint is non-contiguous with preceeding constraints for same owner", "corerror.h" },
-        { 0x80131b33, "VLDTR_E_MS_METHODNIL", "MethodSpec has nil method", "corerror.h" },
-        { 0x80131b34, "VLDTR_E_MS_DUP", "MethodSpec has duplicate based own method and instantiation", "corerror.h" },
-        { 0x80131b35, "VLDTR_E_MS_BADCALLINGCONV", "MethodSpec signature has invalid calling convention", "corerror.h" },
-        { 0x80131b36, "VLDTR_E_MS_MISSARITY", "MethodSpec signature is missing arity specification", "corerror.h" },
-        { 0x80131b37, "VLDTR_E_MS_MISSARG", "MethodSpec signature is missing type argument", "corerror.h" },
-        { 0x80131b38, "VLDTR_E_MS_ARITYMISMATCH", "MethodSpec arity of generic method and instantiation do not match", "corerror.h" },
-        { 0x80131b39, "VLDTR_E_MS_METHODNOTGENERIC", "MethodSpec method is not generic", "corerror.h" },
-        { 0x80131b3a, "VLDTR_E_SIG_MISSARITY", "Signature missing arity of instantiated generic type", "corerror.h" },
-        { 0x80131b3b, "VLDTR_E_SIG_ARITYMISMATCH", "Signature has generic type of arity instantiated at different arity", "corerror.h" },
-        { 0x80131b3c, "VLDTR_E_MD_GENERIC_CCTOR", "Method cannot be both generic and a class constructor", "corerror.h" },
-        { 0x80131b3d, "VLDTR_E_MD_GENERIC_CTOR", "Method cannot be both generic and an instance constructor", "corerror.h" },
-        { 0x80131b3e, "VLDTR_E_MD_GENERIC_IMPORT", "Method cannot be both generic and defined on an imported type", "corerror.h" },
-        { 0x80131b3f, "VLDTR_E_MD_GENERIC_BADCALLCONV", "Method cannot be both generic and have non-default calling convention", "corerror.h" },
-        { 0x80131b40, "VLDTR_E_EP_GENERIC_METHOD", "Entry point in CLR header is the token for a generic method", "corerror.h" },
-        { 0x80131b41, "VLDTR_E_MD_MISSARITY", "Method signature is generic but is missing its arity", "corerror.h" },
-        { 0x80131b42, "VLDTR_E_MD_ARITYZERO", "Method signature is generic but its arity is zero", "corerror.h" },
-        { 0x80131b43, "VLDTR_E_SIG_ARITYZERO", "Signature has generic type instantiated at arity 0", "corerror.h" },
-        { 0x80131b44, "VLDTR_E_MS_ARITYZERO", "MethodSpec signature has arity 0", "corerror.h" },
-        { 0x80131b45, "VLDTR_E_MD_GPMISMATCH", "MethodDef signature has arity n but owns m GenericParams", "corerror.h" },
-        { 0x80131b46, "VLDTR_E_EP_GENERIC_TYPE", "Entry point in CLR header is the token for a method in a generic type", "corerror.h" },
-        { 0x80131b47, "VLDTR_E_MI_DECLNOTGENERIC", "MethodImpl overrides non-generic method with generic method", "corerror.h" },
-        { 0x80131b48, "VLDTR_E_MI_IMPLNOTGENERIC", "MethodImpl overrides non-generic method with generic method", "corerror.h" },
-        { 0x80131b49, "VLDTR_E_MI_ARITYMISMATCH", "MethodImpl overrides generic method of arity n with generic method of arity m", "corerror.h" },
-        { 0x80131b4a, "VLDTR_E_TD_EXTBADTYPESPEC", "TypeDef extends a TypeSpec that is not an instantiated type", "corerror.h" },
-        { 0x80131b4b, "VLDTR_E_SIG_BYREFINST", "Signature has type instantiated at byref at offset i", "corerror.h" },
-        { 0x80131b4c, "VLDTR_E_MS_BYREFINST", "Signature has type instantiated at byref at offset i", "corerror.h" },
-        { 0x80131b4d, "VLDTR_E_TS_EMPTY", "TypeSpec has empty signature", "corerror.h" },
-        { 0x80131b4e, "VLDTR_E_TS_HASSENTINALS", "TypeSpec has signature containing one or more sentinals", "corerror.h" },
-        { 0x80131b4f, "VLDTR_E_TD_GENERICHASEXPLAYOUT", "TypeDef is generic but has explicit layout", "corerror.h" },
-        { 0x80131b50, "VLDTR_E_SIG_BADTOKTYPE", "Signature has token following ELEMENT_TYPE_CLASS (_VALUETYPE) that is not a TypeDef or TypeRef", "corerror.h" },
-        { 0x80131b51, "VLDTR_E_IFACE_METHNOTIMPLTHISMOD", "Warn:Class doesn't implement interface method in this module", "corerror.h" },
-        { 0x80131b52, "TLBX_E_CIRCULAR_EXPORT2", "TypeLib export: attempt to export a CLB imported from a TLB.", "corerror.h" },
-        { 0x80131c00, "CORDBG_E_THREAD_NOT_SCHEDULED", "Thread is not scheduled. Thus we may not have OSThreadId, handle, or context", "corerror.h" },
-        { 0x80131c01, "CORDBG_E_HANDLE_HAS_BEEN_DISPOSED", "Handle has been disposed.", "corerror.h" },
-        { 0x80131c02, "CORDBG_E_NONINTERCEPTABLE_EXCEPTION", "Cant intercept this exception.", "corerror.h" },
-        { 0x80131c03, "CORDBG_E_CANT_UNWIND_ABOVE_CALLBACK", "When intercepting an exception, cannot intercept above the current frame.", "corerror.h" },
-        { 0x80131c04, "CORDBG_E_INTERCEPT_FRAME_ALREADY_SET", "The intercept frame for this exception has already been set.", "corerror.h" },
-        { 0x80131c05, "CORDBG_E_NO_NATIVE_PATCH_AT_ADDR", "there's no native patch at the given address.", "corerror.h" },
-        { 0x80131c06, "CORDBG_E_MUST_BE_INTEROP_DEBUGGING", "This API is only allowed when interop debugging.", "corerror.h" },
-        { 0x80131c07, "CORDBG_E_NATIVE_PATCH_ALREADY_AT_ADDR", "There's already a native patch at the address", "corerror.h" },
-        { 0x80131c08, "CORDBG_E_TIMEOUT", "a wait timed out .. likely an indication of deadlock.", "corerror.h" },
-        { 0x80131c09, "CORDBG_E_CANT_CALL_ON_THIS_THREAD", "Can't use the API on this thread.", "corerror.h" },
-        { 0x80131c0a, "CORDBG_E_ENC_INFOLESS_METHOD", "Method was not JITed in EnC mode", "corerror.h" },
-        { 0x80131c0b, "CORDBG_E_ENC_NESTED_HANLDERS", "Frame cant be updated due to change in max nesting of handlers", "corerror.h" },
-        { 0x80131c0c, "CORDBG_E_ENC_IN_FUNCLET", "Method is in a callable handler/filter. Cant grow stack", "corerror.h" },
-        { 0x80131c0d, "CORDBG_E_ENC_LOCALLOC", "Frame cant be updated due to localloc", "corerror.h" },
-        { 0x80131c0e, "CORDBG_E_ENC_EDIT_NOT_SUPPORTED", "Attempt to perform unsupported edit", "corerror.h" },
-        { 0x80131c0f, "CORDBG_E_FEABORT_DELAYED_UNTIL_THREAD_RESUMED", "Attempt to func eval abort on a suspended thread.", "corerror.h" },
-        { 0x80131c10, "CORDBG_E_NOTREADY", "The LS is not in a good spot to perform the requested operation.", "corerror.h" },
-        { 0x80131c11, "CORDBG_E_CANNOT_RESOLVE_ASSEMBLY", "We failed to resolve assembly given an AssemblyRef token. Assembly may be not loaded yet or not a valid token.", "corerror.h" },
-        { 0x80131c12, "CORDBG_E_MUST_BE_IN_LOAD_MODULE", "Must be in context of LoadModule callback to perform requested operation", "corerror.h" },
-        { 0x80131c13, "CORDBG_E_CANNOT_BE_ON_ATTACH", "Requested operation cannot be performed during an attach operation", "corerror.h" },
-        { 0x80131c14, "CORDBG_E_NGEN_NOT_SUPPORTED", "NGEN must be supported to perform the requested operation", "corerror.h" },
-        { 0x80131c15, "CORDBG_E_ILLEGAL_SHUTDOWN_ORDER", "Trying to shutdown out of order.", "corerror.h" },
-        { 0x80131c16, "CORDBG_E_CANNOT_DEBUG_FIBER_PROCESS", "For Whidbey, we don't support debugging fiber mode managed process", "corerror.h" },
-        { 0x80131c17, "CORDBG_E_MUST_BE_IN_CREATE_PROCESS", "Must be in context of CreateProcess callback to perform requested operation", "corerror.h" },
-        { 0x80131c18, "CORDBG_E_DETACH_FAILED_OUTSTANDING_EVALS", "All outstanding func-evals have not completed, detaching is not allowed at this time.", "corerror.h" },
-        { 0x80131c19, "CORDBG_E_DETACH_FAILED_OUTSTANDING_STEPPERS", "All outstanding steppers have not been closed, detaching is not allowed at this time.", "corerror.h" },
-        { 0x80131c20, "CORDBG_E_CANT_INTEROP_STEP_OUT", "Can't have an ICorDebugStepper do a native step-out.", "corerror.h" },
-        { 0x80131c21, "CORDBG_E_DETACH_FAILED_OUTSTANDING_BREAKPOINTS", "All outstanding breakpoints have not been closed, detaching is not allowed at this time.", "corerror.h" },
-        { 0x80131c22, "CORDBG_E_ILLEGAL_IN_STACK_OVERFLOW", "the operation is illegal because of a stackoverflow.", "corerror.h" },
-        { 0x80131c23, "CORDBG_E_ILLEGAL_AT_GC_UNSAFE_POINT", "The operation failed because it's a GC unsafe point.", "corerror.h" },
-        { 0x80131c24, "CORDBG_E_ILLEGAL_IN_PROLOG", "The operation failed because the thread is in the prolog", "corerror.h" },
-        { 0x80131c25, "CORDBG_E_ILLEGAL_IN_NATIVE_CODE", "The operation failed because the thread is in native code", "corerror.h" },
-        { 0x80131c26, "CORDBG_E_ILLEGAL_IN_OPTIMIZED_CODE", "The operation failed because the thread is in optimized code.", "corerror.h" },
-        { 0x80131c27, "CORDBG_E_MINIDUMP_UNSUPPORTED", nullptr, "corerror.h" },
-        { 0x80131c28, "CORDBG_E_APPDOMAIN_MISMATCH", "A supplied object or type belongs to the wrong AppDomain", "corerror.h" },
-        { 0x80131c29, "CORDBG_E_CONTEXT_UNVAILABLE", "The thread's context is not available.", "corerror.h" },
-        { 0x80131c30, "CORDBG_E_UNCOMPATIBLE_PLATFORMS", "The operation failed because debuggee and debugger are on incompatible platform", "corerror.h" },
-        { 0x80131c31, "CORDBG_E_DEBUGGING_DISABLED", "The operation failed because the debugging has been disabled", "corerror.h" },
-        { 0x80131c32, "CORDBG_E_DETACH_FAILED_ON_ENC", "Detach is illegal after a module has been EnCed.", "corerror.h" },
-        { 0x80131c33, "CORDBG_E_CURRENT_EXCEPTION_IS_OUTSIDE_CURRENT_EXECUTION_SCOPE", "Interception of the current exception is not legal", "corerror.h" },
-        { 0x80131c34, "CORDBG_E_HELPER_MAY_DEADLOCK", "Helper thread can not safely run code. The opereration may work at a later time.", "corerror.h" },
-        { 0x80131d00, "PEFMT_E_NO_CONTENTS", "File is empty", "corerror.h" },
-        { 0x80131d01, "PEFMT_E_NO_NTHEADERS", "File has no NT headers", "corerror.h" },
-        { 0x80131d02, "PEFMT_E_64BIT", "File is PE32+", "corerror.h" },
-        { 0x80131d03, "PEFMT_E_NO_CORHEADER", "File has no COR header", "corerror.h" },
-        { 0x80131d04, "PEFMT_E_NOT_ILONLY", "Flag IL_ONLY not set", "corerror.h" },
-        { 0x80131d05, "PEFMT_E_IMPORT_DLLS", "Bad import DLLs", "corerror.h" },
-        { 0x80131d06, "PEFMT_E_EXE_NOENTRYPOINT", "EXE file has no mgd entry point", "corerror.h" },
-        { 0x80131d07, "PEFMT_E_BASE_RELOCS", "Bad base relocations", "corerror.h" },
-        { 0x80131d08, "PEFMT_E_ENTRYPOINT", "Bad managed entry point", "corerror.h" },
-        { 0x80131d09, "PEFMT_E_ZERO_SIZEOFCODE", "OptHeader.SizeOfCode==0", "corerror.h" },
-        { 0x80131d0a, "PEFMT_E_BAD_CORHEADER", "File has invalid COR header", "corerror.h" },
-        { 0x80131e00, "CLR_OPTSVC_E_CONTROLLER_INTERRUPT", "Service controller interrupted work", "corerror.h" },
-        { 0x80131f00, "NGEN_FAILED_GET_DEPENDENCIES", "Service manager failed to get ICorSvcDependencies interface", "corerror.h" },
-        { 0x80131f01, "NGEN_FAILED_NATIVE_IMAGE_DELETE", "Failed to delete native image", "corerror.h" },
-        { 0x80131fff, "CLDB_E_INTERNALERROR", nullptr, "corerror.h" },
-    };
-#if _DEBUG
-    struct AssertArraySorted {
-        AssertArraySorted() {
-            for (size_t i = 1; i < messages.size(); i++) {
-                assert(messages[i - 1].code <= messages[i].code);
-            }
+    vector<ErrorMessage> messages;
+    RUN_INIT(
+        ADD(0x8000211d, "COR_E_AMBIGUOUSMATCH", "While late binding to a method via reflection, could not resolve between multiple overloads of a method.", "corerror.h");
+        ADD(0x80004002, "COR_E_INVALIDCAST", "Indicates a bad cast condition", "corerror.h");
+        ADD(0x80004003, "COR_E_NULLREFERENCE", "Dereferencing a null reference. In general class libraries should not throw this", "corerror.h");
+        ADD(0x8002000e, "COR_E_TARGETPARAMCOUNT", "There was a mismatch between number of arguments provided and the number expected", "corerror.h");
+        ADD(0x80020012, "COR_E_DIVIDEBYZERO", "Attempted to divide a number by zero.", "corerror.h");
+        ADD(0x8004dead, "E_SYM_DESTROYED", nullptr, "corsym.h");
+        ADD(0x80070002, "COR_E_FILENOTFOUND", nullptr, "corerror.h");
+        ADD(0x80070003, "COR_E_DIRECTORYNOTFOUND", "The specified path couldn't be found.", "corerror.h");
+        ADD(0x80070005, "COR_E_UNAUTHORIZEDACCESS", "Access is denied.", "corerror.h");
+        ADD(0x8007000b, "COR_E_BADIMAGEFORMAT", "The format of DLL or executable being loaded is invalid.", "corerror.h");
+        ADD(0x8007000e, "COR_E_OUTOFMEMORY", "The EE thows this exception when no more memory is avaible to continue execution", "corerror.h");
+        ADD(0x80070026, "COR_E_ENDOFSTREAM", "Thrown when the End of file is reached", "corerror.h");
+        ADD(0x80070057, "COR_E_ARGUMENT", "An argument does not meet the contract of the method.", "corerror.h");
+        ADD(0x800700a1, "ERROR_BAD_PATHNAME", "The specified path is invalid.", "corerror.h");
+        ADD(0x800700ce, "COR_E_PATHTOOLONG", "The specified path was too long.", "corerror.h");
+        ADD(0x80070216, "COR_E_ARITHMETIC", "Overflow or underflow in mathematical operations.", "corerror.h");
+        ADD(0x800703e9, "COR_E_STACKOVERFLOW", "Is raised by the EE when the execution stack overflows as it is attempting to ex", "corerror.h");
+        ADD(0x80131001, "CEE_E_CVTRES_NOT_FOUND", "cannot find cvtres.exe", "corerror.h");
+        ADD(0x80131010, "MSEE_E_LOADLIBFAILED", "Failed to delay load library %s (Win32 error: %d).", "corerror.h");
+        ADD(0x80131011, "MSEE_E_GETPROCFAILED", "Failed to get entry point %s (Win32 error: %d).", "corerror.h");
+        ADD(0x80131012, "MSEE_E_MULTCOPIESLOADED", "Multiple copies of MSCOREE.dll have been loaded by the same process.", "corerror.h");
+        ADD(0x80131013, "COR_E_TYPEUNLOADED", "The type had been unloaded.", "corerror.h");
+        ADD(0x80131013, "COR_E_TYPEUNLOADED", nullptr, "corerror.h");
+        ADD(0x80131014, "COR_E_APPDOMAINUNLOADED", "access unloaded appdomain", "corerror.h");
+        ADD(0x80131015, "COR_E_CANNOTUNLOADAPPDOMAIN", "Error while unloading an appdomain", "corerror.h");
+        ADD(0x80131016, "MSEE_E_ASSEMBLYLOADINPROGRESS", "Assembly is being currently being loaded", "corerror.h");
+        ADD(0x80131017, "MSEE_E_CANNOTCREATEAPPDOMAIN", "Attempt to create appdomain failed", "corerror.h");
+        ADD(0x80131018, "COR_E_ASSEMBLYEXPECTED", "The module was expected to contain an assembly manifest.", "corerror.h");
+        ADD(0x80131018, "COR_E_ASSEMBLYEXPECTED", nullptr, "corerror.h");
+        ADD(0x80131019, "COR_E_FIXUPSINEXE", "Attempt to load an unverifiable exe with fixups (IAT with more than 2 sections or a TLS section)", "corerror.h");
+        ADD(0x8013101a, "COR_E_NO_LOADLIBRARY_ALLOWED", "Attempt to LoadLibrary a managed image in an improper way (only assemblies with EAT's area allowed.)", "corerror.h");
+        ADD(0x8013101b, "COR_E_NEWER_RUNTIME", "The assembly is built by a runtime newer than the currently loaded runtime, and cannot be loaded.", "corerror.h");
+        ADD(0x8013101c, "COR_E_CANNOT_SET_POLICY", "Unable to set app domain security policy after non-GAC domain neutral assemblies are loaded", "corerror.h");
+        ADD(0x8013101d, "COR_E_CANNOT_SPECIFY_EVIDENCE", "Unable to use assembly evidence after non-GAC domain neutral assemblies are loaded", "corerror.h");
+        ADD(0x80131020, "HOST_E_DEADLOCK", "Host detects deadlock on a blocking operation", "corerror.h");
+        ADD(0x80131021, "HOST_E_INTERRUPTED", "Host interrupts a wait, similar to APC", "corerror.h");
+        ADD(0x80131022, "HOST_E_INVALIDOPERATION", "The operation is invalid", "corerror.h");
+        ADD(0x80131023, "HOST_E_CLRNOTAVAILABLE", "CLR has been disabled due to unrecoverable error", "corerror.h");
+        ADD(0x80131024, "HOST_E_TIMEOUT", "A wait times out", "corerror.h");
+        ADD(0x80131025, "HOST_E_NOT_OWNER", nullptr, "corerror.h");
+        ADD(0x80131026, "HOST_E_ABANDONED", "An event is abandoned", "corerror.h");
+        ADD(0x80131027, "HOST_E_EXITPROCESS_THREADABORT", "ExitProcess due to ThreadAbort escalation", "corerror.h");
+        ADD(0x80131028, "HOST_E_EXITPROCESS_ADUNLOAD", "ExitProcess due to AD Unload escalation", "corerror.h");
+        ADD(0x80131029, "HOST_E_EXITPROCESS_TIMEOUT", "ExitProcess due to Timeout escalation", "corerror.h");
+        ADD(0x8013102a, "HOST_E_EXITPROCESS_OUTOFMEMORY", "ExitProcess due to OutOfMemory escalation", "corerror.h");
+        ADD(0x8013102b, "HOST_E_EXITPROCESS_STACKOVERFLOW", "ExitProcess due to StackOverflow escalation", "corerror.h");
+        ADD(0x80131039, "COR_E_MODULE_HASH_CHECK_FAILED", "The check of the module's hash failed.", "corerror.h");
+        ADD(0x80131040, "FUSION_E_REF_DEF_MISMATCH", "The located assembly's manifest definition does not match the assembly reference.", "corerror.h");
+        ADD(0x80131041, "FUSION_E_INVALID_PRIVATE_ASM_LOCATION", "The private assembly was located outside the appbase directory.", "corerror.h");
+        ADD(0x80131042, "FUSION_E_ASM_MODULE_MISSING", "A module specified in the manifest was not found.", "corerror.h");
+        ADD(0x80131043, "FUSION_E_UNEXPECTED_MODULE_FOUND", "Modules which are not in the manifest were streamed in.", "corerror.h");
+        ADD(0x80131044, "FUSION_E_PRIVATE_ASM_DISALLOWED", "A strongly-named assembly is required.", "corerror.h");
+        ADD(0x80131045, "FUSION_E_SIGNATURE_CHECK_FAILED", "The check of the signature failed.", "corerror.h");
+        ADD(0x80131046, "FUSION_E_DATABASE_ERROR", "An unexpected error was encountered in the Assembly Cache database.", "corerror.h");
+        ADD(0x80131047, "FUSION_E_INVALID_NAME", "The given assembly name or codebase was invalid.", "corerror.h");
+        ADD(0x80131048, "FUSION_E_CODE_DOWNLOAD_DISABLED", "HTTP download of assemblies has been disabled for this appdomain.", "corerror.h");
+        ADD(0x80131049, "FUSION_E_UNINSTALL_DISALLOWED", "Uninstall of given assembly is not allowed.", "corerror.h");
+        ADD(0x80131050, "FUSION_E_HOST_GAC_ASM_MISMATCH", "Assembly in host store has a different signature than assembly in GAC", "corerror.h");
+        ADD(0x80131051, "FUSION_E_LOADFROM_BLOCKED", "Hosted environment doesn't permit loading by location", "corerror.h");
+        ADD(0x80131052, "FUSION_E_CACHEFILE_FAILED", "Failed to add file to AppDomain cache", "corerror.h");
+        ADD(0x80131100, "CLDB_E_FILE_BADREAD", "Error occured during a read.", "corerror.h");
+        ADD(0x80131101, "CLDB_E_FILE_BADWRITE", "Error occured during a write.", "corerror.h");
+        ADD(0x80131103, "CLDB_E_FILE_READONLY", "File is read only.", "corerror.h");
+        ADD(0x80131105, "CLDB_E_NAME_ERROR", "An ill-formed name was given.", "corerror.h");
+        ADD(0x80131106, "CLDB_E_TRUNCATION", "ERROR:  Data value was truncated.", "corerror.h");
+        ADD(0x80131107, "CLDB_E_FILE_OLDVER", "Old version error.", "corerror.h");
+        ADD(0x80131108, "CLDB_E_RELOCATED", "A shared mem open failed to open at the originally", "corerror.h");
+        ADD(0x8013110a, "CLDB_E_SMDUPLICATE", "Create of shared memory failed.  A memory mapping of the same name already exists.", "corerror.h");
+        ADD(0x8013110b, "CLDB_E_NO_DATA", "There isn't .CLB data in the memory or stream.", "corerror.h");
+        ADD(0x8013110c, "CLDB_E_READONLY", "Database is read only.", "corerror.h");
+        ADD(0x8013110d, "CLDB_E_INCOMPATIBLE", "The importing scope is not comptabile with the emitting scope", "corerror.h");
+        ADD(0x8013110e, "CLDB_E_FILE_CORRUPT", "File is corrupt.", "corerror.h");
+        ADD(0x8013110f, "CLDB_E_SCHEMA_VERNOTFOUND", "Version %d of schema '%s' not found.", "corerror.h");
+        ADD(0x80131110, "CLDB_E_BADUPDATEMODE", "cannot open a incrementally build scope for full update", "corerror.h");
+        ADD(0x80131121, "CLDB_E_INDEX_NONULLKEYS", "Null value not allowed in unique index or primary key.", "corerror.h");
+        ADD(0x80131122, "CLDB_E_INDEX_DUPLICATE", "Unique index %s has been violated.", "corerror.h");
+        ADD(0x80131123, "CLDB_E_INDEX_BADTYPE", "The columns data type is not allowed in an index.", "corerror.h");
+        ADD(0x80131124, "CLDB_E_INDEX_NOTFOUND", "Index %s not found.", "corerror.h");
+        ADD(0x80131130, "CLDB_E_RECORD_NOTFOUND", "Record wasn't found on lookup.", "corerror.h");
+        ADD(0x80131131, "CLDB_E_RECORD_OVERFLOW", "Too many records were returned for criteria.", "corerror.h");
+        ADD(0x80131132, "CLDB_E_RECORD_DUPLICATE", "Record is a duplicate.", "corerror.h");
+        ADD(0x80131133, "CLDB_E_RECORD_PKREQUIRED", "Primary key value is required.", "corerror.h");
+        ADD(0x80131134, "CLDB_E_RECORD_DELETED", "Record is valid but deleted.", "corerror.h");
+        ADD(0x80131135, "CLDB_E_RECORD_OUTOFORDER", "Record is emitted out of order.", "corerror.h");
+        ADD(0x80131140, "CLDB_E_COLUMN_OVERFLOW", "Data too large.", "corerror.h");
+        ADD(0x80131141, "CLDB_E_COLUMN_READONLY", "Column cannot be changed.", "corerror.h");
+        ADD(0x80131142, "CLDB_E_COLUMN_SPECIALCOL", "Too many RID or primary key columns, 1 is max.", "corerror.h");
+        ADD(0x80131143, "CLDB_E_COLUMN_PKNONULLS", "Primary key column %s may not allow the null value.", "corerror.h");
+        ADD(0x80131150, "CLDB_E_TABLE_CANTDROP", "Can't auto-drop table while open.", "corerror.h");
+        ADD(0x80131151, "CLDB_E_OBJECT_NOTFOUND", "Object was not found in the database.", "corerror.h");
+        ADD(0x80131152, "CLDB_E_OBJECT_COLNOTFOUND", "The column was not found.", "corerror.h");
+        ADD(0x80131153, "CLDB_E_VECTOR_BADINDEX", "The index given was invalid.", "corerror.h");
+        ADD(0x80131154, "CLDB_E_TOO_BIG", "A blob or string was too big.", "corerror.h");
+        ADD(0x8013115f, "META_E_INVALID_TOKEN_TYPE", "A token of the wrong type passed to a metadata function.", "corerror.h");
+        ADD(0x80131160, "TLBX_E_INVALID_TYPEINFO", "Typelib import: invalid type, not converted.", "corerror.h");
+        ADD(0x80131161, "TLBX_E_INVALID_TYPEINFO_UNNAMED", "Typelib import: invalid type, not converted -- name unknown.", "corerror.h");
+        ADD(0x80131162, "TLBX_E_CTX_NESTED", "Typelib export: Format string for nested contexts.", "corerror.h");
+        ADD(0x80131163, "TLBX_E_ERROR_MESSAGE", "Typelib export: Error message wrapper.", "corerror.h");
+        ADD(0x80131164, "TLBX_E_CANT_SAVE", "Typelib export: cant nullptrSaveAllChanges()nullptr", "corerror.h");
+        ADD(0x80131165, "TLBX_W_LIBNOTREGISTERED", "Typelib export: type library is not registered.", "corerror.h");
+        ADD(0x80131166, "TLBX_E_CANTLOADLIBRARY", "Typelib export: type library cannot be loaded.", "corerror.h");
+        ADD(0x80131167, "TLBX_E_BAD_VT_TYPE", "Typelib import: invalid VT_*, not converted.", "corerror.h");
+        ADD(0x80131168, "TLBX_E_NO_MSCOREE_TLB", "Typelib export: can't load mscoree.tlb", "corerror.h");
+        ADD(0x80131169, "TLBX_E_BAD_MSCOREE_TLB", "Typelib export: can't get a required typeinfo from mscoree.tlb.", "corerror.h");
+        ADD(0x8013116a, "TLBX_E_TLB_EXCEPTION", "Typelib import: fault reading a typelib.", "corerror.h");
+        ADD(0x8013116b, "TLBX_E_MULTIPLE_LCIDS", "Typelib import: Multiple LCID's parameters on a method.", "corerror.h");
+        ADD(0x8013116d, "TLBX_E_AMBIGUOUS_RETURN", "Typelib import: duplicate or ambiguous return types.", "corerror.h");
+        ADD(0x8013116e, "TLBX_E_DUPLICATE_TYPE_NAME", "Typelib import: duplicate name (due to user-defined name).", "corerror.h");
+        ADD(0x80131172, "TLBX_I_NONSEQUENTIALSTRUCT", "Typelib export: Can't convert non-sequential structs.", "corerror.h");
+        ADD(0x80131174, "TLBX_I_RESOLVEREFFAILED", "Typelib import: The resolve ref call failed.", "corerror.h");
+        ADD(0x80131175, "TLBX_E_ASANY", "Typelib export: Encounterd nullptrAsAnynullptr -- ignored.", "corerror.h");
+        ADD(0x80131176, "TLBX_E_INVALIDLCIDPARAM", "Typelib export: Encounterd an LCID attribute set to an invalid param.", "corerror.h");
+        ADD(0x80131177, "TLBX_E_LCIDONDISPONLYITF", "Typelib export: Encounterd an LCID attribute on a disp only interface.", "corerror.h");
+        ADD(0x80131178, "TLBX_E_NONPUBLIC_FIELD", "Typelib export: Non-public field in public struct.", "corerror.h");
+        ADD(0x8013117b, "TLBX_E_BAD_NAMES", "Typelib export: bad names list.", "corerror.h");
+        ADD(0x8013117d, "TLBX_E_GENERICINST_SIGNATURE", "TypeLib export: generic type instance in signature.", "corerror.h");
+        ADD(0x8013117e, "TLBX_E_GENERICPAR_SIGNATURE", "TypeLib export: generic type parameter in signature.", "corerror.h");
+        ADD(0x80131180, "META_E_DUPLICATE", "Attempt to define an object that already exists.", "corerror.h");
+        ADD(0x80131181, "META_E_GUID_REQUIRED", "A guid was not provided where one was required.", "corerror.h");
+        ADD(0x80131182, "META_E_TYPEDEF_MISMATCH", "Merge: an import typedef matched ns.name, but not version and guid.", "corerror.h");
+        ADD(0x80131183, "META_E_MERGE_COLLISION", "Merge: conflict between import and emit", "corerror.h");
+        ADD(0x80131186, "TLBX_E_NO_SAFEHANDLE_ARRAYS", "TypeLib export: detected array of SafeHandles", "corerror.h");
+        ADD(0x80131187, "META_E_METHD_NOT_FOUND", "Merge: Class already in emit scope, but member not found", "corerror.h");
+        ADD(0x80131188, "META_E_FIELD_NOT_FOUND", "Merge: Class already in emit scope, but member not found", "corerror.h");
+        ADD(0x80131189, "META_E_PARAM_MISMATCH", "Merge: Parameter information mismatched.", "corerror.h");
+        ADD(0x8013118a, "META_E_BADMETADATA", "Merge: Inconsistency in meta data import scope", "corerror.h");
+        ADD(0x8013118b, "META_E_INTFCEIMPL_NOT_FOUND", "Merge: Class already in emit scope, but interfaceimpl not found", "corerror.h");
+        ADD(0x8013118c, "TLBX_E_NO_CRITICALHANDLE_ARRAYS", "TypeLib export: detected array of CriticalHandles", "corerror.h");
+        ADD(0x8013118d, "META_E_CLASS_LAYOUT_INCONSISTENT", "Merge: Class is duplicated but class layout information is not consistent", "corerror.h");
+        ADD(0x8013118e, "META_E_FIELD_MARSHAL_NOT_FOUND", "Merge: Field is duplicated but we cannot find the matching FieldMarshal information", "corerror.h");
+        ADD(0x8013118f, "META_E_METHODSEM_NOT_FOUND", "Merge:", "corerror.h");
+        ADD(0x80131190, "META_E_EVENT_NOT_FOUND", "Merge: Method is duplicated but we cannot find the matching event info.", "corerror.h");
+        ADD(0x80131191, "META_E_PROP_NOT_FOUND", "Merge: Method is duplicated but we cannot find the maching property info.", "corerror.h");
+        ADD(0x80131192, "META_E_BAD_SIGNATURE", "Bad binary signature", "corerror.h");
+        ADD(0x80131193, "META_E_BAD_INPUT_PARAMETER", "Bad input parameters", "corerror.h");
+        ADD(0x80131194, "META_E_METHDIMPL_INCONSISTENT", "Merge: duplicated methods have inconsistent ImplFlags", "corerror.h");
+        ADD(0x80131195, "META_E_MD_INCONSISTENCY", "Merge: Inconsistency in meta data", "corerror.h");
+        ADD(0x80131196, "META_E_CANNOTRESOLVETYPEREF", "Cannot resolve typeref", "corerror.h");
+        ADD(0x80131198, "META_E_STRINGSPACE_FULL", "No logical space left to create more user strings.", "corerror.h");
+        ADD(0x80131199, "META_E_UNEXPECTED_REMAP", "A TokenRemap occurred which we weren't prepared to handle.", "corerror.h");
+        ADD(0x8013119a, "META_E_HAS_UNMARKALL", "Unmark all has been called already", "corerror.h");
+        ADD(0x8013119b, "META_E_MUST_CALL_UNMARKALL", "Must call UnmarkAll first before marking.", "corerror.h");
+        ADD(0x8013119c, "META_E_GENERICPARAM_INCONSISTENT", "Merge: duplicated types/methods have inconsistent GenericParams", "corerror.h");
+        ADD(0x8013119d, "META_E_EVENT_COUNTS", "Merge: different event counts in import and emit scopes.", "corerror.h");
+        ADD(0x8013119e, "META_E_PROPERTY_COUNTS", "Merge: different property counts in import and emit scopes.", "corerror.h");
+        ADD(0x8013119f, "META_E_TYPEDEF_MISSING", "Merge: An input scope has a TypeRef which should but doesn't have a matching TypeDef.", "corerror.h");
+        ADD(0x801311a0, "TLBX_E_CANT_LOAD_MODULE", "TypeLib export: can't open the module to export.", "corerror.h");
+        ADD(0x801311a1, "TLBX_E_CANT_LOAD_CLASS", "TypeLib export: can't load a class.", "corerror.h");
+        ADD(0x801311a2, "TLBX_E_NULL_MODULE", "TypeLib export: the hMod of a loaded class is 0; can't export it.", "corerror.h");
+        ADD(0x801311a3, "TLBX_E_NO_CLSID_KEY", "TypeLib export: no CLSID or Interface subkey to HKCR.", "corerror.h");
+        ADD(0x801311a4, "TLBX_E_CIRCULAR_EXPORT", "TypeLib export: attempt to export a CLB imported from a TLB.", "corerror.h");
+        ADD(0x801311a5, "TLBX_E_CIRCULAR_IMPORT", "TypeLib import: attempt to import a TLB exported from a CLB.", "corerror.h");
+        ADD(0x801311a6, "TLBX_E_BAD_NATIVETYPE", "TypeLib export: bad Native type in method signature.", "corerror.h");
+        ADD(0x801311a7, "TLBX_E_BAD_VTABLE", "TypeLib import: non-increasing vtable (duplicate slots).", "corerror.h");
+        ADD(0x801311a8, "TLBX_E_CRM_NON_STATIC", "TypeLib export: the COM register method is non static.", "corerror.h");
+        ADD(0x801311a9, "TLBX_E_CRM_INVALID_SIG", "TypeLib export: the specified COM register method does not have the correct signature.", "corerror.h");
+        ADD(0x801311aa, "TLBX_E_CLASS_LOAD_EXCEPTION", "TypeLib export: can't load, have the class load exception.", "corerror.h");
+        ADD(0x801311ab, "TLBX_E_UNKNOWN_SIGNATURE", "TypeLib export: unknown element in signature.", "corerror.h");
+        ADD(0x801311ac, "TLBX_E_REFERENCED_TYPELIB", "TypeLib import: reference to an external typelib.", "corerror.h");
+        ADD(0x801311ad, "TLBX_E_INVALID_NAMESPACE", "TypeLib import: an imported typelib has an invalid namespace name.", "corerror.h");
+        ADD(0x801311ae, "TLBX_E_LAYOUT_ERROR", "Typelib export: an error on Layout()", "corerror.h");
+        ADD(0x801311af, "TLBX_E_NOTIUNKNOWN", "Typelib import: Interface not derived from IUnknown.", "corerror.h");
+        ADD(0x801311b0, "TLBX_E_NONVISIBLEVALUECLASS", "Typelib export: Non COM visible value type in method signature.", "corerror.h");
+        ADD(0x801311b1, "TLBX_E_LPTSTR_NOT_ALLOWED", "Typelib export: Types which contain the native type NATIVE_TYPE_LPTSTR are not allowed to be exported to COM.", "corerror.h");
+        ADD(0x801311b2, "TLBX_E_AUTO_CS_NOT_ALLOWED", "Typelib export: Types with a char set of auto are not allowed to be exported to COM.", "corerror.h");
+        ADD(0x801311b5, "TLBX_E_ENUM_VALUE_INVALID", "Typelib export: The enum value is not legal for a typelib.", "corerror.h");
+        ADD(0x801311b6, "TLBX_E_DUPLICATE_IID", "Typelib export: Duplicate IID", "corerror.h");
+        ADD(0x801311b7, "TLBX_E_NO_NESTED_ARRAYS", "Tyeplib export: detected nested arrays.", "corerror.h");
+        ADD(0x801311b8, "TLBX_E_PARAM_ERROR_NAMED", "Typelib import: param type couldn't be converted.", "corerror.h");
+        ADD(0x801311b9, "TLBX_E_PARAM_ERROR_UNNAMED", "Typelib import: param type couldn't be converted -- param name unknown.", "corerror.h");
+        ADD(0x801311ba, "TLBX_E_AGNOST_SIGNATURE", "TypeLib export: size agnostic element in signature.", "corerror.h");
+        ADD(0x801311bb, "TLBX_E_CONVERT_FAIL", "TypeLib export: exporter failed.", "corerror.h");
+        ADD(0x801311bc, "TLBX_W_DUAL_NOT_DISPATCH", "Typelib import: [dual] interface not derived from IDispatch.", "corerror.h");
+        ADD(0x801311bd, "TLBX_E_BAD_SIGNATURE", "Typelib export: unconvertable signature (use specific error for reporting!)", "corerror.h");
+        ADD(0x801311be, "TLBX_E_ARRAY_NEEDS_NT_FIXED", "Typelib export: non-fixed/non-safearray array in struct", "corerror.h");
+        ADD(0x801311bf, "TLBX_E_CLASS_NEEDS_NT_INTF", "Typelib export: non-interface class in struct", "corerror.h");
+        ADD(0x801311c0, "META_E_CA_INVALID_TARGET", "Known custom attribute on invalid target.", "corerror.h");
+        ADD(0x801311c1, "META_E_CA_INVALID_VALUE", "Known custom attribute had invalid value.", "corerror.h");
+        ADD(0x801311c2, "META_E_CA_INVALID_BLOB", "Known custom attribute blob is bad format.", "corerror.h");
+        ADD(0x801311c3, "META_E_CA_REPEATED_ARG", "Known custom attribute blob has repeated named argument.", "corerror.h");
+        ADD(0x801311c4, "META_E_CA_UNKNOWN_ARGUMENT", "Known custom attrubte named arg not recognized.", "corerror.h");
+        ADD(0x801311c5, "META_E_CA_VARIANT_NYI", "Known attribute named argument doesn't support variant.", "corerror.h");
+        ADD(0x801311c6, "META_E_CA_ARRAY_NYI", "Known attribute named argument doesn't support array.", "corerror.h");
+        ADD(0x801311c7, "META_E_CA_UNEXPECTED_TYPE", "Known attribute parser found unexpected type.", "corerror.h");
+        ADD(0x801311c8, "META_E_CA_INVALID_ARGTYPE", "Known attribute parser only handles fields -- no properties.", "corerror.h");
+        ADD(0x801311c9, "META_E_CA_INVALID_ARG_FOR_TYPE", "Known attribute parser found an argument that is invalid for the object it is applied to.", "corerror.h");
+        ADD(0x801311ca, "META_E_CA_INVALID_UUID", "The format of the UUID was invalid.", "corerror.h");
+        ADD(0x801311cb, "META_E_CA_INVALID_MARSHALAS_FIELDS", "The MarshalAs attribute has fields set that are not valid for the specified unmanaged type.", "corerror.h");
+        ADD(0x801311cc, "META_E_CA_NT_FIELDONLY", "The specified unmanaged type is only valid on fields.", "corerror.h");
+        ADD(0x801311cd, "META_E_CA_NEGATIVE_PARAMINDEX", "The parameter index cannot be negative.", "corerror.h");
+        ADD(0x801311ce, "META_E_CA_NEGATIVE_MULTIPLIER", "The multiplier cannot be negative.", "corerror.h");
+        ADD(0x801311cf, "META_E_CA_NEGATIVE_CONSTSIZE", "The constant size cannot be negative.", "corerror.h");
+        ADD(0x801311d0, "META_E_CA_FIXEDSTR_SIZE_REQUIRED", "A fixed string requires a size.", "corerror.h");
+        ADD(0x801311d1, "META_E_CA_CUSTMARSH_TYPE_REQUIRED", "A custom marshaler requires the custom marshaler type.", "corerror.h");
+        ADD(0x801311d2, "META_E_CA_FILENAME_REQUIRED", "A DllImport attribute requires a filename.", "corerror.h");
+        ADD(0x801311d3, "TLBX_W_NO_PROPS_IN_EVENTS", "TypeLib import: Detected properties in a source dispinterface.", "corerror.h");
+        ADD(0x801311d4, "META_E_NOT_IN_ENC_MODE", "SaveDelta was called without being in EnC mode", "corerror.h");
+        ADD(0x801311d6, "META_E_METHOD_COUNTS", "Merge: different method counts in import and emit scopes.", "corerror.h");
+        ADD(0x801311d7, "META_E_FIELD_COUNTS", "Merge: different field counts in import and emit scopes.", "corerror.h");
+        ADD(0x801311d8, "META_E_PARAM_COUNTS", "Merge: different param counts in import and emit scopes.", "corerror.h");
+        ADD(0x801311da, "TLBX_E_TYPED_REF", "TypeLib export: Exporting a TypedReference.", "corerror.h");
+        ADD(0x801311e1, "TLBX_E_BITNESS_MISMATCH", "TypeLib export: bitness of assembly doesn't match bitness of output type library", "corerror.h");
+        ADD(0x801311e2, "TLBX_E_EVENT_WITH_NEWENUM", "TypeLib import: source interface with NewEnum member.", "corerror.h");
+        ADD(0x801311e3, "TLBX_E_PROPGET_WITHOUT_RETURN", "TypeLib import: propget without return type", "corerror.h");
+        ADD(0x801311e4, "META_E_MISMATCHED_VISIBLITY", "Merge - Match found for type/method/etc but differs in visiblity ", "corerror.h");
+        ADD(0x801311e5, "META_E_CA_BAD_FRIENDS_ARGS", "InternalsVisibileTo can't have a version, culture, or processor architecture ", "corerror.h");
+        ADD(0x801311e6, "META_E_CA_FRIENDS_SN_REQUIRED", "Strong-name signed assemblies can only grant friend access to strong name-signed assemblies", "corerror.h");
+        ADD(0x80131203, "VLDTR_E_RID_OUTOFRANGE", "Rid is out of range.", "corerror.h");
+        ADD(0x80131204, "VLDTR_E_CDTKN_OUTOFRANGE", "Coded token type is out of range.", "corerror.h");
+        ADD(0x80131205, "VLDTR_E_CDRID_OUTOFRANGE", "Coded rid is out of range.", "corerror.h");
+        ADD(0x80131206, "VLDTR_E_STRING_INVALID", "String offset is invalid.", "corerror.h");
+        ADD(0x80131207, "VLDTR_E_GUID_INVALID", "GUID offset is invalid.", "corerror.h");
+        ADD(0x80131208, "VLDTR_E_BLOB_INVALID", "Blob offset if invalid.", "corerror.h");
+        ADD(0x80131209, "VLDTR_E_MOD_MULTI", "Multiple module records found.", "corerror.h");
+        ADD(0x8013120a, "VLDTR_E_MOD_NULLMVID", "Module has null MVID.", "corerror.h");
+        ADD(0x8013120b, "VLDTR_E_TR_NAMENULL", "TypeRef name is NULL.", "corerror.h");
+        ADD(0x8013120c, "VLDTR_E_TR_DUP", "TypeRef has a dup.", "corerror.h");
+        ADD(0x8013120d, "VLDTR_E_TD_NAMENULL", "TypeDef name is NULL.", "corerror.h");
+        ADD(0x8013120e, "VLDTR_E_TD_DUPNAME", "TypeDef has a dup based on name+namespace.", "corerror.h");
+        ADD(0x8013120f, "VLDTR_E_TD_DUPGUID", "TypeDef has a dup based on GUID.", "corerror.h");
+        ADD(0x80131210, "VLDTR_E_TD_NOTIFACEOBJEXTNULL", "TypeDef that's not an Interface and not System.Object extends nil parent.", "corerror.h");
+        ADD(0x80131211, "VLDTR_E_TD_OBJEXTENDSNONNULL", "System.Object extends a non-nil parent.", "corerror.h");
+        ADD(0x80131212, "VLDTR_E_TD_EXTENDSSEALED", "TypeDef extends sealed class.", "corerror.h");
+        ADD(0x80131213, "VLDTR_E_TD_DLTNORTSPCL", "TypeDef is Deleted but not marked with RTSpecialName.", "corerror.h");
+        ADD(0x80131214, "VLDTR_E_TD_RTSPCLNOTDLT", "TypeDef is marked RTSpecialName, but is not a Deleted record.", "corerror.h");
+        ADD(0x80131215, "VLDTR_E_MI_DECLPRIV", "MethodImpl's Decl is private", "corerror.h");
+        ADD(0x80131216, "VLDTR_E_AS_BADNAME", "Assembly [Ref] name has path and/or extension.", "corerror.h");
+        ADD(0x80131217, "VLDTR_E_FILE_SYSNAME", "File has a system name (con, com, aux, etc.).", "corerror.h");
+        ADD(0x80131218, "VLDTR_E_MI_BODYSTATIC", "MethodImpl's body is static.", "corerror.h");
+        ADD(0x80131219, "VLDTR_E_TD_IFACENOTABS", "TypeDef is marked Interface but not Abstract.", "corerror.h");
+        ADD(0x8013121a, "VLDTR_E_TD_IFACEPARNOTNIL", "TypeDef is marked Interface but parent is not Nil.", "corerror.h");
+        ADD(0x8013121b, "VLDTR_E_TD_IFACEGUIDNULL", "TypeDef is marked Interface but GUID is NULL.", "corerror.h");
+        ADD(0x8013121c, "VLDTR_E_MI_DECLFINAL", "TMethodImpl's Decl is final.", "corerror.h");
+        ADD(0x8013121d, "VLDTR_E_TD_VTNOTSEAL", "TypeDef is marked ValueType but not marked Sealed.", "corerror.h");
+        ADD(0x8013121e, "VLDTR_E_PD_BADFLAGS", "Param has extra bits in flags.", "corerror.h");
+        ADD(0x8013121f, "VLDTR_E_IFACE_DUP", "InterfaceImpl has a dup.", "corerror.h");
+        ADD(0x80131220, "VLDTR_E_MR_NAMENULL", "MemberRef name is NULL.", "corerror.h");
+        ADD(0x80131221, "VLDTR_E_MR_VTBLNAME", "MemberRef has an invalid name, _VtblGap*.", "corerror.h");
+        ADD(0x80131222, "VLDTR_E_MR_DELNAME", "MemberRef has an invalid name, _Deleted*.", "corerror.h");
+        ADD(0x80131223, "VLDTR_E_MR_PARNIL", "MemberRef parent Nil in a PE file.", "corerror.h");
+        ADD(0x80131224, "VLDTR_E_MR_BADCALLINGCONV", "MemberRef has invalid calling convention.", "corerror.h");
+        ADD(0x80131225, "VLDTR_E_MR_NOTVARARG", "MemberRef has Method parent but calling convention is not VARARG.", "corerror.h");
+        ADD(0x80131226, "VLDTR_E_MR_NAMEDIFF", "MemberRef name different from parent MethodDef.", "corerror.h");
+        ADD(0x80131227, "VLDTR_E_MR_SIGDIFF", "MemberRef signature different from parent MethodDef.", "corerror.h");
+        ADD(0x80131228, "VLDTR_E_MR_DUP", "MemberRef has a dup.", "corerror.h");
+        ADD(0x80131229, "VLDTR_E_CL_TDAUTO", "ClassLayout parent TypeDef is marked AutoLayout.", "corerror.h");
+        ADD(0x8013122a, "VLDTR_E_CL_BADPCKSZ", "ClassLayout has bad PackingSize.", "corerror.h");
+        ADD(0x8013122b, "VLDTR_E_CL_DUP", "ClassLayout has dup.", "corerror.h");
+        ADD(0x8013122c, "VLDTR_E_FL_BADOFFSET", "FieldLayout2 has bad offset.", "corerror.h");
+        ADD(0x8013122d, "VLDTR_E_FL_TDNIL", "FieldLayout2 has field with nil parent.", "corerror.h");
+        ADD(0x8013122e, "VLDTR_E_FL_NOCL", "FieldLayout2 has no ClassLayout record.", "corerror.h");
+        ADD(0x8013122f, "VLDTR_E_FL_TDNOTEXPLCT", "FieldLayout2 parent TypeDef is not marked with ExplicitLayout.", "corerror.h");
+        ADD(0x80131230, "VLDTR_E_FL_FLDSTATIC", "FieldLayout2 has field marked Static.", "corerror.h");
+        ADD(0x80131231, "VLDTR_E_FL_DUP", "FieldLayout2 has a dup.", "corerror.h");
+        ADD(0x80131232, "VLDTR_E_MODREF_NAMENULL", "ModuleRef name is NULL.", "corerror.h");
+        ADD(0x80131233, "VLDTR_E_MODREF_DUP", "ModuleRef has a dup.", "corerror.h");
+        ADD(0x80131234, "VLDTR_E_TR_BADSCOPE", "TypeRef has a bad resolution scope.", "corerror.h");
+        ADD(0x80131235, "VLDTR_E_TD_NESTEDNOENCL", "TypeDef marked nested has no encloser.", "corerror.h");
+        ADD(0x80131236, "VLDTR_E_TD_EXTTRRES", "TypeDef extends a TypeRef which resolves to a TypeDef in the same module.", "corerror.h");
+        ADD(0x80131237, "VLDTR_E_SIGNULL", "Signature specified is zero-sized.", "corerror.h");
+        ADD(0x80131238, "VLDTR_E_SIGNODATA", "Signature does not have enough data at specified byte.", "corerror.h");
+        ADD(0x80131239, "VLDTR_E_MD_BADCALLINGCONV", "Method signature has invalid calling convention.", "corerror.h");
+        ADD(0x8013123a, "VLDTR_E_MD_THISSTATIC", "Method is marked static but has HASTHIS/EXPLICITTHIS set on the calling convention.", "corerror.h");
+        ADD(0x8013123b, "VLDTR_E_MD_NOTTHISNOTSTATIC", "Method is not marked static but is not HASTHIS/EXPLICITTHIS.", "corerror.h");
+        ADD(0x8013123c, "VLDTR_E_MD_NOARGCNT", "Method signature is missing the argument count.", "corerror.h");
+        ADD(0x8013123d, "VLDTR_E_SIG_MISSELTYPE", "Signature missing element type.", "corerror.h");
+        ADD(0x8013123e, "VLDTR_E_SIG_MISSTKN", "Signature missing token.", "corerror.h");
+        ADD(0x8013123f, "VLDTR_E_SIG_TKNBAD", "Signature has bad token.", "corerror.h");
+        ADD(0x80131240, "VLDTR_E_SIG_MISSFPTR", "Signature is missing function pointer.", "corerror.h");
+        ADD(0x80131241, "VLDTR_E_SIG_MISSFPTRARGCNT", "Signature has function pointer missing argument count.", "corerror.h");
+        ADD(0x80131242, "VLDTR_E_SIG_MISSRANK", "Signature is missing rank specification.", "corerror.h");
+        ADD(0x80131243, "VLDTR_E_SIG_MISSNSIZE", "Signature is missing count of sized dimensions.", "corerror.h");
+        ADD(0x80131244, "VLDTR_E_SIG_MISSSIZE", "Signature is missing size of dimension.", "corerror.h");
+        ADD(0x80131245, "VLDTR_E_SIG_MISSNLBND", "Signature is missing count of lower bounds.", "corerror.h");
+        ADD(0x80131246, "VLDTR_E_SIG_MISSLBND", "Signature is missing a lower bound.", "corerror.h");
+        ADD(0x80131247, "VLDTR_E_SIG_BADELTYPE", "Signature has bad element type.", "corerror.h");
+        ADD(0x80131248, "VLDTR_E_SIG_MISSVASIZE", "Signature has value array missing size.", "corerror.h");
+        ADD(0x80131249, "VLDTR_E_FD_BADCALLINGCONV", "Field signature has invalid calling convention.", "corerror.h");
+        ADD(0x8013124a, "VLDTR_E_MD_NAMENULL", "Method name is NULL.", "corerror.h");
+        ADD(0x8013124b, "VLDTR_E_MD_PARNIL", "Method has parent NIL.", "corerror.h");
+        ADD(0x8013124c, "VLDTR_E_MD_DUP", "Method has dup.", "corerror.h");
+        ADD(0x8013124d, "VLDTR_E_FD_NAMENULL", "Field name is NULL.", "corerror.h");
+        ADD(0x8013124e, "VLDTR_E_FD_PARNIL", "Field parent is Nil.", "corerror.h");
+        ADD(0x8013124f, "VLDTR_E_FD_DUP", "Field has dup.", "corerror.h");
+        ADD(0x80131250, "VLDTR_E_AS_MULTI", "Multiple Assembly records found.", "corerror.h");
+        ADD(0x80131251, "VLDTR_E_AS_NAMENULL", "Assembly name is NULL.", "corerror.h");
+        ADD(0x80131252, "VLDTR_E_SIG_TOKTYPEMISMATCH", "E_T_VALUETYPE<class token> or E_T_CLASS<vtype token>.", "corerror.h");
+        ADD(0x80131253, "VLDTR_E_CL_TDINTF", "Class layout on an Interface.", "corerror.h");
+        ADD(0x80131254, "VLDTR_E_ASOS_OSPLTFRMIDINVAL", "AssemblyOS platform ID invalid.", "corerror.h");
+        ADD(0x80131255, "VLDTR_E_AR_NAMENULL", "AssemblyRef name is NULL.", "corerror.h");
+        ADD(0x80131256, "VLDTR_E_TD_ENCLNOTNESTED", "TypeDef not nested has encloser.", "corerror.h");
+        ADD(0x80131257, "VLDTR_E_AROS_OSPLTFRMIDINVAL", "AssemblyRefOS has invalid platform ID.", "corerror.h");
+        ADD(0x80131258, "VLDTR_E_FILE_NAMENULL", "File name is NULL.", "corerror.h");
+        ADD(0x80131259, "VLDTR_E_CT_NAMENULL", "ExportedType name is NULL.", "corerror.h");
+        ADD(0x8013125a, "VLDTR_E_TD_EXTENDSCHILD", "TypeDef extends its own child.", "corerror.h");
+        ADD(0x8013125b, "VLDTR_E_MAR_NAMENULL", "ManifestResource name is NULL.", "corerror.h");
+        ADD(0x8013125c, "VLDTR_E_FILE_DUP", "File has dup.", "corerror.h");
+        ADD(0x8013125d, "VLDTR_E_FILE_NAMEFULLQLFD", "File name is fully qualified.", "corerror.h");
+        ADD(0x8013125e, "VLDTR_E_CT_DUP", "ExportedType has dup.", "corerror.h");
+        ADD(0x8013125f, "VLDTR_E_MAR_DUP", "ManifestResource has dup.", "corerror.h");
+        ADD(0x80131260, "VLDTR_E_MAR_NOTPUBPRIV", "ManifestResource is neither Public not Private.", "corerror.h");
+        ADD(0x80131261, "VLDTR_E_TD_ENUMNOVALUE", "Enum has no nullptrvalue__nullptr field.", "corerror.h");
+        ADD(0x80131262, "VLDTR_E_TD_ENUMVALSTATIC", "Enum's nullptrvalue__nullptr field is static.", "corerror.h");
+        ADD(0x80131263, "VLDTR_E_TD_ENUMVALNOTSN", "Enum's nullptrvalue__nullptr field is not SpecialName.", "corerror.h");
+        ADD(0x80131264, "VLDTR_E_TD_ENUMFLDNOTST", "Enum's field is not static.", "corerror.h");
+        ADD(0x80131265, "VLDTR_E_TD_ENUMFLDNOTLIT", "Enum's field is not literal.", "corerror.h");
+        ADD(0x80131266, "VLDTR_E_TD_ENUMNOLITFLDS", "Enum has no literal fields.", "corerror.h");
+        ADD(0x80131267, "VLDTR_E_TD_ENUMFLDSIGMISMATCH", "Enum's field sig does not match value__ sig.", "corerror.h");
+        ADD(0x80131268, "VLDTR_E_TD_ENUMVALNOT1ST", "Enum's nullptrvalue__nullptr field is not first.", "corerror.h");
+        ADD(0x80131269, "VLDTR_E_FD_NOTVALUERTSN", "Field is RTSpecialName but name is not nullptrvalue__nullptr.", "corerror.h");
+        ADD(0x8013126a, "VLDTR_E_FD_VALUEPARNOTENUM", "Field nullptrvalue__nullptr in not Enum class.", "corerror.h");
+        ADD(0x8013126b, "VLDTR_E_FD_INSTINIFACE", "Instance field in interface.", "corerror.h");
+        ADD(0x8013126c, "VLDTR_E_FD_NOTPUBINIFACE", "Non-public field in interface.", "corerror.h");
+        ADD(0x8013126d, "VLDTR_E_FMD_GLOBALNOTPUBPRIVSC", "Global field/method neither Public nor PrivateScope.", "corerror.h");
+        ADD(0x8013126e, "VLDTR_E_FMD_GLOBALNOTSTATIC", "Global field/method not static.", "corerror.h");
+        ADD(0x8013126f, "VLDTR_E_FD_GLOBALNORVA", "Global field has no RVA.", "corerror.h");
+        ADD(0x80131270, "VLDTR_E_MD_CTORZERORVA", ".ctor,.cctor has zero RVA.", "corerror.h");
+        ADD(0x80131271, "VLDTR_E_FD_MARKEDNOMARSHAL", "Field is marked marshaled but has no marshaling rec.", "corerror.h");
+        ADD(0x80131272, "VLDTR_E_FD_MARSHALNOTMARKED", "Field has marshaling rec but is not marked marshaled.", "corerror.h");
+        ADD(0x80131273, "VLDTR_E_FD_MARKEDNODEFLT", "Field is marked HasDefault but has no const value.", "corerror.h");
+        ADD(0x80131274, "VLDTR_E_FD_DEFLTNOTMARKED", "Field has const value rec but is not marked HasDefault.", "corerror.h");
+        ADD(0x80131275, "VLDTR_E_FMD_MARKEDNOSECUR", "Field/method is marked HasSecurity but has no security rec.", "corerror.h");
+        ADD(0x80131276, "VLDTR_E_FMD_SECURNOTMARKED", "Field/method has security rec but is not marked HasSecurity.", "corerror.h");
+        ADD(0x80131277, "VLDTR_E_FMD_PINVOKENOTSTATIC", "Field/method is PInvoke but is not marked Static.", "corerror.h");
+        ADD(0x80131278, "VLDTR_E_FMD_MARKEDNOPINVOKE", "Field/method is marked PInvoke but has no ImplMap.", "corerror.h");
+        ADD(0x80131279, "VLDTR_E_FMD_PINVOKENOTMARKED", "Field/method has ImplMap but is not marked PInvoke.", "corerror.h");
+        ADD(0x8013127a, "VLDTR_E_FMD_BADIMPLMAP", "Field/method has invalid ImplMap", "corerror.h");
+        ADD(0x8013127b, "VLDTR_E_IMAP_BADMODREF", "ImplMap has invalid ModuleRef", "corerror.h");
+        ADD(0x8013127c, "VLDTR_E_IMAP_BADMEMBER", "ImplMap has invalid MemberForwarded", "corerror.h");
+        ADD(0x8013127d, "VLDTR_E_IMAP_BADIMPORTNAME", "ImplMap has invalid ImportName", "corerror.h");
+        ADD(0x8013127e, "VLDTR_E_IMAP_BADCALLCONV", "ImplMap has invalid call conv", "corerror.h");
+        ADD(0x8013127f, "VLDTR_E_FMD_BADACCESSFLAG", "Field/method has invalid access flag", "corerror.h");
+        ADD(0x80131280, "VLDTR_E_FD_INITONLYANDLITERAL", "Field is InitOnly and Literal", "corerror.h");
+        ADD(0x80131281, "VLDTR_E_FD_LITERALNOTSTATIC", "Field is Literal but not Static", "corerror.h");
+        ADD(0x80131282, "VLDTR_E_FMD_RTSNNOTSN", "Field/method is RTSpec.Name but not Spec.Name", "corerror.h");
+        ADD(0x80131283, "VLDTR_E_MD_ABSTPARNOTABST", "Method is abstract, parent is not", "corerror.h");
+        ADD(0x80131284, "VLDTR_E_MD_NOTSTATABSTININTF", "Method not static or abstract in interface", "corerror.h");
+        ADD(0x80131285, "VLDTR_E_MD_NOTPUBININTF", "Method not public in interface", "corerror.h");
+        ADD(0x80131286, "VLDTR_E_MD_CTORININTF", "ctor in interface", "corerror.h");
+        ADD(0x80131287, "VLDTR_E_MD_GLOBALCTORCCTOR", "global ctor or cctor", "corerror.h");
+        ADD(0x80131288, "VLDTR_E_MD_CTORSTATIC", "static ctor", "corerror.h");
+        ADD(0x80131289, "VLDTR_E_MD_CTORNOTSNRTSN", "ctor,cctor not marked SpecialName,RTSpecialName", "corerror.h");
+        ADD(0x8013128a, "VLDTR_E_MD_CTORVIRT", "virtual ctor,cctor", "corerror.h");
+        ADD(0x8013128b, "VLDTR_E_MD_CTORABST", "abstract ctor,cctor", "corerror.h");
+        ADD(0x8013128c, "VLDTR_E_MD_CCTORNOTSTATIC", "instance cctor", "corerror.h");
+        ADD(0x8013128d, "VLDTR_E_MD_ZERORVA", "RVA=0, method not abstract or pinvoke or runtime, or reverse", "corerror.h");
+        ADD(0x8013128e, "VLDTR_E_MD_FINNOTVIRT", "Method is final and not virtual", "corerror.h");
+        ADD(0x8013128f, "VLDTR_E_MD_STATANDFINORVIRT", "Method is static and final or virtual", "corerror.h");
+        ADD(0x80131290, "VLDTR_E_MD_ABSTANDFINAL", "Method is abstract and final", "corerror.h");
+        ADD(0x80131291, "VLDTR_E_MD_ABSTANDIMPL", "Method is abstract and implemented", "corerror.h");
+        ADD(0x80131292, "VLDTR_E_MD_ABSTANDPINVOKE", "Method is abstract and pinvoke", "corerror.h");
+        ADD(0x80131293, "VLDTR_E_MD_ABSTNOTVIRT", "Method is abstract and not virtual", "corerror.h");
+        ADD(0x80131294, "VLDTR_E_MD_NOTABSTNOTIMPL", "Method is not abstract and not implemented", "corerror.h");
+        ADD(0x80131295, "VLDTR_E_MD_NOTABSTBADFLAGSRVA", "Method is not abstract and not (RVA!=0 or pinvoke or runtime)", "corerror.h");
+        ADD(0x80131296, "VLDTR_E_MD_PRIVSCOPENORVA", "Method is PrivateScope and has RVA==0", "corerror.h");
+        ADD(0x80131297, "VLDTR_E_MD_GLOBALABSTORVIRT", "Global method is abstract or virtual", "corerror.h");
+        ADD(0x80131298, "VLDTR_E_SIG_LONGFORM", "Signature uses long form", "corerror.h");
+        ADD(0x80131299, "VLDTR_E_MD_MULTIPLESEMANTICS", "Method has multiple semantics (warning)", "corerror.h");
+        ADD(0x8013129a, "VLDTR_E_MD_INVALIDSEMANTICS", "Method has invalid semantics (not event or prop)", "corerror.h");
+        ADD(0x8013129b, "VLDTR_E_MD_SEMANTICSNOTEXIST", "Method has semantics assoc that does not exist", "corerror.h");
+        ADD(0x8013129c, "VLDTR_E_MI_DECLNOTVIRT", "MethodImpl's Decl is not virtual", "corerror.h");
+        ADD(0x8013129d, "VLDTR_E_FMD_GLOBALITEM", "Global field/method (warning,CLS)", "corerror.h");
+        ADD(0x8013129e, "VLDTR_E_MD_MULTSEMANTICFLAGS", "Method has multiple semantic flags set", "corerror.h");
+        ADD(0x8013129f, "VLDTR_E_MD_NOSEMANTICFLAGS", "Method has no semantic flags set", "corerror.h");
+        ADD(0x801312a0, "VLDTR_E_FD_FLDINIFACE", "Field in Interface (warning, CLS)", "corerror.h");
+        ADD(0x801312a1, "VLDTR_E_AS_HASHALGID", "Unrecognized Hash Alg ID (warning)", "corerror.h");
+        ADD(0x801312a2, "VLDTR_E_AS_PROCID", "Unrecognized Processor ID in Assembly(warning)", "corerror.h");
+        ADD(0x801312a3, "VLDTR_E_AR_PROCID", "Unrecognized Processor ID in AssemblyRef(warning)", "corerror.h");
+        ADD(0x801312a4, "VLDTR_E_CN_PARENTRANGE", "Constant: parent token out of range", "corerror.h");
+        ADD(0x801312a5, "VLDTR_E_AS_BADFLAGS", "Invalid flags in Assembly", "corerror.h");
+        ADD(0x801312a6, "VLDTR_E_TR_HASTYPEDEF", "There is TypeDef with same name as TypeRef (warning)", "corerror.h");
+        ADD(0x801312a7, "VLDTR_E_IFACE_BADIMPL", "In InterfaceImpl, the implementing token is not TypeDef", "corerror.h");
+        ADD(0x801312a8, "VLDTR_E_IFACE_BADIFACE", "In InterfaceImpl, the implemented token is not TypeDef or TypeRef", "corerror.h");
+        ADD(0x801312a9, "VLDTR_E_TD_SECURNOTMARKED", "TypeDef has security rec but not marked HasSecurity", "corerror.h");
+        ADD(0x801312aa, "VLDTR_E_TD_MARKEDNOSECUR", "TypeDef marked HasSecurity but has no security rec", "corerror.h");
+        ADD(0x801312ab, "VLDTR_E_MD_CCTORHASARGS", ".cctor has arguments", "corerror.h");
+        ADD(0x801312ac, "VLDTR_E_CT_BADIMPL", "ExportedType has invalid Implementation", "corerror.h");
+        ADD(0x801312ad, "VLDTR_E_MI_ALIENBODY", "MethodImpl has body from other class", "corerror.h");
+        ADD(0x801312ae, "VLDTR_E_MD_CCTORCALLCONV", ".cctor has invalid calling convention", "corerror.h");
+        ADD(0x801312af, "VLDTR_E_MI_BADCLASS", "MethodImpl has invalid Class token", "corerror.h");
+        ADD(0x801312b0, "VLDTR_E_MI_CLASSISINTF", "MethodImpl declared in Interface", "corerror.h");
+        ADD(0x801312b1, "VLDTR_E_MI_BADDECL", "MethodImpl has invalid MethodDeclaration token", "corerror.h");
+        ADD(0x801312b2, "VLDTR_E_MI_BADBODY", "MethodImpl has invalid MethodBody token", "corerror.h");
+        ADD(0x801312b3, "VLDTR_E_MI_DUP", "MethodImpl has duplicate", "corerror.h");
+        ADD(0x801312b4, "VLDTR_E_FD_BADPARENT", "Bad field parent", "corerror.h");
+        ADD(0x801312b5, "VLDTR_E_MD_PARAMOUTOFSEQ", "Param out of sequence (warning)", "corerror.h");
+        ADD(0x801312b6, "VLDTR_E_MD_PARASEQTOOBIG", "Param's sequence num exceeds num of args", "corerror.h");
+        ADD(0x801312b7, "VLDTR_E_MD_PARMMARKEDNOMARSHAL", "Param marked HasMarshal, has no marshaling info", "corerror.h");
+        ADD(0x801312b8, "VLDTR_E_MD_PARMMARSHALNOTMARKED", "Param has marshaling info, not marked HasMarshal", "corerror.h");
+        ADD(0x801312ba, "VLDTR_E_MD_PARMMARKEDNODEFLT", "Param marked HasDefault, has no const value", "corerror.h");
+        ADD(0x801312bb, "VLDTR_E_MD_PARMDEFLTNOTMARKED", "Param has const value, not marked HasDefault", "corerror.h");
+        ADD(0x801312bc, "VLDTR_E_PR_BADSCOPE", "Prop has invalid scope", "corerror.h");
+        ADD(0x801312bd, "VLDTR_E_PR_NONAME", "Prop has no name", "corerror.h");
+        ADD(0x801312be, "VLDTR_E_PR_NOSIG", "Prop has no signature", "corerror.h");
+        ADD(0x801312bf, "VLDTR_E_PR_DUP", "Prop has a duplicate", "corerror.h");
+        ADD(0x801312c0, "VLDTR_E_PR_BADCALLINGCONV", "Prop has bad calling convention", "corerror.h");
+        ADD(0x801312c1, "VLDTR_E_PR_MARKEDNODEFLT", "Prop marked HasDefault, has no const value", "corerror.h");
+        ADD(0x801312c2, "VLDTR_E_PR_DEFLTNOTMARKED", "Prop has const value, not marked HasDefault", "corerror.h");
+        ADD(0x801312c3, "VLDTR_E_PR_BADSEMANTICS", "Prop has method not (Setter,Getter, or Other)", "corerror.h");
+        ADD(0x801312c4, "VLDTR_E_PR_BADMETHOD", "Prop has method with invalid token", "corerror.h");
+        ADD(0x801312c5, "VLDTR_E_PR_ALIENMETHOD", "Prop has method from another class", "corerror.h");
+        ADD(0x801312c6, "VLDTR_E_CN_BLOBNOTNULL", "Const has non-null blob when it should not", "corerror.h");
+        ADD(0x801312c7, "VLDTR_E_CN_BLOBNULL", "Const has null value blob", "corerror.h");
+        ADD(0x801312c8, "VLDTR_E_EV_BADSCOPE", "Event has invalid scope", "corerror.h");
+        ADD(0x801312ca, "VLDTR_E_EV_NONAME", "Event has no name", "corerror.h");
+        ADD(0x801312cb, "VLDTR_E_EV_DUP", "Event has a duplicate", "corerror.h");
+        ADD(0x801312cc, "VLDTR_E_EV_BADEVTYPE", "Event has invalid EventType", "corerror.h");
+        ADD(0x801312cd, "VLDTR_E_EV_EVTYPENOTCLASS", "Event's EventType is not a class", "corerror.h");
+        ADD(0x801312ce, "VLDTR_E_EV_BADSEMANTICS", "Event has method not (AddOn,RemoveOn,Fire,Other)", "corerror.h");
+        ADD(0x801312cf, "VLDTR_E_EV_BADMETHOD", "Event has method with invalid token", "corerror.h");
+        ADD(0x801312d0, "VLDTR_E_EV_ALIENMETHOD", "Event has method from another class", "corerror.h");
+        ADD(0x801312d1, "VLDTR_E_EV_NOADDON", "Event has no AddOn method", "corerror.h");
+        ADD(0x801312d2, "VLDTR_E_EV_NOREMOVEON", "Event has no RemoveOn method", "corerror.h");
+        ADD(0x801312d3, "VLDTR_E_CT_DUPTDNAME", "ExportedType has same name as TypeDef", "corerror.h");
+        ADD(0x801312d4, "VLDTR_E_MAR_BADOFFSET", "MRes refers to non-PE file with offset !=0", "corerror.h");
+        ADD(0x801312d5, "VLDTR_E_DS_BADOWNER", "Decl.security has invalid owner token", "corerror.h");
+        ADD(0x801312d6, "VLDTR_E_DS_BADFLAGS", "Decl.security has invalid action flags", "corerror.h");
+        ADD(0x801312d7, "VLDTR_E_DS_NOBLOB", "Decl.security has no permission blob", "corerror.h");
+        ADD(0x801312d8, "VLDTR_E_MAR_BADIMPL", "Manifest resource has invalid Implementation", "corerror.h");
+        ADD(0x801312da, "VLDTR_E_MR_VARARGCALLINGCONV", "MemberRef has VARARG calling conv. (CLS warning)", "corerror.h");
+        ADD(0x801312db, "VLDTR_E_MD_CTORNOTVOID", ".ctor,.cctor returning not void", "corerror.h");
+        ADD(0x801312dc, "VLDTR_E_EV_FIRENOTVOID", "Fire method returning not void", "corerror.h");
+        ADD(0x801312dd, "VLDTR_E_AS_BADLOCALE", "Invalid locale", "corerror.h");
+        ADD(0x801312de, "VLDTR_E_CN_PARENTTYPE", "Constant has parent of invalid type", "corerror.h");
+        ADD(0x801312df, "VLDTR_E_SIG_SENTINMETHODDEF", "E_T_SENTINEL in MethodDef signature", "corerror.h");
+        ADD(0x801312e0, "VLDTR_E_SIG_SENTMUSTVARARG", "E_T_SENTINEL <=> VARARG", "corerror.h");
+        ADD(0x801312e1, "VLDTR_E_SIG_MULTSENTINELS", "Multiple E_T_SENTINELs", "corerror.h");
+        ADD(0x801312e2, "VLDTR_E_SIG_LASTSENTINEL", "E_T_SENTINEL not followed by type", "corerror.h");
+        ADD(0x801312e3, "VLDTR_E_SIG_MISSARG", "Signature missing argument", "corerror.h");
+        ADD(0x801312e4, "VLDTR_E_SIG_BYREFINFIELD", "Field of ByRef type", "corerror.h");
+        ADD(0x801312e5, "VLDTR_E_MD_SYNCMETHODINVTYPE", "Synchronized method in value class", "corerror.h");
+        ADD(0x801312e6, "VLDTR_E_TD_NAMETOOLONG", "TypeDef name too long", "corerror.h");
+        ADD(0x801312e7, "VLDTR_E_AS_PROCDUP", "Duplicate Assembly Processor", "corerror.h");
+        ADD(0x801312e8, "VLDTR_E_ASOS_DUP", "Duplicate Assembly OS (ID+ver.major+ver.minor)", "corerror.h");
+        ADD(0x801312e9, "VLDTR_E_MAR_BADFLAGS", "Manifest Resource has bad flags", "corerror.h");
+        ADD(0x801312ea, "VLDTR_E_CT_NOTYPEDEFID", "ExportedType has nil TypeDefId", "corerror.h");
+        ADD(0x801312eb, "VLDTR_E_FILE_BADFLAGS", "File has bad flags", "corerror.h");
+        ADD(0x801312ec, "VLDTR_E_FILE_NULLHASH", "File has no hash blob", "corerror.h");
+        ADD(0x801312ed, "VLDTR_E_MOD_NONAME", "Module has no name", "corerror.h");
+        ADD(0x801312ee, "VLDTR_E_MOD_NAMEFULLQLFD", "Module has fully-qualified name", "corerror.h");
+        ADD(0x801312ef, "VLDTR_E_TD_RTSPCLNOTSPCL", "TypeDef is tdRTSpecialName but not tdSpecialName", "corerror.h");
+        ADD(0x801312f0, "VLDTR_E_TD_EXTENDSIFACE", "TypeDef extends interface", "corerror.h");
+        ADD(0x801312f1, "VLDTR_E_MD_CTORPINVOKE", ".ctor,.cctor is PInvokeImpl", "corerror.h");
+        ADD(0x801312f2, "VLDTR_E_TD_SYSENUMNOTCLASS", "System.Enum is not a class", "corerror.h");
+        ADD(0x801312f3, "VLDTR_E_TD_SYSENUMNOTEXTVTYPE", "System.Enum extends not System.ValueType", "corerror.h");
+        ADD(0x801312f4, "VLDTR_E_MI_SIGMISMATCH", "MethodImpl's Decl and Body signatures mismatch", "corerror.h");
+        ADD(0x801312f5, "VLDTR_E_TD_ENUMHASMETHODS", "TypeDef extends System.Enum but has methods", "corerror.h");
+        ADD(0x801312f6, "VLDTR_E_TD_ENUMIMPLIFACE", "TypeDef extends System.Enum but impls interface(s)", "corerror.h");
+        ADD(0x801312f7, "VLDTR_E_TD_ENUMHASPROP", "TypeDef extends System.Enum but has prop(s)", "corerror.h");
+        ADD(0x801312f8, "VLDTR_E_TD_ENUMHASEVENT", "TypeDef extends System.Enum but has event(s)", "corerror.h");
+        ADD(0x801312f9, "VLDTR_E_TD_BADMETHODLST", "TypeDef has MethodList > Nmethods+1", "corerror.h");
+        ADD(0x801312fa, "VLDTR_E_TD_BADFIELDLST", "TypeDef has FieldList > Nfields+1", "corerror.h");
+        ADD(0x801312fb, "VLDTR_E_CN_BADTYPE", "Constant has wrong type", "corerror.h");
+        ADD(0x801312fc, "VLDTR_E_TD_ENUMNOINSTFLD", "Enum has no instance fields", "corerror.h");
+        ADD(0x801312fd, "VLDTR_E_TD_ENUMMULINSTFLD", "Enum has multiple instance fields", "corerror.h");
+        ADD(0x801312fe, "VLDTR_E_INTERRUPTED", "Validator has been interrupted by the VEHandler.", "corerror.h");
+        ADD(0x801312ff, "VLDTR_E_NOTINIT", "Validator failed to initialize correctly.", "corerror.h");
+        ADD(0x80131300, "CORDBG_E_UNRECOVERABLE_ERROR", "Unrecoverable API error.", "corerror.h");
+        ADD(0x80131301, "CORDBG_E_PROCESS_TERMINATED", "Process was terminated.", "corerror.h");
+        ADD(0x80131302, "CORDBG_E_PROCESS_NOT_SYNCHRONIZED", "Process not synchronized.", "corerror.h");
+        ADD(0x80131303, "CORDBG_E_CLASS_NOT_LOADED", "A class is not loaded.", "corerror.h");
+        ADD(0x80131304, "CORDBG_E_IL_VAR_NOT_AVAILABLE", "An IL variable is not available at the", "corerror.h");
+        ADD(0x80131305, "CORDBG_E_BAD_REFERENCE_VALUE", "A reference value was found to be bad", "corerror.h");
+        ADD(0x80131306, "CORDBG_E_FIELD_NOT_AVAILABLE", "A field in a class is not available, ", "corerror.h");
+        ADD(0x80131307, "CORDBG_E_NON_NATIVE_FRAME", "\"Native frame only\" operation on", "corerror.h");
+        ADD(0x80131308, "CORDBG_E_NONCONTINUABLE_EXCEPTION", "Continue on non-continuable exception", "corerror.h");
+        ADD(0x80131309, "CORDBG_E_CODE_NOT_AVAILABLE", "The code is currently unavailable", "corerror.h");
+        ADD(0x8013130a, "CORDBG_E_FUNCTION_NOT_IL", "Attempt to get a ICorDebugFunction for", "corerror.h");
+        ADD(0x8013130e, "CORDBG_E_CANT_SET_IP_INTO_FINALLY", "SetIP isn't possible, because SetIP would", "corerror.h");
+        ADD(0x8013130f, "CORDBG_E_CANT_SET_IP_OUT_OF_FINALLY", "SetIP isn't possible because it would move", "corerror.h");
+        ADD(0x80131310, "CORDBG_E_CANT_SET_IP_INTO_CATCH", "SetIP isn't possible, because SetIP would", "corerror.h");
+        ADD(0x80131311, "CORDBG_E_SET_IP_NOT_ALLOWED_ON_NONLEAF_FRAME", "Setip cannot be done on any frame except", "corerror.h");
+        ADD(0x80131312, "CORDBG_E_SET_IP_IMPOSSIBLE", "SetIP isn't allowed. For example, there is", "corerror.h");
+        ADD(0x80131313, "CORDBG_E_FUNC_EVAL_BAD_START_POINT", "Func eval can't work if we're, for example, ", "corerror.h");
+        ADD(0x80131314, "CORDBG_E_INVALID_OBJECT", "This object value is no longer valid.", "corerror.h");
+        ADD(0x80131315, "CORDBG_E_FUNC_EVAL_NOT_COMPLETE", "If you call CordbEval::GetResult before the", "corerror.h");
+        ADD(0x80131318, "CORDBG_E_INPROC_NOT_IMPL", "The inproc version of the debugging API", "corerror.h");
+        ADD(0x8013131a, "CORDBG_E_STATIC_VAR_NOT_AVAILABLE", "A static variable isn't available because", "corerror.h");
+        ADD(0x8013131b, "CORDBG_E_OBJECT_IS_NOT_COPYABLE_VALUE_CLASS", "Can't copy a VC with object refs in it.", "corerror.h");
+        ADD(0x8013131c, "CORDBG_E_CANT_SETIP_INTO_OR_OUT_OF_FILTER", "SetIP can't leave or enter a filter", "corerror.h");
+        ADD(0x8013131d, "CORDBG_E_CANT_CHANGE_JIT_SETTING_FOR_ZAP_MODULE", "You can't change JIT settings for ZAP", "corerror.h");
+        ADD(0x8013131e, "CORDBG_E_CANT_SET_IP_OUT_OF_FINALLY_ON_WIN64", "SetIP isn't possible because it would move", "corerror.h");
+        ADD(0x8013131f, "CORDBG_E_CANT_SET_IP_OUT_OF_CATCH_ON_WIN64", "SetIP isn't possible because it would move", "corerror.h");
+        ADD(0x80131320, "CORDBG_E_REMOTE_CONNECTION_CONN_RESET", "The remote device closed the connection.", "corerror.h");
+        ADD(0x80131321, "CORDBG_E_REMOTE_CONNECTION_KEEP_ALIVE", "The connection was closed due to akeep alive failure.", "corerror.h");
+        ADD(0x80131322, "CORDBG_E_REMOTE_CONNECTION_FATAL_ERROR", "Generic error that the device connection has been broken with no chance for recovery.", "corerror.h");
+        ADD(0x80131323, "CORDBG_E_CANT_SET_TO_JMC", "Can't use JMC on this code (likely wrong jit settings).", "corerror.h");
+        ADD(0x8013132d, "CORDBG_E_BAD_THREAD_STATE", "The state of the thread is invalid.", "corerror.h");
+        ADD(0x8013132e, "CORDBG_E_DEBUGGER_ALREADY_ATTACHED", "This process has already been attached to", "corerror.h");
+        ADD(0x8013132f, "CORDBG_E_SUPERFLOUS_CONTINUE", "Returned from a call to Continue that was", "corerror.h");
+        ADD(0x80131330, "CORDBG_E_SET_VALUE_NOT_ALLOWED_ON_NONLEAF_FRAME", "Can't perfrom SetValue on non-leaf frames.", "corerror.h");
+        ADD(0x80131331, "CORDBG_E_ENC_EH_MAX_NESTING_LEVEL_CANT_INCREASE", "When doing EnC, some JITters don't let you", "corerror.h");
+        ADD(0x80131332, "CORDBG_E_ENC_MODULE_NOT_ENC_ENABLED", "Tried to do EnC on a module that wasn't", "corerror.h");
+        ADD(0x80131333, "CORDBG_E_SET_IP_NOT_ALLOWED_ON_EXCEPTION", "Setip cannot be done on any exception", "corerror.h");
+        ADD(0x80131334, "CORDBG_E_VARIABLE_IS_ACTUALLY_LITERAL", "The 'variable' doesn't exist because it is a", "corerror.h");
+        ADD(0x80131335, "CORDBG_E_PROCESS_DETACHED", "Process has been detached from", "corerror.h");
+        ADD(0x80131336, "CORDBG_E_ENC_METHOD_SIG_CHANGED", "Not allowed to change the signature of an", "corerror.h");
+        ADD(0x80131337, "CORDBG_E_ENC_METHOD_NO_LOCAL_SIG", "Can't get the local signature for the method", "corerror.h");
+        ADD(0x80131338, "CORDBG_E_ENC_CANT_ADD_FIELD_TO_VALUE_OR_LAYOUT_CLASS", "Adding a field to a value or layout class is prohibitted, ", "corerror.h");
+        ADD(0x80131339, "CORDBG_E_ENC_CANT_CHANGE_FIELD", "Once you've got a field, you're not allowed to change", "corerror.h");
+        ADD(0x8013133a, "CORDBG_E_ENC_CANT_ADD_NON_PRIVATE_MEMBER", "Only support addition of private members.", "corerror.h");
+        ADD(0x8013133b, "CORDBG_E_FIELD_NOT_STATIC", "Returned if someone tries to call GetStaticFieldValue", "corerror.h");
+        ADD(0x8013133c, "CORDBG_E_FIELD_NOT_INSTANCE", "Returned if someone tries to call GetStaticFieldValue", "corerror.h");
+        ADD(0x8013133d, "CORDBG_E_ENC_ZAPPED_WITHOUT_ENC", "If a zap file was created without the EnC flag set, then", "corerror.h");
+        ADD(0x8013133e, "CORDBG_E_ENC_BAD_METHOD_INFO", "Lacking information about method.", "corerror.h");
+        ADD(0x8013133f, "CORDBG_E_ENC_JIT_CANT_UPDATE", "The JIT is unable to update the method.", "corerror.h");
+        ADD(0x80131340, "CORDBG_E_ENC_MISSING_CLASS", "An internal structure about the class is missing", "corerror.h");
+        ADD(0x80131341, "CORDBG_E_ENC_INTERNAL_ERROR", "Generic message for nullptrSomething user doesn't control went wrongnullptr message.", "corerror.h");
+        ADD(0x80131342, "CORDBG_E_ENC_HANGING_FIELD", "The field was added via enc after the class was loaded, and so instead of", "corerror.h");
+        ADD(0x80131343, "CORDBG_E_MODULE_NOT_LOADED", "If the module isn't loaded, including if it's been unloaded.", "corerror.h");
+        ADD(0x80131344, "CORDBG_E_ENC_CANT_CHANGE_SUPERCLASS", "Not allowed to change which class something inherits from", "corerror.h");
+        ADD(0x80131345, "CORDBG_E_UNABLE_TO_SET_BREAKPOINT", "Can't set a breakpoint here.", "corerror.h");
+        ADD(0x80131346, "CORDBG_E_DEBUGGING_NOT_POSSIBLE", "Debugging isn't possible due to an incompatability within the CLR implementation.", "corerror.h");
+        ADD(0x80131347, "CORDBG_E_KERNEL_DEBUGGER_ENABLED", "Debugging isn't possible because a kernel debugger is enabled on the system.", "corerror.h");
+        ADD(0x80131348, "CORDBG_E_KERNEL_DEBUGGER_PRESENT", "Debugging isn't possible because a kernel debugger is present on the system.", "corerror.h");
+        ADD(0x80131349, "CORDBG_E_HELPER_THREAD_DEAD", "The debugger's internal helper thread is dead.", "corerror.h");
+        ADD(0x8013134a, "CORDBG_E_INTERFACE_INHERITANCE_CANT_CHANGE", "Not allowed to change interface inheritance.", "corerror.h");
+        ADD(0x8013134b, "CORDBG_E_INCOMPATIBLE_PROTOCOL", "The debugger's protocol is incompatible with the debuggee.", "corerror.h");
+        ADD(0x8013134c, "CORDBG_E_TOO_MANY_PROCESSES", "The debugger can only handle a finite number of debuggees.", "corerror.h");
+        ADD(0x8013134d, "CORDBG_E_INTEROP_NOT_SUPPORTED", "Interop is not allowed on a win9x platform", "corerror.h");
+        ADD(0x8013134e, "CORDBG_E_NO_REMAP_BREAKPIONT", "Cannot call RemapFunction until have received RemapBreakpoint", "corerror.h");
+        ADD(0x8013134f, "CORDBG_E_OBJECT_NEUTERED", "Object has been neutered (it's in a zombie state).", "corerror.h");
+        ADD(0x80131350, "CORPROF_E_FUNCTION_NOT_COMPILED", "Function not yet compiled.", "corerror.h");
+        ADD(0x80131351, "CORPROF_E_DATAINCOMPLETE", "The ID is not fully loaded/defined yet.", "corerror.h");
+        ADD(0x80131352, "CORPROF_E_NOT_REJITABLE_METHODS", "The Module is not configured for updateable methods.", "corerror.h");
+        ADD(0x80131353, "CORPROF_E_CANNOT_UPDATE_METHOD", "The Method could not be updated for re-jit.", "corerror.h");
+        ADD(0x80131354, "CORPROF_E_FUNCTION_NOT_IL", "The Method has no associated IL", "corerror.h");
+        ADD(0x80131355, "CORPROF_E_NOT_MANAGED_THREAD", "The thread has never run managed code before", "corerror.h");
+        ADD(0x80131356, "CORPROF_E_CALL_ONLY_FROM_INIT", "The function may only be called during profiler init", "corerror.h");
+        ADD(0x80131357, "CORPROF_E_INPROC_NOT_ENABLED", "Inprocess debugging must be enabled during init", "corerror.h");
+        ADD(0x80131358, "CORPROF_E_JITMAPS_NOT_ENABLED", "Can't get a JIT map becuase they are not enabled", "corerror.h");
+        ADD(0x80131359, "CORPROF_E_INPROC_ALREADY_BEGUN", "If a profiler tries to call BeginInprocDebugging more than", "corerror.h");
+        ADD(0x8013135a, "CORPROF_E_INPROC_NOT_AVAILABLE", "States that inprocess debugging not allowed at this point", "corerror.h");
+        ADD(0x8013135b, "CORPROF_E_NOT_YET_AVAILABLE", "This is a general error used to indicated that the information", "corerror.h");
+        ADD(0x8013135c, "CORPROF_E_TYPE_IS_PARAMETERIZED", "The given type is a generic and cannot be used with this method.", "corerror.h");
+        ADD(0x8013135d, "CORPROF_E_FUNCTION_IS_PARAMETERIZED", "The given function is a generic and cannot be used with this method.", "corerror.h");
+        ADD(0x8013135e, "CORPROF_E_STACKSNAPSHOT_INVALID_TGT_THREAD", "A profiler tried to walk the stack of an invalid thread", "corerror.h");
+        ADD(0x8013135f, "CORPROF_E_STACKSNAPSHOT_UNMANAGED_CTX", "A profiler can not walk a thread that is currently executing unmanaged code", "corerror.h");
+        ADD(0x80131360, "CORPROF_E_STACKSNAPSHOT_UNSAFE", "A stackwalk at this point may cause dead locks or data corruption", "corerror.h");
+        ADD(0x80131361, "CORPROF_E_STACKSNAPSHOT_ABORTED", "Stackwalking callback requested the walk to abort", "corerror.h");
+        ADD(0x80131362, "CORPROF_E_LITERALS_HAVE_NO_ADDRESS", "Returned when asked for the address of a static that is a literal.", "corerror.h");
+        ADD(0x80131363, "CORPROF_E_UNSUPPORTED_CALL_SEQUENCE", "A call was made at an unsupported time (e.g., API illegally called asynchronously)", "corerror.h");
+        ADD(0x80131364, "CORPROF_E_ASYNCHRONOUS_UNSAFE", "A legal asynchronous call was made at an unsafe time (e.g., CLR locks are held) ", "corerror.h");
+        ADD(0x80131365, "CORPROF_E_CLASSID_IS_ARRAY", "The specified ClassID cannot be inspected by this function because it is an array", "corerror.h");
+        ADD(0x80131366, "CORPROF_E_CLASSID_IS_COMPOSITE", "The specified ClassID is a non-array composite type (e.g., ref) and cannot be inspected", "corerror.h");
+        ADD(0x80131400, "SECURITY_E_XML_TO_ASN_ENCODING", "Failed to convert XML to ASN", "corerror.h");
+        ADD(0x80131401, "SECURITY_E_INCOMPATIBLE_SHARE", "Loading this assembly would produce a different grant set from other instances", "corerror.h");
+        ADD(0x80131402, "SECURITY_E_UNVERIFIABLE", "Unverifable code failed policy check", "corerror.h");
+        ADD(0x80131403, "SECURITY_E_INCOMPATIBLE_EVIDENCE", "Assembly already loaded without additional security evidence.", "corerror.h");
+        ADD(0x80131410, "CORSEC_E_DECODE_SET", "Failure decoding permission set", "corerror.h");
+        ADD(0x80131411, "CORSEC_E_ENCODE_SET", "Failure encoding permission set", "corerror.h");
+        ADD(0x80131412, "CORSEC_E_UNSUPPORTED_FORMAT", "Unrecognized encoding format", "corerror.h");
+        ADD(0x80131413, "SN_CRYPTOAPI_CALL_FAILED", "StrongName APIs not supported on system", "corerror.h");
+        ADD(0x80131413, "CORSEC_E_CRYPTOAPI_CALL_FAILED", "StrongName APIs not supported on system", "corerror.h");
+        ADD(0x80131414, "SN_NO_SUITABLE_CSP", "StrongName APIs couldn't locate a matching CSP", "corerror.h");
+        ADD(0x80131414, "CORSEC_E_NO_SUITABLE_CSP", "StrongName APIs couldn't locate a matching CSP", "corerror.h");
+        ADD(0x80131415, "CORSEC_E_INVALID_ATTR", "Invalid security custom attribute", "corerror.h");
+        ADD(0x80131416, "CORSEC_E_POLICY_EXCEPTION", "PolicyException thrown", "corerror.h");
+        ADD(0x80131417, "CORSEC_E_MIN_GRANT_FAIL", "Failed to grant minimum permission requests", "corerror.h");
+        ADD(0x80131418, "CORSEC_E_NO_EXEC_PERM", "Failed to grant permission to execute", "corerror.h");
+        ADD(0x80131419, "CORSEC_E_XMLSYNTAX", "XML Syntax error", "corerror.h");
+        ADD(0x8013141a, "CORSEC_E_INVALID_STRONGNAME", "Strong name validation failed", "corerror.h");
+        ADD(0x8013141b, "CORSEC_E_MISSING_STRONGNAME", "Assembly is not strong named", "corerror.h");
+        ADD(0x8013141c, "CORSEC_E_CONTAINER_NOT_FOUND", "Strong name key container not found", "corerror.h");
+        ADD(0x8013141d, "CORSEC_E_INVALID_IMAGE_FORMAT", "Invalid assembly file format", "corerror.h");
+        ADD(0x8013141e, "CORSEC_E_INVALID_PUBLICKEY", "Invalid assembly public key", "corerror.h");
+        ADD(0x80131420, "CORSEC_E_SIGNATURE_MISMATCH", "Signature size mismatch", "corerror.h");
+        ADD(0x80131430, "CORSEC_E_CRYPTO", "generic CryptographicException", "corerror.h");
+        ADD(0x80131431, "CORSEC_E_CRYPTO_UNEX_OPER", "generic CryptographicUnexpectedOperationException", "corerror.h");
+        ADD(0x8013143a, "CORSECATTR_E_BAD_ATTRIBUTE", "Generic problem with a custom attribute", "corerror.h");
+        ADD(0x8013143b, "CORSECATTR_E_MISSING_CONSTRUCTOR", "Missing a required constructor", "corerror.h");
+        ADD(0x8013143c, "CORSECATTR_E_FAILED_TO_CREATE_PERM", "Unable to create a permission for this attribute", "corerror.h");
+        ADD(0x8013143d, "CORSECATTR_E_BAD_ACTION_ASM", "SecurityAction type invalid on assembly", "corerror.h");
+        ADD(0x8013143e, "CORSECATTR_E_BAD_ACTION_OTHER", "SecurityAction type invalid on types and methods", "corerror.h");
+        ADD(0x8013143f, "CORSECATTR_E_BAD_PARENT", "Security custom attribute attached to invalid parent", "corerror.h");
+        ADD(0x80131440, "CORSECATTR_E_TRUNCATED", "Bad custom attribute serialized blob", "corerror.h");
+        ADD(0x80131441, "CORSECATTR_E_BAD_VERSION", "Bad custom attribute serialized blob version", "corerror.h");
+        ADD(0x80131442, "CORSECATTR_E_BAD_ACTION", "Invalid security action code", "corerror.h");
+        ADD(0x80131443, "CORSECATTR_E_NO_SELF_REF", "CA ref to CA def'd in same assembly", "corerror.h");
+        ADD(0x80131444, "CORSECATTR_E_BAD_NONCAS", "Use of non-CAS perm with invalid action", "corerror.h");
+        ADD(0x80131445, "CORSECATTR_E_ASSEMBLY_LOAD_FAILED", "Failed to load assembly containing CA (or req'd CA type)", "corerror.h");
+        ADD(0x80131446, "CORSECATTR_E_ASSEMBLY_LOAD_FAILED_EX", "Failed to load assembly containing CA (or req'd CA type)", "corerror.h");
+        ADD(0x80131447, "CORSECATTR_E_TYPE_LOAD_FAILED", "Failed to load CA type (or reqd CA type)", "corerror.h");
+        ADD(0x80131448, "CORSECATTR_E_TYPE_LOAD_FAILED_EX", "Failed to load CA type (or reqd CA type)", "corerror.h");
+        ADD(0x80131449, "CORSECATTR_E_ABSTRACT", "CA type is abstract", "corerror.h");
+        ADD(0x8013144a, "CORSECATTR_E_UNSUPPORTED_TYPE", "Unsupported type for field/property setter", "corerror.h");
+        ADD(0x8013144b, "CORSECATTR_E_UNSUPPORTED_ENUM_TYPE", "Unsupported base type for enum field/property", "corerror.h");
+        ADD(0x8013144c, "CORSECATTR_E_NO_FIELD", "Couldn't find a CA field", "corerror.h");
+        ADD(0x8013144d, "CORSECATTR_E_NO_PROPERTY", "Couldn't find a CA property", "corerror.h");
+        ADD(0x8013144e, "CORSECATTR_E_EXCEPTION", "Unexpected exception", "corerror.h");
+        ADD(0x8013144f, "CORSECATTR_E_EXCEPTION_HR", "Unexpected exception", "corerror.h");
+        ADD(0x80131450, "ISS_E_ISOSTORE", nullptr, "corerror.h");
+        ADD(0x80131450, "ISS_E_ISOSTORE_START", nullptr, "corerror.h");
+        ADD(0x80131460, "ISS_E_OPEN_STORE_FILE", nullptr, "corerror.h");
+        ADD(0x80131461, "ISS_E_OPEN_FILE_MAPPING", nullptr, "corerror.h");
+        ADD(0x80131462, "ISS_E_MAP_VIEW_OF_FILE", nullptr, "corerror.h");
+        ADD(0x80131463, "ISS_E_GET_FILE_SIZE", nullptr, "corerror.h");
+        ADD(0x80131464, "ISS_E_CREATE_MUTEX", nullptr, "corerror.h");
+        ADD(0x80131465, "ISS_E_LOCK_FAILED", nullptr, "corerror.h");
+        ADD(0x80131466, "ISS_E_FILE_WRITE", nullptr, "corerror.h");
+        ADD(0x80131467, "ISS_E_SET_FILE_POINTER", nullptr, "corerror.h");
+        ADD(0x80131468, "ISS_E_CREATE_DIR", nullptr, "corerror.h");
+        ADD(0x80131469, "ISS_E_STORE_NOT_OPEN", nullptr, "corerror.h");
+        ADD(0x80131480, "ISS_E_CORRUPTED_STORE_FILE", nullptr, "corerror.h");
+        ADD(0x80131481, "ISS_E_STORE_VERSION", nullptr, "corerror.h");
+        ADD(0x80131482, "ISS_E_FILE_NOT_MAPPED", nullptr, "corerror.h");
+        ADD(0x80131483, "ISS_E_BLOCK_SIZE_TOO_SMALL", nullptr, "corerror.h");
+        ADD(0x80131484, "ISS_E_ALLOC_TOO_LARGE", nullptr, "corerror.h");
+        ADD(0x80131485, "ISS_E_USAGE_WILL_EXCEED_QUOTA", nullptr, "corerror.h");
+        ADD(0x80131486, "ISS_E_TABLE_ROW_NOT_FOUND", nullptr, "corerror.h");
+        ADD(0x801314a0, "ISS_E_DEPRECATE", nullptr, "corerror.h");
+        ADD(0x801314a1, "ISS_E_CALLER", nullptr, "corerror.h");
+        ADD(0x801314a2, "ISS_E_PATH_LENGTH", nullptr, "corerror.h");
+        ADD(0x801314a3, "ISS_E_MACHINE", nullptr, "corerror.h");
+        ADD(0x801314a4, "ISS_E_MACHINE_DACL", nullptr, "corerror.h");
+        ADD(0x801314ff, "ISS_E_ISOSTORE_END", nullptr, "corerror.h");
+        ADD(0x80131500, "COR_E_EXCEPTION", "Base class for all exceptions in the runtime", "corerror.h");
+        ADD(0x80131500, "COR_E_EXCEPTION", nullptr, "corerror.h");
+        ADD(0x80131501, "COR_E_SYSTEM", "The base class for the runtime's nullptrless seriousnullptr exceptions", "corerror.h");
+        ADD(0x80131501, "COR_E_SYSTEM", nullptr, "corerror.h");
+        ADD(0x80131502, "COR_E_ARGUMENTOUTOFRANGE", "An argument was out of its legal range.", "corerror.h");
+        ADD(0x80131502, "COR_E_ARGUMENTOUTOFRANGE", nullptr, "corerror.h");
+        ADD(0x80131503, "COR_E_ARRAYTYPEMISMATCH", "Attempted to store an object of the wrong type in an array", "corerror.h");
+        ADD(0x80131503, "COR_E_ARRAYTYPEMISMATCH", nullptr, "corerror.h");
+        ADD(0x80131504, "COR_E_CONTEXTMARSHAL", nullptr, "corerror.h");
+        ADD(0x80131504, "COR_E_CONTEXTMARSHAL", nullptr, "corerror.h");
+        ADD(0x80131505, "COR_E_TIMEOUT", nullptr, "corerror.h");
+        ADD(0x80131505, "COR_E_TIMEOUT", nullptr, "corerror.h");
+        ADD(0x80131506, "COR_E_EXECUTIONENGINE", "An internal error happened in the Common Language Runtime's Execution Engine", "corerror.h");
+        ADD(0x80131506, "COR_E_EXECUTIONENGINE", nullptr, "corerror.h");
+        ADD(0x80131507, "COR_E_FIELDACCESS", "Access to this field is denied.", "corerror.h");
+        ADD(0x80131507, "COR_E_FIELDACCESS", nullptr, "corerror.h");
+        ADD(0x80131508, "COR_E_INDEXOUTOFRANGE", "Attempted to access an element within an array by using an index that is not within the bound of that array.", "corerror.h");
+        ADD(0x80131508, "COR_E_INDEXOUTOFRANGE", nullptr, "corerror.h");
+        ADD(0x80131509, "COR_E_INVALIDOPERATION", "An operation is not legal in the current state.", "corerror.h");
+        ADD(0x80131509, "COR_E_INVALIDOPERATION", nullptr, "corerror.h");
+        ADD(0x8013150a, "COR_E_SECURITY", "An error relating to security occured.", "corerror.h");
+        ADD(0x8013150a, "COR_E_SECURITY", nullptr, "corerror.h");
+        ADD(0x8013150b, "COR_E_REMOTING", "An error relating to remoting occurred.", "corerror.h");
+        ADD(0x8013150b, "COR_E_REMOTING", nullptr, "corerror.h");
+        ADD(0x8013150c, "COR_E_SERIALIZATION", nullptr, "corerror.h");
+        ADD(0x8013150d, "COR_E_VERIFICATION", "A verification failure occurred", "corerror.h");
+        ADD(0x8013150d, "COR_E_VERIFICATION", nullptr, "corerror.h");
+        ADD(0x8013150e, "COR_E_SERVER", nullptr, "corerror.h");
+        ADD(0x8013150f, "COR_E_SERVICEDCOMPONENT", "An error relating to ServicedComponent occurred.", "corerror.h");
+        ADD(0x8013150f, "COR_E_SERVICEDCOMPONENT", nullptr, "corerror.h");
+        ADD(0x80131510, "COR_E_METHODACCESS", "Access to this method is denied.", "corerror.h");
+        ADD(0x80131510, "COR_E_METHODACCESS", nullptr, "corerror.h");
+        ADD(0x80131511, "COR_E_MISSINGFIELD", "An attempt was made to dynamically access a field that does not exist.", "corerror.h");
+        ADD(0x80131511, "COR_E_MISSINGFIELD", nullptr, "corerror.h");
+        ADD(0x80131512, "COR_E_MISSINGMEMBER", "An attempt was made to dynamically invoke or access a field or method that does not exist.", "corerror.h");
+        ADD(0x80131512, "COR_E_MISSINGMEMBER", nullptr, "corerror.h");
+        ADD(0x80131513, "COR_E_MISSINGMETHOD", "An attempt was made to dynamically invoke a method that does not exist", "corerror.h");
+        ADD(0x80131513, "COR_E_MISSINGMETHOD", nullptr, "corerror.h");
+        ADD(0x80131514, "COR_E_MULTICASTNOTSUPPORTED", "Attempted to combine delegates that are not multicast", "corerror.h");
+        ADD(0x80131514, "COR_E_MULTICASTNOTSUPPORTED", nullptr, "corerror.h");
+        ADD(0x80131515, "COR_E_NOTSUPPORTED", "The operation is not supported", "corerror.h");
+        ADD(0x80131515, "COR_E_NOTSUPPORTED", nullptr, "corerror.h");
+        ADD(0x80131516, "COR_E_OVERFLOW", "An arithmetic, casting, or conversion operation overflowed or underflowed.", "corerror.h");
+        ADD(0x80131516, "COR_E_OVERFLOW", nullptr, "corerror.h");
+        ADD(0x80131517, "COR_E_RANK", "An array has the wrong number of dimensions for a particular operation.", "corerror.h");
+        ADD(0x80131517, "COR_E_RANK", nullptr, "corerror.h");
+        ADD(0x80131518, "COR_E_SYNCHRONIZATIONLOCK", "Wait(), Notify() or NotifyAll() was called from an unsynchronized ** block of c", "corerror.h");
+        ADD(0x80131518, "COR_E_SYNCHRONIZATIONLOCK", nullptr, "corerror.h");
+        ADD(0x80131519, "COR_E_THREADINTERRUPTED", "Indicates that the thread was interrupted from a waiting state", "corerror.h");
+        ADD(0x80131519, "COR_E_THREADINTERRUPTED", nullptr, "corerror.h");
+        ADD(0x8013151a, "COR_E_MEMBERACCESS", "Access to this member is denied.", "corerror.h");
+        ADD(0x8013151a, "COR_E_MEMBERACCESS", nullptr, "corerror.h");
+        ADD(0x80131520, "COR_E_THREADSTATE", "Indicate that the Thread class is in an invalid state for the method call", "corerror.h");
+        ADD(0x80131520, "COR_E_THREADSTATE", nullptr, "corerror.h");
+        ADD(0x80131521, "COR_E_THREADSTOP", "Thrown into a thread to cause it to stop. This exception is typically not caught", "corerror.h");
+        ADD(0x80131521, "COR_E_THREADSTOP", nullptr, "corerror.h");
+        ADD(0x80131522, "COR_E_TYPELOAD", "Could not find or load a specific type (class, enum, etc).", "corerror.h");
+        ADD(0x80131522, "COR_E_TYPELOAD", nullptr, "corerror.h");
+        ADD(0x80131523, "COR_E_ENTRYPOINTNOTFOUND", "Could not find the specified DllImport entry point", "corerror.h");
+        ADD(0x80131523, "COR_E_ENTRYPOINTNOTFOUND", nullptr, "corerror.h");
+        ADD(0x80131524, "COR_E_DLLNOTFOUND", "Could not find the specified DllImport DLL.", "corerror.h");
+        ADD(0x80131524, "COR_E_DLLNOTFOUND", nullptr, "corerror.h");
+        ADD(0x80131525, "COR_E_THREADSTART", "Indicate that a user thread fails to start.", "corerror.h");
+        ADD(0x80131525, "COR_E_THREADSTART", nullptr, "corerror.h");
+        ADD(0x80131527, "COR_E_INVALIDCOMOBJECT", "An invalid __ComObject has been used.", "corerror.h");
+        ADD(0x80131527, "COR_E_INVALIDCOMOBJECT", nullptr, "corerror.h");
+        ADD(0x80131528, "COR_E_NOTFINITENUMBER", "Thrown if value (a floating point number) is either the not a number value (NaN) or +- infinity value VB needs this stuff", "corerror.h");
+        ADD(0x80131528, "COR_E_NOTFINITENUMBER", nullptr, "corerror.h");
+        ADD(0x80131529, "COR_E_DUPLICATEWAITOBJECT", "An object appears more than once in the wait objects array.", "corerror.h");
+        ADD(0x80131529, "COR_E_DUPLICATEWAITOBJECT", nullptr, "corerror.h");
+        ADD(0x8013152b, "COR_E_SEMAPHOREFULL", "Adding the given count to the semaphore would cause it to exceed its maximum count.", "corerror.h");
+        ADD(0x8013152b, "COR_E_SEMAPHOREFULL", nullptr, "corerror.h");
+        ADD(0x8013152c, "COR_E_WAITHANDLECANNOTBEOPENED", "No Semaphore of the given name exists.", "corerror.h");
+        ADD(0x8013152c, "COR_E_WAITHANDLECANNOTBEOPENED", nullptr, "corerror.h");
+        ADD(0x8013152d, "COR_E_ABANDONEDMUTEX", "The wait completed due to an abandoned mutex.", "corerror.h");
+        ADD(0x8013152d, "COR_E_ABANDONEDMUTEX", nullptr, "corerror.h");
+        ADD(0x80131530, "COR_E_THREADABORTED", "Thrown into a thread to cause it to abort. Not catchable.", "corerror.h");
+        ADD(0x80131530, "COR_E_THREADABORTED", nullptr, "corerror.h");
+        ADD(0x80131531, "COR_E_INVALIDOLEVARIANTTYPE", "The type of an OLE variant that was passed into the runtime is invalid.", "corerror.h");
+        ADD(0x80131531, "COR_E_INVALIDOLEVARIANTTYPE", nullptr, "corerror.h");
+        ADD(0x80131532, "COR_E_MISSINGMANIFESTRESOURCE", "An expected resource in the assembly manifest was missing.", "corerror.h");
+        ADD(0x80131532, "COR_E_MISSINGMANIFESTRESOURCE", nullptr, "corerror.h");
+        ADD(0x80131533, "COR_E_SAFEARRAYTYPEMISMATCH", "A mismatch has occured between the runtime type of the array and the sub type recorded in the metadata.", "corerror.h");
+        ADD(0x80131533, "COR_E_SAFEARRAYTYPEMISMATCH", nullptr, "corerror.h");
+        ADD(0x80131534, "COR_E_TYPEINITIALIZATION", "An exception was thrown by a type's initializer (.cctor).", "corerror.h");
+        ADD(0x80131534, "COR_E_TYPEINITIALIZATION", nullptr, "corerror.h");
+        ADD(0x80131535, "COR_E_MARSHALDIRECTIVE", "The marshaling directives are invalid.", "corerror.h");
+        ADD(0x80131535, "COR_E_MARSHALDIRECTIVE", nullptr, "corerror.h");
+        ADD(0x80131536, "COR_E_MISSINGSATELLITEASSEMBLY", "An expected satellite assembly containing the ultimate fallback resources for a given culture was not found or couldn't be loaded.  Setup problem?", "corerror.h");
+        ADD(0x80131536, "COR_E_MISSINGSATELLITEASSEMBLY", nullptr, "corerror.h");
+        ADD(0x80131537, "COR_E_FORMAT", "The format of one arguments does not meet the contract of the method.", "corerror.h");
+        ADD(0x80131537, "COR_E_FORMAT", nullptr, "corerror.h");
+        ADD(0x80131538, "COR_E_SAFEARRAYRANKMISMATCH", "A mismatch has occured between the runtime rank of the array and the rank recorded in the metadata.", "corerror.h");
+        ADD(0x80131538, "COR_E_SAFEARRAYRANKMISMATCH", nullptr, "corerror.h");
+        ADD(0x80131539, "COR_E_PLATFORMNOTSUPPORTED", "The method is not supported on this platform", "corerror.h");
+        ADD(0x80131539, "COR_E_PLATFORMNOTSUPPORTED", nullptr, "corerror.h");
+        ADD(0x8013153a, "COR_E_INVALIDPROGRAM", "A program contained invalid IL or bad metadata.  Usually this is a compiler bug.", "corerror.h");
+        ADD(0x8013153a, "COR_E_INVALIDPROGRAM", nullptr, "corerror.h");
+        ADD(0x8013153b, "COR_E_OPERATIONCANCELED", "The operation was cancelled.", "corerror.h");
+        ADD(0x8013153b, "COR_E_OPERATIONCANCELED", nullptr, "corerror.h");
+        ADD(0x8013153d, "COR_E_INSUFFICIENTMEMORY", "Not enough memory was available for an operation. This may not be potentially fatal (vs. an OutOfMemoryException).", "corerror.h");
+        ADD(0x8013153d, "COR_E_INSUFFICIENTMEMORY", nullptr, "corerror.h");
+        ADD(0x8013153e, "COR_E_RUNTIMEWRAPPED", "An object that does not derive from System.Exception has been wrapped in a RuntimeWrappedException.", "corerror.h");
+        ADD(0x8013153e, "COR_E_RUNTIMEWRAPPED", nullptr, "corerror.h");
+        ADD(0x80131540, "COR_E_DEVICESNOTSUPPORTED", nullptr, "corerror.h");
+        ADD(0x80131540, "COR_E_DEVICESNOTSUPPORTED", nullptr, "corerror.h");
+        ADD(0x80131541, "COR_E_DATAMISALIGNED", "A datatype misalignment was detected in a load or store instruction.", "corerror.h");
+        ADD(0x80131541, "COR_E_DATAMISALIGNED", nullptr, "corerror.h");
+        ADD(0x80131577, "COR_E_KEYNOTFOUND", nullptr, "corerror.h");
+        ADD(0x80131577, "COR_E_KEYNOTFOUND", nullptr, "corerror.h");
+        ADD(0x80131600, "COR_E_APPLICATION", "The base class for all nullptrless seriousnullptr exceptions.", "corerror.h");
+        ADD(0x80131600, "COR_E_APPLICATION", nullptr, "corerror.h");
+        ADD(0x80131601, "COR_E_INVALIDFILTERCRITERIA", "The given filter criteria does not match the filter contract.", "corerror.h");
+        ADD(0x80131601, "COR_E_INVALIDFILTERCRITERIA", nullptr, "corerror.h");
+        ADD(0x80131602, "COR_E_REFLECTIONTYPELOAD", "Could not find or load a specific class that was requested through Reflection", "corerror.h");
+        ADD(0x80131602, "COR_E_REFLECTIONTYPELOAD", nullptr, "corerror.h");
+        ADD(0x80131603, "COR_E_TARGET", nullptr, "corerror.h");
+        ADD(0x80131603, "COR_E_TARGET", nullptr, "corerror.h");
+        ADD(0x80131604, "COR_E_TARGETINVOCATION", "If the method called throws an exception", "corerror.h");
+        ADD(0x80131604, "COR_E_TARGETINVOCATION", nullptr, "corerror.h");
+        ADD(0x80131605, "COR_E_CUSTOMATTRIBUTEFORMAT", "If the binary format of a custom attribute is invalid.", "corerror.h");
+        ADD(0x80131605, "COR_E_CUSTOMATTRIBUTEFORMAT", nullptr, "corerror.h");
+        ADD(0x80131620, "COR_E_IO", "Some sort of I/O error.", "corerror.h");
+        ADD(0x80131620, "COR_E_IO", nullptr, "corerror.h");
+        ADD(0x80131621, "COR_E_FILELOAD", nullptr, "corerror.h");
+        ADD(0x80131621, "COR_E_FILELOAD", nullptr, "corerror.h");
+        ADD(0x80131622, "COR_E_OBJECTDISPOSED", "The object has already been disposed.", "corerror.h");
+        ADD(0x80131622, "COR_E_OBJECTDISPOSED", nullptr, "corerror.h");
+        ADD(0x80131623, "COR_E_FAILFAST", "Runtime operation halted by call to System.Environment.FailFast().", "corerror.h");
+        ADD(0x80131623, "COR_E_FAILFAST", nullptr, "corerror.h");
+        ADD(0x80131640, "COR_E_HOSTPROTECTION", "Attempted to perform an operation that was forbidden by the host.", "corerror.h");
+        ADD(0x80131640, "COR_E_HOSTPROTECTION", nullptr, "corerror.h");
+        ADD(0x80131641, "COR_E_ILLEGAL_REENTRANCY", "Attempted to call into managed code when executing inside a low level extensibility point.", "corerror.h");
+        ADD(0x80131641, "COR_E_ILLEGAL_REENTRANCY", nullptr, "corerror.h");
+        ADD(0x80131700, "CLR_E_SHIM_RUNTIMELOAD", "Failed to load the runtime", "corerror.h");
+        ADD(0x80131701, "CLR_E_SHIM_RUNTIMEEXPORT", "Failed to find a required export in the runtime", "corerror.h");
+        ADD(0x80131702, "CLR_E_SHIM_INSTALLROOT", "Install root is not defined", "corerror.h");
+        ADD(0x80131703, "CLR_E_SHIM_INSTALLCOMP", "Expected component of the runtime is not available", "corerror.h");
+        ADD(0x80131801, "VER_E_HRESULT", nullptr, "corerror.h");
+        ADD(0x80131802, "VER_E_OFFSET", nullptr, "corerror.h");
+        ADD(0x80131803, "VER_E_OPCODE", nullptr, "corerror.h");
+        ADD(0x80131804, "VER_E_OPERAND", nullptr, "corerror.h");
+        ADD(0x80131805, "VER_E_TOKEN", nullptr, "corerror.h");
+        ADD(0x80131806, "VER_E_EXCEPT", nullptr, "corerror.h");
+        ADD(0x80131807, "VER_E_STACK_SLOT", nullptr, "corerror.h");
+        ADD(0x80131808, "VER_E_LOC", nullptr, "corerror.h");
+        ADD(0x80131809, "VER_E_ARG", nullptr, "corerror.h");
+        ADD(0x8013180a, "VER_E_FOUND", nullptr, "corerror.h");
+        ADD(0x8013180b, "VER_E_EXPECTED", nullptr, "corerror.h");
+        ADD(0x8013180c, "VER_E_LOC_BYNAME", nullptr, "corerror.h");
+        ADD(0x80131810, "VER_E_UNKNOWN_OPCODE", nullptr, "corerror.h");
+        ADD(0x80131811, "VER_E_SIG_CALLCONV", nullptr, "corerror.h");
+        ADD(0x80131812, "VER_E_SIG_ELEMTYPE", nullptr, "corerror.h");
+        ADD(0x80131814, "VER_E_RET_SIG", nullptr, "corerror.h");
+        ADD(0x80131815, "VER_E_FIELD_SIG", nullptr, "corerror.h");
+        ADD(0x80131818, "VER_E_INTERNAL", nullptr, "corerror.h");
+        ADD(0x80131819, "VER_E_STACK_TOO_LARGE", nullptr, "corerror.h");
+        ADD(0x8013181a, "VER_E_ARRAY_NAME_LONG", nullptr, "corerror.h");
+        ADD(0x80131820, "VER_E_FALLTHRU", nullptr, "corerror.h");
+        ADD(0x80131821, "VER_E_TRY_GTEQ_END", nullptr, "corerror.h");
+        ADD(0x80131822, "VER_E_TRYEND_GT_CS", nullptr, "corerror.h");
+        ADD(0x80131823, "VER_E_HND_GTEQ_END", nullptr, "corerror.h");
+        ADD(0x80131824, "VER_E_HNDEND_GT_CS", nullptr, "corerror.h");
+        ADD(0x80131825, "VER_E_FLT_GTEQ_CS", nullptr, "corerror.h");
+        ADD(0x80131826, "VER_E_TRY_START", nullptr, "corerror.h");
+        ADD(0x80131827, "VER_E_HND_START", nullptr, "corerror.h");
+        ADD(0x80131828, "VER_E_FLT_START", nullptr, "corerror.h");
+        ADD(0x80131829, "VER_E_TRY_OVERLAP", nullptr, "corerror.h");
+        ADD(0x8013182a, "VER_E_TRY_EQ_HND_FIL", nullptr, "corerror.h");
+        ADD(0x8013182b, "VER_E_TRY_SHARE_FIN_FAL", nullptr, "corerror.h");
+        ADD(0x8013182c, "VER_E_HND_OVERLAP", nullptr, "corerror.h");
+        ADD(0x8013182d, "VER_E_HND_EQ", nullptr, "corerror.h");
+        ADD(0x8013182e, "VER_E_FIL_OVERLAP", nullptr, "corerror.h");
+        ADD(0x8013182f, "VER_E_FIL_EQ", nullptr, "corerror.h");
+        ADD(0x80131830, "VER_E_FIL_CONT_TRY", nullptr, "corerror.h");
+        ADD(0x80131831, "VER_E_FIL_CONT_HND", nullptr, "corerror.h");
+        ADD(0x80131832, "VER_E_FIL_CONT_FIL", nullptr, "corerror.h");
+        ADD(0x80131833, "VER_E_FIL_GTEQ_CS", nullptr, "corerror.h");
+        ADD(0x80131834, "VER_E_FIL_START", nullptr, "corerror.h");
+        ADD(0x80131835, "VER_E_FALLTHRU_EXCEP", nullptr, "corerror.h");
+        ADD(0x80131836, "VER_E_FALLTHRU_INTO_HND", nullptr, "corerror.h");
+        ADD(0x80131837, "VER_E_FALLTHRU_INTO_FIL", nullptr, "corerror.h");
+        ADD(0x80131838, "VER_E_LEAVE", nullptr, "corerror.h");
+        ADD(0x80131839, "VER_E_RETHROW", nullptr, "corerror.h");
+        ADD(0x8013183a, "VER_E_ENDFINALLY", nullptr, "corerror.h");
+        ADD(0x8013183b, "VER_E_ENDFILTER", nullptr, "corerror.h");
+        ADD(0x8013183c, "VER_E_ENDFILTER_MISSING", nullptr, "corerror.h");
+        ADD(0x8013183d, "VER_E_BR_INTO_TRY", nullptr, "corerror.h");
+        ADD(0x8013183e, "VER_E_BR_INTO_HND", nullptr, "corerror.h");
+        ADD(0x8013183f, "VER_E_BR_INTO_FIL", nullptr, "corerror.h");
+        ADD(0x80131840, "VER_E_BR_OUTOF_TRY", nullptr, "corerror.h");
+        ADD(0x80131841, "VER_E_BR_OUTOF_HND", nullptr, "corerror.h");
+        ADD(0x80131842, "VER_E_BR_OUTOF_FIL", nullptr, "corerror.h");
+        ADD(0x80131843, "VER_E_BR_OUTOF_FIN", nullptr, "corerror.h");
+        ADD(0x80131844, "VER_E_RET_FROM_TRY", nullptr, "corerror.h");
+        ADD(0x80131845, "VER_E_RET_FROM_HND", nullptr, "corerror.h");
+        ADD(0x80131846, "VER_E_RET_FROM_FIL", nullptr, "corerror.h");
+        ADD(0x80131847, "VER_E_BAD_JMP_TARGET", nullptr, "corerror.h");
+        ADD(0x80131848, "VER_E_PATH_LOC", nullptr, "corerror.h");
+        ADD(0x80131849, "VER_E_PATH_THIS", nullptr, "corerror.h");
+        ADD(0x8013184a, "VER_E_PATH_STACK", nullptr, "corerror.h");
+        ADD(0x8013184b, "VER_E_PATH_STACK_DEPTH", nullptr, "corerror.h");
+        ADD(0x8013184c, "VER_E_THIS", nullptr, "corerror.h");
+        ADD(0x8013184d, "VER_E_THIS_UNINIT_EXCEP", nullptr, "corerror.h");
+        ADD(0x8013184e, "VER_E_THIS_UNINIT_STORE", nullptr, "corerror.h");
+        ADD(0x8013184f, "VER_E_THIS_UNINIT_RET", nullptr, "corerror.h");
+        ADD(0x80131850, "VER_E_THIS_UNINIT_V_RET", nullptr, "corerror.h");
+        ADD(0x80131851, "VER_E_THIS_UNINIT_BR", nullptr, "corerror.h");
+        ADD(0x80131852, "VER_E_LDFTN_CTOR", nullptr, "corerror.h");
+        ADD(0x80131853, "VER_E_STACK_NOT_EQ", nullptr, "corerror.h");
+        ADD(0x80131854, "VER_E_STACK_UNEXPECTED", nullptr, "corerror.h");
+        ADD(0x80131855, "VER_E_STACK_EXCEPTION", nullptr, "corerror.h");
+        ADD(0x80131856, "VER_E_STACK_OVERFLOW", nullptr, "corerror.h");
+        ADD(0x80131857, "VER_E_STACK_UNDERFLOW", nullptr, "corerror.h");
+        ADD(0x80131858, "VER_E_STACK_EMPTY", nullptr, "corerror.h");
+        ADD(0x80131859, "VER_E_STACK_UNINIT", nullptr, "corerror.h");
+        ADD(0x8013185a, "VER_E_STACK_I_I4_I8", nullptr, "corerror.h");
+        ADD(0x8013185b, "VER_E_STACK_R_R4_R8", nullptr, "corerror.h");
+        ADD(0x8013185c, "VER_E_STACK_NO_R_I8", nullptr, "corerror.h");
+        ADD(0x8013185d, "VER_E_STACK_NUMERIC", nullptr, "corerror.h");
+        ADD(0x8013185e, "VER_E_STACK_OBJREF", nullptr, "corerror.h");
+        ADD(0x8013185f, "VER_E_STACK_P_OBJREF", nullptr, "corerror.h");
+        ADD(0x80131860, "VER_E_STACK_BYREF", nullptr, "corerror.h");
+        ADD(0x80131861, "VER_E_STACK_METHOD", nullptr, "corerror.h");
+        ADD(0x80131862, "VER_E_STACK_ARRAY_SD", nullptr, "corerror.h");
+        ADD(0x80131863, "VER_E_STACK_VALCLASS", nullptr, "corerror.h");
+        ADD(0x80131864, "VER_E_STACK_P_VALCLASS", nullptr, "corerror.h");
+        ADD(0x80131865, "VER_E_STACK_NO_VALCLASS", nullptr, "corerror.h");
+        ADD(0x80131866, "VER_E_LOC_DEAD", nullptr, "corerror.h");
+        ADD(0x80131867, "VER_E_LOC_NUM", nullptr, "corerror.h");
+        ADD(0x80131868, "VER_E_ARG_NUM", nullptr, "corerror.h");
+        ADD(0x80131869, "VER_E_TOKEN_RESOLVE", nullptr, "corerror.h");
+        ADD(0x8013186a, "VER_E_TOKEN_TYPE", nullptr, "corerror.h");
+        ADD(0x8013186b, "VER_E_TOKEN_TYPE_MEMBER", nullptr, "corerror.h");
+        ADD(0x8013186c, "VER_E_TOKEN_TYPE_FIELD", nullptr, "corerror.h");
+        ADD(0x8013186d, "VER_E_TOKEN_TYPE_SIG", nullptr, "corerror.h");
+        ADD(0x8013186e, "VER_E_UNVERIFIABLE", nullptr, "corerror.h");
+        ADD(0x8013186f, "VER_E_LDSTR_OPERAND", nullptr, "corerror.h");
+        ADD(0x80131870, "VER_E_RET_PTR_TO_STACK", nullptr, "corerror.h");
+        ADD(0x80131871, "VER_E_RET_VOID", nullptr, "corerror.h");
+        ADD(0x80131872, "VER_E_RET_MISSING", nullptr, "corerror.h");
+        ADD(0x80131873, "VER_E_RET_EMPTY", nullptr, "corerror.h");
+        ADD(0x80131874, "VER_E_RET_UNINIT", nullptr, "corerror.h");
+        ADD(0x80131875, "VER_E_ARRAY_ACCESS", nullptr, "corerror.h");
+        ADD(0x80131876, "VER_E_ARRAY_V_STORE", nullptr, "corerror.h");
+        ADD(0x80131877, "VER_E_ARRAY_SD", nullptr, "corerror.h");
+        ADD(0x80131878, "VER_E_ARRAY_SD_PTR", nullptr, "corerror.h");
+        ADD(0x80131879, "VER_E_ARRAY_FIELD", nullptr, "corerror.h");
+        ADD(0x8013187a, "VER_E_ARGLIST", nullptr, "corerror.h");
+        ADD(0x8013187b, "VER_E_VALCLASS", nullptr, "corerror.h");
+        ADD(0x8013187c, "VER_E_METHOD_ACCESS", nullptr, "corerror.h");
+        ADD(0x8013187d, "VER_E_FIELD_ACCESS", nullptr, "corerror.h");
+        ADD(0x8013187e, "VER_E_DEAD", nullptr, "corerror.h");
+        ADD(0x8013187f, "VER_E_FIELD_STATIC", nullptr, "corerror.h");
+        ADD(0x80131880, "VER_E_FIELD_NO_STATIC", nullptr, "corerror.h");
+        ADD(0x80131881, "VER_E_ADDR", nullptr, "corerror.h");
+        ADD(0x80131882, "VER_E_ADDR_BYREF", nullptr, "corerror.h");
+        ADD(0x80131883, "VER_E_ADDR_LITERAL", nullptr, "corerror.h");
+        ADD(0x80131884, "VER_E_INITONLY", nullptr, "corerror.h");
+        ADD(0x80131885, "VER_E_THROW", nullptr, "corerror.h");
+        ADD(0x80131886, "VER_E_CALLVIRT_VALCLASS", nullptr, "corerror.h");
+        ADD(0x80131887, "VER_E_CALL_SIG", nullptr, "corerror.h");
+        ADD(0x80131888, "VER_E_CALL_STATIC", nullptr, "corerror.h");
+        ADD(0x80131889, "VER_E_CTOR", nullptr, "corerror.h");
+        ADD(0x8013188a, "VER_E_CTOR_VIRT", nullptr, "corerror.h");
+        ADD(0x8013188b, "VER_E_CTOR_OR_SUPER", nullptr, "corerror.h");
+        ADD(0x8013188c, "VER_E_CTOR_MUL_INIT", nullptr, "corerror.h");
+        ADD(0x8013188d, "VER_E_SIG", nullptr, "corerror.h");
+        ADD(0x8013188e, "VER_E_SIG_ARRAY", nullptr, "corerror.h");
+        ADD(0x8013188f, "VER_E_SIG_ARRAY_PTR", nullptr, "corerror.h");
+        ADD(0x80131890, "VER_E_SIG_ARRAY_BYREF", nullptr, "corerror.h");
+        ADD(0x80131891, "VER_E_SIG_ELEM_PTR", nullptr, "corerror.h");
+        ADD(0x80131892, "VER_E_SIG_VARARG", nullptr, "corerror.h");
+        ADD(0x80131893, "VER_E_SIG_VOID", nullptr, "corerror.h");
+        ADD(0x80131894, "VER_E_SIG_BYREF_BYREF", nullptr, "corerror.h");
+        ADD(0x80131896, "VER_E_CODE_SIZE_ZERO", nullptr, "corerror.h");
+        ADD(0x80131897, "VER_E_BAD_VARARG", nullptr, "corerror.h");
+        ADD(0x80131898, "VER_E_TAIL_CALL", nullptr, "corerror.h");
+        ADD(0x80131899, "VER_E_TAIL_BYREF", nullptr, "corerror.h");
+        ADD(0x8013189a, "VER_E_TAIL_RET", nullptr, "corerror.h");
+        ADD(0x8013189b, "VER_E_TAIL_RET_VOID", nullptr, "corerror.h");
+        ADD(0x8013189c, "VER_E_TAIL_RET_TYPE", nullptr, "corerror.h");
+        ADD(0x8013189d, "VER_E_TAIL_STACK_EMPTY", nullptr, "corerror.h");
+        ADD(0x8013189e, "VER_E_METHOD_END", nullptr, "corerror.h");
+        ADD(0x8013189f, "VER_E_BAD_BRANCH", nullptr, "corerror.h");
+        ADD(0x801318a0, "VER_E_FIN_OVERLAP", nullptr, "corerror.h");
+        ADD(0x801318a1, "VER_E_LEXICAL_NESTING", nullptr, "corerror.h");
+        ADD(0x801318a2, "VER_E_VOLATILE", nullptr, "corerror.h");
+        ADD(0x801318a3, "VER_E_UNALIGNED", nullptr, "corerror.h");
+        ADD(0x801318a4, "VER_E_INNERMOST_FIRST", nullptr, "corerror.h");
+        ADD(0x801318a5, "VER_E_CALLI_VIRTUAL", nullptr, "corerror.h");
+        ADD(0x801318a6, "VER_E_CALL_ABSTRACT", nullptr, "corerror.h");
+        ADD(0x801318a7, "VER_E_STACK_UNEXP_ARRAY", nullptr, "corerror.h");
+        ADD(0x801318a8, "VER_E_NOT_IN_GC_HEAP", nullptr, "corerror.h");
+        ADD(0x801318a9, "VER_E_TRY_N_EMPTY_STACK", nullptr, "corerror.h");
+        ADD(0x801318aa, "VER_E_DLGT_CTOR", nullptr, "corerror.h");
+        ADD(0x801318ab, "VER_E_DLGT_BB", nullptr, "corerror.h");
+        ADD(0x801318ac, "VER_E_DLGT_PATTERN", nullptr, "corerror.h");
+        ADD(0x801318ad, "VER_E_DLGT_LDFTN", nullptr, "corerror.h");
+        ADD(0x801318ae, "VER_E_FTN_ABSTRACT", nullptr, "corerror.h");
+        ADD(0x801318af, "VER_E_SIG_C_VC", nullptr, "corerror.h");
+        ADD(0x801318b0, "VER_E_SIG_VC_C", nullptr, "corerror.h");
+        ADD(0x801318b1, "VER_E_BOX_PTR_TO_STACK", nullptr, "corerror.h");
+        ADD(0x801318b2, "VER_E_SIG_BYREF_TB_AH", nullptr, "corerror.h");
+        ADD(0x801318b3, "VER_E_SIG_ARRAY_TB_AH", nullptr, "corerror.h");
+        ADD(0x801318b4, "VER_E_ENDFILTER_STACK", nullptr, "corerror.h");
+        ADD(0x801318b5, "VER_E_DLGT_SIG_I", nullptr, "corerror.h");
+        ADD(0x801318b6, "VER_E_DLGT_SIG_O", nullptr, "corerror.h");
+        ADD(0x801318b7, "VER_E_RA_PTR_TO_STACK", nullptr, "corerror.h");
+        ADD(0x801318b8, "VER_E_CATCH_VALUE_TYPE", nullptr, "corerror.h");
+        ADD(0x801318b9, "VER_E_CATCH_BYREF", nullptr, "corerror.h");
+        ADD(0x801318ba, "VER_E_FIL_PRECEED_HND", nullptr, "corerror.h");
+        ADD(0x801318bb, "VER_E_LDVIRTFTN_STATIC", nullptr, "corerror.h");
+        ADD(0x801318bc, "VER_E_CALLVIRT_STATIC", nullptr, "corerror.h");
+        ADD(0x801318bd, "VER_E_INITLOCALS", nullptr, "corerror.h");
+        ADD(0x801318be, "VER_E_BR_TO_EXCEPTION", nullptr, "corerror.h");
+        ADD(0x801318bf, "VER_E_CALL_CTOR", nullptr, "corerror.h");
+        ADD(0x801318c0, "VER_E_VALCLASS_OBJREF_VAR", nullptr, "corerror.h");
+        ADD(0x801318c1, "VER_E_STACK_P_VALCLASS_OBJREF_VAR", nullptr, "corerror.h");
+        ADD(0x801318c2, "VER_E_SIG_VAR_PARAM", nullptr, "corerror.h");
+        ADD(0x801318c3, "VER_E_SIG_MVAR_PARAM", nullptr, "corerror.h");
+        ADD(0x801318c4, "VER_E_SIG_VAR_ARG", nullptr, "corerror.h");
+        ADD(0x801318c5, "VER_E_SIG_MVAR_ARG", nullptr, "corerror.h");
+        ADD(0x801318c6, "VER_E_SIG_GENERICINST", nullptr, "corerror.h");
+        ADD(0x801318c7, "VER_E_SIG_METHOD_INST", nullptr, "corerror.h");
+        ADD(0x801318c8, "VER_E_SIG_METHOD_PARENT_INST", nullptr, "corerror.h");
+        ADD(0x801318c9, "VER_E_SIG_FIELD_PARENT_INST", nullptr, "corerror.h");
+        ADD(0x801318ca, "VER_E_CALLCONV_NOT_GENERICINST", nullptr, "corerror.h");
+        ADD(0x801318cb, "VER_E_TOKEN_BAD_METHOD_SPEC", nullptr, "corerror.h");
+        ADD(0x801318cc, "VER_E_BAD_READONLY_PREFIX", nullptr, "corerror.h");
+        ADD(0x801318cd, "VER_E_BAD_CONSTRAINED_PREFIX", nullptr, "corerror.h");
+        ADD(0x801318ce, "VER_E_CIRCULAR_VAR_CONSTRAINTS", nullptr, "corerror.h");
+        ADD(0x801318cf, "VER_E_CIRCULAR_MVAR_CONSTRAINTS", nullptr, "corerror.h");
+        ADD(0x801318d0, "VER_E_UNSATISFIED_METHOD_INST", nullptr, "corerror.h");
+        ADD(0x801318d1, "VER_E_UNSATISFIED_METHOD_PARENT_INST", nullptr, "corerror.h");
+        ADD(0x801318d2, "VER_E_UNSATISFIED_FIELD_PARENT_INST", nullptr, "corerror.h");
+        ADD(0x801318d3, "VER_E_UNSATISFIED_BOX_OPERAND", nullptr, "corerror.h");
+        ADD(0x801318d4, "VER_E_CONSTRAINED_CALL_WITH_NON_BYREF_THIS", nullptr, "corerror.h");
+        ADD(0x801318d5, "VER_E_CONSTRAINED_OF_NON_VARIABLE_TYPE", nullptr, "corerror.h");
+        ADD(0x801318d6, "VER_E_READONLY_UNEXPECTED_CALLEE", nullptr, "corerror.h");
+        ADD(0x801318d7, "VER_E_READONLY_ILLEGAL_WRITE", nullptr, "corerror.h");
+        ADD(0x801318d8, "VER_E_READONLY_IN_MKREFANY", nullptr, "corerror.h");
+        ADD(0x801318d9, "VER_E_UNALIGNED_ALIGNMENT", nullptr, "corerror.h");
+        ADD(0x801318da, "VER_E_TAILCALL_INSIDE_EH", nullptr, "corerror.h");
+        ADD(0x801318db, "VER_E_BACKWARD_BRANCH", nullptr, "corerror.h");
+        ADD(0x801318dc, "VER_E_CALL_TO_VTYPE_BASE", nullptr, "corerror.h");
+        ADD(0x801318dd, "VER_E_NEWOBJ_OF_ABSTRACT_CLASS", nullptr, "corerror.h");
+        ADD(0x801318de, "VER_E_UNMANAGED_POINTER", nullptr, "corerror.h");
+        ADD(0x801318df, "VER_E_LDFTN_NON_FINAL_VIRTUAL", nullptr, "corerror.h");
+        ADD(0x801318e0, "VER_E_FIELD_OVERLAP", nullptr, "corerror.h");
+        ADD(0x801318e1, "VER_E_THIS_MISMATCH", nullptr, "corerror.h");
+        ADD(0x801318e2, "VER_E_STACK_I_I4", nullptr, "corerror.h");
+        ADD(0x801318f0, "VER_E_BAD_PE", nullptr, "corerror.h");
+        ADD(0x801318f1, "VER_E_BAD_MD", nullptr, "corerror.h");
+        ADD(0x801318f2, "VER_E_BAD_APPDOMAIN", nullptr, "corerror.h");
+        ADD(0x801318f3, "VER_E_TYPELOAD", nullptr, "corerror.h");
+        ADD(0x801318f4, "VER_E_PE_LOAD", nullptr, "corerror.h");
+        ADD(0x801318f5, "VER_E_WRITE_RVA_STATIC", nullptr, "corerror.h");
+        ADD(0x80131904, "COR_E_SqlException", "System.Data.SqlClient.SqlClientException", "corerror.h");
+        ADD(0x80131920, "COR_E_Data", nullptr, "corerror.h");
+        ADD(0x80131921, "COR_E_DataDeletedRowInaccessible", nullptr, "corerror.h");
+        ADD(0x80131922, "COR_E_DataDuplicateName", nullptr, "corerror.h");
+        ADD(0x80131923, "COR_E_DataInRowChangingEvent", nullptr, "corerror.h");
+        ADD(0x80131924, "COR_E_DataInvalidConstraint", nullptr, "corerror.h");
+        ADD(0x80131925, "COR_E_DataMissingPrimaryKey", nullptr, "corerror.h");
+        ADD(0x80131926, "COR_E_DataNoNullAllowed", nullptr, "corerror.h");
+        ADD(0x80131927, "COR_E_DataReadOnly", nullptr, "corerror.h");
+        ADD(0x80131928, "COR_E_DataRowNotInTable", nullptr, "corerror.h");
+        ADD(0x80131929, "COR_E_DataVersionNotFound", nullptr, "corerror.h");
+        ADD(0x8013192a, "COR_E_DataConstraint", nullptr, "corerror.h");
+        ADD(0x8013192b, "COR_E_StrongTyping", nullptr, "corerror.h");
+        ADD(0x80131930, "COR_E_SqlType", nullptr, "corerror.h");
+        ADD(0x80131931, "COR_E_SqlNullValue", nullptr, "corerror.h");
+        ADD(0x80131932, "COR_E_SqlTruncate", nullptr, "corerror.h");
+        ADD(0x80131933, "COR_E_AdapterMapping", nullptr, "corerror.h");
+        ADD(0x80131934, "COR_E_DataAdapter", nullptr, "corerror.h");
+        ADD(0x80131935, "COR_E_DBConcurrency", nullptr, "corerror.h");
+        ADD(0x80131936, "COR_E_OperationAborted", nullptr, "corerror.h");
+        ADD(0x80131937, "COR_E_InvalidUdt", nullptr, "corerror.h");
+        ADD(0x80131937, "COR_E_OdbcException", "System.Data.Odbc.OdbcException", "corerror.h");
+        ADD(0x80131938, "COR_E_OracleException", "System.Data.OracleClient.OracleException", "corerror.h");
+        ADD(0x80131940, "COR_E_Xml", nullptr, "corerror.h");
+        ADD(0x80131941, "COR_E_XmlSchema", nullptr, "corerror.h");
+        ADD(0x80131942, "COR_E_XmlXslt", nullptr, "corerror.h");
+        ADD(0x80131943, "COR_E_XmlXPath", nullptr, "corerror.h");
+        ADD(0x80131944, "COR_E_XmlQuery", nullptr, "corerror.h");
+        ADD(0x80131b00, "VLDTR_E_IFACE_NOTIFACE", "Interface in InterfaceImpl is not marked tdInterface", "corerror.h");
+        ADD(0x80131b01, "VLDTR_E_FD_RVAHASNORVA", "Field marked fdHasFieldRVA but has no RVA rec", "corerror.h");
+        ADD(0x80131b02, "VLDTR_E_FD_RVAHASZERORVA", "Field marked fdHasFieldRVA has RVA =0", "corerror.h");
+        ADD(0x80131b03, "VLDTR_E_MD_RVAANDIMPLMAP", "Method has both RVA !=0 and ImplMap", "corerror.h");
+        ADD(0x80131b04, "VLDTR_E_TD_EXTRAFLAGS", "TypeDef has extraneous bits in flags", "corerror.h");
+        ADD(0x80131b05, "VLDTR_E_TD_EXTENDSITSELF", "TypeDef extends itself", "corerror.h");
+        ADD(0x80131b06, "VLDTR_E_TD_SYSVTNOTEXTOBJ", "System.ValueType does not extend System.Object", "corerror.h");
+        ADD(0x80131b07, "VLDTR_E_TD_EXTTYPESPEC", "Class extends TypeSpec (warning)", "corerror.h");
+        ADD(0x80131b09, "VLDTR_E_TD_VTNOSIZE", "Value Class has zero size", "corerror.h");
+        ADD(0x80131b0a, "VLDTR_E_TD_IFACESEALED", "Interface is sealed", "corerror.h");
+        ADD(0x80131b0b, "VLDTR_E_NC_BADNESTED", "Bad nullptrnestednullptr token in NestedClass", "corerror.h");
+        ADD(0x80131b0c, "VLDTR_E_NC_BADENCLOSER", "Bad nullptrenclosingnullptr token in NestedClass", "corerror.h");
+        ADD(0x80131b0d, "VLDTR_E_NC_DUP", "Duplicate NestedClass record", "corerror.h");
+        ADD(0x80131b0e, "VLDTR_E_NC_DUPENCLOSER", "Duplicate NestedClass with different encloser", "corerror.h");
+        ADD(0x80131b0f, "VLDTR_E_FRVA_ZERORVA", "RVA=0 in FieldRVA record", "corerror.h");
+        ADD(0x80131b10, "VLDTR_E_FRVA_BADFIELD", "Invalid field token in FieldRVA record", "corerror.h");
+        ADD(0x80131b11, "VLDTR_E_FRVA_DUPRVA", "Duplicate RVA in FieldRVA record", "corerror.h");
+        ADD(0x80131b12, "VLDTR_E_FRVA_DUPFIELD", "Duplicate field in FieldRVA record", "corerror.h");
+        ADD(0x80131b13, "VLDTR_E_EP_BADTOKEN", "Bad token as entry point in CLR header", "corerror.h");
+        ADD(0x80131b14, "VLDTR_E_EP_INSTANCE", "Entry point in CLR header is a token of instance method", "corerror.h");
+        ADD(0x80131b15, "VLDTR_E_TD_ENUMFLDBADTYPE", "Enum has non-integral underlying type", "corerror.h");
+        ADD(0x80131b16, "VLDTR_E_MD_BADRVA", "Method has bogus RVA", "corerror.h");
+        ADD(0x80131b17, "VLDTR_E_FD_LITERALNODEFAULT", "Literal field has no const value", "corerror.h");
+        ADD(0x80131b18, "VLDTR_E_IFACE_METHNOTIMPL", "Class implementing an interface doesn't impl.one of methods", "corerror.h");
+        ADD(0x80131b19, "VLDTR_E_CA_BADPARENT", "CA has invalid owner", "corerror.h");
+        ADD(0x80131b1a, "VLDTR_E_CA_BADTYPE", "CA has invalid type", "corerror.h");
+        ADD(0x80131b1b, "VLDTR_E_CA_NOTCTOR", "CA type is not .ctor", "corerror.h");
+        ADD(0x80131b1c, "VLDTR_E_CA_BADSIG", "CA type has bad signature", "corerror.h");
+        ADD(0x80131b1d, "VLDTR_E_CA_NOSIG", "CA type has no signature", "corerror.h");
+        ADD(0x80131b1e, "VLDTR_E_CA_BADPROLOG", "CA blob has bad prolog (not 0x01 0x00)", "corerror.h");
+        ADD(0x80131b1f, "VLDTR_E_MD_BADLOCALSIGTOK", "Method has invalid LocalSig token", "corerror.h");
+        ADD(0x80131b20, "VLDTR_E_MD_BADHEADER", "Method has invalid header", "corerror.h");
+        ADD(0x80131b21, "VLDTR_E_EP_TOOMANYARGS", "Entry point has more than one arg", "corerror.h");
+        ADD(0x80131b22, "VLDTR_E_EP_BADRET", "Entry point has bad return type", "corerror.h");
+        ADD(0x80131b23, "VLDTR_E_EP_BADARG", "Entry point has bad argument", "corerror.h");
+        ADD(0x80131b24, "VLDTR_E_SIG_BADVOID", "Illegal nullptrvoidnullptr in signature", "corerror.h");
+        ADD(0x80131b25, "VLDTR_E_IFACE_METHMULTIMPL", "Multiple implementation of method", "corerror.h");
+        ADD(0x80131b26, "VLDTR_E_GP_NAMENULL", "GenericParam name is NULL", "corerror.h");
+        ADD(0x80131b27, "VLDTR_E_GP_OWNERNIL", "GenericParam has nil owner.", "corerror.h");
+        ADD(0x80131b28, "VLDTR_E_GP_DUPNAME", "GenericParam has duplicate by owner and name.", "corerror.h");
+        ADD(0x80131b29, "VLDTR_E_GP_DUPNUMBER", "GenericParam has duplicate by owner and number.", "corerror.h");
+        ADD(0x80131b2a, "VLDTR_E_GP_NONSEQ_BY_OWNER", "GenericParam is non sequential by owner", "corerror.h");
+        ADD(0x80131b2b, "VLDTR_E_GP_NONSEQ_BY_NUMBER", "GenericParam is non sequential by number", "corerror.h");
+        ADD(0x80131b2c, "VLDTR_E_GP_UNEXPECTED_OWNER_FOR_VARIANT_VAR", "GenericParam has variance but its owner is not an interface or delegate", "corerror.h");
+        ADD(0x80131b2d, "VLDTR_E_GP_ILLEGAL_VARIANT_MVAR", "GenericParam is a method type parameter and must be non-variant", "corerror.h");
+        ADD(0x80131b2e, "VLDTR_E_GP_ILLEGAL_VARIANCE_FLAGS", "GenericParam has illegal value for variance flags", "corerror.h");
+        ADD(0x80131b2f, "VLDTR_E_GP_REFANDVALUETYPE", "GenericParam has incompatible special constraints reference type and valuetype", "corerror.h");
+        ADD(0x80131b30, "VLDTR_E_GPC_OWNERNIL", "GenericParamConstraint has nil owner", "corerror.h");
+        ADD(0x80131b31, "VLDTR_E_GPC_DUP", "GenericParamConstraint has duplicate by owner and constraint", "corerror.h");
+        ADD(0x80131b32, "VLDTR_E_GPC_NONCONTIGUOUS", "GenericParamConstraint is non-contiguous with preceeding constraints for same owner", "corerror.h");
+        ADD(0x80131b33, "VLDTR_E_MS_METHODNIL", "MethodSpec has nil method", "corerror.h");
+        ADD(0x80131b34, "VLDTR_E_MS_DUP", "MethodSpec has duplicate based own method and instantiation", "corerror.h");
+        ADD(0x80131b35, "VLDTR_E_MS_BADCALLINGCONV", "MethodSpec signature has invalid calling convention", "corerror.h");
+        ADD(0x80131b36, "VLDTR_E_MS_MISSARITY", "MethodSpec signature is missing arity specification", "corerror.h");
+        ADD(0x80131b37, "VLDTR_E_MS_MISSARG", "MethodSpec signature is missing type argument", "corerror.h");
+        ADD(0x80131b38, "VLDTR_E_MS_ARITYMISMATCH", "MethodSpec arity of generic method and instantiation do not match", "corerror.h");
+        ADD(0x80131b39, "VLDTR_E_MS_METHODNOTGENERIC", "MethodSpec method is not generic", "corerror.h");
+        ADD(0x80131b3a, "VLDTR_E_SIG_MISSARITY", "Signature missing arity of instantiated generic type", "corerror.h");
+        ADD(0x80131b3b, "VLDTR_E_SIG_ARITYMISMATCH", "Signature has generic type of arity instantiated at different arity", "corerror.h");
+        ADD(0x80131b3c, "VLDTR_E_MD_GENERIC_CCTOR", "Method cannot be both generic and a class constructor", "corerror.h");
+        ADD(0x80131b3d, "VLDTR_E_MD_GENERIC_CTOR", "Method cannot be both generic and an instance constructor", "corerror.h");
+        ADD(0x80131b3e, "VLDTR_E_MD_GENERIC_IMPORT", "Method cannot be both generic and defined on an imported type", "corerror.h");
+        ADD(0x80131b3f, "VLDTR_E_MD_GENERIC_BADCALLCONV", "Method cannot be both generic and have non-default calling convention", "corerror.h");
+        ADD(0x80131b40, "VLDTR_E_EP_GENERIC_METHOD", "Entry point in CLR header is the token for a generic method", "corerror.h");
+        ADD(0x80131b41, "VLDTR_E_MD_MISSARITY", "Method signature is generic but is missing its arity", "corerror.h");
+        ADD(0x80131b42, "VLDTR_E_MD_ARITYZERO", "Method signature is generic but its arity is zero", "corerror.h");
+        ADD(0x80131b43, "VLDTR_E_SIG_ARITYZERO", "Signature has generic type instantiated at arity 0", "corerror.h");
+        ADD(0x80131b44, "VLDTR_E_MS_ARITYZERO", "MethodSpec signature has arity 0", "corerror.h");
+        ADD(0x80131b45, "VLDTR_E_MD_GPMISMATCH", "MethodDef signature has arity n but owns m GenericParams", "corerror.h");
+        ADD(0x80131b46, "VLDTR_E_EP_GENERIC_TYPE", "Entry point in CLR header is the token for a method in a generic type", "corerror.h");
+        ADD(0x80131b47, "VLDTR_E_MI_DECLNOTGENERIC", "MethodImpl overrides non-generic method with generic method", "corerror.h");
+        ADD(0x80131b48, "VLDTR_E_MI_IMPLNOTGENERIC", "MethodImpl overrides non-generic method with generic method", "corerror.h");
+        ADD(0x80131b49, "VLDTR_E_MI_ARITYMISMATCH", "MethodImpl overrides generic method of arity n with generic method of arity m", "corerror.h");
+        ADD(0x80131b4a, "VLDTR_E_TD_EXTBADTYPESPEC", "TypeDef extends a TypeSpec that is not an instantiated type", "corerror.h");
+        ADD(0x80131b4b, "VLDTR_E_SIG_BYREFINST", "Signature has type instantiated at byref at offset i", "corerror.h");
+        ADD(0x80131b4c, "VLDTR_E_MS_BYREFINST", "Signature has type instantiated at byref at offset i", "corerror.h");
+        ADD(0x80131b4d, "VLDTR_E_TS_EMPTY", "TypeSpec has empty signature", "corerror.h");
+        ADD(0x80131b4e, "VLDTR_E_TS_HASSENTINALS", "TypeSpec has signature containing one or more sentinals", "corerror.h");
+        ADD(0x80131b4f, "VLDTR_E_TD_GENERICHASEXPLAYOUT", "TypeDef is generic but has explicit layout", "corerror.h");
+        ADD(0x80131b50, "VLDTR_E_SIG_BADTOKTYPE", "Signature has token following ELEMENT_TYPE_CLASS (_VALUETYPE) that is not a TypeDef or TypeRef", "corerror.h");
+        ADD(0x80131b51, "VLDTR_E_IFACE_METHNOTIMPLTHISMOD", "Warn:Class doesn't implement interface method in this module", "corerror.h");
+        ADD(0x80131b52, "TLBX_E_CIRCULAR_EXPORT2", "TypeLib export: attempt to export a CLB imported from a TLB.", "corerror.h");
+        ADD(0x80131c00, "CORDBG_E_THREAD_NOT_SCHEDULED", "Thread is not scheduled. Thus we may not have OSThreadId, handle, or context", "corerror.h");
+        ADD(0x80131c01, "CORDBG_E_HANDLE_HAS_BEEN_DISPOSED", "Handle has been disposed.", "corerror.h");
+        ADD(0x80131c02, "CORDBG_E_NONINTERCEPTABLE_EXCEPTION", "Cant intercept this exception.", "corerror.h");
+        ADD(0x80131c03, "CORDBG_E_CANT_UNWIND_ABOVE_CALLBACK", "When intercepting an exception, cannot intercept above the current frame.", "corerror.h");
+        ADD(0x80131c04, "CORDBG_E_INTERCEPT_FRAME_ALREADY_SET", "The intercept frame for this exception has already been set.", "corerror.h");
+        ADD(0x80131c05, "CORDBG_E_NO_NATIVE_PATCH_AT_ADDR", "there's no native patch at the given address.", "corerror.h");
+        ADD(0x80131c06, "CORDBG_E_MUST_BE_INTEROP_DEBUGGING", "This API is only allowed when interop debugging.", "corerror.h");
+        ADD(0x80131c07, "CORDBG_E_NATIVE_PATCH_ALREADY_AT_ADDR", "There's already a native patch at the address", "corerror.h");
+        ADD(0x80131c08, "CORDBG_E_TIMEOUT", "a wait timed out .. likely an indication of deadlock.", "corerror.h");
+        ADD(0x80131c09, "CORDBG_E_CANT_CALL_ON_THIS_THREAD", "Can't use the API on this thread.", "corerror.h");
+        ADD(0x80131c0a, "CORDBG_E_ENC_INFOLESS_METHOD", "Method was not JITed in EnC mode", "corerror.h");
+        ADD(0x80131c0b, "CORDBG_E_ENC_NESTED_HANLDERS", "Frame cant be updated due to change in max nesting of handlers", "corerror.h");
+        ADD(0x80131c0c, "CORDBG_E_ENC_IN_FUNCLET", "Method is in a callable handler/filter. Cant grow stack", "corerror.h");
+        ADD(0x80131c0d, "CORDBG_E_ENC_LOCALLOC", "Frame cant be updated due to localloc", "corerror.h");
+        ADD(0x80131c0e, "CORDBG_E_ENC_EDIT_NOT_SUPPORTED", "Attempt to perform unsupported edit", "corerror.h");
+        ADD(0x80131c0f, "CORDBG_E_FEABORT_DELAYED_UNTIL_THREAD_RESUMED", "Attempt to func eval abort on a suspended thread.", "corerror.h");
+        ADD(0x80131c10, "CORDBG_E_NOTREADY", "The LS is not in a good spot to perform the requested operation.", "corerror.h");
+        ADD(0x80131c11, "CORDBG_E_CANNOT_RESOLVE_ASSEMBLY", "We failed to resolve assembly given an AssemblyRef token. Assembly may be not loaded yet or not a valid token.", "corerror.h");
+        ADD(0x80131c12, "CORDBG_E_MUST_BE_IN_LOAD_MODULE", "Must be in context of LoadModule callback to perform requested operation", "corerror.h");
+        ADD(0x80131c13, "CORDBG_E_CANNOT_BE_ON_ATTACH", "Requested operation cannot be performed during an attach operation", "corerror.h");
+        ADD(0x80131c14, "CORDBG_E_NGEN_NOT_SUPPORTED", "NGEN must be supported to perform the requested operation", "corerror.h");
+        ADD(0x80131c15, "CORDBG_E_ILLEGAL_SHUTDOWN_ORDER", "Trying to shutdown out of order.", "corerror.h");
+        ADD(0x80131c16, "CORDBG_E_CANNOT_DEBUG_FIBER_PROCESS", "For Whidbey, we don't support debugging fiber mode managed process", "corerror.h");
+        ADD(0x80131c17, "CORDBG_E_MUST_BE_IN_CREATE_PROCESS", "Must be in context of CreateProcess callback to perform requested operation", "corerror.h");
+        ADD(0x80131c18, "CORDBG_E_DETACH_FAILED_OUTSTANDING_EVALS", "All outstanding func-evals have not completed, detaching is not allowed at this time.", "corerror.h");
+        ADD(0x80131c19, "CORDBG_E_DETACH_FAILED_OUTSTANDING_STEPPERS", "All outstanding steppers have not been closed, detaching is not allowed at this time.", "corerror.h");
+        ADD(0x80131c20, "CORDBG_E_CANT_INTEROP_STEP_OUT", "Can't have an ICorDebugStepper do a native step-out.", "corerror.h");
+        ADD(0x80131c21, "CORDBG_E_DETACH_FAILED_OUTSTANDING_BREAKPOINTS", "All outstanding breakpoints have not been closed, detaching is not allowed at this time.", "corerror.h");
+        ADD(0x80131c22, "CORDBG_E_ILLEGAL_IN_STACK_OVERFLOW", "the operation is illegal because of a stackoverflow.", "corerror.h");
+        ADD(0x80131c23, "CORDBG_E_ILLEGAL_AT_GC_UNSAFE_POINT", "The operation failed because it's a GC unsafe point.", "corerror.h");
+        ADD(0x80131c24, "CORDBG_E_ILLEGAL_IN_PROLOG", "The operation failed because the thread is in the prolog", "corerror.h");
+        ADD(0x80131c25, "CORDBG_E_ILLEGAL_IN_NATIVE_CODE", "The operation failed because the thread is in native code", "corerror.h");
+        ADD(0x80131c26, "CORDBG_E_ILLEGAL_IN_OPTIMIZED_CODE", "The operation failed because the thread is in optimized code.", "corerror.h");
+        ADD(0x80131c27, "CORDBG_E_MINIDUMP_UNSUPPORTED", nullptr, "corerror.h");
+        ADD(0x80131c28, "CORDBG_E_APPDOMAIN_MISMATCH", "A supplied object or type belongs to the wrong AppDomain", "corerror.h");
+        ADD(0x80131c29, "CORDBG_E_CONTEXT_UNVAILABLE", "The thread's context is not available.", "corerror.h");
+        ADD(0x80131c30, "CORDBG_E_UNCOMPATIBLE_PLATFORMS", "The operation failed because debuggee and debugger are on incompatible platform", "corerror.h");
+        ADD(0x80131c31, "CORDBG_E_DEBUGGING_DISABLED", "The operation failed because the debugging has been disabled", "corerror.h");
+        ADD(0x80131c32, "CORDBG_E_DETACH_FAILED_ON_ENC", "Detach is illegal after a module has been EnCed.", "corerror.h");
+        ADD(0x80131c33, "CORDBG_E_CURRENT_EXCEPTION_IS_OUTSIDE_CURRENT_EXECUTION_SCOPE", "Interception of the current exception is not legal", "corerror.h");
+        ADD(0x80131c34, "CORDBG_E_HELPER_MAY_DEADLOCK", "Helper thread can not safely run code. The opereration may work at a later time.", "corerror.h");
+        ADD(0x80131d00, "PEFMT_E_NO_CONTENTS", "File is empty", "corerror.h");
+        ADD(0x80131d01, "PEFMT_E_NO_NTHEADERS", "File has no NT headers", "corerror.h");
+        ADD(0x80131d02, "PEFMT_E_64BIT", "File is PE32+", "corerror.h");
+        ADD(0x80131d03, "PEFMT_E_NO_CORHEADER", "File has no COR header", "corerror.h");
+        ADD(0x80131d04, "PEFMT_E_NOT_ILONLY", "Flag IL_ONLY not set", "corerror.h");
+        ADD(0x80131d05, "PEFMT_E_IMPORT_DLLS", "Bad import DLLs", "corerror.h");
+        ADD(0x80131d06, "PEFMT_E_EXE_NOENTRYPOINT", "EXE file has no mgd entry point", "corerror.h");
+        ADD(0x80131d07, "PEFMT_E_BASE_RELOCS", "Bad base relocations", "corerror.h");
+        ADD(0x80131d08, "PEFMT_E_ENTRYPOINT", "Bad managed entry point", "corerror.h");
+        ADD(0x80131d09, "PEFMT_E_ZERO_SIZEOFCODE", "OptHeader.SizeOfCode==0", "corerror.h");
+        ADD(0x80131d0a, "PEFMT_E_BAD_CORHEADER", "File has invalid COR header", "corerror.h");
+        ADD(0x80131e00, "CLR_OPTSVC_E_CONTROLLER_INTERRUPT", "Service controller interrupted work", "corerror.h");
+        ADD(0x80131f00, "NGEN_FAILED_GET_DEPENDENCIES", "Service manager failed to get ICorSvcDependencies interface", "corerror.h");
+        ADD(0x80131f01, "NGEN_FAILED_NATIVE_IMAGE_DELETE", "Failed to delete native image", "corerror.h");
+        ADD(0x80131fff, "CLDB_E_INTERNALERROR", nullptr, "corerror.h");
+        return true;
+        );
+    RUN_INIT(
+        for (size_t i = 1; i < messages.size(); i++) {
+            assert(messages[i - 1].code <= messages[i].code);
         }
-    } _;
-#endif
+    );
 }

@@ -10,6 +10,19 @@
 
 #define SINGLE_ARG(...) __VA_ARGS__
 
+#define EVAL_DISCARD(expr) EVAL_DISCARD_IMPL(__COUNTER__, expr)
+#define EVAL_DISCARD_IMPL(counter, expr) EVAL_DISCARD_IMPL_EXPAND(counter, expr)
+#define EVAL_DISCARD_IMPL_EXPAND(counter, expr) auto var_discard_##counter = expr
+
+#define MAKE_DISCARD_VAR(counter) var_discard_##counter
+
+#define RUN_INIT(block) RUN_INIT_IMPL(__COUNTER__, block)
+#define RUN_INIT_IMPL(counter, block) bool MAKE_DISCARD_VAR(counter)() { \
+    block \
+    return true; \
+} \
+EVAL_DISCARD(MAKE_DISCARD_VAR(counter)())
+
 #define BEGIN_FLAG_ENUM(EnumName, EnumType) \
 enum class EnumName: EnumType; \
 inline EnumName operator &(EnumName a, const EnumName b) { \
