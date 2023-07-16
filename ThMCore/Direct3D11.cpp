@@ -105,12 +105,12 @@ namespace core::directx11 {
     void Initialize() {
         if (initialized)
             return;
-        ModuleHandle d3d11(LoadLibraryW(L"d3d11.dll"));
+        auto d3d11 = GetModuleHandleW(L"d3d11.dll");
         if (!d3d11)
             return;
         initialized = true;
 
-        auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11.get(), "D3D11CreateDeviceAndSwapChain");
+        auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11, "D3D11CreateDeviceAndSwapChain");
         if (!_D3D11CreateDeviceAndSwapChain) {
             note::LastErrorToFile(TAG "Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain.");
             return;
@@ -144,17 +144,16 @@ namespace core::directx11 {
             return;
         }
 
-        auto baseAddress = (DWORD)d3d11.get();
+        auto baseAddress = (DWORD)d3d11;
         auto vtable = *(DWORD**)swap_chain.Get();
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
-        vector<minhook::HookConfig> hookConfigs{
+        minhook::CreateHook(vector<minhook::HookConfig>{
             { PVOID(vtable[PresentIdx]), & D3DPresent, (PVOID*)&OriPresent },
             { PVOID(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, (PVOID*)&OriResizeBuffers },
-        };
-        minhook::CreateHook(hookConfigs);
+        });
     }
 
     void PrepareFirstStep(IDXGISwapChain* swapChain) {

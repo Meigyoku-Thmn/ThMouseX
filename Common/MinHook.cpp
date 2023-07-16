@@ -6,8 +6,10 @@
 #include "MinHook.h"
 #include "CallbackStore.h"
 #include "Log.h"
+#include "Helper.Encoding.h"
 
 namespace note = common::log;
+namespace encoding = common::helper::encoding;
 
 using namespace std;
 
@@ -47,7 +49,8 @@ namespace common::minhook {
             auto rs = MH_CreateHookApi(config.moduleName, config.procName, config.pDetour, config.ppOriginal);
             auto errName = string(NAMEOF_ENUM(rs));
             if (rs != MH_OK) {
-                note::ToFile("Failed to create hook for api %s|%s: %s", config.moduleName, config.procName, errName.c_str());
+                auto moduleName = encoding::ConvertToUtf8(config.moduleName);
+                note::ToFile("Failed to create hook for api %s|%s: %s", moduleName.c_str(), config.procName, errName.c_str());
                 return false;
             }
         }

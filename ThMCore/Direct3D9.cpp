@@ -104,17 +104,17 @@ namespace core::directx9 {
         CleanUp();
         SAFE_FREE_LIB(d3dx9_43);
     }
-    
+
     bool initialized;
     void Initialize() {
         if (initialized)
             return;
-        ModuleHandle d3d9(LoadLibraryW(L"d3d9.dll"));
+        auto d3d9 = GetModuleHandleW(L"d3d9.dll");
         if (!d3d9)
             return;
         initialized = true;
 
-        auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9.get(), "Direct3DCreate9");
+        auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9, "Direct3DCreate9");
         if (!_Direct3DCreate9) {
             note::LastErrorToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9.");
             return;
@@ -149,19 +149,18 @@ namespace core::directx9 {
             return;
         }
 
-        auto baseAddress = (DWORD)d3d9.get();
+        auto baseAddress = (DWORD)d3d9;
         auto vtable = *(DWORD**)pD3D.Get();
         auto vtable2 = *(DWORD**)pDevice.Get();
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
-        vector<minhook::HookConfig> hookConfigs{
-            { PVOID(vtable[CreateDeviceIdx]), & D3DCreateDevice, (PVOID*)&OriCreateDevice },
+        minhook::CreateHook(vector<minhook::HookConfig>{
+            { PVOID(vtable[CreateDeviceIdx]), &D3DCreateDevice, (PVOID*)&OriCreateDevice },
             { PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset },
             { PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent },
-        };
-        minhook::CreateHook(hookConfigs);
+        });
     }
 
     void PrepareFirstStep(IDirect3DDevice9* device) {

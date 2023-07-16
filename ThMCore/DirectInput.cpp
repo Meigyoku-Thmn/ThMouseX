@@ -33,12 +33,12 @@ namespace core::directinput {
             return;
         if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
             return;
-        ModuleHandle dinput8(LoadLibraryW(L"DInput8.dll"));
+        auto dinput8 = GetModuleHandleW(L"DInput8.dll");
         if (!dinput8)
             return;
         initialized = true;
 
-        auto _DirectInput8Create = (decltype(&DirectInput8Create))GetProcAddress(dinput8.get(), "DirectInput8Create");
+        auto _DirectInput8Create = (decltype(&DirectInput8Create))GetProcAddress(dinput8, "DirectInput8Create");
         if (!_DirectInput8Create) {
             note::LastErrorToFile(TAG "Failed to import DInput8.dll|DirectInput8Create.");
             return;
@@ -59,12 +59,11 @@ namespace core::directinput {
         }
 
         auto vtable = *(DWORD**)pDevice8.Get();
-        auto baseAddress = (DWORD)dinput8.get();
+        auto baseAddress = (DWORD)dinput8;
 
-        vector<minhook::HookConfig> hookConfigs{
+        minhook::CreateHook(vector<minhook::HookConfig>{
             {PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, (PVOID*)&OriGetDeviceStateDInput8},
-        };
-        minhook::CreateHook(hookConfigs);
+        });
     }
 
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData) {

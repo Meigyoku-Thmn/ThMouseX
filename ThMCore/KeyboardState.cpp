@@ -20,10 +20,9 @@ namespace core::keyboardstate {
     void Initialize() {
         if ((g_currentConfig.InputMethods & InputMethod::GetKeyboardState) == InputMethod::None)
             return;
-        vector<minhook::HookApiConfig> hookConfigs{
+        minhook::CreateApiHook(vector<minhook::HookApiConfig>{
             {L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, (PVOID*)&OriGetKeyboardState},
-        };
-        minhook::CreateApiHook(hookConfigs);
+        });
     }
 
     BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState) {

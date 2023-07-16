@@ -94,10 +94,6 @@ namespace common::luajit {
     HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
     decltype(&_LoadLibraryExA) OriLoadLibraryExA;
 
-    vector<minhook::HookApiConfig> HookConfig = {
-        {L"KERNEL32.DLL", "LoadLibraryExA", &_LoadLibraryExA, (PVOID*)&OriLoadLibraryExA},
-    };
-
     HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto commonDllPath = MakeCommonDllPathW();
         if (strcmp(lpLibFileName, encoding::ConvertToUtf8(commonDllPath.c_str()).c_str()) == 0)
@@ -126,23 +122,27 @@ namespace common::luajit {
 
         luaL_openlibs(L);
 
-        if (!minhook::CreateApiHook(HookConfig)) {
+        vector<minhook::HookApiConfig> hookConfig{
+            {L"KERNEL32.DLL", "LoadLibraryExA", &_LoadLibraryExA, (PVOID*)&OriLoadLibraryExA},
+        };
+
+        if (!minhook::CreateApiHook(hookConfig)) {
             note::ToFile("[LuaJIT] Failed to hook LoadLibraryExA (CreateApiHook).");
             return;
         }
 
-        if (!minhook::EnableHooks(HookConfig)) {
+        if (!minhook::EnableHooks(hookConfig)) {
             note::ToFile("[LuaJIT] Failed to hook LoadLibraryExA (EnableHooks).");
             return;
         }
 
         if (!CheckAndDisableIfError(L, luaL_dostring(L, GetPreparationScript().c_str()))) {
-            minhook::DisableHooks(HookConfig);
+            minhook::DisableHooks(hookConfig);
             note::ToFile("[LuaJIT] The above error occurred in PreparationScript.");
             return;
         }
 
-        minhook::DisableHooks(HookConfig);
+        minhook::DisableHooks(hookConfig);
 
         auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath.c_str());

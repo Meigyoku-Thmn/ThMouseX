@@ -6,6 +6,8 @@
 #include <vector>
 
 #include "../Common/macro.h"
+#include "../Common/Log.h"
+#include "../Common/Helper.Encoding.h"
 #include "../Common/MinHook.h"
 #include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
@@ -30,6 +32,8 @@ namespace directx9 = core::directx9;
 namespace directx11 = core::directx11;
 namespace directinput = core::directinput;
 namespace keyboardstate = core::keyboardstate;
+namespace note = common::log;
+namespace encoding = common::helper::encoding;
 
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
@@ -58,22 +62,20 @@ namespace core {
 
                 minhook::Initialize();
                 luajit::Initialize();
-                messagequeue::Initialize();
                 neolua::Initialize();
-                sendkey::Initialize();
 
                 directx8::Initialize();
                 directx9::Initialize();
                 directx11::Initialize();
 
                 directinput::Initialize();
+                sendkey::Initialize();
                 keyboardstate::Initialize();
                 messagequeue::Initialize();
 
-                std::vector<minhook::HookApiConfig> hookConfigs = {
+                minhook::CreateApiHook(std::vector<minhook::HookApiConfig> {
                     { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, (PVOID*)&OriLoadLibraryExW },
-                };
-                minhook::CreateApiHook(hookConfigs);
+                });
 
                 minhook::EnableAll();
                 g_hookApplied = true;
@@ -87,14 +89,15 @@ namespace core {
         auto rs = OriLoadLibraryExW(lpLibFileName, hFile, dwFlags);
         if (rs != NULL) {
             auto fileName = PathFindFileNameW(lpLibFileName);
+#define THEN_ENABLE_HOOK(block) { block; minhook::EnableAll(); }
             if (_wcsicmp(fileName, L"d3d8.dll") == 0)
-                directx8::Initialize();
+                THEN_ENABLE_HOOK(directx8::Initialize())
             else if (_wcsicmp(fileName, L"d3d9.dll") == 0)
-                directx9::Initialize();
+                THEN_ENABLE_HOOK(directx9::Initialize())
             else if (_wcsicmp(fileName, L"d3d11.dll") == 0)
-                directx11::Initialize();
+                THEN_ENABLE_HOOK(directx11::Initialize())
             else if (_wcsicmp(fileName, L"DInput8.dll") == 0)
-                directinput::Initialize();
+                THEN_ENABLE_HOOK(directinput::Initialize())
         }
         return rs;
     }

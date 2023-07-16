@@ -52,12 +52,11 @@ namespace common::neolua {
         return positionAddress;
     }
 
-    HMODULE mscoree;
     void Initialize() {
         if (g_currentConfig.ScriptingMethodToFindAddress != ScriptingMethod::NeoLua)
             return;
 
-        mscoree = LoadLibraryW(L"mscoree.dll");
+        auto mscoree = GetModuleHandleW(L"mscoree.dll");
         if (!mscoree) {
             log::LastErrorToFile(TAG " Failed to load mscoree.dll.");
             return;
@@ -110,6 +109,5 @@ namespace common::neolua {
             onClose();
         onClose = nullptr;
         positionAddress = NULL;
-        SAFE_FREE_LIB(mscoree);
     }
 }

@@ -103,12 +103,12 @@ namespace core::directx8 {
     void Initialize() {
         if (initialized)
             return;
-        ModuleHandle d3d8(LoadLibraryW(L"d3d8.dll"));
+        auto d3d8 = GetModuleHandleW(L"d3d8.dll");
         if (!d3d8)
             return;
         initialized = true;
 
-        auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8.get(), "Direct3DCreate8");
+        auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8, "Direct3DCreate8");
         if (!_Direct3DCreate8) {
             note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8.");
             return;
@@ -144,19 +144,18 @@ namespace core::directx8 {
             return;
         }
 
-        auto baseAddress = (DWORD)d3d8.get();
+        auto baseAddress = (DWORD)d3d8;
         auto vtable = *(DWORD**)pD3D.Get();
         auto vtable2 = *(DWORD**)pDevice.Get();
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
-        vector<minhook::HookConfig> hookConfig{
+        minhook::CreateHook(vector<minhook::HookConfig>{
             { PVOID(vtable[CreateDeviceIdx]), & D3DCreateDevice, (PVOID*)&OriCreateDevice },
             { PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset },
             { PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent },
-        };
-        minhook::CreateHook(hookConfig);
+        });
     }
 
     void PrepareFirstStep(IDirect3DDevice8* device) {

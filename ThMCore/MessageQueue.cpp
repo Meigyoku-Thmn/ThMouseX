@@ -117,12 +117,12 @@ namespace core::messagequeue {
     }
 
     LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
+        static auto initialized = false;
+        if (!initialized) {
+            initialized = true;
+            core::Initialize();
+        }
         if (code == HC_ACTION && g_hookApplied) {
-            static auto initialized = false;
-            if (!initialized) {
-                initialized = true;
-                core::Initialize();
-            }
             if (!cursorNormalized) {
                 cursorNormalized = true;
                 NormalizeCursor();
@@ -195,11 +195,9 @@ namespace core::messagequeue {
     void Initialize() {
         // Hide the mouse cursor when D3D is running, but only after cursor normalization
         callbackstore::RegisterPostRenderCallback(PostRenderCallback);
-
-        vector<minhook::HookApiConfig> HookConfig{
+        minhook::CreateApiHook(vector<minhook::HookApiConfig>{
             { L"USER32.DLL", "SetCursor", & _SetCursor, (PVOID*)&OriSetCursor },
             { L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor },
-        };
-        minhook::CreateApiHook(HookConfig);
+        });
     }
 }
