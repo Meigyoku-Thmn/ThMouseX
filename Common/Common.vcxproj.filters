@@ -76,9 +76,6 @@
     <ClCompile Include="LuaJIT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CompilerConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NeoLua.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

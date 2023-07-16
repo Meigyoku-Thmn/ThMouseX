@@ -6,6 +6,7 @@
 #include <string>
 #include <comdef.h>
 #include <wrl/client.h>
+#include <DirectX9/Include/DxErr.h>
 
 #include "Log.h"
 #include "Helper.Encoding.h"
@@ -61,6 +62,20 @@ namespace common::log {
             fprintf(logFile, "\n");
         }
         va_end(args);
+    }
+
+    void DxErrToFile(const char* message, HRESULT hResult) {
+        auto errorStr = DXGetErrorStringA(hResult);
+        if (errorStr == NULL) {
+            HResultToFile(message, hResult);
+            return;
+        }
+        auto errorDes = DXGetErrorDescriptionA(hResult);
+        auto description = errorDes != NULL ? string(errorStr) + ": " + errorDes : string(errorStr);
+#if _DEBUG
+        ToConsole("%s: %s", message, description.c_str());
+#endif
+        ToFile("%s: %s", message, description.c_str());
     }
 
     void HResultToFile(const char* message, HRESULT hResult) {

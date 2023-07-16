@@ -10,7 +10,7 @@ using namespace std;
 
 namespace common::errormsg::cor {
     vector<ErrorMessage> messages;
-    RUN_INIT(
+    ON_INIT{
         ADD(0x8000211d, "COR_E_AMBIGUOUSMATCH", "While late binding to a method via reflection, could not resolve between multiple overloads of a method.", "corerror.h");
         ADD(0x80004002, "COR_E_INVALIDCAST", "Indicates a bad cast condition", "corerror.h");
         ADD(0x80004003, "COR_E_NULLREFERENCE", "Dereferencing a null reference. In general class libraries should not throw this", "corerror.h");
@@ -1151,11 +1151,10 @@ namespace common::errormsg::cor {
         ADD(0x80131f00, "NGEN_FAILED_GET_DEPENDENCIES", "Service manager failed to get ICorSvcDependencies interface", "corerror.h");
         ADD(0x80131f01, "NGEN_FAILED_NATIVE_IMAGE_DELETE", "Failed to delete native image", "corerror.h");
         ADD(0x80131fff, "CLDB_E_INTERNALERROR", nullptr, "corerror.h");
-        return true;
-        );
-    RUN_INIT(
+    };
+    ON_INIT{
         for (size_t i = 1; i < messages.size(); i++) {
             assert(messages[i - 1].code <= messages[i].code);
         }
-    );
+    };
 }

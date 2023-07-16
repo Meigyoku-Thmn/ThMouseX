@@ -140,7 +140,7 @@ namespace core::directx11 {
         const D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
         auto rs = _D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
         if (FAILED(rs)) {
-            note::HResultToFile("Failed to create device and swapchain of DirectX 11.", rs);
+            note::DxErrToFile("Failed to create device and swapchain of DirectX 11.", rs);
             return;
         }
 
@@ -164,19 +164,19 @@ namespace core::directx11 {
 
         auto rs = swapChain->GetDevice(IID_PPV_ARGS(&device));
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareFirstStep: swapChain->GetDevice failed", rs);
+            note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetDevice failed", rs);
             return;
         }
 
         ComPtr<ID3D11Texture2D> pBackBuffer;
         rs = swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
+            note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
             return;
         }
         rs = device->CreateRenderTargetView(pBackBuffer.Get(), NULL, &renderTargetView);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
+            note::DxErrToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
             return;
         }
 
@@ -186,14 +186,14 @@ namespace core::directx11 {
 
         rs = device->CreatePixelShader(additiveToneShaderBlob, ARRAYSIZE(additiveToneShaderBlob), NULL, &pixelShader);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareFirstStep: device->CreatePixelShader failed", rs);
+            note::DxErrToFile(TAG "PrepareFirstStep: device->CreatePixelShader failed", rs);
             return;
         }
 
         DXGI_SWAP_CHAIN_DESC desc{};
         rs = swapChain->GetDesc(&desc);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareFirstStep: swapChain->GetDesc failed", rs);
+            note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetDesc failed", rs);
             return;
         }
         g_hFocusWindow = desc.OutputWindow;
@@ -241,7 +241,7 @@ namespace core::directx11 {
         DXGI_SWAP_CHAIN_DESC desc;
         auto rs = swapChain->GetDesc(&desc);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareMeasurement: swapChain->GetDesc failed", rs);
+            note::DxErrToFile(TAG "PrepareMeasurement: swapChain->GetDesc failed", rs);
             return;
         }
 
@@ -271,7 +271,7 @@ namespace core::directx11 {
         DXGI_SWAP_CHAIN_DESC desc;
         auto rs = swapChain->GetDesc(&desc);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareCursorState: swapChain->GetDesc failed", rs);
+            note::DxErrToFile(TAG "PrepareCursorState: swapChain->GetDesc failed", rs);
             return;
         }
 

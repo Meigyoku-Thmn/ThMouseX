@@ -9,6 +9,8 @@
 #include "ErrorMsg.D3D.h"
 #include "ErrorMsg.DDraw.h"
 
+
+
 using namespace std;
 
 namespace common::errormsg {

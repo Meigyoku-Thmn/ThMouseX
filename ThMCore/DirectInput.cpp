@@ -23,24 +23,6 @@ using namespace Microsoft::WRL;
 
 #define TAG "[DirectInput] "
 
-inline const char* GetDInputErrStr(const int errorCode) {
-    if (errorCode == DIERR_NOTINITIALIZED)
-        return "DIERR_NOTINITIALIZED";
-    if (errorCode == DIERR_NOINTERFACE)
-        return "DIERR_NOINTERFACE";
-    if (errorCode == DIERR_DEVICENOTREG)
-        return "DIERR_DEVICENOTREG";
-    if (errorCode == DIERR_BETADIRECTINPUTVERSION)
-        return "DIERR_BETADIRECTINPUTVERSION";
-    if (errorCode == DIERR_INVALIDPARAM)
-        return "DIERR_INVALIDPARAM";
-    if (errorCode == DIERR_OLDDIRECTINPUTVERSION)
-        return "DIERR_OLDDIRECTINPUTVERSION";
-    if (errorCode == DIERR_OUTOFMEMORY)
-        return "DIERR_OUTOFMEMORY";
-    return "Unknown error.";
-}
-
 namespace core::directinput {
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
@@ -65,16 +47,14 @@ namespace core::directinput {
         ComPtr<IDirectInput8A> pDInput8;
         auto rs = _DirectInput8Create(GetModuleHandleA(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8A, (PVOID*)&pDInput8, NULL);
         if (FAILED(rs)) {
-            auto message = TAG "Failed to create an IDirectInput8 instance:";
-            note::ToFile((string(message) + GetDInputErrStr(rs)).c_str());
+            note::DxErrToFile(TAG "Failed to create an IDirectInput8 instance", rs);
             return;
         }
 
         ComPtr<IDirectInputDevice8A> pDevice8;
         rs = pDInput8->CreateDevice(GUID_SysKeyboard, &pDevice8, NULL);
         if (FAILED(rs)) {
-            auto message = TAG "Failed to create an IDirectInputDevice8 instance:";
-            note::ToFile((string(message) + GetDInputErrStr(rs)).c_str());
+            note::DxErrToFile(TAG "Failed to create an IDirectInputDevice8 instance", rs);
             return;
         }
 

@@ -1,1 +1,0 @@
-#pragma comment(lib, "shlwapi.lib")

@@ -42,16 +42,6 @@ constexpr auto PresentIdx = 15;
 using namespace std;
 using namespace Microsoft::WRL;
 
-inline const char* GetD3dErrStr(const int errorCode) {
-    if (errorCode == D3DERR_INVALIDCALL)
-        return "D3DERR_INVALIDCALL";
-    if (errorCode == D3DERR_NOTAVAILABLE)
-        return "D3DERR_NOTAVAILABLE";
-    if (errorCode == D3DERR_OUTOFVIDEOMEMORY)
-        return "D3DERR_OUTOFVIDEOMEMORY";
-    return "Unknown error.";
-}
-
 using CallbackType = void (*)(void);
 
 namespace core::directx8 {
@@ -150,8 +140,7 @@ namespace core::directx8 {
         ComPtr<IDirect3DDevice8> pDevice;
         auto rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
         if (FAILED(rs)) {
-            auto message = TAG "Failed to create an IDirect3DDevice8 instance: ";
-            note::ToFile((string(message) + GetD3dErrStr(rs)).c_str());
+            note::DxErrToFile(TAG "Failed to create an IDirect3DDevice8 instance", rs);
             return;
         }
 
@@ -178,7 +167,7 @@ namespace core::directx8 {
         D3DDEVICE_CREATION_PARAMETERS params;
         auto rs = device->GetCreationParameters(&params);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareFirstStep: device->GetCreationParameters failed", rs);
+            note::DxErrToFile(TAG "PrepareFirstStep: device->GetCreationParameters failed", rs);
             return;
         }
         g_hFocusWindow = params.hFocusWindow;
@@ -223,14 +212,14 @@ namespace core::directx8 {
         ComPtr<IDirect3DSurface8> pSurface;
         auto rs = pDevice->GetRenderTarget(&pSurface);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareMeasurement: pDevice->GetRenderTarget failed", rs);
+            note::DxErrToFile(TAG "PrepareMeasurement: pDevice->GetRenderTarget failed", rs);
             return;
         }
 
         D3DSURFACE_DESC d3dSize;
         rs = pSurface->GetDesc(&d3dSize);
         if (FAILED(rs)) {
-            note::HResultToFile(TAG "PrepareMeasurement: pSurface->GetDesc failed", rs);
+            note::DxErrToFile(TAG "PrepareMeasurement: pSurface->GetDesc failed", rs);
             return;
         }
 
@@ -263,14 +252,14 @@ namespace core::directx8 {
         auto rs = pDevice->GetRenderTarget(&pSurface);
         if (FAILED(rs)) {
             d3dScale = 0.f;
-            note::HResultToFile(TAG "PrepareCursorState: pDevice->GetRenderTarget failed", rs);
+            note::DxErrToFile(TAG "PrepareCursorState: pDevice->GetRenderTarget failed", rs);
             return;
         }
         D3DSURFACE_DESC d3dSize;
         rs = pSurface->GetDesc(&d3dSize);
         if (FAILED(rs)) {
             d3dScale = 0.f;
-            note::HResultToFile(TAG "PrepareCursorState: pSurface->GetDesc failed", rs);
+            note::DxErrToFile(TAG "PrepareCursorState: pSurface->GetDesc failed", rs);
             return;
         }
         auto scale = float(d3dSize.Height) / gs_textureBaseHeight;

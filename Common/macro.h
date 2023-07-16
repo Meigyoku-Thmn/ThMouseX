@@ -16,12 +16,15 @@
 
 #define MAKE_DISCARD_VAR(counter) var_discard_##counter
 
-#define RUN_INIT(block) RUN_INIT_IMPL(__COUNTER__, block)
-#define RUN_INIT_IMPL(counter, block) bool MAKE_DISCARD_VAR(counter)() { \
-    block \
+#define ON_INIT ON_INIT_IMPL(__COUNTER__, __COUNTER__)
+#define ON_INIT_IMPL(counter1, counter2) \
+void MAKE_DISCARD_VAR(counter1)(); \
+bool MAKE_DISCARD_VAR(counter2)() { \
+    MAKE_DISCARD_VAR(counter1)(); \
     return true; \
 } \
-EVAL_DISCARD(MAKE_DISCARD_VAR(counter)())
+EVAL_DISCARD(MAKE_DISCARD_VAR(counter2)()); \
+void MAKE_DISCARD_VAR(counter1)()
 
 #define BEGIN_FLAG_ENUM(EnumName, EnumType) \
 enum class EnumName: EnumType; \
