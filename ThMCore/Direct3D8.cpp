@@ -352,6 +352,8 @@ namespace core::directx8 {
     }
 
     void RenderImGui(IDirect3DDevice8* pDevice) {
+        if (!g_showImGui)
+            return;
         ImGui_ImplDX8_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();

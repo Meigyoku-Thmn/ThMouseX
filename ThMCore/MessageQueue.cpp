@@ -8,6 +8,7 @@
 #include "../Common/Helper.h"
 #include "../Common/NeoLua.h"
 #include "../Common/CallbackStore.h"
+#include "../Common/Log.h"
 #include "Initialization.h"
 #include "MessageQueue.h"
 
@@ -15,10 +16,34 @@ namespace minhook = common::minhook;
 namespace neolua = common::neolua;
 namespace helper = common::helper;
 namespace callbackstore = common::callbackstore;
+namespace note = common::log;
 
 using namespace std;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+#define HandleMouseButton(__ev, downAction, upAction) HandleMouseButtonImpl(__ev, downAction, upAction, __COUNTER__)
+#define HandleMouseButtonImpl(__ev, downAction, upAction, unique) \
+static bool MAKE_DISCARD_VAR(unique) = false; \
+if (e->message == __ev##DOWN && MAKE_DISCARD_VAR(unique) == false) { \
+    MAKE_DISCARD_VAR(unique) = true; \
+    downAction; \
+} \
+else if (e->message == __ev##UP) { \
+    MAKE_DISCARD_VAR(unique) = false; \
+    upAction; \
+}0
+
+#define HandleKeyboardButton(__ev, action) HandleKeyboardButtonImpl(__ev, action, __COUNTER__)
+#define HandleKeyboardButtonImpl(__ev, action, unique) \
+static bool MAKE_DISCARD_VAR(unique) = false; \
+if (e->wParam == __ev && e->message == WM_KEYDOWN && MAKE_DISCARD_VAR(unique) == false) { \
+    MAKE_DISCARD_VAR(unique) = true; \
+    action; \
+} \
+else if (e->wParam == __ev && e->message == WM_KEYUP) { \
+    MAKE_DISCARD_VAR(unique) = false; \
+}0
 
 namespace core::messagequeue {
     UINT CLEAN_MANAGED_DATA;
@@ -80,6 +105,19 @@ namespace core::messagequeue {
     LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
         if (code == HC_ACTION && g_hookApplied) {
             auto e = (PMSG)lParam;
+            static bool imGuiButtonPressing = false;
+            if (g_hFocusWindow) {
+                HandleKeyboardButton(gs_toggleImGuiButton, { {
+                    g_showImGui = !g_showImGui;
+                    if (g_showImGui) {
+                        g_inputEnabled = false;
+                        ShowMousePointer();
+                    }
+                    else
+                        HideMousePointer();
+                    } }
+                );
+            }
             if (g_hFocusWindow != NULL && e->message == WM_KEYDOWN && e->wParam == gs_toggleImGuiButton) {
                 g_showImGui = !g_showImGui;
                 if (g_showImGui) {
@@ -92,25 +130,10 @@ namespace core::messagequeue {
             if (g_showImGui)
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             else {
-                static bool isRightMousePressing = false;
-                if (e->message == WM_LBUTTONDOWN)
-                    g_leftMousePressed = true;
-                else if (e->message == WM_MBUTTONDOWN)
-                    g_midMousePressed = true;
-                else if (e->message == WM_RBUTTONDOWN)
-                    isRightMousePressing = true;
-                else if (e->message == WM_RBUTTONUP && isRightMousePressing == true) {
-                    isRightMousePressing = false;
-                    g_inputEnabled = !g_inputEnabled;
-                }
-                else if (e->message == WM_KEYDOWN) {
-                    if (e->wParam == gs_toggleOsCursorButton) {
-                        if (isCursorShow)
-                            HideMousePointer();
-                        else
-                            ShowMousePointer();
-                    }
-                }
+                HandleMouseButton(WM_LBUTTON, g_leftMousePressed = true, 0);
+                HandleMouseButton(WM_MBUTTON, g_midMousePressed = true, 0);
+                HandleMouseButton(WM_RBUTTON, 0, g_inputEnabled = !g_inputEnabled);
+                HandleKeyboardButton(gs_toggleOsCursorButton, isCursorShow ? HideMousePointer() : ShowMousePointer());
             }
         }
         return CallNextHookEx(NULL, code, wParam, lParam);
