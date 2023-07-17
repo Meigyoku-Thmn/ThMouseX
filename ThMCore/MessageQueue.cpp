@@ -24,25 +24,25 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 #define HandleMouseButton(__ev, downAction, upAction) HandleMouseButtonImpl(__ev, downAction, upAction, __COUNTER__)
 #define HandleMouseButtonImpl(__ev, downAction, upAction, unique) \
-static bool MAKE_DISCARD_VAR(unique) = false; \
-if (e->message == __ev##DOWN && MAKE_DISCARD_VAR(unique) == false) { \
-    MAKE_DISCARD_VAR(unique) = true; \
+static bool MAKE_UNIQUE_VAR(unique) = false; \
+if (e->message == __ev##DOWN && MAKE_UNIQUE_VAR(unique) == false) { \
+    MAKE_UNIQUE_VAR(unique) = true; \
     downAction; \
 } \
 else if (e->message == __ev##UP) { \
-    MAKE_DISCARD_VAR(unique) = false; \
+    MAKE_UNIQUE_VAR(unique) = false; \
     upAction; \
 }0
 
 #define HandleKeyboardButton(__ev, action) HandleKeyboardButtonImpl(__ev, action, __COUNTER__)
 #define HandleKeyboardButtonImpl(__ev, action, unique) \
-static bool MAKE_DISCARD_VAR(unique) = false; \
-if (e->wParam == __ev && e->message == WM_KEYDOWN && MAKE_DISCARD_VAR(unique) == false) { \
-    MAKE_DISCARD_VAR(unique) = true; \
+static bool MAKE_UNIQUE_VAR(unique) = false; \
+if (e->wParam == __ev && e->message == WM_KEYDOWN && MAKE_UNIQUE_VAR(unique) == false) { \
+    MAKE_UNIQUE_VAR(unique) = true; \
     action; \
 } \
 else if (e->wParam == __ev && e->message == WM_KEYUP) { \
-    MAKE_DISCARD_VAR(unique) = false; \
+    MAKE_UNIQUE_VAR(unique) = false; \
 }0
 
 namespace core::messagequeue {
@@ -105,7 +105,6 @@ namespace core::messagequeue {
     LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
         if (code == HC_ACTION && g_hookApplied) {
             auto e = (PMSG)lParam;
-            static bool imGuiButtonPressing = false;
             if (g_hFocusWindow) {
                 HandleKeyboardButton(gs_toggleImGuiButton, { {
                     g_showImGui = !g_showImGui;
