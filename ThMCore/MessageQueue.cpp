@@ -22,26 +22,26 @@ using namespace std;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-#define HandleMouseButton(__ev, downAction, upAction) HandleMouseButtonImpl(__ev, downAction, upAction, __COUNTER__)
-#define HandleMouseButtonImpl(__ev, downAction, upAction, unique) \
+#define HandleMousePress(__ev, downAction, upAction) HandleMousePressImpl(__ev, downAction, upAction, __COUNTER__)
+#define HandleMousePressImpl(__ev, downAction, upAction, unique) \
 static bool MAKE_UNIQUE_VAR(unique) = false; \
 if (e->message == __ev##DOWN && MAKE_UNIQUE_VAR(unique) == false) { \
     MAKE_UNIQUE_VAR(unique) = true; \
     downAction; \
 } \
-else if (e->message == __ev##UP) { \
+else if (e->message == __ev##UP && MAKE_UNIQUE_VAR(unique) == true) { \
     MAKE_UNIQUE_VAR(unique) = false; \
     upAction; \
 }0
 
-#define HandleKeyboardButton(__ev, action) HandleKeyboardButtonImpl(__ev, action, __COUNTER__)
-#define HandleKeyboardButtonImpl(__ev, action, unique) \
+#define HandleKeyboardPress(__ev, action) HandleKeyboardPressImpl(__ev, action, __COUNTER__)
+#define HandleKeyboardPressImpl(__ev, action, unique) \
 static bool MAKE_UNIQUE_VAR(unique) = false; \
 if (e->wParam == __ev && e->message == WM_KEYDOWN && MAKE_UNIQUE_VAR(unique) == false) { \
     MAKE_UNIQUE_VAR(unique) = true; \
     action; \
 } \
-else if (e->wParam == __ev && e->message == WM_KEYUP) { \
+else if (e->wParam == __ev && e->message == WM_KEYUP && MAKE_UNIQUE_VAR(unique) == true) { \
     MAKE_UNIQUE_VAR(unique) = false; \
 }0
 
@@ -106,7 +106,7 @@ namespace core::messagequeue {
         if (code == HC_ACTION && g_hookApplied) {
             auto e = (PMSG)lParam;
             if (g_hFocusWindow) {
-                HandleKeyboardButton(gs_toggleImGuiButton, { {
+                HandleKeyboardPress(gs_toggleImGuiButton, { {
                     g_showImGui = !g_showImGui;
                     if (g_showImGui) {
                         g_inputEnabled = false;
@@ -117,22 +117,13 @@ namespace core::messagequeue {
                     } }
                 );
             }
-            if (g_hFocusWindow != NULL && e->message == WM_KEYDOWN && e->wParam == gs_toggleImGuiButton) {
-                g_showImGui = !g_showImGui;
-                if (g_showImGui) {
-                    g_inputEnabled = false;
-                    ShowMousePointer();
-                }
-                else
-                    HideMousePointer();
-            }
             if (g_showImGui)
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             else {
-                HandleMouseButton(WM_LBUTTON, g_leftMousePressed = true, 0);
-                HandleMouseButton(WM_MBUTTON, g_midMousePressed = true, 0);
-                HandleMouseButton(WM_RBUTTON, 0, g_inputEnabled = !g_inputEnabled);
-                HandleKeyboardButton(gs_toggleOsCursorButton, isCursorShow ? HideMousePointer() : ShowMousePointer());
+                HandleMousePress(WM_LBUTTON, g_leftMousePressed = true, 0);
+                HandleMousePress(WM_MBUTTON, g_midMousePressed = true, 0);
+                HandleMousePress(WM_RBUTTON, 0, g_inputEnabled = !g_inputEnabled);
+                HandleKeyboardPress(gs_toggleOsCursorButton, isCursorShow ? HideMousePointer() : ShowMousePointer());
             }
         }
         return CallNextHookEx(NULL, code, wParam, lParam);
