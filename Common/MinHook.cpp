@@ -18,14 +18,14 @@ namespace common::minhook {
         auto rs = MH_Uninitialize();
         auto errName = string(NAMEOF_ENUM(rs));
         if (!isProcessTerminating && rs != MH_OK)
-            note::ToFile("Failed to uninitialize MinHook: %s", errName.c_str());
+            note::ToFile("[MinHook] Failed to uninitialize MinHook: %s", errName.c_str());
     }
 
     bool Initialize() {
         auto rs = MH_Initialize();
         auto errName = string(NAMEOF_ENUM(rs));
         if (rs != MH_OK) {
-            note::ToFile("Failed to initialize MinHook: %s", errName.c_str());
+            note::ToFile("[MinHook] Failed to initialize MinHook: %s", errName.c_str());
             return false;
         }
         callbackstore::RegisterUninitializeCallback(Uninitialize);
@@ -37,7 +37,7 @@ namespace common::minhook {
             auto rs = MH_CreateHook(config.pTarget, config.pDetour, config.ppOriginal);
             auto errName = string(NAMEOF_ENUM(rs));
             if (rs != MH_OK) {
-                note::ToFile("Failed to create hook for target %p: %s", config.pTarget, errName.c_str());
+                note::ToFile("[MinHook] Failed to create hook for target %p: %s", config.pTarget, errName.c_str());
                 return false;
             }
         }
@@ -50,7 +50,7 @@ namespace common::minhook {
             auto errName = string(NAMEOF_ENUM(rs));
             if (rs != MH_OK) {
                 auto moduleName = encoding::ConvertToUtf8(config.moduleName);
-                note::ToFile("Failed to create hook for api %s|%s: %s", moduleName.c_str(), config.procName, errName.c_str());
+                note::ToFile("[MinHook] Failed to create hook for api %s|%s: %s", moduleName.c_str(), config.procName, errName.c_str());
                 return false;
             }
         }
@@ -91,7 +91,7 @@ namespace common::minhook {
         auto rs = MH_EnableHook(MH_ALL_HOOKS);
         auto errName = string(NAMEOF_ENUM(rs));
         if (rs != MH_OK) {
-            note::ToFile("Failed to enable all hooks: %s", errName.c_str());
+            note::ToFile("[MinHook] Failed to enable all hooks: %s", errName.c_str());
             return false;
         }
         return true;

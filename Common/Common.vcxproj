@@ -189,6 +189,7 @@
     <ClInclude Include="Variables.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CompilerConfig.cpp" />
     <ClCompile Include="ErrorMsg.Cor.cpp" />
     <ClCompile Include="ErrorMsg.D3D.cpp" />
     <ClCompile Include="ErrorMsg.DDraw.cpp" />
