@@ -140,7 +140,7 @@ namespace core::directx11 {
         const D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
         auto rs = _D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
         if (FAILED(rs)) {
-            note::DxErrToFile("Failed to create device and swapchain of DirectX 11.", rs);
+            note::DxErrToFile(TAG "Failed to create device and swapchain of DirectX 11.", rs);
             return;
         }
 
