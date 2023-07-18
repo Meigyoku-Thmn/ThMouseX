@@ -64,9 +64,9 @@ namespace core {
                 luajit::Initialize();
                 neolua::Initialize();
 
-                directx8::Initialize();
-                directx9::Initialize();
                 directx11::Initialize();
+                directx9::Initialize();
+                directx8::Initialize();
 
                 directinput::Initialize();
                 sendkey::Initialize();
