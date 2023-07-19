@@ -44,13 +44,13 @@ namespace memory = common::helper::memory;
     if (cmpPrefix##icmp(moduleName, strPrefix"d3d8.dll") == 0) {                    \
         InitializeAndEnableHook(directx8::Initialize());                            \
     }                                                                               \
-    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d9.dll") == 0)    {            \
+    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d9.dll") == 0) {               \
         InitializeAndEnableHook(directx9::Initialize());                            \
     }                                                                               \
-    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d11.dll") == 0)      {         \
+    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d11.dll") == 0) {              \
         InitializeAndEnableHook(directx11::Initialize());                           \
     }                                                                               \
-    else if (cmpPrefix##icmp(moduleName, strPrefix"DInput8.dll") == 0)    {         \
+    else if (cmpPrefix##icmp(moduleName, strPrefix"DInput8.dll") == 0) {            \
         InitializeAndEnableHook(directinput::Initialize());                         \
     }                                                                               \
     else {                                                                          \
