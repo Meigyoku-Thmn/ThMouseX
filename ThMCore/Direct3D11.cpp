@@ -105,7 +105,7 @@ namespace core::directx11 {
     void Initialize() {
         if (initialized)
             return;
-        auto d3d11 = GetModuleHandleW(L"d3d11.dll");
+        auto d3d11 = helper::GetSystemModuleHandle(L"d3d11.dll");
         if (!d3d11)
             return;
         initialized = true;

@@ -53,11 +53,11 @@ namespace core {
         PathStripPathW(currentProcessName);
         PathRemoveExtensionW(currentProcessName);
 
-        if (_wcsicmp(currentProcessName, L"ThMouseX") == 0)
+        if (wcsicmp(currentProcessName, L"ThMouseX") == 0)
             return;
 
         for (size_t i = 0; i < gs_gameConfigs.length(); i++) {
-            if (_wcsicmp(currentProcessName, gs_gameConfigs[i].ProcessName) == 0) {
+            if (wcsicmp(currentProcessName, gs_gameConfigs[i].ProcessName) == 0) {
                 g_currentConfig = gs_gameConfigs[i];
 
                 minhook::Initialize();
@@ -90,13 +90,13 @@ namespace core {
         if (rs != NULL) {
             auto fileName = PathFindFileNameW(lpLibFileName);
 #define THEN_ENABLE_HOOK(block) { block; minhook::EnableAll(); }
-            if (_wcsicmp(fileName, L"d3d8.dll") == 0)
+            if (wcsicmp(fileName, L"d3d8.dll") == 0)
                 THEN_ENABLE_HOOK(directx8::Initialize())
-            else if (_wcsicmp(fileName, L"d3d9.dll") == 0)
+            else if (wcsicmp(fileName, L"d3d9.dll") == 0)
                 THEN_ENABLE_HOOK(directx9::Initialize())
-            else if (_wcsicmp(fileName, L"d3d11.dll") == 0)
+            else if (wcsicmp(fileName, L"d3d11.dll") == 0)
                 THEN_ENABLE_HOOK(directx11::Initialize())
-            else if (_wcsicmp(fileName, L"DInput8.dll") == 0)
+            else if (wcsicmp(fileName, L"DInput8.dll") == 0)
                 THEN_ENABLE_HOOK(directinput::Initialize())
         }
         return rs;

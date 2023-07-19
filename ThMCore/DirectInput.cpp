@@ -9,11 +9,13 @@
 #include "../Common/Variables.h"
 #include "../Common/MinHook.h"
 #include "../Common/Log.h"
+#include "../Common/Helper.h"
 #include "InputDetermine.h"
 #include "DirectInput.h"
 
 namespace minhook = common::minhook;
 namespace note = common::log;
+namespace helper = common::helper;
 
 constexpr auto GetDeviceStateIdx = 9;
 
@@ -33,7 +35,7 @@ namespace core::directinput {
             return;
         if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
             return;
-        auto dinput8 = GetModuleHandleW(L"DInput8.dll");
+        auto dinput8 = helper::GetSystemModuleHandle(L"DInput8.dll");
         if (!dinput8)
             return;
         initialized = true;

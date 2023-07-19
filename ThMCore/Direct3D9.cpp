@@ -109,7 +109,7 @@ namespace core::directx9 {
     void Initialize() {
         if (initialized)
             return;
-        auto d3d9 = GetModuleHandleW(L"d3d9.dll");
+        auto d3d9 = helper::GetSystemModuleHandle(L"d3d9.dll");
         if (!d3d9)
             return;
         initialized = true;

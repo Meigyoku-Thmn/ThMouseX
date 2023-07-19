@@ -103,7 +103,7 @@ namespace core::directx8 {
     void Initialize() {
         if (initialized)
             return;
-        auto d3d8 = GetModuleHandleW(L"d3d8.dll");
+        auto d3d8 = helper::GetSystemModuleHandle(L"d3d8.dll");
         if (!d3d8)
             return;
         initialized = true;
