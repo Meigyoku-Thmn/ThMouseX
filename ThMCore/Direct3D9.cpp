@@ -105,8 +105,8 @@ namespace core::directx9 {
         SAFE_FREE_LIB(d3dx9_43);
     }
 
-    bool initialized;
     void Initialize() {
+        static bool initialized = false;
         if (initialized)
             return;
         auto d3d9 = helper::GetSystemModuleHandle(L"d3d9.dll");

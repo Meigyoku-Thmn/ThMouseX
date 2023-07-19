@@ -99,8 +99,8 @@ namespace core::directx8 {
         CleanUp();
     }
 
-    bool initialized;
     void Initialize() {
+        static bool initialized = false;
         if (initialized)
             return;
         auto d3d8 = helper::GetSystemModuleHandle(L"d3d8.dll");

@@ -29,8 +29,8 @@ namespace core::directinput {
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
-    bool initialized;
     void Initialize() {
+        static bool initialized = false;
         if (initialized)
             return;
         if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)

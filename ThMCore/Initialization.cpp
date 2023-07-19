@@ -8,6 +8,7 @@
 #include "../Common/macro.h"
 #include "../Common/Log.h"
 #include "../Common/Helper.Encoding.h"
+#include "../Common/Helper.Memory.h"
 #include "../Common/MinHook.h"
 #include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
@@ -34,6 +35,7 @@ namespace directinput = core::directinput;
 namespace keyboardstate = core::keyboardstate;
 namespace note = common::log;
 namespace encoding = common::helper::encoding;
+namespace memory = common::helper::memory;
 
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
@@ -53,11 +55,11 @@ namespace core {
         PathStripPathW(currentProcessName);
         PathRemoveExtensionW(currentProcessName);
 
-        if (wcsicmp(currentProcessName, L"ThMouseX") == 0)
+        if (_wcsicmp(currentProcessName, L"ThMouseX") == 0)
             return;
 
         for (size_t i = 0; i < gs_gameConfigs.length(); i++) {
-            if (wcsicmp(currentProcessName, gs_gameConfigs[i].ProcessName) == 0) {
+            if (_wcsicmp(currentProcessName, gs_gameConfigs[i].ProcessName) == 0) {
                 g_currentConfig = gs_gameConfigs[i];
 
                 minhook::Initialize();
@@ -90,14 +92,25 @@ namespace core {
         if (rs != NULL) {
             auto fileName = PathFindFileNameW(lpLibFileName);
 #define THEN_ENABLE_HOOK(block) { block; minhook::EnableAll(); }
-            if (wcsicmp(fileName, L"d3d8.dll") == 0)
+            if (_wcsicmp(fileName, L"d3d8.dll") == 0)
                 THEN_ENABLE_HOOK(directx8::Initialize())
-            else if (wcsicmp(fileName, L"d3d9.dll") == 0)
+            else if (_wcsicmp(fileName, L"d3d9.dll") == 0)
                 THEN_ENABLE_HOOK(directx9::Initialize())
-            else if (wcsicmp(fileName, L"d3d11.dll") == 0)
+            else if (_wcsicmp(fileName, L"d3d11.dll") == 0)
                 THEN_ENABLE_HOOK(directx11::Initialize())
-            else if (wcsicmp(fileName, L"DInput8.dll") == 0)
+            else if (_wcsicmp(fileName, L"DInput8.dll") == 0)
                 THEN_ENABLE_HOOK(directinput::Initialize())
+            else
+                memory::ScanImportTable(rs, [](auto dllName) {
+                    if (_stricmp(dllName, "d3d8.dll") == 0)
+                        THEN_ENABLE_HOOK(directx8::Initialize())
+                    else if (_stricmp(dllName, "d3d9.dll") == 0)
+                        THEN_ENABLE_HOOK(directx9::Initialize())
+                    else if (_stricmp(dllName, "d3d11.dll") == 0)
+                        THEN_ENABLE_HOOK(directx11::Initialize())
+                    else if (_stricmp(dllName, "DInput8.dll") == 0)
+                        THEN_ENABLE_HOOK(directinput::Initialize())
+                });
         }
         return rs;
     }
