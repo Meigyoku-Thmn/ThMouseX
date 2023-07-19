@@ -22,8 +22,8 @@ using namespace std;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-#define HandleMousePress(__ev, downAction, upAction) HandleMousePressImpl(__ev, downAction, upAction, __COUNTER__)
-#define HandleMousePressImpl(__ev, downAction, upAction, unique) \
+#define HandleMousePress(e, __ev, downAction, upAction) HandleMousePressImpl(e, __ev, downAction, upAction, __COUNTER__)
+#define HandleMousePressImpl(e, __ev, downAction, upAction, unique) \
 static bool MAKE_UNIQUE_VAR(unique) = false; \
 if (e->message == __ev##DOWN && MAKE_UNIQUE_VAR(unique) == false) { \
     MAKE_UNIQUE_VAR(unique) = true; \
@@ -34,8 +34,8 @@ else if (e->message == __ev##UP && MAKE_UNIQUE_VAR(unique) == true) { \
     upAction; \
 }0
 
-#define HandleKeyboardPress(__ev, action) HandleKeyboardPressImpl(__ev, action, __COUNTER__)
-#define HandleKeyboardPressImpl(__ev, action, unique) \
+#define HandleKeyboardPress(e, __ev, action) HandleKeyboardPressImpl(e, __ev, action, __COUNTER__)
+#define HandleKeyboardPressImpl(e, __ev, action, unique) \
 static bool MAKE_UNIQUE_VAR(unique) = false; \
 if (e->wParam == __ev && e->message == WM_KEYDOWN && MAKE_UNIQUE_VAR(unique) == false) { \
     MAKE_UNIQUE_VAR(unique) = true; \
@@ -106,7 +106,7 @@ namespace core::messagequeue {
         if (code == HC_ACTION && g_hookApplied) {
             auto e = (PMSG)lParam;
             if (g_hFocusWindow) {
-                HandleKeyboardPress(gs_toggleImGuiButton, { {
+                HandleKeyboardPress(e, gs_toggleImGuiButton, { {
                     g_showImGui = !g_showImGui;
                     if (g_showImGui) {
                         g_inputEnabled = false;
@@ -120,10 +120,10 @@ namespace core::messagequeue {
             if (g_showImGui)
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             else {
-                HandleMousePress(WM_LBUTTON, g_leftMousePressed = true, 0);
-                HandleMousePress(WM_MBUTTON, g_midMousePressed = true, 0);
-                HandleMousePress(WM_RBUTTON, 0, g_inputEnabled = !g_inputEnabled);
-                HandleKeyboardPress(gs_toggleOsCursorButton, isCursorShow ? HideMousePointer() : ShowMousePointer());
+                HandleMousePress(e, WM_LBUTTON, g_leftMousePressed = true, 0);
+                HandleMousePress(e, WM_MBUTTON, g_midMousePressed = true, 0);
+                HandleMousePress(e, WM_RBUTTON, 0, g_inputEnabled = !g_inputEnabled);
+                HandleKeyboardPress(e, gs_toggleOsCursorButton, isCursorShow ? HideMousePointer() : ShowMousePointer());
             }
         }
         return CallNextHookEx(NULL, code, wParam, lParam);

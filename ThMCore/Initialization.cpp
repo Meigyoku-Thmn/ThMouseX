@@ -37,6 +37,26 @@ namespace note = common::log;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
 
+#define InitializeAndEnableHook(initializeBlock) initializeBlock; minhook::EnableAll(); 0
+#define TryMatchAndInitializeModuleA(moduleName, ...) TryMatchAndInitializeModule(moduleName, __VA_ARGS__, _str, )
+#define TryMatchAndInitializeModuleW(moduleName, ...) TryMatchAndInitializeModule(moduleName, __VA_ARGS__, _wcs, L)
+#define TryMatchAndInitializeModule(moduleName, elseBlock, cmpPrefix, strPrefix)    \
+    if (cmpPrefix##icmp(moduleName, strPrefix"d3d8.dll") == 0) {                    \
+        InitializeAndEnableHook(directx8::Initialize());                            \
+    }                                                                               \
+    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d9.dll") == 0)    {            \
+        InitializeAndEnableHook(directx9::Initialize());                            \
+    }                                                                               \
+    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d11.dll") == 0)      {         \
+        InitializeAndEnableHook(directx11::Initialize());                           \
+    }                                                                               \
+    else if (cmpPrefix##icmp(moduleName, strPrefix"DInput8.dll") == 0)    {         \
+        InitializeAndEnableHook(directinput::Initialize());                         \
+    }                                                                               \
+    else {                                                                          \
+        elseBlock;                                                                  \
+    }                                                                               
+
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
     decltype(&_LoadLibraryExW) OriLoadLibraryExW;
@@ -91,26 +111,9 @@ namespace core {
         auto rs = OriLoadLibraryExW(lpLibFileName, hFile, dwFlags);
         if (rs != NULL) {
             auto fileName = PathFindFileNameW(lpLibFileName);
-#define THEN_ENABLE_HOOK(block) { block; minhook::EnableAll(); }
-            if (_wcsicmp(fileName, L"d3d8.dll") == 0)
-                THEN_ENABLE_HOOK(directx8::Initialize())
-            else if (_wcsicmp(fileName, L"d3d9.dll") == 0)
-                THEN_ENABLE_HOOK(directx9::Initialize())
-            else if (_wcsicmp(fileName, L"d3d11.dll") == 0)
-                THEN_ENABLE_HOOK(directx11::Initialize())
-            else if (_wcsicmp(fileName, L"DInput8.dll") == 0)
-                THEN_ENABLE_HOOK(directinput::Initialize())
-            else
-                memory::ScanImportTable(rs, [](auto dllName) {
-                    if (_stricmp(dllName, "d3d8.dll") == 0)
-                        THEN_ENABLE_HOOK(directx8::Initialize())
-                    else if (_stricmp(dllName, "d3d9.dll") == 0)
-                        THEN_ENABLE_HOOK(directx9::Initialize())
-                    else if (_stricmp(dllName, "d3d11.dll") == 0)
-                        THEN_ENABLE_HOOK(directx11::Initialize())
-                    else if (_stricmp(dllName, "DInput8.dll") == 0)
-                        THEN_ENABLE_HOOK(directinput::Initialize())
-                });
+            TryMatchAndInitializeModuleW(fileName, memory::ScanImportTable(rs, [](auto dllName) {
+                TryMatchAndInitializeModuleA(dllName, 0);
+            }));
         }
         return rs;
     }
