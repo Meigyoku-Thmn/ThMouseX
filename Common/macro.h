@@ -1,6 +1,11 @@
 #pragma once
 #include <winerror.h>
 
+#define APP_NAME "ThMouseX"
+
+#define L_(str) L_IMPL(str)
+#define L_IMPL(str) L##str
+
 #define _ref
 
 #define DLLEXPORT __declspec(dllexport)

@@ -168,7 +168,7 @@ namespace core::messagequeue {
     bool CheckHookProcHandle(HHOOK handle) {
         if (handle != NULL)
             return true;
-        helper::ReportLastError("ThMouseX: SetWindowsHookEx Error");
+        helper::ReportLastError(APP_NAME ": SetWindowsHookEx Error");
         return false;
     }
 

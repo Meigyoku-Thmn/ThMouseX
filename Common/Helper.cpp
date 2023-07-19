@@ -22,7 +22,7 @@ namespace common::helper {
         WCHAR modulePath[MAX_PATH];
         GetModuleFileNameW(moduleHandle, modulePath, ARRAYSIZE(modulePath));
         auto expectedPath = L"C:\\WINDOWS\\SYSTEM32\\" + wstring(moduleName);
-        if (wcsicmp(expectedPath.c_str(), modulePath) == 0)
+        if (_wcsicmp(expectedPath.c_str(), modulePath) == 0)
             return moduleHandle;
         return NULL;
     }

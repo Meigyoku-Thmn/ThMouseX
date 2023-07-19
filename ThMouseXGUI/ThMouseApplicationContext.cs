@@ -20,7 +20,7 @@ namespace ThMouseX
                 new MenuItem("About", (_, __) => ShowDialog()),
                 new MenuItem("Exit", (_, __) => Exit()),
             });
-            notifyIcon.ShowBalloonTip(2000, AboutForm.AppName, $"{AboutForm.AppName} is activated.", ToolTipIcon.Info);
+            notifyIcon.ShowBalloonTip(2000, Program.AppName, $"{Program.AppName} is activated.", ToolTipIcon.Info);
         }
 
         void ShowDialog()

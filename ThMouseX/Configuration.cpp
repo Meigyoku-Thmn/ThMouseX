@@ -25,7 +25,7 @@ namespace directx11 = core::directx11;
 namespace directinput = core::directinput;
 
 #define GameFile "Games.txt"
-#define ThMouseXFile "ThMouseX.txt"
+#define ThMouseXFile APP_NAME ".txt"
 #define VirtualKeyCodesFile "VirtualKeyCodes.txt"
 
 using namespace std;
@@ -48,7 +48,7 @@ namespace core::configuration {
     bool ReadGamesFile() {
         ifstream gamesFile(GameFile);
         if (!gamesFile) {
-            MessageBoxA(NULL, "Missing " GameFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
+            MessageBoxA(NULL, "Missing " GameFile " file.", APP_NAME, MB_OK | MB_ICONERROR);
             return false;
         }
         gs_gameConfigs.fill({});
@@ -124,7 +124,7 @@ namespace core::configuration {
 
         ifstream iniFile(ThMouseXFile);
         if (!iniFile) {
-            MessageBoxA(NULL, "Missing " ThMouseXFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
+            MessageBoxA(NULL, "Missing " ThMouseXFile " file.", APP_NAME, MB_OK | MB_ICONERROR);
             return false;
         }
 
@@ -148,7 +148,7 @@ namespace core::configuration {
             if (key == "BombButton") {
                 auto vkCode = vkCodes.find(value);
                 if (vkCode == vkCodes.end()) {
-                    MessageBoxA(NULL, ThMouseXFile ": Invalid BombButton value.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid BombButton value.", APP_NAME, MB_OK | MB_ICONERROR);
                     return false;
                 }
                 gs_bombButton = vkCode->second;
@@ -156,7 +156,7 @@ namespace core::configuration {
             else if (key == "ExtraButton") {
                 auto vkCode = vkCodes.find(value);
                 if (vkCode == vkCodes.end()) {
-                    MessageBoxA(NULL, ThMouseXFile ": Invalid ExtraButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid ExtraButton.", APP_NAME, MB_OK | MB_ICONERROR);
                     return false;
                 }
                 gs_extraButton = vkCode->second;
@@ -164,7 +164,7 @@ namespace core::configuration {
             else if (key == "ToggleImGuiButton") {
                 auto vkCode = vkCodes.find(value);
                 if (vkCode == vkCodes.end()) {
-                    MessageBoxA(NULL, ThMouseXFile ": Invalid ToggleImGuiButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid ToggleImGuiButton.", APP_NAME, MB_OK | MB_ICONERROR);
                     return false;
                 }
                 gs_toggleImGuiButton = vkCode->second;
@@ -172,14 +172,14 @@ namespace core::configuration {
             else if (key == "ToggleOsCursorButton") {
                 auto vkCode = vkCodes.find(value);
                 if (vkCode == vkCodes.end()) {
-                    MessageBoxA(NULL, ThMouseXFile ": Invalid ToggleOsCursorButton.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid ToggleOsCursorButton.", APP_NAME, MB_OK | MB_ICONERROR);
                     return false;
                 }
                 gs_toggleOsCursorButton = vkCode->second;
             }
             else if (key == "CursorTexture") {
                 if (value.size() == 0) {
-                    MessageBoxA(NULL, ThMouseXFile ": Invalid CursorTexture.", "ThMouseX", MB_OK | MB_ICONERROR);
+                    MessageBoxA(NULL, ThMouseXFile ": Invalid CursorTexture.", APP_NAME, MB_OK | MB_ICONERROR);
                     return false;
                 }
                 auto wTexturePath = encoding::ConvertToUtf16(value.c_str());
@@ -189,14 +189,14 @@ namespace core::configuration {
                 auto [height, convMessage] = helper::ConvertToULong(value, 10);
                 if (convMessage != nullptr) {
                     MessageBoxA(NULL, format(ThMouseXFile ": Invalid CursorBaseHeight: {}.", convMessage).c_str(),
-                        "ThMouseX", MB_OK | MB_ICONERROR);
+                        APP_NAME, MB_OK | MB_ICONERROR);
                     return false;
                 }
                 gs_textureBaseHeight = height;
             }
             else {
                 MessageBoxA(NULL, format("Invalid attribute at line {} in " ThMouseXFile ".", lineCount).c_str(),
-                    "ThMouseX", MB_OK | MB_ICONERROR);
+                    APP_NAME, MB_OK | MB_ICONERROR);
                 return false;
             }
         }
@@ -222,7 +222,7 @@ tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount) {
     auto maxSize = ARRAYSIZE(gs_gameConfigs[0].ProcessName) - 1;
     if (wProcessName.size() > maxSize) {
         MessageBoxA(NULL, format("processName longer than {} characters at line {} in " GameFile ".",
-            maxSize, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            maxSize, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { move(wProcessName), false };
     }
     return { move(wProcessName), true };
@@ -254,7 +254,7 @@ tuple<vector<DWORD>, ScriptingMethod, bool> ExtractPositionRVA(stringstream& str
             auto [offset, convMessage] = helper::ConvertToULong(offsetStr, 16);
             if (convMessage != nullptr) {
                 MessageBoxA(NULL, format("Invalid positionRVA: {} at line {} in " GameFile ".",
-                    convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+                    convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
                 return { move(addressOffsets), scriptingEngine, false };
             }
 
@@ -263,7 +263,7 @@ tuple<vector<DWORD>, ScriptingMethod, bool> ExtractPositionRVA(stringstream& str
 
         if (addressOffsets.size() == 0) {
             MessageBoxA(NULL, format("Found no address offset for positionRVA at line {} in " GameFile ".",
-                lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+                lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
             return { move(addressOffsets), scriptingEngine, false };
         }
     }
@@ -284,7 +284,7 @@ tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount) 
         dataType = PointDataType::Short;
     else {
         MessageBoxA(NULL, format("Invalid dataType at line {} in " GameFile ".", lineCount).c_str(),
-            "ThMouseX", MB_OK | MB_ICONERROR);
+            APP_NAME, MB_OK | MB_ICONERROR);
         return { move(dataType), false };
     }
 
@@ -297,13 +297,13 @@ tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount) {
 
     if (posOffsetStr[0] != '(' || posOffsetStr[posOffsetStr.length() - 1] != ')') {
         MessageBoxA(NULL, format("Invalid offset: expected wrapping '(' and ')' at line {} in " GameFile ".",
-            lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { FloatPoint(), false };
     }
     auto commaIdx = posOffsetStr.find(',');
     if (commaIdx == string::npos) {
         MessageBoxA(NULL, format("Invalid offset: expected separating comma ',' at line {} in " GameFile ".",
-            lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { FloatPoint(), false };
     }
 
@@ -311,7 +311,7 @@ tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount) {
     auto [offsetX, convMessage] = helper::ConvertToFloat(offsetXStr);
     if (convMessage != nullptr) {
         MessageBoxA(NULL, format("Invalid offset X: {} at line {} in " GameFile ".",
-            convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { FloatPoint(), false };
     }
 
@@ -319,7 +319,7 @@ tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount) {
     auto [offsetY, convMessage2] = helper::ConvertToFloat(offsetYStr);
     if (convMessage2 != nullptr) {
         MessageBoxA(NULL, format("Invalid offset Y: {} at line {} in " GameFile ".",
-            convMessage2, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            convMessage2, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { FloatPoint(), false };
     }
 
@@ -332,7 +332,7 @@ tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount) {
 
     if (baseHeight == 0) {
         MessageBoxA(NULL, format("Invalid baseHeight at line {} in " GameFile ".", lineCount).c_str(),
-            "ThMouseX", MB_OK | MB_ICONERROR);
+            APP_NAME, MB_OK | MB_ICONERROR);
         return { baseHeight, false };
     }
 
@@ -346,7 +346,7 @@ tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount) 
     auto colonIdx = aspectRatioStr.find(':');
     if (colonIdx == string::npos) {
         MessageBoxA(NULL, format("Invalid aspectRatio: expected separating ':' at line {} in " GameFile ".",
-            lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { FloatPoint(), false };
     }
 
@@ -354,7 +354,7 @@ tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount) 
     auto [ratioX, convMessage] = helper::ConvertToFloat(ratioXStr);
     if (convMessage != nullptr) {
         MessageBoxA(NULL, format("Invalid aspectRatio X: {} at line {} in " GameFile ".",
-            convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { FloatPoint(), false };
     }
 
@@ -362,7 +362,7 @@ tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount) 
     auto [ratioY, convMessage2] = helper::ConvertToFloat(ratioYStr);
     if (convMessage2 != nullptr) {
         MessageBoxA(NULL, format("Invalid aspectRatio Y: {} at line {} in " GameFile ".",
-            convMessage2, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+            convMessage2, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { FloatPoint(), false };
     }
 
@@ -389,7 +389,7 @@ tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount)
 
     if (inputMethods == InputMethod::None) {
         MessageBoxA(NULL, format("Invalid inputMethod at line {} in " GameFile ".", lineCount).c_str(),
-            "ThMouseX", MB_OK | MB_ICONERROR);
+            APP_NAME, MB_OK | MB_ICONERROR);
         return { inputMethods, false };
     }
 
@@ -403,7 +403,7 @@ tuple<VkCodes, bool> ReadVkCodes() {
 
     ifstream vkcodeFile(VirtualKeyCodesFile);
     if (!vkcodeFile) {
-        MessageBoxA(NULL, "Missing " VirtualKeyCodesFile " file.", "ThMouseX", MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, "Missing " VirtualKeyCodesFile " file.", APP_NAME, MB_OK | MB_ICONERROR);
         return { move(vkCodes), false };
     }
 
@@ -421,7 +421,7 @@ tuple<VkCodes, bool> ReadVkCodes() {
         auto [value, convMessage] = helper::ConvertToULong(valueStr, 0);
         if (convMessage != nullptr) {
             MessageBoxA(NULL, format("Invalid value: {} at line {} in " VirtualKeyCodesFile ".",
-                convMessage, lineCount).c_str(), "ThMouseX", MB_OK | MB_ICONERROR);
+                convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
             return { move(vkCodes), false };
         }
         vkCodes[key] = (BYTE)value;

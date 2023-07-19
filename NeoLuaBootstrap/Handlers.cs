@@ -7,7 +7,7 @@ namespace NeoLuaBootstrap
     using DelegateMap = Dictionary<string, (Delegate Delegate, GCHandle Handle)>;
     public static class Handlers
     {
-        [DllImport("ThMCore.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(Scripting.AppName, CallingConvention = CallingConvention.Cdecl)]
         static extern void NeoLua_SetOnClose(IntPtr address);
 
         static readonly DelegateMap EventDelegates = new DelegateMap();

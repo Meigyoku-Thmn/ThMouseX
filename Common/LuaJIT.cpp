@@ -1,10 +1,11 @@
 #include "framework.h"
 #include <string>
 #include <codecvt>
-#include "macro.h"
 #include <luajit/lua.hpp>
+#include <format>
 
 #include "MinHook.h"
+#include "macro.h"
 #include "CallbackStore.h"
 #include "LuaJIT.h"
 #include "Log.h"
@@ -22,8 +23,6 @@ namespace callbackstore = common::callbackstore;
 
 using namespace std;
 
-#define Common_Lib_Path "%Common_Lib_Path%"
-
 DWORD LuaJIT_ReadUInt32(DWORD address) {
     return *PDWORD(address);
 }
@@ -36,13 +35,14 @@ void LuaJIT_OpenConsole() {
     note::OpenConsole();
 }
 
-wstring MakeCommonDllPathW() {
-    return wstring(g_currentModuleDirPath) + L"\\" + L"ThMCore.dll";
+wstring GetThisModulePath() {
+    return wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME);
 }
 
 string GetPreparationScript() {
-    auto keyword = Common_Lib_Path;
-    auto preparationScript = string(R"(
+    auto thisDllPath = encoding::ConvertToUtf8(GetThisModulePath().c_str());
+    helper::Replace(thisDllPath, "\\", "\\\\");
+    auto preparationScript = format(R"(
         local ffi = require("ffi")
 
         ffi.cdef [[
@@ -51,7 +51,7 @@ string GetPreparationScript() {
             void     LuaJIT_OpenConsole    ();
         ]]
 
-        local ThMouseX = ffi.load(")" Common_Lib_Path R"(")
+        local ThMouseX = ffi.load("{}")
 
         function OpenConsole()
             return ThMouseX.LuaJIT_OpenConsole()
@@ -66,12 +66,9 @@ string GetPreparationScript() {
         end
 
         function AllocNew(...)
-            return ffi.new(unpack({...}))
+            return ffi.new(unpack({{...}}))
         end
-    )");
-    auto commonDllPath = encoding::ConvertToUtf8(MakeCommonDllPathW().c_str());
-    helper::Replace(commonDllPath, "\\", "\\\\");
-    helper::Replace(preparationScript, keyword, commonDllPath.c_str());
+    )", thisDllPath);
     return preparationScript;
 }
 
@@ -95,9 +92,9 @@ namespace common::luajit {
     decltype(&_LoadLibraryExA) OriLoadLibraryExA;
 
     HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
-        auto commonDllPath = MakeCommonDllPathW();
-        if (strcmp(lpLibFileName, encoding::ConvertToUtf8(commonDllPath.c_str()).c_str()) == 0)
-            return LoadLibraryExW(commonDllPath.c_str(), hFile, dwFlags);
+        auto thisDllPath = GetThisModulePath();
+        if (strcmp(lpLibFileName, encoding::ConvertToUtf8(thisDllPath.c_str()).c_str()) == 0)
+            return LoadLibraryExW(thisDllPath.c_str(), hFile, dwFlags);
         else
             return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
     }

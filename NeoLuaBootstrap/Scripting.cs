@@ -15,13 +15,15 @@ namespace NeoLuaBootstrap
 {
     static class Scripting
     {
-        [DllImport("ThMCore.dll", CallingConvention = CallingConvention.Cdecl)]
+        public const string AppName = "ThMouseX";
+
+        [DllImport(AppName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void NeoLua_SetPositionAddress(IntPtr address);
 
-        [DllImport("ThMCore.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(AppName, CallingConvention = CallingConvention.Cdecl)]
         public static extern PointDataType NeoLua_GetDataType();
 
-        [DllImport("ThMCore.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(AppName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void NeoLua_OpenConsole();
 
         static readonly List<Delegate> DelegateStore = new List<Delegate>();
@@ -96,7 +98,7 @@ namespace NeoLuaBootstrap
 
         static Lua L;
 
-        const string HarmonyId = "ThMouseX NeoLua Scripting";
+        const string HarmonyId = AppName + " NeoLua Scripting";
         static readonly Harmony HarmonyInst = new Harmony(HarmonyId);
         static public void Uninitialize()
         {
