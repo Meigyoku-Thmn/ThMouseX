@@ -37,6 +37,8 @@ namespace note = common::log;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
 
+#define LOAD_LIBRARY_AS_RES (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE)
+
 #define InitializeAndEnableHook(initializeBlock) initializeBlock; minhook::EnableAll(); 0
 #define TryMatchAndInitializeModuleA(moduleName, ...) TryMatchAndInitializeModule(moduleName, __VA_ARGS__, _str,  )
 #define TryMatchAndInitializeModuleW(moduleName, ...) TryMatchAndInitializeModule(moduleName, __VA_ARGS__, _wcs, L)
@@ -111,7 +113,7 @@ namespace core {
 
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto rs = OriLoadLibraryExW(lpLibFileName, hFile, dwFlags);
-        if (rs != NULL) {
+        if (rs != NULL && !(dwFlags & LOAD_LIBRARY_AS_RES)) {
             auto fileName = PathFindFileNameW(lpLibFileName);
             TryMatchAndInitializeModuleW(fileName, memory::ScanImportTable(rs, [](auto dllName) {
                 TryMatchAndInitializeModuleA(dllName, 0);
