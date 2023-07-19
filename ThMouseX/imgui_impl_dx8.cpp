@@ -86,6 +86,7 @@ void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data) {
     bd->pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     bd->pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
     bd->pd3dDevice->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
+    // This below is needed for the entire Touhou series from Touhou 6!
     bd->pd3dDevice->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_DISABLE);
 
     // Setup orthographic projection matrix

@@ -7,7 +7,7 @@
 #include <wrl/client.h>
 #include <comdef.h>
 #include <imgui.h>
-#include <imgui_impl_win32.h>
+#include "imgui_impl_win32.h"
 #include "imgui_impl_dx9.h"
 
 #include "../Common/macro.h"
@@ -70,6 +70,8 @@ namespace core::directx9 {
     D3DXVECTOR3         cursorPivot;
     D3DXVECTOR2         cursorScale;
     float               d3dScale = 1.f;
+    float               xScale = 1.f;
+    float               yScale = 1.f;
 
     // d3dx9_43.dll
     HMODULE d3dx9_43;
@@ -279,6 +281,8 @@ namespace core::directx9 {
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
         g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
+        xScale = float(clientSize.width()) / d3dSize.Width;
+        yScale = float(clientSize.height()) / d3dSize.Height;
     }
 
     /*
@@ -400,6 +404,7 @@ namespace core::directx9 {
     void RenderImGui(IDirect3DDevice9* pDevice) {
         if (!g_showImGui)
             return;
+        ImGui_ImplWin32_SetMousePosScale(xScale, yScale);
         ImGui_ImplDX9_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();

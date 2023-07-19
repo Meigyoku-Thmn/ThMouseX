@@ -10,7 +10,7 @@
 #include <wrl/client.h>
 #include <comdef.h>
 #include <imgui.h>
-#include <imgui_impl_win32.h>
+#include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
 #include "../Common/macro.h"
@@ -75,6 +75,8 @@ namespace core::directx11 {
     XMVECTORF32                 cursorPivot;
     XMVECTORF32                 cursorScale;
     float                       d3dScale = 1.f;
+    float                       xScale = 1.f;
+    float                       yScale = 1.f;
 
     void CleanUp() {
         SAFE_RELEASE(pixelShader);
@@ -254,6 +256,8 @@ namespace core::directx11 {
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
         g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
+        xScale = float(clientSize.width()) / desc.BufferDesc.Width;
+        yScale = float(clientSize.height()) / desc.BufferDesc.Height;
     }
 
     /*
@@ -364,6 +368,7 @@ namespace core::directx11 {
     void RenderImGui() {
         if (!g_showImGui || !context || !renderTargetView)
             return;
+        ImGui_ImplWin32_SetMousePosScale(xScale, yScale);
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
