@@ -28,3 +28,5 @@ extern DWORD        gs_toggleOsCursorButton;
 extern DWORD        gs_toggleImGuiButton;
 extern WCHAR        gs_textureFilePath[MAX_PATH];
 extern DWORD        gs_textureBaseHeight;
+extern DWORD        gs_imGuiBaseFontSize;
+extern DWORD        gs_imGuiBaseVerticalResolution;

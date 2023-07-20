@@ -57,7 +57,7 @@ namespace core::directx9 {
     bool firstStepPrepared;
     bool measurementPrepared;
     bool cursorStatePrepared;
-    bool imGuiPrepared;
+    bool imGuiConfigured;
 
     void ClearMeasurementFlags() {
         measurementPrepared = false;
@@ -70,8 +70,8 @@ namespace core::directx9 {
     D3DXVECTOR3         cursorPivot;
     D3DXVECTOR2         cursorScale;
     float               d3dScale = 1.f;
-    float               xScale = 1.f;
-    float               yScale = 1.f;
+    float               imGuiMousePosScaleX = 1.f;
+    float               imGuiMousePosScaleY = 1.f;
 
     // d3dx9_43.dll
     HMODULE d3dx9_43;
@@ -80,18 +80,20 @@ namespace core::directx9 {
     decltype(&D3DXCreateTextureFromFileW) _D3DXCreateTextureFromFileW;
     decltype(&D3DXMatrixTransformation2D) _D3DXMatrixTransformation2D;
 
-    void CleanUp() {
+    void CleanUp(bool forReal = false) {
+        ImGui_ImplDX9_InvalidateDeviceObjects();
         SAFE_RELEASE(cursorSprite);
         SAFE_RELEASE(cursorTexture);
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
-    }
-
-    void ShutdownImGui() {
-        ImGui_ImplDX9_Shutdown();
-        ImGui_ImplWin32_Shutdown();
-        ImGui::DestroyContext();
+        imGuiConfigured = false;
+        if (forReal) {
+            ImGui_ImplDX9_Shutdown();
+            ImGui_ImplWin32_Shutdown();
+            ImGui::DestroyContext();
+            SAFE_FREE_LIB(d3dx9_43);
+        }
     }
 
     HRESULT WINAPI D3DCreateDevice(IDirect3D9* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface) {
@@ -102,9 +104,7 @@ namespace core::directx9 {
     void TearDownCallback(bool isProcessTerminating) {
         if (isProcessTerminating)
             return;
-        ShutdownImGui();
-        CleanUp();
-        SAFE_FREE_LIB(d3dx9_43);
+        CleanUp(true);
     }
 
     void Initialize() {
@@ -215,12 +215,8 @@ namespace core::directx9 {
     }
 
     HRESULT WINAPI D3DReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
-        ImGui_ImplDX9_InvalidateDeviceObjects();
         CleanUp();
-        auto result = OriReset(pDevice, pPresentationParameters);
-        if (SUCCEEDED(result))
-            ImGui_ImplDX9_CreateDeviceObjects();
-        return result;
+        return OriReset(pDevice, pPresentationParameters);
     }
 
     /*
@@ -281,8 +277,8 @@ namespace core::directx9 {
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
         g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
-        xScale = float(clientSize.width()) / d3dSize.Width;
-        yScale = float(clientSize.height()) / d3dSize.Height;
+        imGuiMousePosScaleX = float(clientSize.width()) / d3dSize.Width;
+        imGuiMousePosScaleY = float(clientSize.height()) / d3dSize.Height;
     }
 
     /*
@@ -344,7 +340,7 @@ namespace core::directx9 {
         pDevice->BeginScene();
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
-        POINT pointerPosition = helper::GetPointerPosition();
+        auto pointerPosition = helper::GetPointerPosition();
         D3DXVECTOR3 cursorPositionD3D(float(pointerPosition.x), float(pointerPosition.y), 0.f);
         if (d3dScale != 0.f && d3dScale != 1.f)
             cursorPositionD3D /= d3dScale;
@@ -382,6 +378,7 @@ namespace core::directx9 {
     }
 
     void PrepareImGui(IDirect3DDevice9* pDevice) {
+        static bool imGuiPrepared;
         if (imGuiPrepared)
             return;
         imGuiPrepared = true;
@@ -396,15 +393,41 @@ namespace core::directx9 {
         ImGui::StyleColorsDark();
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX9_Init(pDevice);
-        auto font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", 20);
-        if (!font)
+    }
+
+    void ConfigureImGui(IDirect3DDevice9* pDevice) {
+        if (imGuiConfigured)
+            return;
+        imGuiConfigured = true;
+
+        auto& io = ImGui::GetIO();
+        io.Fonts->Clear();
+
+        ComPtr<IDirect3DSurface9> pSurface;
+        auto rs = pDevice->GetRenderTarget(0, &pSurface);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "ConfigureImGui: pDevice->GetRenderTarget failed", rs);
+            return;
+        }
+        D3DSURFACE_DESC d3dSize;
+        rs = pSurface->GetDesc(&d3dSize);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "ConfigureImGui: pSurface->GetDesc failed", rs);
+            return;
+        }
+
+        auto fontScale = float(d3dSize.Height) / gs_imGuiBaseVerticalResolution;
+        auto fontSize = round(gs_imGuiBaseFontSize * fontScale);
+        if (fontSize < 13)
+            io.Fonts->AddFontDefault();
+        else if (!io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", fontSize))
             io.Fonts->AddFontDefault();
     }
 
     void RenderImGui(IDirect3DDevice9* pDevice) {
         if (!g_showImGui)
             return;
-        ImGui_ImplWin32_SetMousePosScale(xScale, yScale);
+        ImGui_ImplWin32_SetMousePosScale(imGuiMousePosScaleX, imGuiMousePosScaleY);
         ImGui_ImplDX9_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
@@ -421,6 +444,7 @@ namespace core::directx9 {
         PrepareMeasurement(pDevice);
         PrepareCursorState(pDevice);
         PrepareImGui(pDevice);
+        ConfigureImGui(pDevice);
         RenderCursor(pDevice);
         RenderImGui(pDevice);
         callbackstore::TriggerPostRenderCallbacks();

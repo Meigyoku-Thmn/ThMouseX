@@ -29,6 +29,9 @@ DWORD       gs_toggleOsCursorButton = 0x4D; // VK_M
 DWORD       gs_toggleImGuiButton = 0xC0; // VK_BACK_QUOTE
 WCHAR       gs_textureFilePath[MAX_PATH]{};
 DWORD       gs_textureBaseHeight = 480;
+WCHAR       gs_imGuiFontPath[MAX_PATH]{};
+DWORD       gs_imGuiBaseFontSize = 20;
+DWORD       gs_imGuiBaseVerticalResolution = 960;
 #pragma data_seg()
 // make the above segment shared across processes
 #pragma comment(linker, "/SECTION:.SHRCONF,RWS")
