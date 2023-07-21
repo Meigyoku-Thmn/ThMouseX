@@ -60,7 +60,7 @@ namespace core::directx11 {
     bool firstStepPrepared;
     bool measurementPrepared;
     bool cursorStatePrepared;
-    bool imGuiPrepared;
+    bool imGuiConfigured;
 
     void ClearMeasurementFlags() {
         measurementPrepared = false;
@@ -77,10 +77,11 @@ namespace core::directx11 {
     XMVECTORF32                 cursorPivot;
     XMVECTORF32                 cursorScale;
     float                       d3dScale = 1.f;
-    float                       xScale = 1.f;
-    float                       yScale = 1.f;
+    float                       imGuiMousePosScaleX = 1.f;
+    float                       imGuiMousePosScaleY = 1.f;
 
-    void CleanUp() {
+    void CleanUp(bool forReal = false) {
+        ImGui_ImplDX11_InvalidateDeviceObjects();
         SAFE_RELEASE(pixelShader);
         SAFE_DELETE(spriteBatch);
         SAFE_RELEASE(cursorTexture);
@@ -90,19 +91,18 @@ namespace core::directx11 {
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
-    }
-
-    void ShutdownImGui() {
-        ImGui_ImplDX11_Shutdown();
-        ImGui_ImplWin32_Shutdown();
-        ImGui::DestroyContext();
+        imGuiConfigured = false;
+        if (forReal) {
+            ImGui_ImplDX11_Shutdown();
+            ImGui_ImplWin32_Shutdown();
+            ImGui::DestroyContext();
+        }
     }
 
     void TearDownCallback(bool isProcessTerminating) {
         if (isProcessTerminating)
             return;
-        ShutdownImGui();
-        CleanUp();
+        CleanUp(true);
     }
 
     void Initialize() {
@@ -213,12 +213,8 @@ namespace core::directx11 {
     }
 
     HRESULT WINAPI D3DResizeBuffers(IDXGISwapChain* swapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
-        ImGui_ImplDX11_InvalidateDeviceObjects();
         CleanUp();
-        auto result = OriResizeBuffers(swapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
-        if (SUCCEEDED(result))
-            ImGui_ImplDX11_CreateDeviceObjects();
-        return result;
+        return OriResizeBuffers(swapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
     }
 
     /*
@@ -258,8 +254,8 @@ namespace core::directx11 {
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
         g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
-        xScale = float(clientSize.width()) / desc.BufferDesc.Width;
-        yScale = float(clientSize.height()) / desc.BufferDesc.Height;
+        imGuiMousePosScaleX = float(clientSize.width()) / desc.BufferDesc.Width;
+        imGuiMousePosScaleY = float(clientSize.height()) / desc.BufferDesc.Height;
     }
 
     /*
@@ -313,7 +309,7 @@ namespace core::directx11 {
         }
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
-        POINT pointerPosition = helper::GetPointerPosition();
+        auto pointerPosition = helper::GetPointerPosition();
         XMVECTOR cursorPositionD3D = XMVECTORF32{ float(pointerPosition.x), float(pointerPosition.y) };
         if (d3dScale != 0.f && d3dScale != 1.f) {
             cursorPositionD3D = XMVectorScale(cursorPositionD3D, d3dScale);
@@ -349,6 +345,7 @@ namespace core::directx11 {
     }
 
     void PrepareImGui() {
+        static bool imGuiPrepared;
         if (imGuiPrepared)
             return;
         imGuiPrepared = true;
@@ -362,15 +359,35 @@ namespace core::directx11 {
         ImGui::StyleColorsDark();
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX11_Init(device, context);
-        auto font = io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(gs_imGuiFontPath).c_str(), gs_imGuiBaseFontSize);
-        if (!font)
+    }
+
+    void ConfigureImGui(IDXGISwapChain* swapChain) {
+        if (imGuiConfigured)
+            return;
+        imGuiConfigured = true;
+
+        auto& io = ImGui::GetIO();
+        io.Fonts->Clear();
+
+        DXGI_SWAP_CHAIN_DESC desc;
+        auto rs = swapChain->GetDesc(&desc);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "PrepareCursorState: swapChain->GetDesc failed", rs);
+            return;
+        }
+
+        auto fontScale = float(desc.BufferDesc.Height) / gs_imGuiBaseVerticalResolution;
+        auto fontSize = round(gs_imGuiBaseFontSize * fontScale);
+        if (fontSize < 13)
+            io.Fonts->AddFontDefault();
+        else if (!io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", fontSize))
             io.Fonts->AddFontDefault();
     }
 
     void RenderImGui() {
         if (!g_showImGui || !context || !renderTargetView)
             return;
-        ImGui_ImplWin32_SetMousePosScale(xScale, yScale);
+        ImGui_ImplWin32_SetMousePosScale(imGuiMousePosScaleX, imGuiMousePosScaleY);
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
@@ -386,6 +403,7 @@ namespace core::directx11 {
         PrepareMeasurement(swapChain);
         PrepareCursorState(swapChain);
         PrepareImGui();
+        ConfigureImGui(swapChain);
         RenderCursor(swapChain);
         RenderImGui();
         callbackstore::TriggerPostRenderCallbacks();

@@ -9,16 +9,16 @@ extern WCHAR    g_currentModuleDirPath[MAX_PATH];
 extern GameConfig  g_currentConfig;
 
 // global game state
-extern bool        g_hookApplied;
-extern HMODULE     g_targetModule;
-extern HMODULE     g_coreModule;
-extern HWND        g_hFocusWindow;
-extern bool        g_leftMousePressed;
-extern bool        g_midMousePressed;
-extern bool        g_inputEnabled;
-extern float       g_pixelRate;
-extern FloatPoint  g_pixelOffset;
-extern bool        g_showImGui;
+extern bool         g_hookApplied;
+extern HMODULE      g_targetModule;
+extern HMODULE      g_coreModule;
+extern HWND         g_hFocusWindow;
+extern bool         g_leftMousePressed;
+extern bool         g_midMousePressed;
+extern bool         g_inputEnabled;
+extern float        g_pixelRate;
+extern FloatPoint   g_pixelOffset;
+extern bool         g_showImGui;
 
 // configuration from main exe
 extern GameConfigs  gs_gameConfigs;

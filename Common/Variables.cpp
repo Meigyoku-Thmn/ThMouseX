@@ -9,16 +9,16 @@ WCHAR   g_currentModuleDirPath[MAX_PATH];
 GameConfig      g_currentConfig;
 
 // global game state
-bool            g_hookApplied;
-HMODULE         g_targetModule;
-HMODULE         g_coreModule;
-HWND            g_hFocusWindow;
-bool            g_leftMousePressed;
-bool            g_midMousePressed;
-bool            g_inputEnabled;
-float           g_pixelRate = 1;
-FloatPoint      g_pixelOffset{1, 1};
-bool            g_showImGui;
+bool        g_hookApplied;
+HMODULE     g_targetModule;
+HMODULE     g_coreModule;
+HWND        g_hFocusWindow;
+bool        g_leftMousePressed;
+bool        g_midMousePressed;
+bool        g_inputEnabled;
+float       g_pixelRate = 1;
+FloatPoint  g_pixelOffset{1, 1};
+bool        g_showImGui;
 
 // configuration from main exe
 #pragma data_seg(".SHRCONF")

@@ -60,7 +60,7 @@ namespace core::directx8 {
     bool firstStepPrepared;
     bool measurementPrepared;
     bool cursorStatePrepared;
-    bool imGuiPrepared;
+    bool imGuiConfigured;
 
     void ClearMeasurementFlags() {
         measurementPrepared = false;
@@ -73,21 +73,22 @@ namespace core::directx8 {
     D3DXVECTOR2         cursorPivot;
     D3DXVECTOR2         cursorScale;
     float               d3dScale = 1.f;
-    float               xScale = 1.f;
-    float               yScale = 1.f;
+    float               imGuiMousePosScaleX = 1.f;
+    float               imGuiMousePosScaleY = 1.f;
 
-    void CleanUp() {
+    void CleanUp(bool forReal = false) {
+        ImGui_ImplDX8_InvalidateDeviceObjects();
         SAFE_RELEASE(cursorSprite);
         SAFE_RELEASE(cursorTexture);
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
-    }
-
-    void ShutdownImGui() {
-        ImGui_ImplDX8_Shutdown();
-        ImGui_ImplWin32_Shutdown();
-        ImGui::DestroyContext();
+        imGuiConfigured = false;
+        if (forReal) {
+            ImGui_ImplDX8_Shutdown();
+            ImGui_ImplWin32_Shutdown();
+            ImGui::DestroyContext();
+        }
     }
 
     HRESULT WINAPI D3DCreateDevice(IDirect3D8* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice8** ppReturnedDeviceInterface) {
@@ -99,8 +100,7 @@ namespace core::directx8 {
     void TearDownCallback(bool isProcessTerminating) {
         if (isProcessTerminating)
             return;
-        ShutdownImGui();
-        CleanUp();
+        CleanUp(true);
     }
 
     void Initialize() {
@@ -157,8 +157,8 @@ namespace core::directx8 {
 
         minhook::CreateHook(vector<minhook::HookConfig>{
             { PVOID(vtable[CreateDeviceIdx]), & D3DCreateDevice, (PVOID*)&OriCreateDevice },
-            { PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset },
-            { PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent },
+            {PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset},
+            {PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent},
         });
     }
 
@@ -179,17 +179,13 @@ namespace core::directx8 {
             D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = { (cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f };
+            cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f};
         }
     }
 
     HRESULT WINAPI D3DReset(IDirect3DDevice8* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
-        ImGui_ImplDX8_InvalidateDeviceObjects();
         CleanUp();
-        auto result = OriReset(pDevice, pPresentationParameters);
-        if (FAILED(result))
-            ImGui_ImplDX8_CreateDeviceObjects();
-        return result;
+        return OriReset(pDevice, pPresentationParameters);
     }
 
     /*
@@ -238,8 +234,8 @@ namespace core::directx8 {
         g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
         g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
-        xScale = float(clientSize.width()) / d3dSize.Width;
-        yScale = float(clientSize.height()) / d3dSize.Height;
+        imGuiMousePosScaleX = float(clientSize.width()) / d3dSize.Width;
+        imGuiMousePosScaleY = float(clientSize.height()) / d3dSize.Height;
     }
 
     /*
@@ -301,7 +297,7 @@ namespace core::directx8 {
         pDevice->BeginScene();
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
-        POINT pointerPosition = helper::GetPointerPosition();
+        auto pointerPosition = helper::GetPointerPosition();
         D3DXVECTOR2 cursorPositionD3D(float(pointerPosition.x), float(pointerPosition.y));
         if (d3dScale != 0.f && d3dScale != 1.f)
             cursorPositionD3D /= d3dScale;
@@ -338,6 +334,7 @@ namespace core::directx8 {
     }
 
     void PrepareImGui(IDirect3DDevice8* pDevice) {
+        static bool imGuiPrepared;
         if (imGuiPrepared)
             return;
         imGuiPrepared = true;
@@ -351,16 +348,42 @@ namespace core::directx8 {
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         ImGui::StyleColorsDark();
         ImGui_ImplWin32_Init(g_hFocusWindow);
-        ImGui_ImplDX8_Init(pDevice);        
-        auto font = io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(gs_imGuiFontPath).c_str(), gs_imGuiBaseFontSize);
-        if (!font)
+        ImGui_ImplDX8_Init(pDevice);
+    }
+
+    void ConfigureImGui(IDirect3DDevice8* pDevice) {
+        if (imGuiConfigured)
+            return;
+        imGuiConfigured = true;
+
+        auto& io = ImGui::GetIO();
+        io.Fonts->Clear();
+
+        ComPtr<IDirect3DSurface8> pSurface;
+        auto rs = pDevice->GetRenderTarget(&pSurface);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "ConfigureImGui: pDevice->GetRenderTarget failed", rs);
+            return;
+        }
+        D3DSURFACE_DESC d3dSize;
+        rs = pSurface->GetDesc(&d3dSize);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "ConfigureImGui: pSurface->GetDesc failed", rs);
+            return;
+        }
+
+        auto fontScale = float(d3dSize.Height) / gs_imGuiBaseVerticalResolution;
+        auto fontSize = round(gs_imGuiBaseFontSize * fontScale);
+        if (fontSize < 13)
+            io.Fonts->AddFontDefault();
+        else if (!io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", fontSize))
             io.Fonts->AddFontDefault();
     }
 
     void RenderImGui(IDirect3DDevice8* pDevice) {
         if (!g_showImGui)
             return;
-        ImGui_ImplWin32_SetMousePosScale(xScale, yScale);
+        ImGui_ImplWin32_SetMousePosScale(imGuiMousePosScaleX, imGuiMousePosScaleY);
         ImGui_ImplDX8_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
@@ -377,6 +400,7 @@ namespace core::directx8 {
         PrepareMeasurement(pDevice);
         PrepareCursorState(pDevice);
         PrepareImGui(pDevice);
+        ConfigureImGui(pDevice);
         RenderCursor(pDevice);
         RenderImGui(pDevice);
         callbackstore::TriggerPostRenderCallbacks();
