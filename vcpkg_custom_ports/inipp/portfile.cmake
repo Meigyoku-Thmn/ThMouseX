@@ -1,0 +1,10 @@
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO mcmtroffaes/inipp
+    REF c61e699682d3f1091209c2179f1d03f5fc593327
+    SHA512 232712609ee38d223eb6cba136bbf3cc31cca4d503fcb9c52568a73e19ac0df0f6deea1172d280c70f75651329fd9c2058f5b26bc8f427969bf3950fe79ccf20
+)
+
+file(INSTALL ${SOURCE_PATH}/inipp/inipp.h  DESTINATION ${CURRENT_PACKAGES_DIR}/include)
+
+vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE.txt")

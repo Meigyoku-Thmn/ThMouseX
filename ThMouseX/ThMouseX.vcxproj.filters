@@ -115,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Games.txt" />
-    <CopyFileToFolders Include="ThMouseX.txt" />
+    <CopyFileToFolders Include="ThMouseX.ini" />
     <CopyFileToFolders Include="VirtualKeyCodes.txt" />
     <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">
       <Filter>ConfigScripts</Filter>

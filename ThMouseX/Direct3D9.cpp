@@ -16,12 +16,14 @@
 #include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
+#include "../Common/Helper.Encoding.h"
 #include "../Common/Log.h"
 #include "Direct3D9.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
+namespace encoding = common::helper::encoding;
 namespace note = common::log;
 
 #define TAG "[DirectX9] "
@@ -420,7 +422,7 @@ namespace core::directx9 {
         auto fontSize = round(gs_imGuiBaseFontSize * fontScale);
         if (fontSize < 13)
             io.Fonts->AddFontDefault();
-        else if (!io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", fontSize))
+        else if (!io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(gs_imGuiFontPath).c_str(), fontSize))
             io.Fonts->AddFontDefault();
     }
 

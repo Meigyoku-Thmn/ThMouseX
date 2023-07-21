@@ -4,9 +4,15 @@
     "directxtk",
     "luajit",
     "minhook",
-    "nameof"
+    "nameof",
+    "inipp"
   ],
   "builtin-baseline": "861c33057553ee836e7061ffbdabc25ea343145d",
+  "vcpkg-configuration": {
+    "overlay-ports": [
+      "./vcpkg_custom_ports"
+    ]
+  },
   "overrides": [
     {
       "name": "imgui",
@@ -27,6 +33,10 @@
     {
       "name": "nameof",
       "version": "0.10.3"
+    },
+    {
+      "name": "inipp",
+      "version": "2022-02-04"
     }
   ]
 }

@@ -22,6 +22,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		vcpkg.json = vcpkg.json
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vcpkg_custom_ports", "vcpkg_custom_ports", "{0BC970E8-88F7-409A-A19C-864968D63227}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "inipp", "inipp", "{044C7786-B635-46BD-874B-EF75F6B0DE2B}"
+	ProjectSection(SolutionItems) = preProject
+		vcpkg_custom_ports\inipp\portfile.cmake = vcpkg_custom_ports\inipp\portfile.cmake
+		vcpkg_custom_ports\inipp\vcpkg.json = vcpkg_custom_ports\inipp\vcpkg.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +91,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0BC970E8-88F7-409A-A19C-864968D63227} = {B337E9DD-BB1B-4851-B933-05C75CB5D9AC}
+		{044C7786-B635-46BD-874B-EF75F6B0DE2B} = {0BC970E8-88F7-409A-A19C-864968D63227}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B04EB577-D4A9-409A-8E97-AC2E350FEE6B}

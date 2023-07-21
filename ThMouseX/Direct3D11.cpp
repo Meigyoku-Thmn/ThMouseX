@@ -20,6 +20,7 @@
 #include "../Common/Variables.h"
 #include "../Common/DataTypes.h"
 #include "../Common/Helper.h"
+#include "../Common/Helper.Encoding.h"
 #include "../Common/Log.h"
 #include "Direct3D11.h"
 
@@ -28,6 +29,7 @@
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
+namespace encoding = common::helper::encoding;
 namespace note = common::log;
 
 #define TAG "[DirectX11] "
@@ -360,7 +362,7 @@ namespace core::directx11 {
         ImGui::StyleColorsDark();
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX11_Init(device, context);
-        auto font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", 20);
+        auto font = io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(gs_imGuiFontPath).c_str(), gs_imGuiBaseFontSize);
         if (!font)
             io.Fonts->AddFontDefault();
     }
