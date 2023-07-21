@@ -6,6 +6,11 @@
 #include "../Common/DataTypes.h"
 #include "InputDetermine.h"
 
+#define CalculatePosition(position, output) { \
+    output.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X + paddingX); \
+    output.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y); \
+}
+
 namespace helper = common::helper;
 
 namespace core::inputdetermine {
@@ -29,16 +34,12 @@ namespace core::inputdetermine {
                 auto paddingX = (clientSize.width() - realWidth) / 2;
 
                 POINT playerPos{};
-#define CalculatePosition(position) { \
-    playerPos.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X + paddingX); \
-    playerPos.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y); \
-}
                 if (g_currentConfig.PosDataType == PointDataType::Int)
-                    CalculatePosition((IntPoint*)address)
+                    CalculatePosition((IntPoint*)address, playerPos)
                 else if (g_currentConfig.PosDataType == PointDataType::Float)
-                    CalculatePosition((FloatPoint*)address)
+                    CalculatePosition((FloatPoint*)address, playerPos)
                 else if (g_currentConfig.PosDataType == PointDataType::Short)
-                    CalculatePosition((ShortPoint*)address);
+                    CalculatePosition((ShortPoint*)address, playerPos);
 
                 auto mousePos = helper::GetPointerPosition();
 
