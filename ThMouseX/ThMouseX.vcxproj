@@ -178,6 +178,7 @@
     <ClCompile Include="Direct3D11.cpp" />
     <ClCompile Include="Direct3D8.cpp" />
     <ClCompile Include="DllMain.cpp" />
+    <ClCompile Include="ImGuiOverlay.cpp" />
     <ClCompile Include="imgui_impl_dx9.cpp" />
     <ClCompile Include="imgui_impl_win32.cpp" />
     <ClCompile Include="Initialization.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="Direct3D8.h" />
     <ClInclude Include="Direct3D9.h" />
     <ClInclude Include="DirectInput.h" />
+    <ClInclude Include="ImGuiOverlay.h" />
     <ClInclude Include="imgui_impl_dx9.h" />
     <ClInclude Include="imgui_impl_win32.h" />
     <ClInclude Include="Initialization.h" />

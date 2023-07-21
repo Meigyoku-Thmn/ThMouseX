@@ -6,9 +6,11 @@
 #include <memory>
 #include <wrl/client.h>
 #include <comdef.h>
+#include <mutex>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx8.h"
+#include "ImGuiOverlay.h"
 
 #include "../Common/macro.h"
 #include "../Common/macro.h"
@@ -26,6 +28,7 @@ namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace note = common::log;
+namespace imguioverlay = core::imguioverlay;
 
 #define TAG "[DirectX8] "
 
@@ -105,12 +108,17 @@ namespace core::directx8 {
 
     void Initialize() {
         static bool initialized = false;
-        if (initialized)
-            return;
-        auto d3d8 = helper::GetSystemModuleHandle(L"d3d8.dll");
-        if (!d3d8)
-            return;
-        initialized = true;
+        static mutex mtx;
+        HMODULE d3d8{};
+        {
+            const lock_guard lock(mtx);
+            if (initialized)
+                return;
+            d3d8 = helper::GetSystemModuleHandle(L"d3d8.dll");
+            if (!d3d8)
+                return;
+            initialized = true;
+        }
 
         auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8, "Direct3DCreate8");
         if (!_Direct3DCreate8) {
@@ -342,11 +350,7 @@ namespace core::directx8 {
         if (!g_hFocusWindow)
             return;
 
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        auto& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-        ImGui::StyleColorsDark();
+        imguioverlay::Prepare();
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX8_Init(pDevice);
     }
@@ -372,26 +376,17 @@ namespace core::directx8 {
             return;
         }
 
-        auto fontScale = float(d3dSize.Height) / gs_imGuiBaseVerticalResolution;
-        auto fontSize = round(gs_imGuiBaseFontSize * fontScale);
-        if (fontSize < 13)
-            io.Fonts->AddFontDefault();
-        else if (!io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", fontSize))
-            io.Fonts->AddFontDefault();
+        imguioverlay::Configure(float(d3dSize.Height) / gs_imGuiBaseVerticalResolution);
     }
 
     void RenderImGui(IDirect3DDevice8* pDevice) {
         if (!g_showImGui)
             return;
-        ImGui_ImplWin32_SetMousePosScale(imGuiMousePosScaleX, imGuiMousePosScaleY);
         ImGui_ImplDX8_NewFrame();
         ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
-        ImGui::EndFrame();
+        auto drawData = imguioverlay::Render(imGuiMousePosScaleX, imGuiMousePosScaleY);
         pDevice->BeginScene();
-        ImGui::Render();
-        ImGui_ImplDX8_RenderDrawData(ImGui::GetDrawData());
+        ImGui_ImplDX8_RenderDrawData(drawData);
         pDevice->EndScene();
     }
 

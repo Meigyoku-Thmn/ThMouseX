@@ -9,9 +9,11 @@
 #include <memory>
 #include <wrl/client.h>
 #include <comdef.h>
+#include <mutex>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
+#include "ImGuiOverlay.h"
 
 #include "../Common/macro.h"
 #include "../Common/DataTypes.h"
@@ -31,6 +33,7 @@ namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace note = common::log;
+namespace imguioverlay = core::imguioverlay;
 
 #define TAG "[DirectX11] "
 
@@ -107,12 +110,17 @@ namespace core::directx11 {
 
     void Initialize() {
         static bool initialized = false;
-        if (initialized)
-            return;
-        auto d3d11 = helper::GetSystemModuleHandle(L"d3d11.dll");
-        if (!d3d11)
-            return;
-        initialized = true;
+        static mutex mtx;
+        HMODULE d3d11{};
+        {
+            const lock_guard lock(mtx);
+            if (initialized)
+                return;
+            d3d11 = helper::GetSystemModuleHandle(L"d3d11.dll");
+            if (!d3d11)
+                return;
+            initialized = true;
+        }
 
         auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11, "D3D11CreateDeviceAndSwapChain");
         if (!_D3D11CreateDeviceAndSwapChain) {
@@ -352,11 +360,7 @@ namespace core::directx11 {
         if (!device || !context || !g_hFocusWindow)
             return;
 
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        auto& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-        ImGui::StyleColorsDark();
+        imguioverlay::Prepare();
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX11_Init(device, context);
     }
@@ -376,26 +380,17 @@ namespace core::directx11 {
             return;
         }
 
-        auto fontScale = float(desc.BufferDesc.Height) / gs_imGuiBaseVerticalResolution;
-        auto fontSize = round(gs_imGuiBaseFontSize * fontScale);
-        if (fontSize < 13)
-            io.Fonts->AddFontDefault();
-        else if (!io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/tahoma.ttf", fontSize))
-            io.Fonts->AddFontDefault();
+        imguioverlay::Configure(float(desc.BufferDesc.Height) / gs_imGuiBaseVerticalResolution);
     }
 
     void RenderImGui() {
         if (!g_showImGui || !context || !renderTargetView)
             return;
-        ImGui_ImplWin32_SetMousePosScale(imGuiMousePosScaleX, imGuiMousePosScaleY);
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
-        ImGui::EndFrame();
-        ImGui::Render();
+        auto drawData = imguioverlay::Render(imGuiMousePosScaleX, imGuiMousePosScaleY);
         context->OMSetRenderTargets(1, &renderTargetView, NULL);
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+        ImGui_ImplDX11_RenderDrawData(drawData);
     }
 
     HRESULT WINAPI D3DPresent(IDXGISwapChain* swapChain, UINT SyncInterval, UINT Flags) {

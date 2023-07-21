@@ -117,8 +117,9 @@ namespace core::messagequeue {
                     } }
                 );
             }
-            if (g_showImGui)
+            if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
+            }
             else {
                 HandleMousePress(e, WM_LBUTTON, g_leftMousePressed = true, 0);
                 HandleMousePress(e, WM_MBUTTON, g_midMousePressed = true, 0);
