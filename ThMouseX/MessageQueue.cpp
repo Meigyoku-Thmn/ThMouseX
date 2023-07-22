@@ -158,7 +158,12 @@ namespace core::messagequeue {
                 }
             }
             else if (e->message == WM_SIZE) {
-                if (e->wParam == SIZE_RESTORED) {
+                static bool isMinimized = false;
+                if (e->wParam == SIZE_MINIMIZED) {
+                    isMinimized = true;
+                }
+                else if (e->wParam == SIZE_RESTORED && isMinimized) {
+                    isMinimized = false;
                     callbackstore::TriggerClearMeasurementFlagsCallbacks();
                 }
             }
