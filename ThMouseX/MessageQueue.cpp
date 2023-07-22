@@ -103,20 +103,18 @@ namespace core::messagequeue {
     }
 
     LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        if (code == HC_ACTION && g_hookApplied) {
-            auto e = (PMSG)lParam;
-            if (g_hFocusWindow) {
-                HandleKeyboardPress(e, gs_toggleImGuiButton, { {
-                    g_showImGui = !g_showImGui;
-                    if (g_showImGui) {
-                        g_inputEnabled = false;
-                        ShowMousePointer();
-                    }
-                    else
-                        HideMousePointer();
-                    } }
-                );
-            }
+        auto e = (PMSG)lParam;
+        if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
+            HandleKeyboardPress(e, gs_toggleImGuiButton, { {
+                g_showImGui = !g_showImGui;
+                if (g_showImGui) {
+                    g_inputEnabled = false;
+                    ShowMousePointer();
+                }
+                else
+                    HideMousePointer();
+                } }
+            );
             if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
