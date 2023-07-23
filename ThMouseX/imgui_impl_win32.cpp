@@ -590,21 +590,19 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
         case WM_MBUTTONUP:
         case WM_XBUTTONUP:
         {
-            if (bd->MouseIsCaptured) {
-                ImGuiMouseSource mouse_source = GetMouseSourceFromMessageExtraInfo();
-                int button = 0;
-                if (msg == WM_LBUTTONUP) { button = 0; }
-                if (msg == WM_RBUTTONUP) { button = 1; }
-                if (msg == WM_MBUTTONUP) { button = 2; }
-                if (msg == WM_XBUTTONUP) { button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4; }
-                bd->MouseButtonsDown &= ~(1 << button);
-                if (bd->MouseButtonsDown == 0 && ::GetCapture() == hwnd) {
-                    ::ReleaseCapture();
-                    bd->MouseIsCaptured = false;
-                }
-                io.AddMouseSourceEvent(mouse_source);
-                io.AddMouseButtonEvent(button, false);
+            ImGuiMouseSource mouse_source = GetMouseSourceFromMessageExtraInfo();
+            int button = 0;
+            if (msg == WM_LBUTTONUP) { button = 0; }
+            if (msg == WM_RBUTTONUP) { button = 1; }
+            if (msg == WM_MBUTTONUP) { button = 2; }
+            if (msg == WM_XBUTTONUP) { button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4; }
+            bd->MouseButtonsDown &= ~(1 << button);
+            if (bd->MouseIsCaptured && bd->MouseButtonsDown == 0 && ::GetCapture() == hwnd) {
+                ::ReleaseCapture();
+                bd->MouseIsCaptured = false;
             }
+            io.AddMouseSourceEvent(mouse_source);
+            io.AddMouseButtonEvent(button, false);
             return 0;
         }
         case WM_MOUSEWHEEL:
