@@ -27,38 +27,28 @@ void SendKeyUp(BYTE vkCode) {
     SendMessageW(g_hFocusWindow, WM_KEYUP, vkCode, MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC));
 }
 
-void HandleHoldKey(DWORD gameInput, bool& lastState, BYTE vkCode) {
+void HandleKeyPress(DWORD gameInput, bool& wasPressing, BYTE vkCode) {
     if (gameInput) {
-        if (!lastState) {
+        if (!wasPressing) {
             SendKeyDown(vkCode);
-            lastState = true;
+            wasPressing = true;
         }
     } else {
-        if (lastState) {
+        if (wasPressing) {
             SendKeyUp(vkCode);
-            lastState = false;
+            wasPressing = false;
         }
-    }
-}
-
-void HandleTriggerKey(DWORD gameInput, bool& lastState, BYTE vkCode) {
-    if (gameInput) {
-        SendKeyDown(vkCode);
-        lastState = true;
-    } else if (lastState) {
-        SendKeyUp(vkCode);
-        lastState = false;
     }
 }
 
 void TestInputAndSendKeys() {
     auto gameInput = DetermineGameInput();
-    HandleTriggerKey(gameInput & USE_BOMB, _ref lastState.bomb, gs_bombButton);
-    HandleTriggerKey(gameInput & USE_SPECIAL, _ref lastState.extra, gs_extraButton);
-    HandleHoldKey(gameInput & MOVE_LEFT, _ref lastState.left, VK_LEFT);
-    HandleHoldKey(gameInput & MOVE_RIGHT, _ref lastState.right, VK_RIGHT);
-    HandleHoldKey(gameInput & MOVE_UP, _ref lastState.up, VK_UP);
-    HandleHoldKey(gameInput & MOVE_DOWN, _ref lastState.down, VK_DOWN);
+    HandleKeyPress(gameInput & USE_BOMB, _ref lastState.bomb, gs_bombButton);
+    HandleKeyPress(gameInput & USE_SPECIAL, _ref lastState.extra, gs_extraButton);
+    HandleKeyPress(gameInput & MOVE_LEFT, _ref lastState.left, VK_LEFT);
+    HandleKeyPress(gameInput & MOVE_RIGHT, _ref lastState.right, VK_RIGHT);
+    HandleKeyPress(gameInput & MOVE_UP, _ref lastState.up, VK_UP);
+    HandleKeyPress(gameInput & MOVE_DOWN, _ref lastState.down, VK_DOWN);
 }
 
 void CleanUp(bool isProcessTerminating) {

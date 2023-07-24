@@ -119,8 +119,8 @@ namespace core::messagequeue {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
             else {
-                HandleMousePress(e, WM_LBUTTON, g_leftMousePressed = true, 0);
-                HandleMousePress(e, WM_MBUTTON, g_midMousePressed = true, 0);
+                HandleMousePress(e, WM_LBUTTON, g_leftMousePressed = true, g_leftMousePressed = false);
+                HandleMousePress(e, WM_MBUTTON, g_midMousePressed = true, g_midMousePressed = false);
                 HandleMousePress(e, WM_RBUTTON, 0, g_inputEnabled = !g_inputEnabled);
                 HandleKeyboardPress(e, gs_toggleOsCursorButton, isCursorShow ? HideMousePointer() : ShowMousePointer());
             }

@@ -18,11 +18,9 @@ namespace core::inputdetermine {
         DWORD gameInput = 0;
         if (g_leftMousePressed) {
             gameInput |= USE_BOMB;
-            g_leftMousePressed = false;
         }
         if (g_midMousePressed) {
             gameInput |= USE_SPECIAL;
-            g_midMousePressed = false;
         }
         if (g_inputEnabled) {
             auto address = helper::CalculateAddress();
