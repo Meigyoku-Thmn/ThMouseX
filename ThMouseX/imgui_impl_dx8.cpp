@@ -47,14 +47,22 @@ ImGui_ImplDX8_Data* ImGui_ImplDX8_GetBackendData() {
 void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data) {
     ImGui_ImplDX8_Data* bd = ImGui_ImplDX8_GetBackendData();
 
-    // Setup viewport
-    D3DVIEWPORT8 vp{};
-    vp.X = vp.Y = 0;
-    vp.Width = (DWORD)draw_data->DisplaySize.x;
-    vp.Height = (DWORD)draw_data->DisplaySize.y;
-    vp.MinZ = 0.0f;
-    vp.MaxZ = 1.0f;
-    bd->pd3dDevice->SetViewport(&vp);
+    IDirect3DSurface8* pSurface{};
+    D3DSURFACE_DESC d3dSize{};
+    if (SUCCEEDED(bd->pd3dDevice->GetRenderTarget(&pSurface)) && SUCCEEDED(pSurface->GetDesc(&d3dSize))) {
+        // Setup viewport
+        D3DVIEWPORT8 vp{};
+        vp.X = vp.Y = 0;
+        vp.Width = d3dSize.Width;
+        vp.Height = d3dSize.Height;
+        vp.MinZ = 0.0f;
+        vp.MaxZ = 1.0f;
+        bd->pd3dDevice->SetViewport(&vp);
+    }
+    if (pSurface) {
+        pSurface->Release();
+        pSurface = NULL;
+    }
 
     // Setup render state: fixed-pipeline, alpha-blending, no face culling, no depth testing, shade mode (for gradient), bilinear sampling.
     bd->pd3dDevice->GetDepthStencilSurface(&bd->realDepthStencilBuffer);
@@ -94,9 +102,9 @@ void ImGui_ImplDX8_SetupRenderState(ImDrawData* draw_data) {
     // Being agnostic of whether <d3dx8.h> or <DirectXMath.h> can be used, we aren't relying on D3DXMatrixIdentity()/D3DXMatrixOrthoOffCenterLH() or DirectX::XMMatrixIdentity()/DirectX::XMMatrixOrthographicOffCenterLH()
     {
         float L = draw_data->DisplayPos.x + 0.5f;
-        float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x + 0.5f;
+        float R = draw_data->DisplayPos.x + d3dSize.Width + 0.5f;
         float T = draw_data->DisplayPos.y + 0.5f;
-        float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y + 0.5f;
+        float B = draw_data->DisplayPos.y + d3dSize.Height + 0.5f;
         D3DMATRIX mat_identity = {{{
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
