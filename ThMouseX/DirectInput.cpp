@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <wrl/client.h>
+#include <mutex>
 
 #include "../Common/macro.h"
 #include "../Common/DataTypes.h"
@@ -31,14 +32,19 @@ namespace core::directinput {
 
     void Initialize() {
         static bool initialized = false;
-        if (initialized)
-            return;
-        if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
-            return;
-        auto dinput8 = helper::GetSystemModuleHandle(L"DInput8.dll");
-        if (!dinput8)
-            return;
-        initialized = true;
+        static mutex mtx;
+        HMODULE dinput8{};
+        {
+            const lock_guard lock(mtx);
+            if (initialized)
+                return;
+            if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
+                return;
+            dinput8 = helper::GetSystemModuleHandle(L"DInput8.dll");
+            if (!dinput8)
+                return;
+            initialized = true;
+        }
 
         auto _DirectInput8Create = (decltype(&DirectInput8Create))GetProcAddress(dinput8, "DirectInput8Create");
         if (!_DirectInput8Create) {

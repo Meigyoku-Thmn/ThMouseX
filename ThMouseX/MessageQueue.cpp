@@ -103,22 +103,21 @@ namespace core::messagequeue {
     }
 
     LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        if (code == HC_ACTION && g_hookApplied) {
-            auto e = (PMSG)lParam;
-            if (g_hFocusWindow) {
-                HandleKeyboardPress(e, gs_toggleImGuiButton, { {
-                    g_showImGui = !g_showImGui;
-                    if (g_showImGui) {
-                        g_inputEnabled = false;
-                        ShowMousePointer();
-                    }
-                    else
-                        HideMousePointer();
-                    } }
-                );
-            }
-            if (g_showImGui)
+        auto e = (PMSG)lParam;
+        if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
+            HandleKeyboardPress(e, gs_toggleImGuiButton, { {
+                g_showImGui = !g_showImGui;
+                if (g_showImGui) {
+                    g_inputEnabled = false;
+                    ShowMousePointer();
+                }
+                else
+                    HideMousePointer();
+                } }
+            );
+            if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
+            }
             else {
                 HandleMousePress(e, WM_LBUTTON, g_leftMousePressed = true, 0);
                 HandleMousePress(e, WM_MBUTTON, g_midMousePressed = true, 0);
@@ -157,7 +156,12 @@ namespace core::messagequeue {
                 }
             }
             else if (e->message == WM_SIZE) {
-                if (e->wParam == SIZE_RESTORED) {
+                static bool isMinimized = false;
+                if (e->wParam == SIZE_MINIMIZED) {
+                    isMinimized = true;
+                }
+                else if (e->wParam == SIZE_RESTORED && isMinimized) {
+                    isMinimized = false;
                     callbackstore::TriggerClearMeasurementFlagsCallbacks();
                 }
             }
