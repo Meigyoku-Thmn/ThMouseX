@@ -6,7 +6,6 @@
 #include "DataTypes.h"
 
 namespace common::helper {
-    HMODULE GetSystemModuleHandle(const WCHAR* moduleName);
     void ReportLastError(const char* title);
     std::string& Replace(std::string& input, const char* keyword, const char* replacement);
     std::tuple<float, const char*> ConvertToFloat(const std::string& input);

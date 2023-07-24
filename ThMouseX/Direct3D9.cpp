@@ -120,7 +120,7 @@ namespace core::directx9 {
             const lock_guard lock(mtx);
             if (initialized)
                 return;
-            d3d9 = helper::GetSystemModuleHandle(L"d3d9.dll");
+            d3d9 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d9.dll")).c_str());
             if (!d3d9)
                 return;
             initialized = true;

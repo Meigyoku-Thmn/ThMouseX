@@ -69,6 +69,8 @@ namespace core {
 
         g_targetModule = GetModuleHandleW(NULL);
 
+        GetSystemDirectoryW(g_systemDirPath, ARRAYSIZE(g_systemDirPath));
+
         GetModuleFileNameW(g_coreModule, g_currentModuleDirPath, ARRAYSIZE(g_currentModuleDirPath));
         PathRemoveFileSpecW(g_currentModuleDirPath);
 

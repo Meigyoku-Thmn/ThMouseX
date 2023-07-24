@@ -114,7 +114,7 @@ namespace core::directx8 {
             const lock_guard lock(mtx);
             if (initialized)
                 return;
-            d3d8 = helper::GetSystemModuleHandle(L"d3d8.dll");
+            d3d8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d8.dll")).c_str());
             if (!d3d8)
                 return;
             initialized = true;

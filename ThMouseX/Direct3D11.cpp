@@ -116,7 +116,7 @@ namespace core::directx11 {
             const lock_guard lock(mtx);
             if (initialized)
                 return;
-            d3d11 = helper::GetSystemModuleHandle(L"d3d11.dll");
+            d3d11 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d11.dll")).c_str());
             if (!d3d11)
                 return;
             initialized = true;

@@ -40,7 +40,7 @@ namespace core::directinput {
                 return;
             if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
                 return;
-            dinput8 = helper::GetSystemModuleHandle(L"DInput8.dll");
+            dinput8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\DInput8.dll")).c_str());
             if (!dinput8)
                 return;
             initialized = true;

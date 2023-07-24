@@ -12,21 +12,6 @@
 using namespace std;
 
 namespace common::helper {
-    // This function expects a file name with extension, not a file path
-    HMODULE GetSystemModuleHandle(const WCHAR* moduleName) {
-        if (moduleName == NULL)
-            return NULL;
-        auto moduleHandle = GetModuleHandleW(moduleName);
-        if (moduleHandle == NULL)
-            return NULL;
-        WCHAR modulePath[MAX_PATH];
-        GetModuleFileNameW(moduleHandle, modulePath, ARRAYSIZE(modulePath));
-        auto expectedPath = L"C:\\WINDOWS\\SYSTEM32\\" + wstring(moduleName);
-        if (_wcsicmp(expectedPath.c_str(), modulePath) == 0)
-            return moduleHandle;
-        return NULL;
-    }
-
     void ReportLastError(const char* title) {
         auto flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         auto dwErr = GetLastError();
