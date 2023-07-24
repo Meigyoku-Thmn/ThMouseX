@@ -65,6 +65,8 @@ namespace core::directx8 {
     bool cursorStatePrepared;
     bool imGuiConfigured;
 
+    bool imGuiPrepared;
+
     void ClearMeasurementFlags() {
         measurementPrepared = false;
         cursorStatePrepared = false;
@@ -87,7 +89,7 @@ namespace core::directx8 {
         measurementPrepared = false;
         cursorStatePrepared = false;
         imGuiConfigured = false;
-        if (forReal) {
+        if (forReal && imGuiPrepared) {
             ImGui_ImplDX8_Shutdown();
             ImGui_ImplWin32_Shutdown();
             ImGui::DestroyContext();
@@ -342,7 +344,6 @@ namespace core::directx8 {
     }
 
     void PrepareImGui(IDirect3DDevice8* pDevice) {
-        static bool imGuiPrepared;
         if (imGuiPrepared)
             return;
         imGuiPrepared = true;

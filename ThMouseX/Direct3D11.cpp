@@ -65,6 +65,8 @@ namespace core::directx11 {
     bool cursorStatePrepared;
     bool imGuiConfigured;
 
+    bool imGuiPrepared;
+
     void ClearMeasurementFlags() {
         measurementPrepared = false;
         cursorStatePrepared = false;
@@ -95,7 +97,7 @@ namespace core::directx11 {
         measurementPrepared = false;
         cursorStatePrepared = false;
         imGuiConfigured = false;
-        if (forReal) {
+        if (forReal && imGuiPrepared) {
             ImGui_ImplDX11_Shutdown();
             ImGui_ImplWin32_Shutdown();
             ImGui::DestroyContext();
@@ -353,7 +355,6 @@ namespace core::directx11 {
     }
 
     void PrepareImGui() {
-        static bool imGuiPrepared;
         if (imGuiPrepared)
             return;
         imGuiPrepared = true;
