@@ -4,5 +4,5 @@
 namespace core::imguioverlay {
     void Prepare();
     void Configure(float fontScale);
-    ImDrawData* Render(float mouseScaleX, float mouseScaleY);
+    ImDrawData* Render(unsigned int renderWidth, unsigned int renderHeight, float mouseScaleX, float mouseScaleY);
 }

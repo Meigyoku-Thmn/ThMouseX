@@ -384,12 +384,21 @@ namespace core::directx11 {
         imguioverlay::Configure(float(desc.BufferDesc.Height) / gs_imGuiBaseVerticalResolution);
     }
 
-    void RenderImGui() {
+    void RenderImGui(IDXGISwapChain* swapChain) {
         if (!g_showImGui || !context || !renderTargetView)
             return;
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
-        auto drawData = imguioverlay::Render(imGuiMousePosScaleX, imGuiMousePosScaleY);
+        DXGI_SWAP_CHAIN_DESC desc;
+        auto rs = swapChain->GetDesc(&desc);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "RenderImGui: swapChain->GetDesc failed", rs);
+            return;
+        }
+        auto drawData = imguioverlay::Render(
+            desc.BufferDesc.Width, desc.BufferDesc.Height,
+            imGuiMousePosScaleX, imGuiMousePosScaleY
+        );
         context->OMSetRenderTargets(1, &renderTargetView, NULL);
         ImGui_ImplDX11_RenderDrawData(drawData);
     }
@@ -401,7 +410,7 @@ namespace core::directx11 {
         PrepareImGui();
         ConfigureImGui(swapChain);
         RenderCursor(swapChain);
-        RenderImGui();
+        RenderImGui(swapChain);
         callbackstore::TriggerPostRenderCallbacks();
         return OriPresent(swapChain, SyncInterval, Flags);
     }

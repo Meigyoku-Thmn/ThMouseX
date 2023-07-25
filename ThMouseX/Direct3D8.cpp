@@ -385,7 +385,19 @@ namespace core::directx8 {
             return;
         ImGui_ImplDX8_NewFrame();
         ImGui_ImplWin32_NewFrame();
-        auto drawData = imguioverlay::Render(imGuiMousePosScaleX, imGuiMousePosScaleY);
+        ComPtr<IDirect3DSurface8> pSurface;
+        auto rs = pDevice->GetRenderTarget(&pSurface);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "RenderImGui: pDevice->GetRenderTarget failed", rs);
+            return;
+        }
+        D3DSURFACE_DESC d3dSize;
+        rs = pSurface->GetDesc(&d3dSize);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "RenderImGui: pSurface->GetDesc failed", rs);
+            return;
+        }
+        auto drawData = imguioverlay::Render(d3dSize.Width, d3dSize.Height, imGuiMousePosScaleX, imGuiMousePosScaleY);
         pDevice->BeginScene();
         ImGui_ImplDX8_RenderDrawData(drawData);
         pDevice->EndScene();

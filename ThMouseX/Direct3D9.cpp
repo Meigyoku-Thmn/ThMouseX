@@ -430,7 +430,19 @@ namespace core::directx9 {
             return;
         ImGui_ImplDX9_NewFrame();
         ImGui_ImplWin32_NewFrame();
-        auto drawData = imguioverlay::Render(imGuiMousePosScaleX, imGuiMousePosScaleY);
+        ComPtr<IDirect3DSurface9> pSurface;
+        auto rs = pDevice->GetRenderTarget(0, &pSurface);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "RenderImGui: pDevice->GetRenderTarget failed", rs);
+            return;
+        }
+        D3DSURFACE_DESC d3dSize;
+        rs = pSurface->GetDesc(&d3dSize);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "RenderImGui: pSurface->GetDesc failed", rs);
+            return;
+        }
+        auto drawData = imguioverlay::Render(d3dSize.Width, d3dSize.Height, imGuiMousePosScaleX, imGuiMousePosScaleY);
         pDevice->BeginScene();
         ImGui_ImplDX9_RenderDrawData(drawData);
         pDevice->EndScene();
