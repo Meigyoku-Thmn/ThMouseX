@@ -65,6 +65,8 @@ namespace core::messagequeue {
     auto hCursor = LoadCursorA(NULL, IDC_ARROW);
 
     HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
+        if (g_showImGui)
+            return OriSetCursor(hCursor);
         return NULL;
     }
 
@@ -140,10 +142,13 @@ namespace core::messagequeue {
                 NormalizeCursor();
             }
             auto e = (PCWPRETSTRUCT)lParam;
+            if (g_showImGui) {
+                ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
+            }
             if (e->message == CLEAN_MANAGED_DATA) {
                 neolua::Uninitialize();
             }
-            else if (e->message == WM_SETCURSOR) {
+            else if (e->message == WM_SETCURSOR && !g_showImGui) {
                 if (LOWORD(e->lParam) == HTCLIENT) {
                     if (isCursorShow)
                         ShowMousePointer();
