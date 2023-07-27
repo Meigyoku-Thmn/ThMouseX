@@ -30,20 +30,20 @@ using namespace Microsoft::WRL;
 
 void OnClose();
 decltype(&OnClose) onClose;
-void NeoLua_SetOnClose(DWORD address) {
+DLLEXPORT_C void NeoLua_SetOnClose(DWORD address) {
     *(PDWORD)&onClose = address;
 }
 
-DWORD positionAddress;
-void NeoLua_SetPositionAddress(DWORD address) {
+static DWORD positionAddress;
+DLLEXPORT_C void NeoLua_SetPositionAddress(DWORD address) {
     positionAddress = address;
 }
 
-PointDataType NeoLua_GetDataType() {
+DLLEXPORT_C PointDataType NeoLua_GetDataType() {
     return g_currentConfig.PosDataType;
 }
 
-void NeoLua_OpenConsole() {
+DLLEXPORT_C void NeoLua_OpenConsole() {
     note::OpenConsole();
 }
 
@@ -53,7 +53,13 @@ namespace common::neolua {
     }
 
     void Initialize() {
-        if (g_currentConfig.ScriptingMethodToFindAddress != ScriptingMethod::NeoLua)
+        if (g_currentConfig.ScriptType != ScriptType::NeoLua)
+            return;
+        // Only support Attached
+        if (g_currentConfig.ScriptRunPlace != ScriptRunPlace::Attached)
+            return;
+        // Only support Push
+        if (g_currentConfig.ScriptPositionGetMethod != ScriptPositionGetMethod::Push)
             return;
 
         auto mscoree = GetModuleHandleW(L"mscoree.dll");

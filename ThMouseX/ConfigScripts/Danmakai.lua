@@ -8,13 +8,13 @@ local objectIds = {PLAYER_ELDY, PLAYER_DIANA, PLAYER_ANGEL, HITMARK}
 objectIds[0] = #objectIds
 
 local baseOffset = 0x023D561C
-local objectPoolCountAddress = ResolveAddress(AllocNew('uint32_t[1]', {baseOffset + 2 * 4}), 1)
+local objectPoolCountAddress = ResolveAddress(ffi.new('uint32_t[1]', {baseOffset + 2 * 4}), 1)
 
 local positionOffset = 0xB4
 local objectIdOffset = 0x7C
 
-local posAddressChain = AllocNew('uint32_t[3]', {baseOffset, 0, positionOffset})
-local objectIdAddressChain = AllocNew('uint32_t[4]', {baseOffset, 0, objectIdOffset, 0})
+local posAddressChain = ffi.new('uint32_t[3]', {baseOffset, 0, positionOffset})
+local objectIdAddressChain = ffi.new('uint32_t[4]', {baseOffset, 0, objectIdOffset, 0})
 
 local objectFound = false
 

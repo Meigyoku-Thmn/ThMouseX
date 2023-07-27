@@ -1,7 +1,6 @@
 #include <MinHook.h>
 #include <vector>
 #include "macro.h"
-#include <nameof.hpp>
 
 #include "MinHook.h"
 #include "CallbackStore.h"
@@ -16,16 +15,14 @@ using namespace std;
 namespace common::minhook {
     void Uninitialize(bool isProcessTerminating) {
         auto rs = MH_Uninitialize();
-        auto errName = string(NAMEOF_ENUM(rs));
         if (!isProcessTerminating && rs != MH_OK)
-            note::ToFile("[MinHook] Failed to uninitialize MinHook: %s", errName.c_str());
+            note::ToFile("[MinHook] Failed to uninitialize MinHook: %s", MH_StatusToString(rs));
     }
 
     bool Initialize() {
         auto rs = MH_Initialize();
-        auto errName = string(NAMEOF_ENUM(rs));
         if (rs != MH_OK) {
-            note::ToFile("[MinHook] Failed to initialize MinHook: %s", errName.c_str());
+            note::ToFile("[MinHook] Failed to initialize MinHook: %s", MH_StatusToString(rs));
             return false;
         }
         callbackstore::RegisterUninitializeCallback(Uninitialize);
@@ -35,9 +32,8 @@ namespace common::minhook {
     bool CreateHook(const vector<HookConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto rs = MH_CreateHook(config.pTarget, config.pDetour, config.ppOriginal);
-            auto errName = string(NAMEOF_ENUM(rs));
             if (rs != MH_OK) {
-                note::ToFile("[MinHook] Failed to create hook for target %p: %s", config.pTarget, errName.c_str());
+                note::ToFile("[MinHook] Failed to create hook for target %p: %s", config.pTarget, MH_StatusToString(rs));
                 return false;
             }
         }
@@ -47,10 +43,9 @@ namespace common::minhook {
     bool CreateApiHook(const vector<HookApiConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto rs = MH_CreateHookApi(config.moduleName, config.procName, config.pDetour, config.ppOriginal);
-            auto errName = string(NAMEOF_ENUM(rs));
             if (rs != MH_OK) {
                 auto moduleName = encoding::ConvertToUtf8(config.moduleName);
-                note::ToFile("[MinHook] Failed to create hook for api %s|%s: %s", moduleName.c_str(), config.procName, errName.c_str());
+                note::ToFile("[MinHook] Failed to create hook for api %s|%s: %s", moduleName.c_str(), config.procName, MH_StatusToString(rs));
                 return false;
             }
         }
@@ -89,9 +84,8 @@ namespace common::minhook {
 
     bool EnableAll() {
         auto rs = MH_EnableHook(MH_ALL_HOOKS);
-        auto errName = string(NAMEOF_ENUM(rs));
         if (rs != MH_OK) {
-            note::ToFile("[MinHook] Failed to enable all hooks: %s", errName.c_str());
+            note::ToFile("[MinHook] Failed to enable all hooks: %s", MH_StatusToString(rs));
             return false;
         }
         return true;

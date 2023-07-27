@@ -7,7 +7,7 @@ ffi.cdef [[
 ]]
 
 local Obj_Player_Id = 232
-local getObjectFromId = ffi.cast("getObjectFromId", ResolveAddress(AllocNew('uint32_t[1]', {0x34A30}), 1))
+local getObjectFromId = ffi.cast("getObjectFromId", ResolveAddress(ffi.new('uint32_t[1]', {0x34A30}), 1))
 
 -- native code will call into this function for each frame
 function getPositionAddress()

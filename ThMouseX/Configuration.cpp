@@ -85,7 +85,7 @@ typedef unordered_map<string, BYTE, string_hash, equal_to<>> VkCodes;
 #pragma region method declaration
 bool IsCommentLine(stringstream& stream);
 tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount);
-tuple<vector<DWORD>, ScriptingMethod, bool> ExtractPositionRVA(stringstream& stream, int lineCount);
+tuple<vector<DWORD>, ScriptType, ScriptRunPlace, ScriptPositionGetMethod, bool> ExtractPositionRVA(stringstream& stream, int lineCount);
 tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount);
 tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount);
 tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount);
@@ -115,7 +115,7 @@ namespace core::configuration {
             if (!ok1)
                 return false;
 
-            auto [addressOffsets, scriptingMethod, ok2] = ExtractPositionRVA(lineStream, lineCount);
+            auto [addressOffsets, scriptType, scriptRunPlace, scriptPosGetMethod, ok2] = ExtractPositionRVA(lineStream, lineCount);
             if (!ok2)
                 return false;
 
@@ -150,7 +150,9 @@ namespace core::configuration {
                 assert(addressOffsets.size() <= ARRAYSIZE(gameConfig.Address.Level));
                 gameConfig.Address.Length = addressOffsets.size();
             }
-            gameConfig.ScriptingMethodToFindAddress = scriptingMethod;
+            gameConfig.ScriptType = scriptType;
+            gameConfig.ScriptRunPlace = scriptRunPlace;
+            gameConfig.ScriptPositionGetMethod = scriptPosGetMethod;
 
             gameConfig.PosDataType = dataType;
 
@@ -230,17 +232,47 @@ tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount) {
     return {move(wProcessName), true};
 }
 
-tuple<vector<DWORD>, ScriptingMethod, bool> ExtractPositionRVA(stringstream& stream, int lineCount) {
+tuple<vector<DWORD>, ScriptType, ScriptRunPlace, ScriptPositionGetMethod, bool>
+ExtractPositionRVA(stringstream& stream, int lineCount) {
     string pointerChainStr;
     stream >> pointerChainStr;
     vector<DWORD> addressOffsets;
-    auto scriptingEngine = ScriptingMethod::None;
 
-    if (_stricmp(pointerChainStr.c_str(), "LuaJIT") == 0)
-        scriptingEngine = ScriptingMethod::LuaJIT;
-    else if (_stricmp(pointerChainStr.c_str(), "NeoLua") == 0)
-        scriptingEngine = ScriptingMethod::NeoLua;
-    else {
+    auto scriptType = ScriptType::None;
+    auto scriptRunPlace = ScriptRunPlace::None;
+    auto scriptPosGetMethod = ScriptPositionGetMethod::None;
+
+    auto scriptingConfig = string(pointerChainStr);
+    auto tok = strtok(scriptingConfig.data(), "/");
+    const char* segments[3]{"", "", ""};
+    auto segPos = 0;
+    while (tok != NULL) {
+        if (tok[0] != '\0')
+            segments[segPos] = tok;
+        segPos++;
+        tok = strtok(NULL, "/");
+        if (segPos == 3)
+            break;
+    }
+
+    if (_stricmp(segments[0], "LuaJIT") == 0)
+        scriptType = ScriptType::LuaJIT;
+    else if (_stricmp(segments[0], "NeoLua") == 0)
+        scriptType = ScriptType::NeoLua;
+    else if (_stricmp(segments[0], "Lua") == 0)
+        scriptType = ScriptType::Lua;
+
+    if (_stricmp(segments[1], "Detached") == 0)
+        scriptRunPlace = ScriptRunPlace::Detached;
+    else if (_stricmp(segments[1], "Attached") == 0)
+        scriptRunPlace = ScriptRunPlace::Attached;
+
+    if (_stricmp(segments[2], "Pull") == 0)
+        scriptPosGetMethod = ScriptPositionGetMethod::Pull;
+    else if (_stricmp(segments[2], "Push") == 0)
+        scriptPosGetMethod = ScriptPositionGetMethod::Push;
+
+    if (scriptType == ScriptType::None) {
         auto maxSize = ARRAYSIZE(gs_gameConfigs[0].Address.Level);
         addressOffsets.reserve(maxSize);
         size_t leftBoundIdx = 0, rightBoundIdx = -1;
@@ -257,7 +289,7 @@ tuple<vector<DWORD>, ScriptingMethod, bool> ExtractPositionRVA(stringstream& str
             if (convMessage != nullptr) {
                 MessageBoxA(NULL, format("Invalid positionRVA: {} at line {} in " GameFile ".",
                     convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-                return {move(addressOffsets), scriptingEngine, false};
+                return {move(addressOffsets), scriptType, scriptRunPlace, scriptPosGetMethod, false};
             }
 
             addressOffsets.push_back(offset);
@@ -266,11 +298,11 @@ tuple<vector<DWORD>, ScriptingMethod, bool> ExtractPositionRVA(stringstream& str
         if (addressOffsets.size() == 0) {
             MessageBoxA(NULL, format("Found no address offset for positionRVA at line {} in " GameFile ".",
                 lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-            return {move(addressOffsets), scriptingEngine, false};
+            return {move(addressOffsets), scriptType, scriptRunPlace, scriptPosGetMethod, false};
         }
     }
 
-    return {move(addressOffsets), scriptingEngine, true};
+    return {move(addressOffsets), scriptType, scriptRunPlace, scriptPosGetMethod, true};
 }
 
 tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount) {
@@ -378,9 +410,7 @@ tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount)
     auto inputMethods = InputMethod::None;
     auto inputMethodIter = strtok(inputMethodStr.data(), "/");
     while (inputMethodIter != NULL) {
-        if (_stricmp(inputMethodIter, "HookAll") == 0)
-            inputMethods |= InputMethod::DirectInput | InputMethod::GetKeyboardState;
-        else if (_stricmp(inputMethodIter, "DirectInput") == 0)
+        if (_stricmp(inputMethodIter, "DirectInput") == 0)
             inputMethods |= InputMethod::DirectInput;
         else if (_stricmp(inputMethodIter, "GetKeyboardState") == 0)
             inputMethods |= InputMethod::GetKeyboardState;

@@ -23,16 +23,32 @@ namespace callbackstore = common::callbackstore;
 
 using namespace std;
 
-DWORD LuaJIT_ReadUInt32(DWORD address) {
+DLLEXPORT_C DWORD LuaJIT_ReadUInt32(DWORD address) {
     return *PDWORD(address);
 }
 
-DWORD LuaJIT_ResolveAddress(DWORD* offsets, int length) {
+DLLEXPORT_C DWORD LuaJIT_ResolveAddress(DWORD* offsets, int length) {
     return memory::ResolveAddress(offsets, length);
 }
 
-void LuaJIT_OpenConsole() {
+DLLEXPORT_C void LuaJIT_OpenConsole() {
     note::OpenConsole();
+}
+
+static DWORD positionAddress;
+DLLEXPORT_C void LuaJIT_SetPositionAddress(DWORD address) {
+    positionAddress = address;
+}
+
+
+DLLEXPORT_C wchar_t* LuaJIT_ConvertToUtf16Alloc(const char* utf8str) {
+    auto utf16str = encoding::ConvertToUtf16(utf8str);
+    auto utf16raw = new wchar_t[utf16str.size() + 1];
+    return wcscpy(utf16raw, utf16str.c_str());
+}
+
+DLLEXPORT_C void LuaJIT_DeleteUtf16Alloc(wchar_t* utf16) {
+    delete[] utf16;
 }
 
 wstring GetThisModulePath() {
@@ -46,16 +62,23 @@ string GetPreparationScript() {
         local ffi = require("ffi")
 
         ffi.cdef [[
-            uint32_t LuaJIT_ReadUInt32     (uint32_t address);
-            uint32_t LuaJIT_ResolveAddress (uint32_t* offsets, int length);
-            void     LuaJIT_OpenConsole    ();
+            uint32_t LuaJIT_ReadUInt32          (uint32_t address);
+            uint32_t LuaJIT_ResolveAddress      (uint32_t* offsets, int length);
+            void     LuaJIT_OpenConsole         ();
+            void     LuaJIT_SetPositionAddress  (uint32_t address);
+
+            int32_t stdcall MH_CreateHook      (uint32_t* pTarget, uint32_t* pDetour, uint32_t** ppOriginal);
+            int32_t stdcall MH_CreateHookApi   (wchar_t* pszModule, char* pszProcName, uint32_t* pDetour, uint32_t** ppOriginal);
+            int32_t stdcall MH_EnableHook      (uint32_t* pTarget);
+            int32_t stdcall MH_RemoveHook      (uint32_t* pTarget);
+            int32_t stdcall MH_DisableHook     (uint32_t* pTarget);
+            char*   stdcall MH_StatusToString  (int32_t status);
+
+            wchar_t* LuaJIT_ConvertToUtf16Alloc(const char* utf8str);
+            void     LuaJIT_DeleteUtf16Alloc(wchar_t* utf16)
         ]]
 
         local ThMouseX = ffi.load("{}")
-
-        function OpenConsole()
-            return ThMouseX.LuaJIT_OpenConsole()
-        end
 
         function ReadUInt32(address)
             return ThMouseX.LuaJIT_ReadUInt32(address)
@@ -65,8 +88,31 @@ string GetPreparationScript() {
             return ThMouseX.LuaJIT_ResolveAddress(addressChain, length)
         end
 
-        function AllocNew(...)
-            return ffi.new(unpack({{...}}))
+        function OpenConsole()
+            return ThMouseX.LuaJIT_OpenConsole()
+        end
+
+        function SetPositionAddress(address)
+            return ThMouseX.LuaJIT_SetPositionAddress(address)
+        end
+
+        function CreateHook(target, detour, outOriginal)
+            return MH_CreateHook(target, detour, outOriginal)
+        end
+
+        function CreateHookApi(module, procName, detour, outOriginal)
+            local moduleUtf16 = ThMouseX.LuaJIT_ConvertToUtf16Alloc(module)
+            local rs = MH_CreateHookApi(moduleUtf16, procName, detour, outOriginal)
+            LuaJIT_DeleteUtf16Alloc(moduleUtf16)
+            return rs;
+        end
+
+        function RemoveHook(target)
+            return MH_RemoveHook(target)
+        end
+
+        function HookStatusToString(status)
+            return ffi.string(MH_StatusToString(status))
         end
     )", thisDllPath);
     return preparationScript;
@@ -105,7 +151,13 @@ namespace common::luajit {
     }
 
     void Initialize() {
-        if (g_currentConfig.ScriptingMethodToFindAddress != ScriptingMethod::LuaJIT)
+        if (g_currentConfig.ScriptType != ScriptType::LuaJIT)
+            return;
+        // Only support Detached
+        if (g_currentConfig.ScriptRunPlace != ScriptRunPlace::Detached)
+            return;
+        // Can support Pull and Push
+        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::None)
             return;
 
         L = luaL_newstate();
@@ -147,6 +199,9 @@ namespace common::luajit {
         if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str())))
             return;
 
+        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push)
+            return;
+
         lua_getglobal(L, GET_POSITION_ADDRESS);
         if (!lua_isfunction(L, -1)) {
             note::ToFile("[LuaJIT] %s", GET_POSITION_ADDRESS " function not found in global scope.");
@@ -158,6 +213,10 @@ namespace common::luajit {
     DWORD GetPositionAddress() {
         if (scriptingDisabled)
             return NULL;
+
+        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push) {
+            return positionAddress;
+        }
 
         lua_pushvalue(L, -1);
 

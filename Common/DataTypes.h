@@ -71,19 +71,31 @@ GetKeyboardState = 1 << 1,
 SendKey = 1 << 2,
 END_FLAG_ENUM()
 
-enum class ScriptingMethod {
-    None, LuaJIT, NeoLua
+enum class ScriptType {
+    None, LuaJIT, NeoLua, Lua,
+};
+
+enum class ScriptRunPlace {
+    None, Detached, Attached,
+};
+
+enum class ScriptPositionGetMethod {
+    None, Pull, Push,
 };
 
 struct GameConfig {
-    WCHAR           ProcessName[PROCESS_NAME_MAX_LEN];
-    AddressChain    Address;
-    ScriptingMethod ScriptingMethodToFindAddress;
-    PointDataType   PosDataType;
-    FloatPoint      BasePixelOffset;
-    DWORD           BaseHeight;
-    FloatPoint      AspectRatio;
-    InputMethod     InputMethods;
+    WCHAR                   ProcessName[PROCESS_NAME_MAX_LEN];
+    AddressChain            Address;
+
+    ScriptType              ScriptType;
+    ScriptRunPlace          ScriptRunPlace;
+    ScriptPositionGetMethod ScriptPositionGetMethod;
+
+    PointDataType           PosDataType;
+    FloatPoint              BasePixelOffset;
+    DWORD                   BaseHeight;
+    FloatPoint              AspectRatio;
+    InputMethod             InputMethods;
 };
 
 template <class ElementType, size_t ArraySize>

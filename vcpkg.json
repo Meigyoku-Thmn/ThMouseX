@@ -4,7 +4,6 @@
     "directxtk",
     "luajit",
     "minhook",
-    "nameof",
     "inipp"
   ],
   "builtin-baseline": "861c33057553ee836e7061ffbdabc25ea343145d",
@@ -29,10 +28,6 @@
     {
       "name": "minhook",
       "version": "1.3.3"
-    },
-    {
-      "name": "nameof",
-      "version": "0.10.3"
     },
     {
       "name": "inipp",

@@ -161,9 +161,9 @@ namespace common::helper {
     }
 
     DWORD CalculateAddress() {
-        if (g_currentConfig.ScriptingMethodToFindAddress == ScriptingMethod::LuaJIT) {
+        if (g_currentConfig.ScriptType == ScriptType::LuaJIT) {
             return luajit::GetPositionAddress();
-        } else if (g_currentConfig.ScriptingMethodToFindAddress == ScriptingMethod::NeoLua) {
+        } else if (g_currentConfig.ScriptType == ScriptType::NeoLua) {
             return neolua::GetPositionAddress();
         } else {
             return memory::ResolveAddress(g_currentConfig.Address.Level, g_currentConfig.Address.Length);
