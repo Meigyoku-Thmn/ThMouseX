@@ -59,6 +59,12 @@
     <ClInclude Include="CallbackStore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Lua.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -101,6 +107,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CompilerConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lua.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaApi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

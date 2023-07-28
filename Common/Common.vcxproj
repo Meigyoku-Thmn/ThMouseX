@@ -180,6 +180,8 @@
     <ClInclude Include="Helper.h" />
     <ClInclude Include="Helper.Memory.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="Lua.h" />
+    <ClInclude Include="LuaApi.h" />
     <ClInclude Include="LuaJIT.h" />
     <ClInclude Include="macro.h" />
     <ClInclude Include="framework.h" />
@@ -198,6 +200,8 @@
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Helper.Memory.cpp" />
+    <ClCompile Include="Lua.cpp" />
+    <ClCompile Include="LuaApi.cpp" />
     <ClCompile Include="MinHook.cpp" />
     <ClCompile Include="LuaJIT.cpp" />
     <ClCompile Include="NeoLua.cpp" />

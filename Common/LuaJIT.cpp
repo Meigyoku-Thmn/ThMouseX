@@ -51,12 +51,8 @@ DLLEXPORT_C void LuaJIT_DeleteUtf16Alloc(wchar_t* utf16) {
     delete[] utf16;
 }
 
-wstring GetThisModulePath() {
-    return wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME);
-}
-
 string GetPreparationScript() {
-    auto thisDllPath = encoding::ConvertToUtf8(GetThisModulePath().c_str());
+    auto thisDllPath = encoding::ConvertToUtf8((wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME)).c_str());
     helper::Replace(thisDllPath, "\\", "\\\\");
     auto preparationScript = format(R"(
         local ffi = require("ffi")
@@ -138,7 +134,7 @@ namespace common::luajit {
     decltype(&_LoadLibraryExA) OriLoadLibraryExA;
 
     HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
-        auto thisDllPath = GetThisModulePath();
+        auto thisDllPath = wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME);
         if (strcmp(lpLibFileName, encoding::ConvertToUtf8(thisDllPath.c_str()).c_str()) == 0)
             return LoadLibraryExW(thisDllPath.c_str(), hFile, dwFlags);
         else
