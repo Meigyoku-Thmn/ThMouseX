@@ -188,6 +188,7 @@
     <ClInclude Include="MinHook.h" />
     <ClInclude Include="NeoLua.h" />
     <ClInclude Include="CallbackStore.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Variables.h" />
   </ItemGroup>
   <ItemGroup>
@@ -207,6 +208,13 @@
     <ClCompile Include="NeoLua.cpp" />
     <ClCompile Include="CallbackStore.cpp" />
     <ClCompile Include="Variables.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Common.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Common.def" />
+    <None Include="LuaJitPrepScript.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -82,6 +82,21 @@ namespace common::minhook {
         return true;
     }
 
+    bool RemoveHooks(const vector<HookApiConfig>& hookConfigs) {
+        for (auto& config : hookConfigs) {
+            auto hModule = GetModuleHandleW(config.moduleName);
+            if (!hModule)
+                return false;
+            auto proc = GetProcAddress(hModule, config.procName);
+            if (!proc)
+                return false;
+            auto rs = MH_RemoveHook(proc);
+            if (rs != MH_OK)
+                return false;
+        }
+        return true;
+    }
+
     bool EnableAll() {
         auto rs = MH_EnableHook(MH_ALL_HOOKS);
         if (rs != MH_OK) {

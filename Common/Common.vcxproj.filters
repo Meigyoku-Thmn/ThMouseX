@@ -9,6 +9,27 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{331d709d-bc65-4848-a21d-2582d0ee92e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LuaScript">
+      <UniqueIdentifier>{d09c4982-ffc2-4779-bf36-f6de32072931}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LuaScript">
+      <UniqueIdentifier>{526406dd-2934-4efa-bc7f-e60cffff6e8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ErrorMsg">
+      <UniqueIdentifier>{48a9f00e-6410-4246-a825-c2c2ca8fa4db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ErrorMsg">
+      <UniqueIdentifier>{036f30c4-fc00-4ad8-8684-a7e7e8842c5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Helper">
+      <UniqueIdentifier>{02efa8c1-aeb8-4710-a614-6c81800d3a2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helper">
+      <UniqueIdentifier>{933a857b-cacc-4b55-80a8-666329e6ee5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -20,37 +41,10 @@
     <ClInclude Include="DataTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ErrorMsg.Cor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ErrorMsg.D3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ErrorMsg.DDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ErrorMsg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Helper.Encoding.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Helper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Helper.Memory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LuaJIT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MinHook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NeoLua.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Variables.h">
@@ -59,11 +53,41 @@
     <ClInclude Include="CallbackStore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
     <ClInclude Include="Lua.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\LuaScript</Filter>
     </ClInclude>
     <ClInclude Include="LuaApi.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\LuaScript</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaJIT.h">
+      <Filter>Header Files\LuaScript</Filter>
+    </ClInclude>
+    <ClInclude Include="NeoLua.h">
+      <Filter>Header Files\LuaScript</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorMsg.Cor.h">
+      <Filter>Header Files\ErrorMsg</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorMsg.D3D.h">
+      <Filter>Header Files\ErrorMsg</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorMsg.DDraw.h">
+      <Filter>Header Files\ErrorMsg</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorMsg.h">
+      <Filter>Header Files\ErrorMsg</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.Encoding.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.Memory.h">
+      <Filter>Header Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -73,34 +97,7 @@
     <ClCompile Include="Variables.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Helper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MinHook.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaJIT.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NeoLua.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Helper.Memory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Helper.Encoding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ErrorMsg.DDraw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ErrorMsg.Cor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ErrorMsg.D3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ErrorMsg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CallbackStore.cpp">
@@ -110,10 +107,50 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Lua.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\LuaScript</Filter>
     </ClCompile>
     <ClCompile Include="LuaApi.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\LuaScript</Filter>
     </ClCompile>
+    <ClCompile Include="LuaJIT.cpp">
+      <Filter>Source Files\LuaScript</Filter>
+    </ClCompile>
+    <ClCompile Include="NeoLua.cpp">
+      <Filter>Source Files\LuaScript</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorMsg.Cor.cpp">
+      <Filter>Source Files\ErrorMsg</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorMsg.cpp">
+      <Filter>Source Files\ErrorMsg</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorMsg.D3D.cpp">
+      <Filter>Source Files\ErrorMsg</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorMsg.DDraw.cpp">
+      <Filter>Source Files\ErrorMsg</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.Encoding.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.Memory.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Common.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LuaJitPrepScript.lua">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Common.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

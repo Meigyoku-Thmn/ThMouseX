@@ -22,5 +22,6 @@ namespace common::minhook {
     bool CreateApiHook(const std::vector<HookApiConfig>& hookConfigs);
     bool EnableHooks(const std::vector<HookApiConfig>& hookConfigs);
     bool DisableHooks(const std::vector<HookApiConfig>& hookConfigs);
+    bool RemoveHooks(const std::vector<HookApiConfig>& hookConfigs);
     bool EnableAll();
 }

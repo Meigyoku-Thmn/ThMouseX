@@ -1,0 +1,7 @@
+EXPORTS
+    MH_CreateHook
+    MH_CreateHookApi
+    MH_EnableHook
+    MH_RemoveHook
+    MH_DisableHook
+    MH_StatusToString
