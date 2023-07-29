@@ -212,6 +212,7 @@
     <ClInclude Include="KeyboardState.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MessageQueue.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SendKey.h" />
   </ItemGroup>
   <ItemGroup>
@@ -273,6 +274,9 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ThMouseX.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

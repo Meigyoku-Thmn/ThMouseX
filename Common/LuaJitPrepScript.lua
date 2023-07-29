@@ -1,28 +1,32 @@
 local ffi = require("ffi")
 
 ffi.cdef [[
+    typedef unsigned long DWORD;
+    typedef void* LPVOID;
+    typedef const wchar_t* LPCWSTR;
+    typedef const char* LPCSTR;
+    typedef void (*UninitializeCallbackType)(bool isProcessTerminating);
+
     DWORD       Lua_ReadUInt32          (DWORD address);
     DWORD       Lua_ResolveAddress      (DWORD* offsets, int length);
     void        Lua_OpenConsole         ();
     void        Lua_SetPositionAddress  (DWORD address);
     int         Lua_GetDataType         ();
 
-    typedef void (*UninitializeCallbackType)(bool isProcessTerminating);
-
-    void        Lua_RegisterUninitializeCallback    (UninitializeCallbackType callback)
+    void        Lua_RegisterUninitializeCallback    (UninitializeCallbackType callback);
     
     wchar_t*    Lua_ConvertToUtf16Alloc (const char* utf8str);
     void        Lua_DeleteUtf16Alloc    (wchar_t* utf16);
 
-    int         stdcall MH_CreateHook       (LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal);
-    int         stdcall MH_CreateHookApi    (LPCWSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
-    int         stdcall MH_EnableHook       (LPVOID pTarget);
-    int         stdcall MH_RemoveHook       (LPVOID pTarget);
-    int         stdcall MH_DisableHook      (LPVOID pTarget);
-    const char* stdcall MH_StatusToString   (int status);
+    int         __stdcall MH_CreateHook		(LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal);
+    int         __stdcall MH_CreateHookApi	(LPCWSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
+    int         __stdcall MH_EnableHook		(LPVOID pTarget);
+    int         __stdcall MH_RemoveHook		(LPVOID pTarget);
+    int         __stdcall MH_DisableHook	(LPVOID pTarget);
+    const char* __stdcall MH_StatusToString	(int status);
 ]]
 
--- {} should be replaced by a path to ThMouseX.dll
+-- should be replaced by a path to ThMouseX.dll
 local ThMouseX = ffi.load("{}")
 
 function ReadUInt32(address)

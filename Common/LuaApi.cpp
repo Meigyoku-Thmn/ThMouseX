@@ -5,7 +5,7 @@
 #include "Log.h"
 #include "Variables.h"
 #include "CallbackStore.h"
-#include "resource.h"
+#include "../ThMouseX/resource.h"
 
 #include <Windows.h>
 #include <string>

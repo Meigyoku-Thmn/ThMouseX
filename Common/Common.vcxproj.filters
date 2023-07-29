@@ -9,9 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{331d709d-bc65-4848-a21d-2582d0ee92e1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\LuaScript">
       <UniqueIdentifier>{d09c4982-ffc2-4779-bf36-f6de32072931}</UniqueIdentifier>
     </Filter>
@@ -52,9 +49,6 @@
     </ClInclude>
     <ClInclude Include="CallbackStore.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="Lua.h">
       <Filter>Header Files\LuaScript</Filter>
@@ -141,16 +135,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Common.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="LuaJitPrepScript.lua">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Common.def">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="LuaJitPrepScript.lua">
+      <Filter>Source Files\LuaScript</Filter>
     </None>
   </ItemGroup>
 </Project>
