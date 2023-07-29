@@ -4,20 +4,11 @@ using System.Runtime.InteropServices;
 
 namespace NeoLuaBootstrap
 {
-    using DelegateMap = Dictionary<string, (Delegate Delegate, GCHandle Handle)>;
     public static class Handlers
     {
+        [DefaultDllImportSearchPaths(Scripting.SearchPath)]
         [DllImport(Scripting.AppName, CallingConvention = CallingConvention.Cdecl)]
-        static extern void NeoLua_SetOnClose(IntPtr address);
-
-        static readonly DelegateMap EventDelegates = new DelegateMap();
-
-        static Handlers()
-        {
-            var onCloseDelegate = new OnClose(OnClose_Impl);
-            var gcOnCloseHandle = GCHandle.Alloc(onCloseDelegate);
-            EventDelegates.Add(nameof(OnClose), (onCloseDelegate, gcOnCloseHandle));
-        }
+        static extern void Lua_RegisterUninitializeCallback(OnClose callback);
 
         static public int OnInit(string scriptPath)
         {
@@ -25,7 +16,7 @@ namespace NeoLuaBootstrap
             {
                 Scripting.Uninitialize();
                 Scripting.Initialize(scriptPath);
-                NeoLua_SetOnClose(Marshal.GetFunctionPointerForDelegate(EventDelegates[nameof(OnClose)].Delegate));
+                Lua_RegisterUninitializeCallback(OnCloseDelegate);
                 return 0;
             }
             catch (Exception e)
@@ -37,10 +28,12 @@ namespace NeoLuaBootstrap
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        delegate void OnClose();
-        static public void OnClose_Impl()
+        delegate void OnClose(bool isProcessTerminating);
+
+        static readonly OnClose OnCloseDelegate = OnClose_Impl;
+        static public void OnClose_Impl(bool isProcessTerminating)
         {
-            Scripting.Uninitialize();
+            Scripting.Uninitialize(isProcessTerminating);
         }
     }
 }

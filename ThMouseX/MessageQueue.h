@@ -6,7 +6,6 @@
 #include "../Common/macro.h"
 
 namespace core::messagequeue {
-    DLLEXPORT_C bool RegisterCleanManagedDataMessage();
     DLLEXPORT_C bool InstallHooks();
     DLLEXPORT_C void RemoveHooks();
     void Initialize();

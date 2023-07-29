@@ -5,5 +5,4 @@
 namespace common::neolua {
     DWORD GetPositionAddress();
     void Initialize();
-    void Uninitialize();
 }

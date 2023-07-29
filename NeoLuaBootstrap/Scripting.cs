@@ -16,15 +16,20 @@ namespace NeoLuaBootstrap
     static class Scripting
     {
         public const string AppName = "ThMouseX";
+        public const DllImportSearchPath SearchPath =
+            DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.UseDllDirectoryForDependencies;
 
+        [DefaultDllImportSearchPaths(SearchPath)]
         [DllImport(AppName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void NeoLua_SetPositionAddress(IntPtr address);
+        public static extern void Lua_SetPositionAddress(IntPtr address);
 
+        [DefaultDllImportSearchPaths(SearchPath)]
         [DllImport(AppName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern PointDataType NeoLua_GetDataType();
+        public static extern PointDataType Lua_GetDataType();
 
+        [DefaultDllImportSearchPaths(SearchPath)]
         [DllImport(AppName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void NeoLua_OpenConsole();
+        public static extern void Lua_OpenConsole();
 
         static readonly List<Delegate> DelegateStore = new List<Delegate>();
         static readonly FieldInfo DelegateStoreField = AccessTools.Field(typeof(Scripting), nameof(DelegateStore));
@@ -40,7 +45,7 @@ namespace NeoLuaBootstrap
         {
             None, Int, Float, Short
         };
-        static readonly PointDataType DataType = NeoLua_GetDataType();
+        static readonly PointDataType DataType = Lua_GetDataType();
         public static readonly object Pos = DataType == PointDataType.Int ? new Position<int>() :
                                             DataType == PointDataType.Float ? new Position<float>() :
                                             DataType == PointDataType.Short ? new Position<short>() : new object();
@@ -100,11 +105,11 @@ namespace NeoLuaBootstrap
 
         const string HarmonyId = AppName + " NeoLua Scripting";
         static readonly Harmony HarmonyInst = new Harmony(HarmonyId);
-        static public void Uninitialize()
+        static public void Uninitialize(bool isProcessTerminating = false)
         {
             try
             {
-                NeoLua_SetPositionAddress(IntPtr.Zero);
+                Lua_SetPositionAddress(IntPtr.Zero);
                 HarmonyInst.UnpatchAll(HarmonyId);
                 PrefixStore.Clear();
                 PostfixStore.Clear();
@@ -123,7 +128,7 @@ namespace NeoLuaBootstrap
             Traverse = _Traverse
             const Scripting typpeof NeoLuaBootstrap.Scripting
             Position = Scripting.Pos
-            OpenConsole = Scripting.NeoLua_OpenConsole
+            OpenConsole = Scripting.Lua_OpenConsole
         ";
 
         static public void Initialize(string scriptPath)
@@ -132,7 +137,7 @@ namespace NeoLuaBootstrap
             {
                 if (Pos == null)
                     return;
-                NeoLua_SetPositionAddress(PosHandle.AddrOfPinnedObject());
+                Lua_SetPositionAddress(PosHandle.AddrOfPinnedObject());
 
                 L = new Lua();
                 var g = L.CreateEnvironment();

@@ -10,6 +10,7 @@
 #include "NeoLua.h"
 #include "Log.h"
 #include "Variables.h"
+#include "LuaApi.h"
 
 namespace note = common::log;
 
@@ -28,28 +29,9 @@ using namespace Microsoft::WRL;
     return; \
 }0
 
-void OnClose();
-decltype(&OnClose) onClose;
-DLLEXPORT_C void NeoLua_SetOnClose(DWORD address) {
-    *(PDWORD)&onClose = address;
-}
-
-static DWORD positionAddress;
-DLLEXPORT_C void NeoLua_SetPositionAddress(DWORD address) {
-    positionAddress = address;
-}
-
-DLLEXPORT_C PointDataType NeoLua_GetDataType() {
-    return g_currentConfig.PosDataType;
-}
-
-DLLEXPORT_C void NeoLua_OpenConsole() {
-    note::OpenConsole();
-}
-
 namespace common::neolua {
     DWORD GetPositionAddress() {
-        return positionAddress;
+        return Lua_GetPositionAddress();
     }
 
     void Initialize() {
@@ -108,12 +90,5 @@ namespace common::neolua {
             (PDWORD)&_
         );
         IfFailedReturnWithLog(TAG, "Failed to invoke NeoLuaBootstrap.Handlers.OnInit", result);
-    }
-
-    void Uninitialize() {
-        if (onClose != nullptr)
-            onClose();
-        onClose = nullptr;
-        positionAddress = NULL;
     }
 }

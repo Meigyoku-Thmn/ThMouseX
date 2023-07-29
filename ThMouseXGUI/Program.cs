@@ -14,8 +14,6 @@ namespace ThMouseX
         public const string DllName = AppName + ".dll";
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        static extern bool RegisterCleanManagedDataMessage();
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         static extern bool InstallHooks();
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         static extern void RemoveHooks();
@@ -36,9 +34,6 @@ namespace ThMouseX
                 MessageBox.Show($"{AppName} is already running.", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Environment.Exit(1);
             }
-
-            if (!RegisterCleanManagedDataMessage())
-                Environment.Exit(1);
 
             if (!ReadGamesFile())
                 Environment.Exit(1);

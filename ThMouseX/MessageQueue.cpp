@@ -46,16 +46,6 @@ else if (e->wParam == __ev && e->message == WM_KEYUP && MAKE_UNIQUE_VAR(unique) 
 }0
 
 namespace core::messagequeue {
-    UINT CLEAN_MANAGED_DATA;
-    bool RegisterCleanManagedDataMessage() {
-        CLEAN_MANAGED_DATA = RegisterWindowMessageA("CLEAN_MANAGED_DATA {6BF7C2B8-F245-4781-AA3C-467366CA3551}");
-        if (CLEAN_MANAGED_DATA == 0) {
-            MessageBoxA(NULL, "Failed to register CLEAN_MANAGED_DATA message.", "RegisterWindowMessage error", MB_OK | MB_ICONERROR);
-            return false;
-        }
-        return true;
-    }
-
     HCURSOR WINAPI _SetCursor(HCURSOR hCursor);
     decltype(&_SetCursor) OriSetCursor;
     int WINAPI _ShowCursor(BOOL bShow);
@@ -145,9 +135,6 @@ namespace core::messagequeue {
             if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
-            if (e->message == CLEAN_MANAGED_DATA) {
-                neolua::Uninitialize();
-            }
             else if (e->message == WM_SETCURSOR && !g_showImGui) {
                 if (LOWORD(e->lParam) == HTCLIENT) {
                     if (isCursorShow)
@@ -195,15 +182,12 @@ namespace core::messagequeue {
     }
 
     void RemoveHooks() {
-        DWORD _;
-        auto broadcastFlags = SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG;
-        // notify targets to clean up managed data, but managed DLLs/assemblies unfortunately cannot be unloaded.
-        SendMessageTimeoutW(HWND_BROADCAST, CLEAN_MANAGED_DATA, 0, 0, broadcastFlags, 1000, &_);
         // unregister hooks.
         UnhookWindowsHookEx(GetMsgProcHandle);
         UnhookWindowsHookEx(CallWndRetProcHandle);
         // force all top-level windows to process a message, therefore force all processes to unload the DLL.
-        SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, broadcastFlags, 1000, &_);
+        DWORD _;
+        SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &_);
     }
 
     void PostRenderCallback() {
