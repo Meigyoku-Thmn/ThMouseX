@@ -210,6 +210,7 @@ namespace core::directx11 {
             return;
         }
         g_hFocusWindow = desc.OutputWindow;
+        g_isMinimized = IsIconic(g_hFocusWindow);
 
         if (gs_textureFilePath[0] && SUCCEEDED(CreateWICTextureFromFile(device, gs_textureFilePath, NULL, &cursorTexture))) {
             ComPtr<ID3D11Resource> resource;

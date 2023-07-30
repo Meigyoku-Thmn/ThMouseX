@@ -14,6 +14,7 @@ extern bool         g_hookApplied;
 extern HMODULE      g_targetModule;
 extern HMODULE      g_coreModule;
 extern HWND         g_hFocusWindow;
+extern bool         g_isMinimized;
 extern bool         g_leftMousePressed;
 extern bool         g_midMousePressed;
 extern bool         g_inputEnabled;

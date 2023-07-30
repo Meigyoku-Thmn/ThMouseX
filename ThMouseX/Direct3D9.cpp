@@ -219,6 +219,7 @@ namespace core::directx9 {
             return;
         }
         g_hFocusWindow = params.hFocusWindow;
+        g_isMinimized = IsIconic(g_hFocusWindow);
 
         if (gs_textureFilePath[0] && SUCCEEDED(_D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture))) {
             _D3DXCreateSprite(device, &cursorSprite);

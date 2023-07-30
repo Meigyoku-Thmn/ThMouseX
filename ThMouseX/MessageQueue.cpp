@@ -147,13 +147,12 @@ namespace core::messagequeue {
                     DefWindowProcW(e->hwnd, e->message, e->wParam, e->lParam);
                 }
             }
-            else if (e->message == WM_SIZE) {
-                static bool isMinimized = false;
+            else if (e->message == WM_SIZE && g_hFocusWindow) {
                 if (e->wParam == SIZE_MINIMIZED) {
-                    isMinimized = true;
+                    g_isMinimized = true;
                 }
-                else if (e->wParam == SIZE_RESTORED && isMinimized) {
-                    isMinimized = false;
+                else if (e->wParam == SIZE_RESTORED && g_isMinimized) {
+                    g_isMinimized = false;
                     callbackstore::TriggerClearMeasurementFlagsCallbacks();
                 }
             }

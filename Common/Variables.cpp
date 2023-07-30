@@ -14,6 +14,7 @@ bool        g_hookApplied;
 HMODULE     g_targetModule;
 HMODULE     g_coreModule;
 HWND        g_hFocusWindow;
+bool        g_isMinimized;
 bool        g_leftMousePressed;
 bool        g_midMousePressed;
 bool        g_inputEnabled;

@@ -184,6 +184,7 @@ namespace core::directx8 {
             return;
         }
         g_hFocusWindow = params.hFocusWindow;
+        g_isMinimized = IsIconic(g_hFocusWindow);
 
         if (gs_textureFilePath[0] && SUCCEEDED(D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture))) {
             D3DXCreateSprite(device, &cursorSprite);
