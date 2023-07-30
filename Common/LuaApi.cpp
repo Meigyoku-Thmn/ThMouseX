@@ -55,8 +55,8 @@ PointDataType Lua_GetDataType() {
     return g_currentConfig.PosDataType;
 }
 
-void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbackType callback) {
-    callbackstore::RegisterUninitializeCallback(callback);
+void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbackType callback, bool isFromDotNet) {
+    callbackstore::RegisterUninitializeCallback(callback, isFromDotNet);
 }
 
 string LuaJitPrepScript;
@@ -72,8 +72,16 @@ ON_INIT{
     LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
 };
 
-string MakePreparationScriptForLuaJIT() {
-    auto thisDllPath = encoding::ConvertToUtf8((wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME)).c_str());
-    helper::Replace(thisDllPath, "\\", "\\\\");
-    return vformat(LuaJitPrepScript, make_format_args(thisDllPath));
+namespace common::luaapi {
+    void Uninitialize(bool isProcessTerminating) {
+        Lua_SetPositionAddress(NULL);
+    }
+    void Initialize() {
+        callbackstore::RegisterUninitializeCallback(Uninitialize);
+    }
+    string MakePreparationScriptForLuaJIT() {
+        auto thisDllPath = encoding::ConvertToUtf8((wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME)).c_str());
+        helper::Replace(thisDllPath, "\\", "\\\\");
+        return vformat(LuaJitPrepScript, make_format_args(thisDllPath));
+    }
 }

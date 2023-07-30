@@ -21,6 +21,7 @@ namespace memory = common::helper::memory;
 namespace encoding = common::helper::encoding;
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
+namespace luaapi = common::luaapi;
 
 using namespace std;
 
@@ -91,7 +92,7 @@ namespace common::luajit {
             return;
         }
 
-        if (!CheckAndDisableIfError(L, luaL_dostring(L, MakePreparationScriptForLuaJIT().c_str()))) {
+        if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::MakePreparationScriptForLuaJIT().c_str()))) {
             minhook::RemoveHooks(hookConfig);
             note::ToFile("[LuaJIT] The above error occurred in PreparationScript.");
             return;

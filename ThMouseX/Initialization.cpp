@@ -12,6 +12,7 @@
 #include "../Common/MinHook.h"
 #include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
+#include "../Common/LuaApi.h"
 #include "../Common/LuaJIT.h"
 #include "../Common/NeoLua.h"
 #include "KeyboardState.h"
@@ -24,6 +25,7 @@
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
+namespace luaapi = common::luaapi;
 namespace luajit = common::luajit;
 namespace neolua = common::neolua;
 namespace messagequeue = core::messagequeue;
@@ -89,6 +91,7 @@ namespace core {
                 g_currentConfig = gs_gameConfigs[i];
 
                 minhook::Initialize();
+                luaapi::Initialize();
                 luajit::Initialize();
                 neolua::Initialize();
 

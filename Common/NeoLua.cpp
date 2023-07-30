@@ -85,10 +85,10 @@ namespace common::neolua {
         result = runtimeHost->ExecuteInDefaultAppDomain(
             bootstrapDllPath.c_str(),
             L"NeoLuaBootstrap.Handlers",
-            L"OnInit",
+            L"Initialize",
             scriptPath.c_str(),
             (PDWORD)&_
         );
-        IfFailedReturnWithLog(TAG, "Failed to invoke NeoLuaBootstrap.Handlers.OnInit", result);
+        IfFailedReturnWithLog(TAG, "Failed to invoke NeoLuaBootstrap.Handlers.Initialize", result);
     }
 }

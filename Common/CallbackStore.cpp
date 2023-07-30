@@ -8,12 +8,16 @@
 using namespace std;
 
 namespace common::callbackstore {
-    vector<UninitializeCallbackType> uninitializeCallbacks;
+    struct UninitializeCallbackItem {
+        UninitializeCallbackType callback;
+        bool isFromDotNet;
+    };
+    vector<UninitializeCallbackItem> uninitializeCallbacks;
     vector<CallbackType> postRenderCallbacks;
     vector<CallbackType> clearMeasurementFlagsCallbacks;
 
-    void RegisterUninitializeCallback(UninitializeCallbackType callback) {
-        uninitializeCallbacks.push_back(callback);
+    void RegisterUninitializeCallback(UninitializeCallbackType callback, bool isFromDotNet) {
+        uninitializeCallbacks.emplace_back(callback, isFromDotNet);
     }
     void RegisterPostRenderCallback(CallbackType callback) {
         postRenderCallbacks.push_back(callback);
@@ -23,12 +27,18 @@ namespace common::callbackstore {
     }
 
     void TriggerUninitializeCallbacks(bool isProcessTerminating) {
-        for (auto& callback : uninitializeCallbacks) callback(isProcessTerminating);
+        for (auto& item : uninitializeCallbacks) {
+            if (isProcessTerminating && item.isFromDotNet)
+                continue;
+            item.callback(isProcessTerminating);
+        }
     }
     void TriggerPostRenderCallbacks() {
-        for (auto& callback : postRenderCallbacks) callback();
+        for (auto& callback : postRenderCallbacks)
+            callback();
     }
     void TriggerClearMeasurementFlagsCallbacks() {
-        for (auto& callback : clearMeasurementFlagsCallbacks) callback();
+        for (auto& callback : clearMeasurementFlagsCallbacks)
+            callback();
     }
 }
