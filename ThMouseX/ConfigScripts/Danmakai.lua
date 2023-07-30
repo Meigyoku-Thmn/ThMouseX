@@ -1,5 +1,7 @@
 -- Script to search player's position in Danmaka: Red Forbidden Fruit
 -- This game was made in GameMaker Studio
+local ffi = require("ffi")
+
 local PLAYER_ELDY = 278
 local PLAYER_DIANA = 279
 local PLAYER_ANGEL = 280

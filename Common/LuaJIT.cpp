@@ -47,7 +47,7 @@ namespace common::luajit {
     HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto thisDllPath = wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME);
         if (strcmp(lpLibFileName, encoding::ConvertToUtf8(thisDllPath.c_str()).c_str()) == 0)
-            return LoadLibraryExW(thisDllPath.c_str(), hFile, dwFlags);
+            return g_coreModule;
         else
             return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
     }
