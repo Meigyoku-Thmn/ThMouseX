@@ -6,7 +6,7 @@
 namespace common::callbackstore {
     using UninitializeCallbackType = void (*)(bool isProcessTerminating);
     using CallbackType = void (*)(void);
-    void RegisterUninitializeCallback(UninitializeCallbackType callback, bool isFromDotNet = false);
+    void RegisterUninitializeCallback(UninitializeCallbackType callback, bool isFromManagedCode = false);
     void RegisterPostRenderCallback(CallbackType callback);
     void RegisterClearMeasurementFlagsCallback(CallbackType callback);
     void TriggerUninitializeCallbacks(bool isProcessTerminating);

@@ -14,6 +14,7 @@
 #include "../Common/Variables.h"
 #include "../Common/LuaApi.h"
 #include "../Common/LuaJIT.h"
+#include "../Common/Lua.h"
 #include "../Common/NeoLua.h"
 #include "KeyboardState.h"
 #include "SendKey.h"
@@ -28,6 +29,7 @@ namespace callbackstore = common::callbackstore;
 namespace luaapi = common::luaapi;
 namespace luajit = common::luajit;
 namespace neolua = common::neolua;
+namespace lua = common::lua;
 namespace messagequeue = core::messagequeue;
 namespace sendkey = core::sendkey;
 namespace directx8 = core::directx8;
@@ -78,6 +80,8 @@ namespace core {
 
         WCHAR currentProcessName[MAX_PATH];
         GetModuleFileNameW(g_targetModule, currentProcessName, ARRAYSIZE(currentProcessName));
+        wcscpy(g_currentProcessDirPath, currentProcessName);
+        PathRemoveFileSpecW(g_currentProcessDirPath);
         PathStripPathW(currentProcessName);
         PathRemoveExtensionW(currentProcessName);
 
@@ -92,6 +96,7 @@ namespace core {
 
                 minhook::Initialize();
                 luaapi::Initialize();
+                lua::Initialize();
                 luajit::Initialize();
                 neolua::Initialize();
 

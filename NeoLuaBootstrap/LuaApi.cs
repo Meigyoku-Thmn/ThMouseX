@@ -29,7 +29,7 @@ namespace NeoLuaBootstrap
         public delegate void UninitializeDelegate(bool isProcessTerminating);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void RegisterUninitializeCallbackDelegate(UninitializeDelegate callback, bool isFromDotNet);
+        public delegate void RegisterUninitializeCallbackDelegate(UninitializeDelegate callback, bool isFromManagedCode);
         public static RegisterUninitializeCallbackDelegate RegisterUninitializeCallback;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

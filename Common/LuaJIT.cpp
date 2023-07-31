@@ -34,6 +34,7 @@ lua_State* L;
 bool CheckAndDisableIfError(lua_State* L, int r) {
     if (r != 0) {
         note::ToFile("[LuaJIT] %s", lua_tostring(L, -1));
+        lua_pop(L, 1);
         scriptingDisabled = true;
         return false;
     }

@@ -5,6 +5,7 @@
 
 WCHAR   g_currentModuleDirPath[MAX_PATH];
 WCHAR   g_systemDirPath[MAX_PATH];
+WCHAR   g_currentProcessDirPath[MAX_PATH];
 
 // single game config
 GameConfig      g_currentConfig;

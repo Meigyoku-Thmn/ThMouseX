@@ -5,6 +5,7 @@
 
 extern WCHAR    g_currentModuleDirPath[MAX_PATH];
 extern WCHAR    g_systemDirPath[MAX_PATH];
+extern WCHAR    g_currentProcessDirPath[MAX_PATH];
 
 // single game config
 extern GameConfig  g_currentConfig;

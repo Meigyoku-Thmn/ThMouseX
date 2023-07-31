@@ -10,14 +10,14 @@ using namespace std;
 namespace common::callbackstore {
     struct UninitializeCallbackItem {
         UninitializeCallbackType callback;
-        bool isFromDotNet;
+        bool isFromManagedCode;
     };
     vector<UninitializeCallbackItem> uninitializeCallbacks;
     vector<CallbackType> postRenderCallbacks;
     vector<CallbackType> clearMeasurementFlagsCallbacks;
 
-    void RegisterUninitializeCallback(UninitializeCallbackType callback, bool isFromDotNet) {
-        uninitializeCallbacks.emplace_back(callback, isFromDotNet);
+    void RegisterUninitializeCallback(UninitializeCallbackType callback, bool isFromManagedCode) {
+        uninitializeCallbacks.emplace_back(callback, isFromManagedCode);
     }
     void RegisterPostRenderCallback(CallbackType callback) {
         postRenderCallbacks.push_back(callback);
@@ -28,7 +28,7 @@ namespace common::callbackstore {
 
     void TriggerUninitializeCallbacks(bool isProcessTerminating) {
         for (auto& item : uninitializeCallbacks) {
-            if (isProcessTerminating && item.isFromDotNet)
+            if (isProcessTerminating && item.isFromManagedCode)
                 continue;
             item.callback(isProcessTerminating);
         }

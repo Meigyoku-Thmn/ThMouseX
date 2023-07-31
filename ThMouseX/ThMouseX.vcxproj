@@ -227,7 +227,10 @@
     <CopyFileToFolders Include="VirtualKeyCodes.txt" />
     <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">
       <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
-    </CopyFileToFolders>
+    </CopyFileToFolders>	
+	<CopyFileToFolders Include="ConfigScripts/DFLYT.lua">
+      <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
+	</CopyFileToFolders>
     <CopyFileToFolders Include="ConfigScripts/THMHJ.lua">
       <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
     </CopyFileToFolders>

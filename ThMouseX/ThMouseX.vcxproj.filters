@@ -136,18 +136,24 @@
     <ClInclude Include="InputDetermine.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="Cursor.png" />
     <CopyFileToFolders Include="Games.txt" />
     <CopyFileToFolders Include="ThMouseX.ini" />
     <CopyFileToFolders Include="VirtualKeyCodes.txt" />
     <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="ConfigScripts/DFLYT.lua">
+      <Filter>ConfigScripts</Filter>
+    </CopyFileToFolders>
     <CopyFileToFolders Include="ConfigScripts/THMHJ.lua">
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="Cursor.png" />
     <CopyFileToFolders Include="ConfigScripts/thWWW.lua">
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
@@ -162,5 +168,8 @@
     <FxCompile Include="ImGuiPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ThMouseX.rc" />
   </ItemGroup>
 </Project>
