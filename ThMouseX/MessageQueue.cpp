@@ -68,9 +68,9 @@ namespace core::messagequeue {
     int cursorVisibility;
     void ShowCursorEx(bool show) {
         if (show && cursorVisibility < 0)
-            OriShowCursor(TRUE);
+            cursorVisibility = OriShowCursor(TRUE);
         else if (!show && cursorVisibility >= 0)
-            OriShowCursor(FALSE);
+            cursorVisibility = OriShowCursor(FALSE);
     }
 
     void HideMousePointer() {
