@@ -13,7 +13,7 @@ namespace NeoLuaBootstrap
                 LuaApi.Initialize();
                 Scripting.Uninitialize();
                 Scripting.Initialize(scriptPath);
-                LuaApi.RegisterUninitializeCallback(uninitializeDelegate, true);
+                LuaApi.RegisterUninitializeCallback(uninitializeDelegate);
                 return 0;
             }
             catch (Exception e)

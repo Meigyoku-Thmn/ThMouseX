@@ -52,8 +52,8 @@ PointDataType Lua_GetDataType() {
     return g_currentConfig.PosDataType;
 }
 
-void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbackType callback, bool isFromDotNet) {
-    callbackstore::RegisterUninitializeCallback(callback, isFromDotNet);
+void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbackType callback) {
+    callbackstore::RegisterUninitializeCallback(callback, true);
 }
 
 string LuaJitPrepScript;

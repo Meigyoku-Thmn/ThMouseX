@@ -316,6 +316,8 @@ tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount) 
         dataType = PointDataType::Float;
     else if (_stricmp(dataTypeStr.c_str(), "Short") == 0)
         dataType = PointDataType::Short;
+    else if (_stricmp(dataTypeStr.c_str(), "Double") == 0)
+        dataType = PointDataType::Double;
     else {
         MessageBoxA(NULL, format("Invalid dataType at line {} in " GameFile ".", lineCount).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);

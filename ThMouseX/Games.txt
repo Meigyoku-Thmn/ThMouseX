@@ -111,4 +111,4 @@ THMHJ           NeoLua/Attached/Push    float      (-0.5,-1.5)    480          4
 thWWW           LuaJIT/Detached/Pull    float      (155.5,20.5)   540          16:9          SendKey
 
 ; Chaos of Black Loong
-DFLYT			Lua/Attached/Push       float      (0,0)          480          4:3           GetKeyboardState
+DFLYT			Lua/Attached/Push       double     (224,592.5)    480          4:3           SendKey

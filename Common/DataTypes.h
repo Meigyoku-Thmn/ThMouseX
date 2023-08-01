@@ -35,7 +35,7 @@ struct RECTSIZE: RECT {
 };
 
 enum class PointDataType {
-    None, Int, Float, Short
+    None, Int, Float, Short, Double
 };
 
 struct IntPoint {
@@ -51,6 +51,11 @@ struct ShortPoint {
 struct FloatPoint {
     float X;
     float Y;
+};
+
+struct DoublePoint {
+    double X;
+    double Y;
 };
 
 union TypedPoint {

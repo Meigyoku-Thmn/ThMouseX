@@ -5,6 +5,7 @@
 
 #include "Helper.h"
 #include "Helper.Memory.h"
+#include "Lua.h"
 #include "LuaJIT.h"
 #include "NeoLua.h"
 #include "Variables.h"
@@ -161,12 +162,13 @@ namespace common::helper {
     }
 
     DWORD CalculateAddress() {
-        if (g_currentConfig.ScriptType == ScriptType::LuaJIT) {
+        if (g_currentConfig.ScriptType == ScriptType::LuaJIT)
             return luajit::GetPositionAddress();
-        } else if (g_currentConfig.ScriptType == ScriptType::NeoLua) {
+        else if (g_currentConfig.ScriptType == ScriptType::NeoLua)
             return neolua::GetPositionAddress();
-        } else {
-            return memory::ResolveAddress(g_currentConfig.Address.Level, g_currentConfig.Address.Length);
-        }
+        else if (g_currentConfig.ScriptType == ScriptType::Lua)
+            return lua::GetPositionAddress();
+        else
+            return memory::ResolveAddress(g_currentConfig.Address.Level, g_currentConfig.Address.Length);        
     }
 }

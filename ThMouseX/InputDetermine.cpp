@@ -37,7 +37,9 @@ namespace core::inputdetermine {
                 else if (g_currentConfig.PosDataType == PointDataType::Float)
                     CalculatePosition((FloatPoint*)address, playerPos)
                 else if (g_currentConfig.PosDataType == PointDataType::Short)
-                    CalculatePosition((ShortPoint*)address, playerPos);
+                    CalculatePosition((ShortPoint*)address, playerPos)
+                else if (g_currentConfig.PosDataType == PointDataType::Double)
+                    CalculatePosition((DoublePoint*)address, playerPos);
 
                 auto mousePos = helper::GetPointerPosition();
 

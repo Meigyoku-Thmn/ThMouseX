@@ -16,6 +16,6 @@ namespace NeoLuaBootstrap
 
     public enum PointDataType
     {
-        None, Int, Float, Short
+        None, Int, Float, Short, Double
     };
 }

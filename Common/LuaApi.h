@@ -13,7 +13,7 @@ DLLEXPORT_C void Lua_OpenConsole();
 DLLEXPORT_C void Lua_SetPositionAddress(DWORD address);
 DLLEXPORT_C DWORD Lua_GetPositionAddress();
 DLLEXPORT_C PointDataType Lua_GetDataType();
-DLLEXPORT_C void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbackType callback, bool isFromDotNet = false);
+DLLEXPORT_C void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbackType callback);
 
 namespace common::luaapi {
     void Initialize();

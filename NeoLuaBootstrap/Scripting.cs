@@ -22,7 +22,8 @@ namespace NeoLuaBootstrap
         static readonly PointDataType DataType = LuaApi.GetDataType();
         public static readonly object Pos = DataType == PointDataType.Int ? new Position<int>() :
                                             DataType == PointDataType.Float ? new Position<float>() :
-                                            DataType == PointDataType.Short ? new Position<short>() : new object();
+                                            DataType == PointDataType.Short ? new Position<short>() :
+                                            DataType == PointDataType.Double ? new Position<double>() : new object();
         static readonly GCHandle PosHandle = GCHandle.Alloc(Pos, GCHandleType.Pinned);
 
         static void LoadDelegate(this Emit emitter, Delegate dele)
