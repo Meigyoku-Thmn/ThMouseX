@@ -138,7 +138,7 @@
     <None Include="Common.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="LuaJitPrepScript.lua">
+    <None Include="PreparationScript.lua">
       <Filter>Source Files\LuaScript</Filter>
     </None>
   </ItemGroup>

@@ -4,7 +4,6 @@
 #include <luajit/lua.hpp>
 #include <format>
 
-#include "MinHook.h"
 #include "macro.h"
 #include "CallbackStore.h"
 #include "LuaJIT.h"
@@ -19,7 +18,6 @@ namespace note = common::log;
 namespace helper = common::helper;
 namespace memory = common::helper::memory;
 namespace encoding = common::helper::encoding;
-namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
 namespace luaapi = common::luaapi;
 
@@ -79,33 +77,10 @@ namespace common::luajit {
 
         luaL_openlibs(L);
 
-        vector<minhook::HookApiConfig> hookConfig{
-            {L"KERNEL32.DLL", "LoadLibraryExA", &_LoadLibraryExA, (PVOID*)&OriLoadLibraryExA},
-        };
-
-        if (!minhook::CreateApiHook(hookConfig)) {
-            note::ToFile("[LuaJIT] Failed to hook LoadLibraryExA (CreateApiHook).");
-            return;
-        }
-
-        if (!minhook::EnableHooks(hookConfig)) {
-            note::ToFile("[LuaJIT] Failed to hook LoadLibraryExA (EnableHooks).");
-            return;
-        }
-
         if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::MakePreparationScript().c_str()))) {
-            minhook::RemoveHooks(hookConfig);
             note::ToFile("[LuaJIT] The above error occurred in Preparation Script.");
             return;
         }
-
-        if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::GetLuaJITPreparationScript().c_str()))) {
-            minhook::RemoveHooks(hookConfig);
-            note::ToFile("[LuaJIT] The above error occurred in LuaJitPrepScript.lua.");
-            return;
-        }
-
-        minhook::RemoveHooks(hookConfig);
 
         auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath.c_str());

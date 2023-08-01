@@ -210,7 +210,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Common.def" />
-    <None Include="LuaJitPrepScript.lua" />
+    <None Include="PreparationScript.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

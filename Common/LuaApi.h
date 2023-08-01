@@ -18,5 +18,4 @@ DLLEXPORT_C void Lua_RegisterUninitializeCallback(common::callbackstore::Uniniti
 namespace common::luaapi {
     void Initialize();
     std::string MakePreparationScript();
-    std::string GetLuaJITPreparationScript();
 }

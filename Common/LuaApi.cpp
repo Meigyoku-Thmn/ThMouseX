@@ -56,31 +56,46 @@ void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbac
     callbackstore::RegisterUninitializeCallback(callback, isFromDotNet);
 }
 
+string LuaJitPrepScript;
+ON_INIT{
+    auto dllModule = GetModuleHandleW(L_(APP_NAME".dll"));
+auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), L"LUASCRIPT");
+if (scriptRes == NULL)
+return;
+auto scriptSize = SizeofResource(dllModule, scriptRes);
+auto scriptHandle = LoadResource(dllModule, scriptRes);
+if (scriptHandle == NULL)
+return;
+LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
+};
+
 namespace common::luaapi {
     void Uninitialize(bool isProcessTerminating) {
         Lua_SetPositionAddress(NULL);
     }
+
+    HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
+    decltype(&_LoadLibraryExA) OriLoadLibraryExA;
+    HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
+        auto thisDllPath = wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME);
+        if (strcmp(lpLibFileName, encoding::ConvertToUtf8(thisDllPath.c_str()).c_str()) == 0)
+            return g_coreModule;
+        else
+            return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
+    }
+
     void Initialize() {
         callbackstore::RegisterUninitializeCallback(Uninitialize);
+        vector<minhook::HookApiConfig> hookConfigs{
+            {L"KERNEL32.DLL", "LoadLibraryExA", &_LoadLibraryExA, (PVOID*)&OriLoadLibraryExA},
+        };
+        minhook::CreateApiHook(hookConfigs);
+        minhook::EnableHooks(hookConfigs)
     }
 
     string MakePreparationScript() {
         auto thisDllPath = encoding::ConvertToUtf8((wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME)).c_str());
         helper::Replace(thisDllPath, "\\", "\\\\");
-        return format(R"(
-            ThMouseX_DllPath = {}
-        )", thisDllPath);
-    }
-
-    string GetLuaJITPreparationScript() {
-        auto dllModule = GetModuleHandleW(L_(APP_NAME".dll"));
-        auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), L"LUASCRIPT");
-        if (scriptRes == NULL)
-            return "";
-        auto scriptSize = SizeofResource(dllModule, scriptRes);
-        auto scriptHandle = LoadResource(dllModule, scriptRes);
-        if (scriptHandle == NULL)
-            return "";
-        return string((const char*)LockResource(scriptHandle), scriptSize);
+        return vformat(LuaJitPrepScript, make_format_args(thisDllPath));
     }
 }
