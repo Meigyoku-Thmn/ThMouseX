@@ -1,4 +1,4 @@
-ThMouseX_DllPath = {}
+ThMouseX_DllPath = "{}"
 
 function InitializeForLuaJIT()    
     local ffi = require("ffi")

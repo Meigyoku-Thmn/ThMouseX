@@ -90,7 +90,7 @@ namespace common::luaapi {
             {L"KERNEL32.DLL", "LoadLibraryExA", &_LoadLibraryExA, (PVOID*)&OriLoadLibraryExA},
         };
         minhook::CreateApiHook(hookConfigs);
-        minhook::EnableHooks(hookConfigs)
+        minhook::EnableHooks(hookConfigs);
     }
 
     string MakePreparationScript() {
