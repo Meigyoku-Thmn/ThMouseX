@@ -93,9 +93,15 @@ namespace common::luajit {
             return;
         }
 
-        if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::MakePreparationScriptForLuaJIT().c_str()))) {
+        if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::MakePreparationScript().c_str()))) {
             minhook::RemoveHooks(hookConfig);
-            note::ToFile("[LuaJIT] The above error occurred in PreparationScript.");
+            note::ToFile("[LuaJIT] The above error occurred in Preparation Script.");
+            return;
+        }
+
+        if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::GetLuaJITPreparationScript().c_str()))) {
+            minhook::RemoveHooks(hookConfig);
+            note::ToFile("[LuaJIT] The above error occurred in LuaJitPrepScript.lua.");
             return;
         }
 

@@ -12,6 +12,7 @@
 ; NeoLua/Attached/Push
 ; LuaJIT/Detached/Pull
 ; LuaJIT/Detached/Push
+; Lua/Attached/Pull
 ; Lua/Attached/Push
 
 ; NeoLua:
@@ -24,7 +25,7 @@
 
 ; Lua:
 ; - Supported Place: Attached
-; - Supported PosGetMethod: Push (Basically hook into an existing Lua runtime, vanila Lua, or LuaJIT)
+; - Supported PosGetMethod: Pull, Push (Basically hook into an existing Lua runtime, be it vanila Lua or LuaJIT)
 
 ; processName   positionRVA             dataType   offset         baseHeight   aspectRatio   inputMethod
 

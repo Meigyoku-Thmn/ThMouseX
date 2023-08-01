@@ -7,6 +7,7 @@ ffi.cdef [[
     typedef const char* LPCSTR;
     typedef void (*UninitializeCallbackType)(bool isProcessTerminating);
 
+    int         Lua_CreateHookApi       (LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
     DWORD       Lua_ReadUInt32          (DWORD address);
     DWORD       Lua_ResolveAddress      (DWORD* offsets, int length);
     void        Lua_OpenConsole         ();
@@ -14,20 +15,15 @@ ffi.cdef [[
     int         Lua_GetDataType         ();
 
     void        Lua_RegisterUninitializeCallback    (UninitializeCallbackType callback);
-    
-    wchar_t*    Lua_ConvertToUtf16Alloc (const char* utf8str);
-    void        Lua_DeleteUtf16Alloc    (wchar_t* utf16);
 
-    int         __stdcall MH_CreateHook		(LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal);
-    int         __stdcall MH_CreateHookApi	(LPCWSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
-    int         __stdcall MH_EnableHook		(LPVOID pTarget);
-    int         __stdcall MH_RemoveHook		(LPVOID pTarget);
-    int         __stdcall MH_DisableHook	(LPVOID pTarget);
-    const char* __stdcall MH_StatusToString	(int status);
+    int         __stdcall MH_CreateHook     (LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal);
+    int         __stdcall MH_EnableHook     (LPVOID pTarget);
+    int         __stdcall MH_RemoveHook     (LPVOID pTarget);
+    int         __stdcall MH_DisableHook    (LPVOID pTarget);
+    const char* __stdcall MH_StatusToString (int status);
 ]]
 
--- should be replaced by a path to ThMouseX.dll
-local ThMouseX = ffi.load("{}")
+local ThMouseX = ffi.load(ThMouseX_DllPath)
 
 function ReadUInt32(address)
     return ThMouseX.Lua_ReadUInt32(address)
@@ -58,10 +54,7 @@ function CreateHook(target, detour, outOriginal)
 end
 
 function CreateHookApi(module, procName, detour, outOriginal)
-    local moduleUtf16 = ThMouseX.Lua_ConvertToUtf16Alloc(module)
-    local rs = ThMouseX.MH_CreateHookApi(moduleUtf16, procName, detour, outOriginal)
-    ThMouseX.Lua_DeleteUtf16Alloc(moduleUtf16)
-    return rs;
+    return ThMouseX.Lua_CreateHookApi(module, procName, detour, outOriginal)
 end
 
 function EnableHook(target)

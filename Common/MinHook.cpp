@@ -67,15 +67,9 @@ namespace common::minhook {
         return true;
     }
 
-    bool DisableHooks(const vector<HookApiConfig>& hookConfigs) {
+    bool EnableHooks(const vector<HookConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
-            auto hModule = GetModuleHandleW(config.moduleName);
-            if (!hModule)
-                return false;
-            auto proc = GetProcAddress(hModule, config.procName);
-            if (!proc)
-                return false;
-            auto rs = MH_DisableHook(proc);
+            auto rs = MH_EnableHook(config.pTarget);
             if (rs != MH_OK)
                 return false;
         }
@@ -93,6 +87,19 @@ namespace common::minhook {
             auto rs = MH_RemoveHook(proc);
             if (rs != MH_OK)
                 return false;
+            if (config.ppOriginal)
+                *config.ppOriginal = NULL;
+        }
+        return true;
+    }
+
+    bool RemoveHooks(const vector<HookConfig>& hookConfigs) {
+        for (auto& config : hookConfigs) {
+            auto rs = MH_RemoveHook(config.pTarget);
+            if (rs != MH_OK)
+                return false;
+            if (config.ppOriginal)
+                *config.ppOriginal = NULL;
         }
         return true;
     }
