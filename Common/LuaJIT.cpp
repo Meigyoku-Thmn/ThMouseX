@@ -23,11 +23,11 @@ namespace luaapi = common::luaapi;
 
 using namespace std;
 
-bool scriptingDisabled = false;
+static bool scriptingDisabled = false;
 
 #define GET_POSITION_ADDRESS "getPositionAddress"
 
-lua_State* L;
+static lua_State* L;
 
 bool CheckAndDisableIfError(lua_State* L, int r) {
     if (r != 0) {

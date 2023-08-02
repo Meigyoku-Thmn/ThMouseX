@@ -21,6 +21,12 @@ namespace luaapi = common::luaapi;
 
 using namespace std;
 
+static bool scriptingDisabled = false;
+
+#define GET_POSITION_ADDRESS "getPositionAddress"
+
+static lua_State* L;
+
 #define ImportFunc(lua, luaDllName, funcName) \
 (decltype(&funcName))GetProcAddress(lua, #funcName); \
 if (!_ ## funcName) { \
@@ -46,11 +52,17 @@ namespace common::lua {
     decltype(&luaL_loadstring) _luaL_loadstring;
     decltype(&lua_tolstring) _lua_tolstring;
     decltype(&lua_settop) _lua_settop;
+    decltype(&lua_tointeger) _lua_tointeger;
+    decltype(&lua_isnumber) _lua_isnumber;
+    decltype(&lua_pushvalue) _lua_pushvalue;
+    decltype(&lua_type) _lua_type;
+    decltype(&lua_getfield) _lua_getfield;
 
     bool Validate(lua_State* L, int r) {
         if (r != 0) {
             note::ToFile("[Lua] %s", _lua_tolstring(L, -1, 0));
             _lua_settop(L, -2);
+            scriptingDisabled = true;
             return false;
         }
         return true;
@@ -67,8 +79,8 @@ namespace common::lua {
         // Only support Attached
         if (g_currentConfig.ScriptRunPlace != ScriptRunPlace::Attached)
             return;
-        // Only support Push
-        if (g_currentConfig.ScriptPositionGetMethod != ScriptPositionGetMethod::Push)
+        // Can support Pull and Push
+        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::None)
             return;
 
         {
@@ -77,11 +89,13 @@ namespace common::lua {
             ifstream scriptFile(scriptPath.c_str());
             if (!scriptFile) {
                 note::ToFile("[Lua] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
+                scriptingDisabled = true;
                 return;
             }
             string firstLine;
             if (!getline(scriptFile, firstLine)) {
                 note::ToFile("[Lua] Cannot read the first line of %s: %s.", scriptPath.c_str(), strerror(errno));
+                scriptingDisabled = true;
                 return;
             }
             stringstream lineStream(firstLine);
@@ -89,22 +103,26 @@ namespace common::lua {
             lineStream >> token;
             if (token != "--") {
                 note::ToFile("[Lua] The first line of '%s' is not a Lua comment.", scriptPath.c_str());
+                scriptingDisabled = true;
                 return;
             }
             lineStream >> token;
             if (token != "LuaDllName") {
                 note::ToFile("[Lua] The first Lua comment of '%s' doesn't have the key LuaDllName.", scriptPath.c_str());
+                scriptingDisabled = true;
                 return;
             }
             lineStream >> token;
             if (token != "=") {
                 note::ToFile("[Lua] Expected '=' after LuaDllName in '%s'.", scriptPath.c_str());
+                scriptingDisabled = true;
                 return;
             }
             token = "";
             lineStream >> token;
             if (token == "") {
                 note::ToFile("[Lua] LuaDllName value must be specified in '%s'.", scriptPath.c_str());
+                scriptingDisabled = true;
                 return;
             }
             luaDllName = token;
@@ -114,6 +132,7 @@ namespace common::lua {
         auto lua = GetModuleHandleW(luaPath.c_str());
         if (!lua) {
             note::ToFile("[Lua] Failed to load %s from the game's directory.", luaDllName.c_str());
+            scriptingDisabled = true;
             return;
         }
 
@@ -125,6 +144,11 @@ namespace common::lua {
         _luaL_loadstring = ImportFunc(lua, luaDllName, luaL_loadstring);
         _lua_tolstring = ImportFunc(lua, luaDllName, lua_tolstring);
         _lua_settop = ImportFunc(lua, luaDllName, lua_settop);
+        _lua_tointeger = ImportFunc(lua, luaDllName, lua_tointeger);
+        _lua_isnumber = ImportFunc(lua, luaDllName, lua_isnumber);
+        _lua_pushvalue = ImportFunc(lua, luaDllName, lua_pushvalue);
+        _lua_type = ImportFunc(lua, luaDllName, lua_type);
+        _lua_getfield = ImportFunc(lua, luaDllName, lua_getfield);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
             {_luaL_callmeta, &luaL_callmeta_hook, (PVOID*)&ori_luaL_callmeta},
@@ -165,6 +189,8 @@ namespace common::lua {
             return;
         scriptAttached = true;
 
+        ::L = L;
+
         auto rs = 0;
         if ((rs = _luaL_loadstring(L, luaapi::MakePreparationScript().c_str())) == 0)
             rs = ori_lua_pcall(L, 0, LUA_MULTRET, 0);
@@ -174,6 +200,7 @@ namespace common::lua {
         auto scriptIn = fopen(scriptPath.c_str(), "rb");
         if (scriptIn == NULL) {
             note::ToFile("[Lua] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
+            scriptingDisabled = true;
             return;
         }
         fseek(scriptIn, 0, SEEK_END);
@@ -185,12 +212,42 @@ namespace common::lua {
         fclose(scriptIn);
         if ((rs = _luaL_loadstring(L, (const char*)scriptContent)) == 0)
             rs = ori_lua_pcall(L, 0, LUA_MULTRET, 0);
+        delete[] scriptContent;
         if (!Validate(L, rs))
             return;
-        delete[] scriptContent;
+
+        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push)
+            return;
+
+        _lua_getfield(L, LUA_GLOBALSINDEX, GET_POSITION_ADDRESS);
+        if (_lua_type(L, -1) != LUA_TFUNCTION) {
+            note::ToFile("[Lua] " GET_POSITION_ADDRESS " function not found in global scope.");
+            scriptingDisabled = true;
+            return;
+        }
+        _lua_settop(L, -2);
     }
 
     DWORD GetPositionAddress() {
-        return Lua_GetPositionAddress();
+        if (scriptingDisabled)
+            return NULL;
+
+        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push) {
+            return Lua_GetPositionAddress();
+        }
+
+        _lua_getfield(L, LUA_GLOBALSINDEX, GET_POSITION_ADDRESS);
+        if (!Validate(L, _lua_pcall(L, 0, 1, 0)))
+            return NULL;
+
+        if (!_lua_isnumber(L, -1)) {
+            note::ToFile("[Lua] The value returned from " GET_POSITION_ADDRESS " wasn't a number.");
+            scriptingDisabled = true;
+            return NULL;
+        }
+
+        auto result = (DWORD)_lua_tointeger(L, -1);
+        _lua_settop(L, -2);
+        return result;
     }
 }

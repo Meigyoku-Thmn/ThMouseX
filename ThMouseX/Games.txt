@@ -110,5 +110,5 @@ THMHJ           NeoLua/Attached/Push    float      (-0.5,-1.5)    480          4
 ; Wonderful Waking World
 thWWW           LuaJIT/Detached/Pull    float      (155.5,20.5)   540          16:9          SendMessage
 
-; Chaos of Black Loong
-DFLYT			Lua/Attached/Push       double     (224,592.5)    480          4:3           SendInput
+; Chaos of Black Loong (offset is done in Lua script)
+DFLYT			Lua/Attached/Pull       double     (0,0)          480          4:3           SendInput
