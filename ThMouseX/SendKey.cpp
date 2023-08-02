@@ -20,11 +20,39 @@ struct LastState {
 } lastState;
 
 void SendKeyDown(BYTE vkCode) {
-    SendMessageW(g_hFocusWindow, WM_KEYDOWN, vkCode, MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC));
+    if ((g_currentConfig.InputMethods & InputMethod::SendMsg) == InputMethod::SendMsg) {
+        auto lParam = MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16 | 0x00000001;
+        SendMessageW(g_hFocusWindow, WM_KEYDOWN, vkCode, lParam);
+    }
+    else if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::SendKey) {
+        INPUT input{
+            .type = INPUT_KEYBOARD,
+            .ki = {
+                .wVk = vkCode,
+                .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC),
+                .dwFlags = KEYEVENTF_EXTENDEDKEY,
+            },
+        };
+        SendInput(1, &input, sizeof(INPUT));
+    }
 }
 
 void SendKeyUp(BYTE vkCode) {
-    SendMessageW(g_hFocusWindow, WM_KEYUP, vkCode, MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC));
+    if ((g_currentConfig.InputMethods & InputMethod::SendMsg) == InputMethod::SendMsg) {
+        auto lParam = MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16 | 0xC0000001;
+        SendMessageW(g_hFocusWindow, WM_KEYUP, vkCode, lParam);
+    }
+    else if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::SendKey) {
+        INPUT input{
+            .type = INPUT_KEYBOARD,
+            .ki = {
+                .wVk = vkCode,
+                .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC),
+                .dwFlags = KEYEVENTF_KEYUP | KEYEVENTF_EXTENDEDKEY,
+            },
+        };
+        SendInput(1, &input, sizeof(INPUT));
+    }
 }
 
 void HandleKeyPress(DWORD gameInput, bool& wasPressing, BYTE vkCode) {
@@ -33,7 +61,8 @@ void HandleKeyPress(DWORD gameInput, bool& wasPressing, BYTE vkCode) {
             SendKeyDown(vkCode);
             wasPressing = true;
         }
-    } else {
+    }
+    else {
         if (wasPressing) {
             SendKeyUp(vkCode);
             wasPressing = false;
@@ -64,7 +93,7 @@ void CleanUp(bool isProcessTerminating) {
 
 namespace core::sendkey {
     void Initialize() {
-        if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::None)
+        if ((g_currentConfig.InputMethods & (InputMethod::SendKey | InputMethod::SendMsg)) == InputMethod::None)
             return;
         callbackstore::RegisterPostRenderCallback(TestInputAndSendKeys);
         callbackstore::RegisterUninitializeCallback(CleanUp);

@@ -418,6 +418,8 @@ tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount)
             inputMethods |= InputMethod::GetKeyboardState;
         else if (_stricmp(inputMethodIter, "SendKey") == 0)
             inputMethods |= InputMethod::SendKey;
+        else if (_stricmp(inputMethodIter, "SendMsg") == 0)
+            inputMethods |= InputMethod::SendMsg;
         inputMethodIter = strtok(NULL, "/");
     }
 

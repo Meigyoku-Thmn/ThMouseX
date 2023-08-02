@@ -74,6 +74,7 @@ None = 0,
 DirectInput = 1 << 0,
 GetKeyboardState = 1 << 1,
 SendKey = 1 << 2,
+SendMsg = 1 << 3,
 END_FLAG_ENUM()
 
 enum class ScriptType {
