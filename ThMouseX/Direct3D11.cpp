@@ -140,18 +140,18 @@ namespace core::directx11 {
         ComPtr<IDXGISwapChain> swap_chain;
         DXGI_SWAP_CHAIN_DESC sd{
             .BufferDesc = DXGI_MODE_DESC{
-                .Format = DXGI_FORMAT_R8G8B8A8_UNORM
-            },
+                .Format = DXGI_FORMAT_R8G8B8A8_UNORM/*
+          */},
             .SampleDesc = DXGI_SAMPLE_DESC{
-                .Count = 1
-            },
+                .Count = 1/*
+          */},
             .BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
             .BufferCount = 2,
             .OutputWindow = tmpWnd.get(),
             .Windowed = TRUE,
             .SwapEffect = DXGI_SWAP_EFFECT_DISCARD
         };
-        const D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
+        const D3D_FEATURE_LEVEL feature_levels[] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
         auto rs = _D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, NULL, NULL);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create device and swapchain of DirectX 11.", rs);
@@ -166,7 +166,7 @@ namespace core::directx11 {
 
         minhook::CreateHook(vector<minhook::HookConfig>{
             { PVOID(vtable[PresentIdx]), & D3DPresent, (PVOID*)&OriPresent },
-            { PVOID(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, (PVOID*)&OriResizeBuffers },
+            {PVOID(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, (PVOID*)&OriResizeBuffers},
         });
     }
 
@@ -219,7 +219,7 @@ namespace core::directx11 {
             resource->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
             D3D11_TEXTURE2D_DESC desc;
             pTextureInterface->GetDesc(&desc);
-            cursorPivot = { (desc.Height - 1) / 2.f, (desc.Width - 1) / 2.f, 0.f };
+            cursorPivot = {(desc.Height - 1) / 2.f, (desc.Width - 1) / 2.f, 0.f};
         }
     }
 
@@ -288,7 +288,7 @@ namespace core::directx11 {
         }
 
         auto scale = float(desc.BufferDesc.Height) / gs_textureBaseHeight;
-        cursorScale = XMVECTORF32{ scale, scale };
+        cursorScale = XMVECTORF32{scale, scale};
 
         RECTSIZE clientSize{};
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
@@ -321,7 +321,7 @@ namespace core::directx11 {
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         auto pointerPosition = helper::GetPointerPosition();
-        XMVECTOR cursorPositionD3D = XMVECTORF32{ float(pointerPosition.x), float(pointerPosition.y) };
+        XMVECTOR cursorPositionD3D = XMVECTORF32{float(pointerPosition.x), float(pointerPosition.y)};
         if (d3dScale != 0.f && d3dScale != 1.f) {
             cursorPositionD3D = XMVectorScale(cursorPositionD3D, d3dScale);
         }

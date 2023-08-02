@@ -19,9 +19,28 @@ struct LastState {
     bool down;
 } lastState;
 
+bool IsVKExtended(UINT key) {
+    if (key == VK_INSERT || key == VK_DELETE || key == VK_END || key == VK_DOWN ||
+        key == VK_NEXT || key == VK_LEFT || key == VK_RIGHT || key == VK_HOME || key == VK_UP ||
+        key == VK_PRIOR || key == VK_DIVIDE || key == VK_APPS || key == VK_LWIN || key == VK_RWIN ||
+        key == VK_RMENU || key == VK_RCONTROL || key == VK_SLEEP || key == VK_BROWSER_BACK ||
+        key == VK_BROWSER_FORWARD || key == VK_BROWSER_REFRESH || key == VK_BROWSER_STOP ||
+        key == VK_BROWSER_SEARCH || key == VK_BROWSER_FAVORITES || key == VK_BROWSER_HOME ||
+        key == VK_VOLUME_MUTE || key == VK_VOLUME_DOWN || key == VK_VOLUME_UP || key == VK_MEDIA_NEXT_TRACK ||
+        key == VK_MEDIA_PREV_TRACK || key == VK_MEDIA_STOP || key == VK_MEDIA_PLAY_PAUSE ||
+        key == VK_LAUNCH_MAIL || key == VK_LAUNCH_MEDIA_SELECT || key == VK_LAUNCH_APP1 || key == VK_LAUNCH_APP2
+        ) {
+        return true;
+    }
+    else
+        return false;
+}
+
 void SendKeyDown(BYTE vkCode) {
     if ((g_currentConfig.InputMethods & InputMethod::SendMsg) == InputMethod::SendMsg) {
-        auto lParam = MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16 | 0x00000001;
+        auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16) | 0x00000001;
+        if (IsVKExtended(vkCode))
+            lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYDOWN, vkCode, lParam);
     }
     else if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::SendKey) {
@@ -30,8 +49,8 @@ void SendKeyDown(BYTE vkCode) {
             .ki = {
                 .wVk = vkCode,
                 .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC),
-                .dwFlags = KEYEVENTF_EXTENDEDKEY,
-            },
+                .dwFlags = IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0,/*
+          */},
         };
         SendInput(1, &input, sizeof(INPUT));
     }
@@ -39,7 +58,9 @@ void SendKeyDown(BYTE vkCode) {
 
 void SendKeyUp(BYTE vkCode) {
     if ((g_currentConfig.InputMethods & InputMethod::SendMsg) == InputMethod::SendMsg) {
-        auto lParam = MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16 | 0xC0000001;
+        auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16) | 0xC0000001;
+        if (IsVKExtended(vkCode))
+            lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYUP, vkCode, lParam);
     }
     else if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::SendKey) {
@@ -48,8 +69,8 @@ void SendKeyUp(BYTE vkCode) {
             .ki = {
                 .wVk = vkCode,
                 .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC),
-                .dwFlags = KEYEVENTF_KEYUP | KEYEVENTF_EXTENDEDKEY,
-            },
+                .dwFlags = KEYEVENTF_KEYUP | (IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0),/*
+          */},
         };
         SendInput(1, &input, sizeof(INPUT));
     }
