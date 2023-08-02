@@ -87,7 +87,7 @@ namespace common::luaapi {
     void Initialize() {
         callbackstore::RegisterUninitializeCallback(Uninitialize);
         vector<minhook::HookApiConfig> hookConfigs{
-            {L"KERNEL32.DLL", "LoadLibraryExA", &_LoadLibraryExA, (PVOID*)&OriLoadLibraryExA},
+            {L"KERNELBASE.DLL", "LoadLibraryExA", &_LoadLibraryExA, (PVOID*)&OriLoadLibraryExA},
         };
         minhook::CreateApiHook(hookConfigs);
         minhook::EnableHooks(hookConfigs);

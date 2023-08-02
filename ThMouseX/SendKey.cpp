@@ -44,6 +44,8 @@ void SendKeyDown(BYTE vkCode) {
         SendMessageW(g_hFocusWindow, WM_KEYDOWN, vkCode, lParam);
     }
     else if ((g_currentConfig.InputMethods & InputMethod::SendInput) == InputMethod::SendInput) {
+        if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
+            return;
         INPUT input{
             .type = INPUT_KEYBOARD,
             .ki = {
@@ -64,6 +66,8 @@ void SendKeyUp(BYTE vkCode) {
         SendMessageW(g_hFocusWindow, WM_KEYUP, vkCode, lParam);
     }
     else if ((g_currentConfig.InputMethods & InputMethod::SendInput) == InputMethod::SendInput) {
+        if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
+            return;
         INPUT input{
             .type = INPUT_KEYBOARD,
             .ki = {
