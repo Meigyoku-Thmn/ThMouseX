@@ -416,9 +416,9 @@ tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount)
             inputMethods |= InputMethod::DirectInput;
         else if (_stricmp(inputMethodIter, "GetKeyboardState") == 0)
             inputMethods |= InputMethod::GetKeyboardState;
-        else if (_stricmp(inputMethodIter, "SendKey") == 0)
-            inputMethods |= InputMethod::SendKey;
-        else if (_stricmp(inputMethodIter, "SendMsg") == 0)
+        else if (_stricmp(inputMethodIter, "SendInput") == 0)
+            inputMethods |= InputMethod::SendInput;
+        else if (_stricmp(inputMethodIter, "SendMessage") == 0)
             inputMethods |= InputMethod::SendMsg;
         inputMethodIter = strtok(NULL, "/");
     }

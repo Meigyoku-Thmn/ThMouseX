@@ -28,8 +28,7 @@ bool IsVKExtended(UINT key) {
         key == VK_BROWSER_SEARCH || key == VK_BROWSER_FAVORITES || key == VK_BROWSER_HOME ||
         key == VK_VOLUME_MUTE || key == VK_VOLUME_DOWN || key == VK_VOLUME_UP || key == VK_MEDIA_NEXT_TRACK ||
         key == VK_MEDIA_PREV_TRACK || key == VK_MEDIA_STOP || key == VK_MEDIA_PLAY_PAUSE ||
-        key == VK_LAUNCH_MAIL || key == VK_LAUNCH_MEDIA_SELECT || key == VK_LAUNCH_APP1 || key == VK_LAUNCH_APP2
-        ) {
+        key == VK_LAUNCH_MAIL || key == VK_LAUNCH_MEDIA_SELECT || key == VK_LAUNCH_APP1 || key == VK_LAUNCH_APP2) {
         return true;
     }
     else
@@ -43,13 +42,13 @@ void SendKeyDown(BYTE vkCode) {
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYDOWN, vkCode, lParam);
     }
-    else if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::SendKey) {
+    else if ((g_currentConfig.InputMethods & InputMethod::SendInput) == InputMethod::SendInput) {
         INPUT input{
             .type = INPUT_KEYBOARD,
             .ki = {
                 .wVk = vkCode,
                 .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC),
-                .dwFlags = IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0,/*
+                .dwFlags = DWORD(IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0),/*
           */},
         };
         SendInput(1, &input, sizeof(INPUT));
@@ -63,13 +62,13 @@ void SendKeyUp(BYTE vkCode) {
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYUP, vkCode, lParam);
     }
-    else if ((g_currentConfig.InputMethods & InputMethod::SendKey) == InputMethod::SendKey) {
+    else if ((g_currentConfig.InputMethods & InputMethod::SendInput) == InputMethod::SendInput) {
         INPUT input{
             .type = INPUT_KEYBOARD,
             .ki = {
                 .wVk = vkCode,
                 .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC),
-                .dwFlags = KEYEVENTF_KEYUP | (IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0),/*
+                .dwFlags = DWORD(KEYEVENTF_KEYUP | (IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0)),/*
           */},
         };
         SendInput(1, &input, sizeof(INPUT));
@@ -114,7 +113,7 @@ void CleanUp(bool isProcessTerminating) {
 
 namespace core::sendkey {
     void Initialize() {
-        if ((g_currentConfig.InputMethods & (InputMethod::SendKey | InputMethod::SendMsg)) == InputMethod::None)
+        if ((g_currentConfig.InputMethods & (InputMethod::SendInput | InputMethod::SendMsg)) == InputMethod::None)
             return;
         callbackstore::RegisterPostRenderCallback(TestInputAndSendKeys);
         callbackstore::RegisterUninitializeCallback(CleanUp);
