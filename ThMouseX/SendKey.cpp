@@ -19,6 +19,7 @@ struct LastState {
     bool down;
 } lastState;
 
+// from Autoit source code: https://github.com/ellysh/au3src/blob/35517393091e7d97052d20ccdee8d9d6db36276f/src/sendkeys.cpp#L790
 bool IsVKExtended(UINT key) {
     if (key == VK_INSERT || key == VK_DELETE || key == VK_END || key == VK_DOWN ||
         key == VK_NEXT || key == VK_LEFT || key == VK_RIGHT || key == VK_HOME || key == VK_UP ||
