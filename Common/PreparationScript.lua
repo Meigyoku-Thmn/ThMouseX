@@ -1,4 +1,6 @@
-ThMouseX_DllPath = "{}"
+-- This file is not really a valid Lua script, but a Lua script template that is passed to std::vformat
+ThMouseX_DllPath = "{0}"
+ThMouseX_ModuleHandle = {1:#0x}
 
 function InitializeForLuaJIT()    
     local ffi = require("ffi")
@@ -6,73 +8,47 @@ function InitializeForLuaJIT()
     ffi.cdef [[
         typedef unsigned long DWORD;
         typedef void* LPVOID;
+        typedef LPVOID HMODULE;
         typedef const wchar_t* LPCWSTR;
         typedef const char* LPCSTR;
         typedef void (*UninitializeCallbackType)(bool isProcessTerminating);
-
-        int         Lua_CreateHookApi       (LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
-        DWORD       Lua_ReadUInt32          (DWORD address);
-        DWORD       Lua_ResolveAddress      (DWORD* offsets, int length);
-        void        Lua_OpenConsole         ();
-        void        Lua_SetPositionAddress  (DWORD address);
-        int         Lua_GetDataType         ();
-
-        void        Lua_RegisterUninitializeCallback    (UninitializeCallbackType callback);
-
-        int         __stdcall MH_CreateHook     (LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal);
-        int         __stdcall MH_EnableHook     (LPVOID pTarget);
-        int         __stdcall MH_RemoveHook     (LPVOID pTarget);
-        int         __stdcall MH_DisableHook    (LPVOID pTarget);
-        const char* __stdcall MH_StatusToString (int status);
+        
+        LPVOID      GetProcAddress(HMODULE hModule, LPCSTR lpProcName);
+        typedef DWORD   (*Lua_ReadUInt32)(DWORD address);
+        typedef DWORD   (*Lua_ResolveAddress)(DWORD* offsets, int length);
+        typedef void    (*Lua_OpenConsole)();
+        typedef void    (*Lua_SetPositionAddress)(DWORD address);
+        typedef int     (*Lua_GetDataType)();
+        typedef void    (*Lua_RegisterUninitializeCallback)(UninitializeCallbackType callback);
+        
+        typedef int     (__stdcall *MH_CreateHook)(LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal);
+        typedef int     (*Lua_CreateHookApi)(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
+        typedef int     (__stdcall *MH_EnableHook)(LPVOID pTarget);
+        typedef int     (__stdcall *MH_RemoveHook)(LPVOID pTarget);
+        typedef int     (__stdcall *MH_DisableHook)(LPVOID pTarget);
+        typedef LPCSTR  (__stdcall *MH_StatusToString)(int status);
     ]]
 
-    local ThMouseX = ffi.load(ThMouseX_DllPath)
-
-    function ReadUInt32(address)
-        return ThMouseX.Lua_ReadUInt32(address)
+    local hModule = ffi.cast("HMODULE", ThMouseX_ModuleHandle)
+    local config = {{
+        {{'ReadUInt32',                     'Lua_ReadUInt32'}},
+        {{'ResolveAddress',                 'Lua_ResolveAddress'}},
+        {{'OpenConsole',                    'Lua_OpenConsole'}},
+        {{'SetPositionAddress',             'Lua_SetPositionAddress'}},
+        {{'GetDataType',                    'Lua_GetDataType'}},
+        {{'RegisterUninitializeCallback',   'Lua_RegisterUninitializeCallback'}},
+        {{'CreateHook',                     'MH_CreateHook'}},
+        {{'CreateHookApi',                  'Lua_CreateHookApi'}},
+        {{'EnableHook',                     'MH_EnableHook'}},
+        {{'RemoveHook',                     'MH_RemoveHook'}},
+        {{'DisableHook',                    'MH_DisableHook'}},
+        {{'_HookStatusToString',            'MH_StatusToString'}},
+    }}
+    for i = 1, #config do
+        local item = config[i]
+        _G[item[1]] = ffi.cast(item[2], ffi.C.GetProcAddress(hModule, item[2]))
     end
-
-    function ResolveAddress(addressChain, length)
-        return ThMouseX.Lua_ResolveAddress(addressChain, length)
-    end
-
-    function OpenConsole()
-        return ThMouseX.Lua_OpenConsole()
-    end
-
-    function SetPositionAddress(address)
-        return ThMouseX.Lua_SetPositionAddress(address)
-    end
-
-    function GetDataType()
-        return ThMouseX.Lua_GetDataType()
-    end
-
-    function RegisterUninitializeCallback(callback)
-        return ThMouseX.Lua_RegisterUninitializeCallback(callback)
-    end
-
-    function CreateHook(target, detour, outOriginal)
-        return MH_CreateHook(target, detour, outOriginal)
-    end
-
-    function CreateHookApi(module, procName, detour, outOriginal)
-        return ThMouseX.Lua_CreateHookApi(module, procName, detour, outOriginal)
-    end
-
-    function EnableHook(target)
-        return ThMouseX.MH_EnableHook(target)
-    end
-
-    function RemoveHook(target)
-        return ThMouseX.MH_RemoveHook(target)
-    end
-
-    function DisableHook(target)
-        return ThMouseX.MH_DisableHook(target)
-    end
-
     function HookStatusToString(status)
-        return ffi.string(ThMouseX.MH_StatusToString(status))
+        return ffi.string(_HookStatusToString(status))
     end
 end

@@ -7,9 +7,15 @@ local ffi = require("ffi")
 local position = ffi.new('double[2]', {0, 0})
 
 -- native code will call into this function for each frame
+local function getPos()
+    position[0] = (player and player.x or 0) + 224
+    position[1] = 480 - ((player and player.y or 0) + 239) - 1 -- y axis is inverted
+end
+
 function getPositionAddress()
-    local _player = rawget(_G, "player")
-    position[0] = (_player and _player.x or 0) + 224
-    position[1] = 480 - ((_player and _player.y or 0) + 239) - 1 -- y axis is inverted
+    status = pcall(getPos)
+    if (not status) then
+        return 0
+    end
     return tonumber(ffi.cast("DWORD", position))
 end
