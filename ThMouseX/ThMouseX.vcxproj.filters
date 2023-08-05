@@ -143,6 +143,7 @@
   <ItemGroup>
     <CopyFileToFolders Include="Cursor.png" />
     <CopyFileToFolders Include="Games.txt" />
+    <CopyFileToFolders Include="Games2.txt" />
     <CopyFileToFolders Include="ThMouseX.ini" />
     <CopyFileToFolders Include="VirtualKeyCodes.txt" />
     <CopyFileToFolders Include="ConfigScripts/Danmakai.lua">

@@ -90,7 +90,8 @@ namespace core {
         if (_wcsicmp(currentProcessName, L_(APP_NAME "GUI")) == 0)
             return;
 
-        for (size_t i = 0; i < gs_gameConfigs.length(); i++) {
+        for (auto ord = gs_gameConfigs.length(); ord > 0; ord--) {
+            auto i = ord - 1;
             if (_wcsicmp(currentProcessName, gs_gameConfigs[i].ProcessName) == 0) {
                 g_currentConfig = gs_gameConfigs[i];
 

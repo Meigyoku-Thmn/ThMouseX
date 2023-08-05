@@ -98,9 +98,6 @@ th18            [000CF410][62C]         int        (28672,2048)   61440        4
 ; Touhou 18.5
 th185           [000D7C3C][62C]         int        (40960,2048)   61440        4:3           GetKeyboardState
 
-; Touhou 19 Demo
-th19            [00220114][658]         int        (20992,2048)   61440        4:3           GetKeyboardState
-
 ; DANMAKAI: Red Forbidden Fruit
 Danmakai        LuaJIT/Detached/Pull    float      (239.5,13.5)   540          16:9          SendMessage
 
@@ -111,4 +108,4 @@ THMHJ           NeoLua/Attached/Push    float      (-0.5,-1.5)    480          4
 thWWW           LuaJIT/Detached/Pull    float      (155.5,20.5)   540          16:9          SendMessage
 
 ; Chaos of Black Loong (offset is done in Lua script)
-DFLYT			Lua/Attached/Pull       double     (0,0)          480          4:3           SendInput
+DFLYT           Lua/Attached/Pull       double     (0,0)          480          4:3           SendInput

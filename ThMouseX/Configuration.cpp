@@ -26,6 +26,7 @@ namespace directx11 = core::directx11;
 namespace directinput = core::directinput;
 
 #define GameFile "Games.txt"
+#define GameFile2 "Games2.txt"
 #define ThMouseXFile APP_NAME ".ini"
 #define VirtualKeyCodesFile "VirtualKeyCodes.txt"
 
@@ -84,24 +85,36 @@ typedef unordered_map<string, BYTE, string_hash, equal_to<>> VkCodes;
 
 #pragma region method declaration
 bool IsCommentLine(stringstream& stream);
-tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount);
-tuple<vector<DWORD>, ScriptType, ScriptRunPlace, ScriptPositionGetMethod, bool> ExtractPositionRVA(stringstream& stream, int lineCount);
-tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount);
-tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount);
-tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount);
-tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount);
-tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount);
+tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount, const char* gameConfigPath);
+tuple<vector<DWORD>, ScriptType, ScriptRunPlace, ScriptPositionGetMethod, bool> ExtractPositionRVA(stringstream& stream, int lineCount, const char* gameConfigPath);
+tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, const char* gameConfigPath);
+tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const char* gameConfigPath);
+tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, const char* gameConfigPath);
+tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, const char* gameConfigPath);
+tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, const char* gameConfigPath);
 tuple<VkCodes, bool> ReadVkCodes();
 #pragma endregion
 
 namespace core::configuration {
+    bool ReadGamesFile(const char* gameConfigPath, bool overrding = false);
     bool ReadGamesFile() {
-        ifstream gamesFile(GameFile);
+        auto rs = ReadGamesFile(GameFile);
+        if (rs)
+            rs = ReadGamesFile(GameFile2, true);
+        return rs;
+    }
+    bool ReadGamesFile(const char* gameConfigPath, bool overrding) {
+        ifstream gamesFile(gameConfigPath);
         if (!gamesFile) {
-            MessageBoxA(NULL, "Missing " GameFile " file.", APP_NAME, MB_OK | MB_ICONERROR);
-            return false;
+            if (!overrding) {
+                MessageBoxA(NULL, format("Missing {} file.", gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+                return false;
+            }
+            else
+                return true;
         }
-        gs_gameConfigs.fill({});
+        if (!overrding)
+            gs_gameConfigs.fill({});
 
         string line;
         int lineCount = 0;
@@ -111,31 +124,31 @@ namespace core::configuration {
             if (IsCommentLine(lineStream))
                 continue;
 
-            auto [processName, ok1] = ExtractProcessName(lineStream, lineCount);
+            auto [processName, ok1] = ExtractProcessName(lineStream, lineCount, gameConfigPath);
             if (!ok1)
                 return false;
 
-            auto [addressOffsets, scriptType, scriptRunPlace, scriptPosGetMethod, ok2] = ExtractPositionRVA(lineStream, lineCount);
+            auto [addressOffsets, scriptType, scriptRunPlace, scriptPosGetMethod, ok2] = ExtractPositionRVA(lineStream, lineCount, gameConfigPath);
             if (!ok2)
                 return false;
 
-            auto [dataType, ok3] = ExtractDataType(lineStream, lineCount);
+            auto [dataType, ok3] = ExtractDataType(lineStream, lineCount, gameConfigPath);
             if (!ok3)
                 return false;
 
-            auto [offset, ok4] = ExtractOffset(lineStream, lineCount);
+            auto [offset, ok4] = ExtractOffset(lineStream, lineCount, gameConfigPath);
             if (!ok4)
                 return false;
 
-            auto [baseHeight, ok5] = ExtractBaseHeight(lineStream, lineCount);
+            auto [baseHeight, ok5] = ExtractBaseHeight(lineStream, lineCount, gameConfigPath);
             if (!ok5)
                 return false;
 
-            auto [aspectRatio, ok6] = ExtractAspectRatio(lineStream, lineCount);
+            auto [aspectRatio, ok6] = ExtractAspectRatio(lineStream, lineCount, gameConfigPath);
             if (!ok6)
                 return false;
 
-            auto [inputMethods, ok7] = ExtractInputMethod(lineStream, lineCount);
+            auto [inputMethods, ok7] = ExtractInputMethod(lineStream, lineCount, gameConfigPath);
             if (!ok7)
                 return false;
 
@@ -218,22 +231,22 @@ bool IsCommentLine(stringstream& stream) {
     return false;
 }
 
-tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount) {
+tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount, const char* gameConfigPath) {
     string processName;
     stream >> quoted(processName);
     auto wProcessName = encoding::ConvertToUtf16(processName.c_str());
 
     auto maxSize = ARRAYSIZE(gs_gameConfigs[0].ProcessName) - 1;
     if (wProcessName.size() > maxSize) {
-        MessageBoxA(NULL, format("processName longer than {} characters at line {} in " GameFile ".",
-            maxSize, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-        return {move(wProcessName), false};
+        MessageBoxA(NULL, format("processName longer than {} characters at line {} in {}.",
+            maxSize, lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+        return { move(wProcessName), false };
     }
-    return {move(wProcessName), true};
+    return { move(wProcessName), true };
 }
 
 tuple<vector<DWORD>, ScriptType, ScriptRunPlace, ScriptPositionGetMethod, bool>
-ExtractPositionRVA(stringstream& stream, int lineCount) {
+ExtractPositionRVA(stringstream& stream, int lineCount, const char* gameConfigPath) {
     string pointerChainStr;
     stream >> pointerChainStr;
     vector<DWORD> addressOffsets;
@@ -244,7 +257,7 @@ ExtractPositionRVA(stringstream& stream, int lineCount) {
 
     auto scriptingConfig = string(pointerChainStr);
     auto tok = strtok(scriptingConfig.data(), "/");
-    const char* segments[3]{"", "", ""};
+    const char* segments[3]{ "", "", "" };
     auto segPos = 0;
     while (tok != NULL) {
         if (tok[0] != '\0')
@@ -287,25 +300,25 @@ ExtractPositionRVA(stringstream& stream, int lineCount) {
             auto offsetStr = pointerChainStr.substr(leftBoundIdx + 1, rightBoundIdx - leftBoundIdx - 1);
             auto [offset, convMessage] = helper::ConvertToULong(offsetStr, 16);
             if (convMessage != nullptr) {
-                MessageBoxA(NULL, format("Invalid positionRVA: {} at line {} in " GameFile ".",
-                    convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-                return {move(addressOffsets), scriptType, scriptRunPlace, scriptPosGetMethod, false};
+                MessageBoxA(NULL, format("Invalid positionRVA: {} at line {} in {}.",
+                    convMessage, lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+                return { move(addressOffsets), scriptType, scriptRunPlace, scriptPosGetMethod, false };
             }
 
             addressOffsets.push_back(offset);
         }
 
         if (addressOffsets.size() == 0) {
-            MessageBoxA(NULL, format("Found no address offset for positionRVA at line {} in " GameFile ".",
-                lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-            return {move(addressOffsets), scriptType, scriptRunPlace, scriptPosGetMethod, false};
+            MessageBoxA(NULL, format("Found no address offset for positionRVA at line {} in {}.",
+                lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+            return { move(addressOffsets), scriptType, scriptRunPlace, scriptPosGetMethod, false };
         }
     }
 
-    return {move(addressOffsets), scriptType, scriptRunPlace, scriptPosGetMethod, true};
+    return { move(addressOffsets), scriptType, scriptRunPlace, scriptPosGetMethod, true };
 }
 
-tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount) {
+tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, const char* gameConfigPath) {
     string dataTypeStr;
     stream >> dataTypeStr;
     auto dataType = PointDataType::None;
@@ -319,93 +332,93 @@ tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount) 
     else if (_stricmp(dataTypeStr.c_str(), "Double") == 0)
         dataType = PointDataType::Double;
     else {
-        MessageBoxA(NULL, format("Invalid dataType at line {} in " GameFile ".", lineCount).c_str(),
+        MessageBoxA(NULL, format("Invalid dataType at line {} in {}.", lineCount, gameConfigPath).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);
-        return {move(dataType), false};
+        return { move(dataType), false };
     }
 
-    return {move(dataType), true};
+    return { move(dataType), true };
 }
 
-tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount) {
+tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const char* gameConfigPath) {
     string posOffsetStr;
     stream >> posOffsetStr;
 
     if (posOffsetStr[0] != '(' || posOffsetStr[posOffsetStr.length() - 1] != ')') {
-        MessageBoxA(NULL, format("Invalid offset: expected wrapping '(' and ')' at line {} in " GameFile ".",
-            lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-        return {FloatPoint(), false};
+        MessageBoxA(NULL, format("Invalid offset: expected wrapping '(' and ')' at line {} in {}.",
+            lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+        return { FloatPoint(), false };
     }
     auto commaIdx = posOffsetStr.find(',');
     if (commaIdx == string::npos) {
-        MessageBoxA(NULL, format("Invalid offset: expected separating comma ',' at line {} in " GameFile ".",
-            lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-        return {FloatPoint(), false};
+        MessageBoxA(NULL, format("Invalid offset: expected separating comma ',' at line {} in {}.",
+            lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+        return { FloatPoint(), false };
     }
 
     auto offsetXStr = posOffsetStr.substr(1, commaIdx - 1);
     auto [offsetX, convMessage] = helper::ConvertToFloat(offsetXStr);
     if (convMessage != nullptr) {
-        MessageBoxA(NULL, format("Invalid offset X: {} at line {} in " GameFile ".",
-            convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-        return {FloatPoint(), false};
+        MessageBoxA(NULL, format("Invalid offset X: {} at line {} in {}.",
+            convMessage, lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+        return { FloatPoint(), false };
     }
 
     auto offsetYStr = posOffsetStr.substr(commaIdx + 1, posOffsetStr.length() - commaIdx - 2);
     auto [offsetY, convMessage2] = helper::ConvertToFloat(offsetYStr);
     if (convMessage2 != nullptr) {
-        MessageBoxA(NULL, format("Invalid offset Y: {} at line {} in " GameFile ".",
-            convMessage2, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-        return {FloatPoint(), false};
+        MessageBoxA(NULL, format("Invalid offset Y: {} at line {} in {}.",
+            convMessage2, lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+        return { FloatPoint(), false };
     }
 
-    return {FloatPoint(offsetX, offsetY), true};
+    return { FloatPoint(offsetX, offsetY), true };
 }
 
-tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount) {
+tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, const char* gameConfigPath) {
     DWORD baseHeight;
     stream >> dec >> baseHeight;
 
     if (baseHeight == 0) {
-        MessageBoxA(NULL, format("Invalid baseHeight at line {} in " GameFile ".", lineCount).c_str(),
+        MessageBoxA(NULL, format("Invalid baseHeight at line {} in {}.", lineCount, gameConfigPath).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);
-        return {baseHeight, false};
+        return { baseHeight, false };
     }
 
-    return {baseHeight, true};
+    return { baseHeight, true };
 }
 
-tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount) {
+tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, const char* gameConfigPath) {
     string aspectRatioStr;
     stream >> aspectRatioStr;
 
     auto colonIdx = aspectRatioStr.find(':');
     if (colonIdx == string::npos) {
-        MessageBoxA(NULL, format("Invalid aspectRatio: expected separating ':' at line {} in " GameFile ".",
-            lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-        return {FloatPoint(), false};
+        MessageBoxA(NULL, format("Invalid aspectRatio: expected separating ':' at line {} in {}.",
+            lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+        return { FloatPoint(), false };
     }
 
     auto ratioXStr = aspectRatioStr.substr(0, colonIdx);
     auto [ratioX, convMessage] = helper::ConvertToFloat(ratioXStr);
     if (convMessage != nullptr) {
-        MessageBoxA(NULL, format("Invalid aspectRatio X: {} at line {} in " GameFile ".",
-            convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-        return {FloatPoint(), false};
+        MessageBoxA(NULL, format("Invalid aspectRatio X: {} at line {} in {}.",
+            convMessage, lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+        return { FloatPoint(), false };
     }
 
     auto ratioYStr = aspectRatioStr.substr(colonIdx + 1, aspectRatioStr.length() - colonIdx - 1);
     auto [ratioY, convMessage2] = helper::ConvertToFloat(ratioYStr);
     if (convMessage2 != nullptr) {
-        MessageBoxA(NULL, format("Invalid aspectRatio Y: {} at line {} in " GameFile ".",
-            convMessage2, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-        return {FloatPoint(), false};
+        MessageBoxA(NULL, format("Invalid aspectRatio Y: {} at line {} in {}.",
+            convMessage2, lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+        return { FloatPoint(), false };
     }
 
-    return {FloatPoint(ratioX, ratioY), true};
+    return { FloatPoint(ratioX, ratioY), true };
 }
 
-tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount) {
+tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, const char* gameConfigPath) {
     string inputMethodStr;
     stream >> inputMethodStr;
 
@@ -424,12 +437,12 @@ tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount)
     }
 
     if (inputMethods == InputMethod::None) {
-        MessageBoxA(NULL, format("Invalid inputMethod at line {} in " GameFile ".", lineCount).c_str(),
+        MessageBoxA(NULL, format("Invalid inputMethod at line {} in {}.", lineCount, gameConfigPath).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);
-        return {inputMethods, false};
+        return { inputMethods, false };
     }
 
-    return {inputMethods, true};
+    return { inputMethods, true };
 }
 
 tuple<VkCodes, bool> ReadVkCodes() {
@@ -440,7 +453,7 @@ tuple<VkCodes, bool> ReadVkCodes() {
     ifstream vkcodeFile(VirtualKeyCodesFile);
     if (!vkcodeFile) {
         MessageBoxA(NULL, "Missing " VirtualKeyCodesFile " file.", APP_NAME, MB_OK | MB_ICONERROR);
-        return {move(vkCodes), false};
+        return { move(vkCodes), false };
     }
 
     while (getline(vkcodeFile, line)) {
@@ -458,10 +471,10 @@ tuple<VkCodes, bool> ReadVkCodes() {
         if (convMessage != nullptr) {
             MessageBoxA(NULL, format("Invalid value: {} at line {} in " VirtualKeyCodesFile ".",
                 convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-            return {move(vkCodes), false};
+            return { move(vkCodes), false };
         }
         vkCodes[key] = (BYTE)value;
     }
 
-    return {move(vkCodes), true};
+    return { move(vkCodes), true };
 }
