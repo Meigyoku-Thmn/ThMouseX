@@ -124,6 +124,8 @@ namespace core::messagequeue {
                 g_midMousePressed = wantCaptureMouse ? false : true;
                 if (wantCaptureMouse)
                     g_inputEnabled = false;
+                else
+                    ImGui::SetWindowFocus();
             } }, g_midMousePressed = false);
             HandleMousePress(e, WM_RBUTTON, 0, { {
                 g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
