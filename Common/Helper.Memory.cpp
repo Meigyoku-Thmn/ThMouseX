@@ -1,7 +1,11 @@
 #include "framework.h"
+#include <string>
+#include <format>
 
 #include "Helper.Memory.h"
 #include "Variables.h"
+
+using namespace std;
 
 namespace common::helper::memory {
     DWORD ResolveAddress(DWORD* offsets, int length) {
@@ -16,6 +20,19 @@ namespace common::helper::memory {
         }
         return address;
     }
+
+    string GetAddressConfigAsString() {
+        if (g_currentConfig.ScriptType != ScriptType::None)
+            return "Using script";
+        string rs;
+        rs.reserve(128);
+        for (int i = 0; i < g_currentConfig.Address.Length; i++) {
+            auto offset = g_currentConfig.Address.Level[i];
+            rs.append(format("[{:x}]", offset));
+        }
+        return rs;
+    }
+
     void ScanImportTable(HMODULE hModule, ImportTableCallbackType callback) {
         auto dosHeaders = (PIMAGE_DOS_HEADER)hModule;
         auto ntHeaders = (PIMAGE_NT_HEADERS)((DWORD_PTR)hModule + dosHeaders->e_lfanew);

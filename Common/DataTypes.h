@@ -16,7 +16,7 @@ struct ErrorMessage {
     LPCSTR symbolicName;
     LPCSTR description;
     LPCSTR sourceHeader;
-    ErrorMessage(unsigned int code, const char* symbolicName, const char* description, const char* sourceHeader):
+    ErrorMessage(unsigned int code, const char* symbolicName, const char* description, const char* sourceHeader) :
         code(code), symbolicName(symbolicName), description(description), sourceHeader(sourceHeader) {
     }
 };
@@ -25,7 +25,7 @@ enum ModulateStage {
     WhiteInc, WhiteDec, BlackInc, BlackDec,
 };
 
-struct RECTSIZE: RECT {
+struct RECTSIZE : RECT {
     LONG width() const {
         return right - left;
     }
@@ -69,12 +69,23 @@ struct AddressChain {
 };
 static_assert(sizeof(void*) == sizeof(AddressChain::Level[0]));
 
+BEGIN_FLAG_ENUM(GameInput, DWORD)
+NONE/*        */ = 0,
+USE_BOMB/*    */ = 0b0000'0001,
+USE_SPECIAL/* */ = 0b0000'0010,
+
+MOVE_LEFT/*   */ = 0b1000'0000,
+MOVE_RIGHT/*  */ = 0b0100'0000,
+MOVE_UP/*     */ = 0b0010'0000,
+MOVE_DOWN/*   */ = 0b0001'0000,
+END_FLAG_ENUM()
+
 BEGIN_FLAG_ENUM(InputMethod, int)
-None = 0,
-DirectInput = 1 << 0,
+None/*        */ = 0,
+DirectInput/* */ = 1 << 0,
 GetKeyboardState = 1 << 1,
-SendInput = 1 << 2,
-SendMsg = 1 << 3,
+SendInput/*   */ = 1 << 2,
+SendMsg/*     */ = 1 << 3,
 END_FLAG_ENUM()
 
 enum class ScriptType {
@@ -105,7 +116,7 @@ struct GameConfig {
 };
 
 template <class ElementType, size_t ArraySize>
-class _GameConfigs: public std::array<ElementType, ArraySize> {
+class _GameConfigs : public std::array<ElementType, ArraySize> {
 private:
     _GameConfigs::size_type _length;
 public:

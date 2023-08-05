@@ -4,7 +4,8 @@
     "directxtk",
     "luajit",
     "minhook",
-    "inipp"
+    "inipp",
+    "nameof"
   ],
   "builtin-baseline": "861c33057553ee836e7061ffbdabc25ea343145d",
   "vcpkg-configuration": {
@@ -32,6 +33,10 @@
     {
       "name": "inipp",
       "version": "2022-02-04"
+    },
+    {
+      "name": "nameof",
+      "version": "0.10.3"
     }
   ]
 }

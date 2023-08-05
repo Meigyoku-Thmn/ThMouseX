@@ -6,55 +6,64 @@
 #include "../Common/DataTypes.h"
 #include "InputDetermine.h"
 
-#define CalculatePosition(position, output) { \
-    output.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X + paddingX); \
-    output.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y); \
+template <typename T>
+void CalculatePosition(T position, POINT& output) {
+    RECTSIZE clientSize{};
+    GetClientRect(g_hFocusWindow, &clientSize);
+    auto realWidth = clientSize.height() * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
+    auto paddingX = (clientSize.width() - realWidth) / 2;
+    g_playerPosRaw = { (double)(position)->X, (double)(position)->Y };
+    output.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X + paddingX);
+    output.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y);
+}
+
+void CalculatePlayerPos(DWORD address) {
+    if (g_currentConfig.PosDataType == PointDataType::Int)
+        CalculatePosition((IntPoint*)address, g_playerPos);
+    else if (g_currentConfig.PosDataType == PointDataType::Float)
+        CalculatePosition((FloatPoint*)address, g_playerPos);
+    else if (g_currentConfig.PosDataType == PointDataType::Short)
+        CalculatePosition((ShortPoint*)address, g_playerPos);
+    else if (g_currentConfig.PosDataType == PointDataType::Double)
+        CalculatePosition((DoublePoint*)address, g_playerPos);
 }
 
 namespace helper = common::helper;
 
 namespace core::inputdetermine {
-    DWORD DetermineGameInput() {
-        DWORD gameInput = 0;
-        if (g_leftMousePressed) {
-            gameInput |= USE_BOMB;
-        }
-        if (g_midMousePressed) {
-            gameInput |= USE_SPECIAL;
-        }
-        if (g_inputEnabled) {
-            auto address = helper::CalculateAddress();
+    GameInput DetermineGameInput() {
+        g_gameInput = GameInput::NONE;
+        g_playerPos = {};
+        g_playerPosRaw = {};
+        DWORD address{};
+        if (g_inputEnabled || g_showImGui) {
+            if (g_leftMousePressed) {
+                g_gameInput |= GameInput::USE_BOMB;
+            }
+            if (g_midMousePressed) {
+                g_gameInput |= GameInput::USE_SPECIAL;
+            }
+            address = helper::CalculateAddress();
             if (address != 0) {
-                // support borderless mode (except the DOT by DOT mode from Touhou 18 which I gave up)
-                RECTSIZE clientSize{};
-                GetClientRect(g_hFocusWindow, &clientSize);
-                auto realWidth = clientSize.height() * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
-                auto paddingX = (clientSize.width() - realWidth) / 2;
-
-                POINT playerPos{};
-                if (g_currentConfig.PosDataType == PointDataType::Int)
-                    CalculatePosition((IntPoint*)address, playerPos)
-                else if (g_currentConfig.PosDataType == PointDataType::Float)
-                    CalculatePosition((FloatPoint*)address, playerPos)
-                else if (g_currentConfig.PosDataType == PointDataType::Short)
-                    CalculatePosition((ShortPoint*)address, playerPos)
-                else if (g_currentConfig.PosDataType == PointDataType::Double)
-                    CalculatePosition((DoublePoint*)address, playerPos);
+                CalculatePlayerPos(address);
 
                 auto mousePos = helper::GetPointerPosition();
 
-                if (playerPos.x < mousePos.x - 1)
-                    gameInput |= MOVE_RIGHT;
-                else if (playerPos.x > mousePos.x + 1)
-                    gameInput |= MOVE_LEFT;
+                if (g_playerPos.x < mousePos.x - 1)
+                    g_gameInput |= GameInput::MOVE_RIGHT;
+                else if (g_playerPos.x > mousePos.x + 1)
+                    g_gameInput |= GameInput::MOVE_LEFT;
 
-                if (playerPos.y < mousePos.y - 1)
-                    gameInput |= MOVE_DOWN;
-                else if (playerPos.y > mousePos.y + 1)
-                    gameInput |= MOVE_UP;
+                if (g_playerPos.y < mousePos.y - 1)
+                    g_gameInput |= GameInput::MOVE_DOWN;
+                else if (g_playerPos.y > mousePos.y + 1)
+                    g_gameInput |= GameInput::MOVE_UP;
             }
         }
+        if (!g_inputEnabled) {
+            return GameInput::NONE;
+        }
 
-        return gameInput;
+        return g_gameInput;
     }
 }

@@ -80,8 +80,8 @@ void SendKeyUp(BYTE vkCode) {
     }
 }
 
-void HandleKeyPress(DWORD gameInput, bool& wasPressing, BYTE vkCode) {
-    if (gameInput) {
+void HandleKeyPress(GameInput gameInput, bool& wasPressing, BYTE vkCode) {
+    if (gameInput != GameInput::NONE) {
         if (!wasPressing) {
             SendKeyDown(vkCode);
             wasPressing = true;
@@ -97,12 +97,12 @@ void HandleKeyPress(DWORD gameInput, bool& wasPressing, BYTE vkCode) {
 
 void TestInputAndSendKeys() {
     auto gameInput = DetermineGameInput();
-    HandleKeyPress(gameInput & USE_BOMB, _ref lastState.bomb, gs_bombButton);
-    HandleKeyPress(gameInput & USE_SPECIAL, _ref lastState.extra, gs_extraButton);
-    HandleKeyPress(gameInput & MOVE_LEFT, _ref lastState.left, VK_LEFT);
-    HandleKeyPress(gameInput & MOVE_RIGHT, _ref lastState.right, VK_RIGHT);
-    HandleKeyPress(gameInput & MOVE_UP, _ref lastState.up, VK_UP);
-    HandleKeyPress(gameInput & MOVE_DOWN, _ref lastState.down, VK_DOWN);
+    HandleKeyPress(gameInput & GameInput::USE_BOMB, _ref lastState.bomb, gs_bombButton);
+    HandleKeyPress(gameInput & GameInput::USE_SPECIAL, _ref lastState.extra, gs_extraButton);
+    HandleKeyPress(gameInput & GameInput::MOVE_LEFT, _ref lastState.left, VK_LEFT);
+    HandleKeyPress(gameInput & GameInput::MOVE_RIGHT, _ref lastState.right, VK_RIGHT);
+    HandleKeyPress(gameInput & GameInput::MOVE_UP, _ref lastState.up, VK_UP);
+    HandleKeyPress(gameInput & GameInput::MOVE_DOWN, _ref lastState.down, VK_DOWN);
 }
 
 void CleanUp(bool isProcessTerminating) {

@@ -79,17 +79,17 @@ namespace core::directinput {
         if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
             auto keys = PBYTE(lpvData);
             auto gameInput = DetermineGameInput();
-            if (gameInput & USE_BOMB)
+            if ((gameInput & GameInput::USE_BOMB) == GameInput::USE_BOMB)
                 keys[DIK_X] |= 0x80;
-            if (gameInput & USE_SPECIAL)
+            if ((gameInput & GameInput::USE_SPECIAL) == GameInput::USE_SPECIAL)
                 keys[DIK_C] |= 0x80;
-            if (gameInput & MOVE_LEFT)
+            if ((gameInput & GameInput::MOVE_LEFT) == GameInput::MOVE_LEFT)
                 keys[DIK_LEFT] |= 0x80;
-            if (gameInput & MOVE_RIGHT)
+            if ((gameInput & GameInput::MOVE_RIGHT) == GameInput::MOVE_RIGHT)
                 keys[DIK_RIGHT] |= 0x80;
-            if (gameInput & MOVE_UP)
+            if ((gameInput & GameInput::MOVE_UP) == GameInput::MOVE_UP)
                 keys[DIK_UP] |= 0x80;
-            if (gameInput & MOVE_DOWN)
+            if ((gameInput & GameInput::MOVE_DOWN) == GameInput::MOVE_DOWN)
                 keys[DIK_DOWN] |= 0x80;
         }
         return hr;

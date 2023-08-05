@@ -29,17 +29,17 @@ namespace core::keyboardstate {
         auto rs = OriGetKeyboardState(lpKeyState);
         if (rs != FALSE) {
             auto gameInput = DetermineGameInput();
-            if (gameInput & USE_BOMB)
+            if ((gameInput & GameInput::USE_BOMB) == GameInput::USE_BOMB)
                 lpKeyState[gs_bombButton] |= 0x80;
-            if (gameInput & USE_SPECIAL)
+            if ((gameInput & GameInput::USE_SPECIAL) == GameInput::USE_SPECIAL)
                 lpKeyState[gs_extraButton] |= 0x80;
-            if (gameInput & MOVE_LEFT)
+            if ((gameInput & GameInput::MOVE_LEFT) == GameInput::MOVE_LEFT)
                 lpKeyState[VK_LEFT] |= 0x80;
-            if (gameInput & MOVE_RIGHT)
+            if ((gameInput & GameInput::MOVE_RIGHT) == GameInput::MOVE_RIGHT)
                 lpKeyState[VK_RIGHT] |= 0x80;
-            if (gameInput & MOVE_UP)
+            if ((gameInput & GameInput::MOVE_UP) == GameInput::MOVE_UP)
                 lpKeyState[VK_UP] |= 0x80;
-            if (gameInput & MOVE_DOWN)
+            if ((gameInput & GameInput::MOVE_DOWN) == GameInput::MOVE_DOWN)
                 lpKeyState[VK_DOWN] |= 0x80;
         }
         return rs;

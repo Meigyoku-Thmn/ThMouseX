@@ -22,6 +22,10 @@ bool        g_inputEnabled;
 float       g_pixelRate = 1;
 FloatPoint  g_pixelOffset{1, 1};
 bool        g_showImGui;
+// for debugging purpose, not single source of truth
+POINT       g_playerPos;
+DoublePoint g_playerPosRaw;
+GameInput   g_gameInput;
 
 // configuration from main exe
 #pragma data_seg(".SHRCONF")

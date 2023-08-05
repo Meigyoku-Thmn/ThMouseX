@@ -22,6 +22,10 @@ extern bool         g_inputEnabled;
 extern float        g_pixelRate;
 extern FloatPoint   g_pixelOffset;
 extern bool         g_showImGui;
+// for debugging purpose, not single source of truth
+extern POINT        g_playerPos;
+extern DoublePoint  g_playerPosRaw;
+extern GameInput    g_gameInput;
 
 // configuration from main exe
 extern GameConfigs  gs_gameConfigs;
