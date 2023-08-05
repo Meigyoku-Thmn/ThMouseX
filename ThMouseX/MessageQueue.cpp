@@ -1,5 +1,6 @@
 #include "framework.h"
 #include <vector>
+#include <imgui.h>
 #include "imgui_impl_win32.h"
 
 #include "../Common/macro.h"
@@ -111,11 +112,24 @@ namespace core::messagequeue {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
             else {
-                HandleMousePress(e, WM_LBUTTON, g_leftMousePressed = true, g_leftMousePressed = false);
-                HandleMousePress(e, WM_MBUTTON, g_midMousePressed = true, g_midMousePressed = false);
-                HandleMousePress(e, WM_RBUTTON, 0, g_inputEnabled = !g_inputEnabled);
                 HandleKeyboardPress(e, gs_toggleOsCursorButton, isCursorShow ? HideMousePointer() : ShowMousePointer());
             }
+            auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
+            HandleMousePress(e, WM_LBUTTON, { {
+                g_leftMousePressed = wantCaptureMouse ? false : true;
+                if (wantCaptureMouse)
+                    g_inputEnabled = false;
+            } }, g_leftMousePressed = false);
+            HandleMousePress(e, WM_MBUTTON, { {
+                g_midMousePressed = wantCaptureMouse ? false : true;
+                if (wantCaptureMouse)
+                    g_inputEnabled = false;
+            } }, g_midMousePressed = false);
+            HandleMousePress(e, WM_RBUTTON, 0, { {
+                g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
+                if (!wantCaptureMouse)
+                    ImGui::SetWindowFocus();
+            } });
         }
         return CallNextHookEx(NULL, code, wParam, lParam);
     }
