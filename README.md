@@ -55,7 +55,7 @@ It also have preconfiguration of some other games:
 * DANMAKAI: Red Forbidden Fruit
 * Fantastic Danmaku Festival I & II
 
-You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt.
+You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt. (from version 3.0.0)
 
 FAQ
 ---
