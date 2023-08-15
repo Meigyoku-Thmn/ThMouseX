@@ -30,26 +30,26 @@ Drawbacks
 Preconfigured games
 -------------
 This tool should be compatible with any Touhou games from 6 to the latest. Here is the list of preconfigured games in [Games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt):
-* Touhou 6 東方紅魔郷 ～ Embodiment of Scarlet Devil (v1.02h)
-* Touhou 7 東方妖々夢 ～ Perfect Cherry Blossom (v1.00b)
-* Touhou 8 東方永夜抄 ～ Imperishable Night (v1.00d)
-* Touhou 9 東方花映塚 ～ Phantasmagoria of Flower View (v1.50a)
-* Touhou 9.5 東方文花帖 ～ Shoot the Bullet (v1.02a)
-* Touhou 10 東方風神録 ～ Mountain of Faith 
-* Touhou 11 東方地霊殿 ～ Subterranean Animism 
-* Touhou 12 東方星蓮船 ～ Undefined Fantastic Object (v1.00b)
+* Touhou 6&emsp;&ensp;東方紅魔郷 ～ Embodiment of Scarlet Devil (v1.02h)
+* Touhou 7&emsp;&ensp;東方妖々夢 ～ Perfect Cherry Blossom (v1.00b)
+* Touhou 8&emsp;&ensp;東方永夜抄 ～ Imperishable Night (v1.00d)
+* Touhou 9&emsp;&ensp;東方花映塚 ～ Phantasmagoria of Flower View (v1.50a)
+* Touhou 9.5&ensp; 東方文花帖 ～ Shoot the Bullet (v1.02a)
+* Touhou 10&emsp;東方風神録 ～ Mountain of Faith 
+* Touhou 11&emsp;東方地霊殿 ～ Subterranean Animism 
+* Touhou 12&emsp;東方星蓮船 ～ Undefined Fantastic Object (v1.00b)
 * Touhou 12.5 Double Spoiler ～ 東方文花帖
 * Touhou 12.8 妖精大戦争 ～ 東方三月精 Fairy Wars 
-* Touhou 13 東方神霊廟 ～ Ten Desires (v1.00c)
-* Touhou 14 東方輝針城 ～ Double Dealing Character (v1.00b)
+* Touhou 13&emsp;東方神霊廟 ～ Ten Desires (v1.00c)
+* Touhou 14&emsp;東方輝針城 ～ Double Dealing Character (v1.00b)
 * Touhou 14.3 弾幕アマノジャク ～ Impossible Spell Card
-* Touhou 15 東方紺珠伝 ～ Legacy of Lunatic Kingdom (v1.00b)
-* Touhou 16 東方天空璋 ～ Hidden Star in Four Seasons
+* Touhou 15&emsp;東方紺珠伝 ～ Legacy of Lunatic Kingdom (v1.00b)
+* Touhou 16&emsp;東方天空璋 ～ Hidden Star in Four Seasons
 * Touhou 16.5 秘封ナイトメアダイアリー 〜 Violet Detector
-* Touhou 17 東方鬼形獣 ～ Wily Beast and Weakest Creature
-* Touhou 18 東方虹龍洞 ～ Unconnected Marketeerss
+* Touhou 17&emsp;東方鬼形獣 ～ Wily Beast and Weakest Creature
+* Touhou 18&emsp;東方虹龍洞 ～ Unconnected Marketeerss
 * Touhou 18.5 バレットフィリア達の闇市場 〜 100th Black Market
-* Touhou 19 東方獣王園 〜 Unfinished Dream of All Living Ghost (v1.00a) (will be included in ThMouseX 3.0.0)
+* Touhou 19&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost (v1.00a) (will be included in ThMouseX 3.0.0)
 
 It also have preconfiguration of some other games:
 * [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
