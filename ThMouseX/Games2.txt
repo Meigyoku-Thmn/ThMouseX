@@ -2,6 +2,3 @@
 ; So newer version of Games.txt will not overwrite your custom configuration
 
 ; processName   positionRVA             dataType   offset         baseHeight   aspectRatio   inputMethod
-
-; Touhou 19 Demo
-th19            [00220114][658]         int        (20992,2048)   61440        4:3           GetKeyboardState
