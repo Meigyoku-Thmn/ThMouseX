@@ -18,8 +18,8 @@ Differences of the fork
 -----------------------
 * Support any game's resolutions
 * Support DirectX8 and DirectX9 games
-* Can be opened and closed at any time, it will automatically detect configurated games
-* You can use Lua script ([LuaJIT](https://luajit.org/) or [NeoLua](https://github.com/neolithos/neolua)) to configurate further.
+* Can be opened and closed at any time, it will automatically detect configured games
+* You can use Lua script ([Lua](https://www.lua.org/), [LuaJIT](https://luajit.org/), or [NeoLua](https://github.com/neolithos/neolua)) to configure further.
 
 Drawbacks
 --------
