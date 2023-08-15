@@ -53,10 +53,10 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 
 It also have preconfiguration of some other games:
 * [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
-* [Fantastic Danmaku Festival I](https://store.steampowered.com/app/882710/_TouHou_Makuka_Sai__Fantastic_Danmaku_Festival/)
-* [Fantastic Danmaku Festival Part II](https://store.steampowered.com/app/1031480/TouHou_Makuka_Sai__Fantastic_Danmaku_Festival_Part_II/)
-* [Wonderful Waking World](https://oligarchomp.itch.io/wonderful-waking-world)
-* [Chaos of Black Loong](https://store.steampowered.com/app/915130/__Touhou_Chaos_of_Black_Loong/)
+* [東方幕華祭 〜 Fantastic Danmaku Festival](https://store.steampowered.com/app/882710/_TouHou_Makuka_Sai__Fantastic_Danmaku_Festival/)
+* [東方幕華祭 春雪篇 〜 Fantastic Danmaku Festival Part II](https://store.steampowered.com/app/1031480/TouHou_Makuka_Sai__Fantastic_Danmaku_Festival_Part_II/)
+* [東方眠世界 〜 Wonderful Waking World](https://oligarchomp.itch.io/wonderful-waking-world)
+* [东方龙隐談 〜 Touhou Chaos of Black Loong](https://store.steampowered.com/app/915130/__Touhou_Chaos_of_Black_Loong/)
 
 You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt. (from version 3.0.0)
 
