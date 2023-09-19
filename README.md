@@ -17,13 +17,14 @@ https://github.com/Meigyoku-Thmn/ThMouseX/releases <br>
 Differences of the fork
 -----------------------
 * Support any game's resolutions
-* Support DirectX8 and DirectX9 games
+* Support DirectX8, DirectX9 and DirectX11 games
+* Support .NET Framework games via [NeoLua](https://github.com/neolithos/neolua) and [Lib.Harmony](https://github.com/pardeike/Harmony)
 * Can be opened and closed at any time, it will automatically detect configured games
 * You can use Lua script ([Lua](https://www.lua.org/), [LuaJIT](https://luajit.org/), or [NeoLua](https://github.com/neolithos/neolua)) to configure further.
 
 Drawbacks
 --------
-* Only works with 32-bit games
+* Only works with 32-bit games, if there is a good 64-bit bullet hell game I will consider add 64-bit support.
 * Doesn't work well with Steam Overlay, although this is minimal.
 * Configuration is difficult.
 
@@ -49,16 +50,16 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 17&emsp;&emsp;東方鬼形獣 ～ Wily Beast and Weakest Creature
 * Touhou 18&emsp;&emsp;東方虹龍洞 ～ Unconnected Marketeerss
 * Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market
-* Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost (v1.00a) (will be included in ThMouseX 3.0.0)
+* Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost (v1.00a)
 
 It also have preconfiguration of some other games:
 * [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
 * [東方幕華祭 〜 Fantastic Danmaku Festival](https://store.steampowered.com/app/882710/_TouHou_Makuka_Sai__Fantastic_Danmaku_Festival/)
 * [東方幕華祭 春雪篇 〜 Fantastic Danmaku Festival Part II](https://store.steampowered.com/app/1031480/TouHou_Makuka_Sai__Fantastic_Danmaku_Festival_Part_II/)
-* [東方眠世界 〜 Wonderful Waking World](https://oligarchomp.itch.io/wonderful-waking-world) (will be included in ThMouseX 3.0.0)
-* [東方龍隱談 〜 Chaos of Black Loong](https://store.steampowered.com/app/915130/__Touhou_Chaos_of_Black_Loong/) (will be included in ThMouseX 3.0.0)
+* [東方眠世界 〜 Wonderful Waking World](https://oligarchomp.itch.io/wonderful-waking-world)
+* [東方龍隱談 〜 Chaos of Black Loong](https://store.steampowered.com/app/915130/__Touhou_Chaos_of_Black_Loong/)
 
-You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt. (from version 3.0.0)
+You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt.
 
 FAQ
 ---
@@ -118,26 +119,27 @@ The crosshair/cursor sprite may be changed:
 3. Change the file name after "CursorTexture = " to the preferred crosshair file's name. (Don't forget the file extension name ".png".)
 
 ### Add your favorite games
-You can extend ThMouseX to support more Shoot 'em ups games by modifying the "games.txt" file. You can also use Lua script for advanced cases.
-
-Open the file with any text editor and try yourself.
-
-(To document more)
+You can extend ThMouseX to support more Shoot 'em ups games by modifying the "[Games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt)" file. You can also use [Lua script](https://github.com/Meigyoku-Thmn/ThMouseX/tree/master/ThMouseX/ConfigScripts) for advanced cases.
 
 ### Sometime ThMouseX doesn't actually work, the game's character just keeps moving to a corner or is not bound exactly to the cursor
-They are really rare bugs that I have yet found a way to fix.
-
+They are really rare bugs that I have yet found a way to fix. <br>
 Some workarounds:
 * Restart ThMouseX
 * Start ThMouseX FIRST, then start the game
 * When starting ThMouseX, make sure your game's window is NOT minimized (this should be fixed from version 2.1.0).
 
-### Steam Overlay stops functional, the game control is unusable too!
+### "Delay" movement, lag mouse cursor
+This is a normal problem in every games that the in-game cursor is a [little delay](https://github.com/ocornut/imgui/blob/master/docs/EXAMPLES.md#:~:text=About%20mouse%20cursor%20latency) compared to the OS cursor. ThMouseX also doesn't change the game's behavior (it doesn't cheat), so the character still has to follow the game rule, no "teleportation".
+
+### Character cannot stay in one place where the cursor is, even when holding down the SHIFT button, the character just sways crazily around the cursor
+The moving step of the character is a fixed value and usually longer than the mouse movement step you are able to make (for example, you can move the cursor 1 px, but the game character can't, if it moves, it has to move 5 px a frame). Holding SHIFT can reduce the moving step but only so much. I think this is an unsolvable issue. <br>
+But there is a case that the game character feel really lagged and sways a lot around the cursor however you try, I saw that in Touhou 7. Installing [Vsync Patch](https://en.touhouwiki.net/wiki/Game_Tools_and_Modifications#Vsync_Patches) does fix that.
+
+### Steam Overlay stops functioning, the game control is unusable too!
 This is a limitation of how this tool hooks into the game's routine. Please avoid turning off ThMouseX while Steam Overlay is visible.
 
 ### Game crashes when exiting or lauching ThMouseX
-Please avoid lauching and exiting ThMouseX many times while the game is running.
-
+Please avoid lauching and exiting ThMouseX many times while the game is running.<br>
 So far I only see this bug on .NET Framework games and it's a rare bug. It may has something with the library Lib.Harmony which ThMouseX uses.
 
 ### Antivirus programs' detection
@@ -157,4 +159,4 @@ Old (pre-Steam) versions of Fantastic Danmaku Festival use .NET Framework 2, so 
 
 Ensure the name of this manifest file is `THMHJ.exe.config`, not `THMHJ.txt` or `THMHJ.exe.config.txt`.
 
-This can also be applied to other applications that use .NET Framework 2 too.
+This can also be applied to other applications that use .NET Framework 2/3.
