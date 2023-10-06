@@ -12,7 +12,7 @@ Demo clip: https://www.youtube.com/watch?v=uMkzmM13qpU
 Download link
 ---
 https://github.com/Meigyoku-Thmn/ThMouseX/releases <br>
-(Required .NET Framework 4.8 from version 2.1.0)
+(Require .NET Framework 4.8 from version 2.1.0)
 
 Differences of the fork
 -----------------------
@@ -88,7 +88,7 @@ Remember to **compile for 32-bit, toolset v143, .NET Framework 4.8**, and make s
 * VirtualKeyCodes.txt
 
 ### Another way to compile without installing anything on your computer (recommended way)
-- Fork the THMouseX repository your Github account<br>
+- Fork the THMouseX repository to your Github account<br>
 ![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/4b941f22-594d-46c6-be83-818db918e2d4)
 - Go to the "Actions" tab<br>
 ![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/34ed8954-c711-4df4-843e-f730d8483394)
