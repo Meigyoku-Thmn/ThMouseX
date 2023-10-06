@@ -90,9 +90,12 @@ Remember to **compile for 32-bit, toolset v143, .NET Framework 4.8**, and make s
 ### Another way to compile without installing anything on your computer (recommended way)
 - Fork the THMouseX repository
 - Go to the "Actions" tab
-- Select the "Deployment" workflow
-- Run the workflow (refresh the page if nothing shows up)
-- Wait for it, then download the produced zipped artifact (shown up in the page with url form `https://github.com/<username>/ThMouseX/actions/runs/<flowid>`).
+![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/34ed8954-c711-4df4-843e-f730d8483394)
+- Click "Deployment" on the left sidebar]
+![chrome_1lYLXTdT9o](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/81c9cd3b-ef98-4092-a172-b48f379dd2c8)
+- Run the workflow
+![chrome_AxRRzs1MUn](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/cdf4206b-4fa5-4e70-a0ac-a7e325d30ef9)
+- Wait for it, then download the produced zipped artifact (shown up in the page with url form `https://github.com/<username>/ThMouseX/actions/runs/<flowid>`)
 
 ### How to use ThMouseX?
 1. Run ThMouseX.exe.
