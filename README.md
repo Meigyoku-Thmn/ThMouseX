@@ -88,14 +88,16 @@ Remember to **compile for 32-bit, toolset v143, .NET Framework 4.8**, and make s
 * VirtualKeyCodes.txt
 
 ### Another way to compile without installing anything on your computer (recommended way)
-- Fork the THMouseX repository
+- Fork the THMouseX repository your Github account
+![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/4b941f22-594d-46c6-be83-818db918e2d4)
 - Go to the "Actions" tab
 ![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/34ed8954-c711-4df4-843e-f730d8483394)
-- Click "Deployment" on the left sidebar]
+- Click "Deployment" on the left sidebar
 ![chrome_1lYLXTdT9o](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/81c9cd3b-ef98-4092-a172-b48f379dd2c8)
 - Run the workflow
 ![chrome_AxRRzs1MUn](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/cdf4206b-4fa5-4e70-a0ac-a7e325d30ef9)
 - Wait for it, then download the produced zipped artifact (shown up in the page with url form `https://github.com/<username>/ThMouseX/actions/runs/<flowid>`)
+![chrome_jdw1pXLJl2](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/0bcf952d-4acf-4db7-ba83-8e7d106b0301)
 
 ### How to use ThMouseX?
 1. Run ThMouseX.exe.
