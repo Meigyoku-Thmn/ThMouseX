@@ -127,7 +127,9 @@ The crosshair/cursor sprite may be changed:
 You can extend ThMouseX to support more Shoot 'em ups games by modifying the "[Games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt)" file. You can also use [Lua script](https://github.com/Meigyoku-Thmn/ThMouseX/tree/master/ThMouseX/ConfigScripts) for advanced cases.
 
 ### Sometime ThMouseX doesn't actually work, the game's character just keeps moving to a corner or is not bound exactly to the cursor
-They are really rare bugs that I have yet found a way to fix. <br>
+Try updating your game to the latest version.
+
+If it doesn't solve, then there are really rare bugs that I have yet found a way to fix. <br>
 Some workarounds:
 * Restart ThMouseX
 * Start ThMouseX FIRST, then start the game
