@@ -31,32 +31,32 @@ Drawbacks
 Preconfigured games
 -------------
 This tool should be compatible with any Touhou games from 6 to the latest. Here is the list of preconfigured games in [Games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt):
-* Touhou 6&emsp;&emsp;&ensp;東方紅魔郷 ～ Embodiment of Scarlet Devil (v1.02h)
-* Touhou 7&emsp;&emsp;&ensp;東方妖々夢 ～ Perfect Cherry Blossom (v1.00b)
-* Touhou 8&emsp;&emsp;&ensp;東方永夜抄 ～ Imperishable Night (v1.00d)
-* Touhou 9&emsp;&emsp;&ensp;東方花映塚 ～ Phantasmagoria of Flower View (v1.50a)
-* Touhou 9.5&emsp;&ensp; 東方文花帖 ～ Shoot the Bullet (v1.02a)
-* Touhou 10&emsp;&emsp;東方風神録 ～ Mountain of Faith 
-* Touhou 11&emsp;&emsp;東方地霊殿 ～ Subterranean Animism 
-* Touhou 12&emsp;&emsp;東方星蓮船 ～ Undefined Fantastic Object (v1.00b)
+* Touhou 6&emsp;&emsp;&ensp;東方紅魔郷 ～ Embodiment of Scarlet Devil         (v1.02h)
+* Touhou 7&emsp;&emsp;&ensp;東方妖々夢 ～ Perfect Cherry Blossom              (v1.00b)
+* Touhou 8&emsp;&emsp;&ensp;東方永夜抄 ～ Imperishable Night                  (v1.00d)
+* Touhou 9&emsp;&emsp;&ensp;東方花映塚 ～ Phantasmagoria of Flower View       (v1.50a)
+* Touhou 9.5&emsp;&ensp; 東方文花帖 ～ Shoot the Bullet                       (v1.02a)
+* Touhou 10&emsp;&emsp;東方風神録 ～ Mountain of Faith                        (v1.00a)
+* Touhou 11&emsp;&emsp;東方地霊殿 ～ Subterranean Animism                     (v1.00a)
+* Touhou 12&emsp;&emsp;東方星蓮船 ～ Undefined Fantastic Object               (v1.00b)
 * Touhou 12.5&emsp; Double Spoiler ～ 東方文花帖
 * Touhou 12.8&emsp; 妖精大戦争 ～ 東方三月精 Fairy Wars 
-* Touhou 13&emsp;&emsp;東方神霊廟 ～ Ten Desires (v1.00c)
-* Touhou 14&emsp;&emsp;東方輝針城 ～ Double Dealing Character (v1.00b)
+* Touhou 13&emsp;&emsp;東方神霊廟 ～ Ten Desires                              (v1.00c)
+* Touhou 14&emsp;&emsp;東方輝針城 ～ Double Dealing Character                 (v1.00b)
 * Touhou 14.3&emsp; 弾幕アマノジャク ～ Impossible Spell Card
-* Touhou 15&emsp;&emsp;東方紺珠伝 ～ Legacy of Lunatic Kingdom (v1.00b)
-* Touhou 16&emsp;&emsp;東方天空璋 ～ Hidden Star in Four Seasons
-* Touhou 16.5&emsp; 秘封ナイトメアダイアリー 〜 Violet Detector
-* Touhou 17&emsp;&emsp;東方鬼形獣 ～ Wily Beast and Weakest Creature
-* Touhou 18&emsp;&emsp;東方虹龍洞 ～ Unconnected Marketeerss
-* Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market
-* Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost (v1.00a)
+* Touhou 15&emsp;&emsp;東方紺珠伝 ～ Legacy of Lunatic Kingdom                (v1.00b)
+* Touhou 16&emsp;&emsp;東方天空璋 ～ Hidden Star in Four Seasons              (v1.00a)
+* Touhou 16.5&emsp; 秘封ナイトメアダイアリー 〜 Violet Detector                (v1.00a)
+* Touhou 17&emsp;&emsp;東方鬼形獣 ～ Wily Beast and Weakest Creature          (v1.00b)
+* Touhou 18&emsp;&emsp;東方虹龍洞 ～ Unconnected Marketeerss                  (v1.00a)
+* Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market           (v1.00a)
+* Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost     (v1.00a)
 
 It also have preconfiguration of some other games:
 * [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
 * [東方幕華祭 〜 Fantastic Danmaku Festival](https://store.steampowered.com/app/882710/_TouHou_Makuka_Sai__Fantastic_Danmaku_Festival/)
 * [東方幕華祭 春雪篇 〜 Fantastic Danmaku Festival Part II](https://store.steampowered.com/app/1031480/TouHou_Makuka_Sai__Fantastic_Danmaku_Festival_Part_II/)
-* [東方眠世界 〜 Wonderful Waking World](https://oligarchomp.itch.io/wonderful-waking-world)
+* [東方眠世界 〜 Wonderful Waking World](https://store.steampowered.com/app/1901490/__Wonderful_Waking_World/) ([itch.io link](https://oligarchomp.itch.io/wonderful-waking-world))
 * [東方龍隱談 〜 Chaos of Black Loong](https://store.steampowered.com/app/915130/__Touhou_Chaos_of_Black_Loong/)
 
 You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt.
