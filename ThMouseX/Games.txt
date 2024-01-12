@@ -84,7 +84,7 @@ th143           [000E6B88][5EC]         int        (40960,2048)   61440        4
 th15            [000E9BB8][624]         int        (28672,2048)   61440        4:3           DirectInput
 
 ; Touhou 16
-th16            [0009FAFC][61C]         int        (28672,2048)   61440        4:3           DirectInput
+th16            [000A6EF8][61C]         int        (28672,2048)   61440        4:3           DirectInput
 
 ; Touhou 16.5
 th165           [000B5654][618]         int        (40960,2048)   61440        4:3           DirectInput
