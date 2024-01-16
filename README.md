@@ -39,11 +39,11 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 10&emsp;&emsp;東方風神録 ～ Mountain of Faith                        (v1.00a)
 * Touhou 11&emsp;&emsp;東方地霊殿 ～ Subterranean Animism                     (v1.00a)
 * Touhou 12&emsp;&emsp;東方星蓮船 ～ Undefined Fantastic Object               (v1.00b)
-* Touhou 12.5&emsp; Double Spoiler ～ 東方文花帖
-* Touhou 12.8&emsp; 妖精大戦争 ～ 東方三月精 Fairy Wars 
+* Touhou 12.5&emsp; Double Spoiler ～ 東方文花帖                              (v1.00a)
+* Touhou 12.8&emsp; 妖精大戦争 ～ 東方三月精 Fairy Wars                        (v1.00a)
 * Touhou 13&emsp;&emsp;東方神霊廟 ～ Ten Desires                              (v1.00c)
 * Touhou 14&emsp;&emsp;東方輝針城 ～ Double Dealing Character                 (v1.00b)
-* Touhou 14.3&emsp; 弾幕アマノジャク ～ Impossible Spell Card
+* Touhou 14.3&emsp; 弾幕アマノジャク ～ Impossible Spell Card                  (v1.00a)
 * Touhou 15&emsp;&emsp;東方紺珠伝 ～ Legacy of Lunatic Kingdom                (v1.00b)
 * Touhou 16&emsp;&emsp;東方天空璋 ～ Hidden Star in Four Seasons              (v1.00a)
 * Touhou 16.5&emsp; 秘封ナイトメアダイアリー 〜 Violet Detector                (v1.00a)
