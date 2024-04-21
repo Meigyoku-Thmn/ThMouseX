@@ -59,6 +59,14 @@ It also have preconfiguration of some other games:
 * [東方眠世界 〜 Wonderful Waking World](https://store.steampowered.com/app/1901490/__Wonderful_Waking_World/) ([itch.io link](https://oligarchomp.itch.io/wonderful-waking-world))
 * [東方龍隱談 〜 Chaos of Black Loong](https://store.steampowered.com/app/915130/__Touhou_Chaos_of_Black_Loong/)
 
+* [Len'en 1&emsp;連縁无現里　～ Evanescent Existence (1.20a)](https://www.freem.ne.jp/win/game/15994)
+
+* [Len'en 2&emsp;連縁蛇叢釼　～ Earthen Miraculous Sword (1.20a)](https://www.freem.ne.jp/win/game/15995)
+
+* [Len'en 3&emsp;連縁霊烈傳　～ Reactivate Majestical Imperial (1.21a)](https://www.freem.ne.jp/win/game/15996)
+
+* [Len'en 4&emsp;連縁天影戦記　～ Brilliant Pagoda or Haze Castle (1.20f)](https://www.freem.ne.jp/win/game/13429)
+
 You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt.
 
 FAQ

@@ -318,6 +318,12 @@ namespace core::directx11 {
             };
             context->RSSetViewports(1, &myViewPort);
         }
+        
+        ID3D11Buffer* indexBuffer;
+        DXGI_FORMAT indexBufferFormat;
+        UINT indexBufferOffset;
+        
+        context->IAGetIndexBuffer(&indexBuffer, &indexBufferFormat, &indexBufferOffset);
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         auto pointerPosition = helper::GetPointerPosition();
@@ -350,6 +356,9 @@ namespace core::directx11 {
         auto color = g_inputEnabled ? ToneColor(tone) : RGBA(255, 200, 200, 128);
         spriteBatch->Draw(cursorTexture, cursorPositionD3D, NULL, color, 0, cursorPivot, 1, SpriteEffects_None);
         spriteBatch->End();
+        
+        context->IASetIndexBuffer(indexBuffer, indexBufferFormat, indexBufferOffset);
+        if (indexBuffer) indexBuffer->Release();
 
         if (needRestoreViewport)
             context->RSSetViewports(nViewPorts, viewPorts);
