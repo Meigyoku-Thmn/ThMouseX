@@ -83,6 +83,9 @@
     <ClInclude Include="Helper.Memory.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="Helper.Graphics.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -131,6 +134,9 @@
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
     <ClCompile Include="Helper.Memory.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.Graphics.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
   </ItemGroup>

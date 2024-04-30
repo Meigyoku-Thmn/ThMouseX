@@ -23,6 +23,7 @@
 #include "../Common/DataTypes.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
+#include "../Common/Helper.Graphics.h"
 #include "../Common/Log.h"
 #include "Direct3D11.h"
 
@@ -32,6 +33,7 @@ namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
+namespace graphics = common::helper::graphics;
 namespace note = common::log;
 namespace imguioverlay = core::imguioverlay;
 
@@ -301,29 +303,8 @@ namespace core::directx11 {
     void RenderCursor(IDXGISwapChain* swapChain) {
         if (!cursorTexture || !spriteBatch || !renderTargetView || !device || !context)
             return;
-
-        auto needRestoreViewport = false;
-        UINT nViewPorts = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
-        D3D11_VIEWPORT viewPorts[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
-        DXGI_SWAP_CHAIN_DESC desc{};
-        auto rs = swapChain->GetDesc(&desc);
-        if (SUCCEEDED(rs)) {
-            needRestoreViewport = true;
-            context->RSGetViewports(&nViewPorts, viewPorts);
-            auto myViewPort = D3D11_VIEWPORT{
-                .TopLeftX = 0,
-                .TopLeftY = 0,
-                .Width = (float)desc.BufferDesc.Width,
-                .Height = (float)desc.BufferDesc.Height,
-            };
-            context->RSSetViewports(1, &myViewPort);
-        }
-        
-        ID3D11Buffer* indexBuffer;
-        DXGI_FORMAT indexBufferFormat;
-        UINT indexBufferOffset;
-        
-        context->IAGetIndexBuffer(&indexBuffer, &indexBufferFormat, &indexBufferOffset);
+                
+        auto dx11State = graphics::SaveDx11State(swapChain, context);
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         auto pointerPosition = helper::GetPointerPosition();
@@ -357,11 +338,7 @@ namespace core::directx11 {
         spriteBatch->Draw(cursorTexture, cursorPositionD3D, NULL, color, 0, cursorPivot, 1, SpriteEffects_None);
         spriteBatch->End();
         
-        context->IASetIndexBuffer(indexBuffer, indexBufferFormat, indexBufferOffset);
-        if (indexBuffer) indexBuffer->Release();
-
-        if (needRestoreViewport)
-            context->RSSetViewports(nViewPorts, viewPorts);
+        graphics::LoadDx11State(context, dx11State);
     }
 
     void PrepareImGui() {
