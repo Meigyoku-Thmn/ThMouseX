@@ -81,6 +81,6 @@ namespace common::luaapi {
     string MakePreparationScript() {
         auto thisDllPath = encoding::ConvertToUtf8((wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME)).c_str());
         helper::Replace(thisDllPath, "\\", "\\\\");
-        return vformat(LuaJitPrepScript, make_format_args(thisDllPath, (uintptr_t)g_coreModule));
+        return "stub!";//vformat(LuaJitPrepScript, make_format_args(thisDllPath, (uintptr_t)g_coreModule));
     }
 }
