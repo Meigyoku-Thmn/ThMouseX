@@ -36,7 +36,7 @@ namespace core::inputdetermine {
     double y_error_WHATEVER = 0.0;
     long prev_xPSpeed = 1;
     long prev_yPSpeed = 1;
-    POINT previous_pos = {0, 0};
+    POINT previous_pos = {-1, -1};
     GameInput DetermineGameInput() {
         g_gameInput = GameInput::NONE;
         g_playerPos = {};
@@ -59,6 +59,10 @@ namespace core::inputdetermine {
                 auto yDist = mousePos.y - g_playerPos.y;
                 auto xPSpeed = previous_pos.x - g_playerPos.x;
                 auto yPSpeed = previous_pos.y - g_playerPos.y;
+                if(previous_pos = {-1, -1}){
+                    xPSpeed = 0;
+                    yPSpeed = 0;
+                }
                 if(xPSpeed == 0) xPSpeed = prev_xPSpeed;
                 if(yPSpeed == 0) yPSpeed = prev_yPSpeed;
                 if(xDist < 0) xDist = -xDist;
@@ -69,7 +73,7 @@ namespace core::inputdetermine {
                 if(yPSpeed > xPSpeed){
                     v = yPSpeed;
                 }
-                if(xDist >= v || yDist >= v){
+                if(xDist >= v || yDist >= v || xDist + yDist > 10)){
                     if(xDist > yDist){
                         if (g_playerPos.x < mousePos.x - 1)
                             g_gameInput |= GameInput::MOVE_RIGHT;
