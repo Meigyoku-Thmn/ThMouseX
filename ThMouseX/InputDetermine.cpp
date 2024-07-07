@@ -73,33 +73,33 @@ namespace core::inputdetermine {
                 if(yPSpeed > xPSpeed){
                     v = yPSpeed;
                 }
-                if(xDist >= v || yDist >= v || xDist + yDist > 10){
+                if(xDist > v + 1 || yDist > v + 1 || xDist + yDist > 10){
                     if(xDist > yDist){
-                        if (g_playerPos.x < mousePos.x - 1)
+                        if (g_playerPos.x < mousePos.x)
                             g_gameInput |= GameInput::MOVE_RIGHT;
-                        else if (g_playerPos.x > mousePos.x + 1)
+                        else if (g_playerPos.x > mousePos.x)
                             g_gameInput |= GameInput::MOVE_LEFT;
                         double error = (double)yDist / xDist;
                         y_error_WHATEVER += error;
                     }else{
-                        if (g_playerPos.y < mousePos.y - 1)
+                        if (g_playerPos.y < mousePos.y)
                             g_gameInput |= GameInput::MOVE_DOWN;
-                        else if (g_playerPos.y > mousePos.y + 1)
+                        else if (g_playerPos.y > mousePos.y)
                             g_gameInput |= GameInput::MOVE_UP;
                         double error = (double)xDist / yDist;
                         x_error_WHATEVER += error;
                     }
                     if(y_error_WHATEVER > 1){
-                        if (g_playerPos.y < mousePos.y - 1)
+                        if (g_playerPos.y < mousePos.y)
                             g_gameInput |= GameInput::MOVE_DOWN;
-                        else if (g_playerPos.y > mousePos.y + 1)
+                        else if (g_playerPos.y > mousePos.y)
                             g_gameInput |= GameInput::MOVE_UP;
                         y_error_WHATEVER -= floor(y_error_WHATEVER);
                     }
                     if(x_error_WHATEVER > 1){
-                        if (g_playerPos.x < mousePos.x - 1)
+                        if (g_playerPos.x < mousePos.x)
                             g_gameInput |= GameInput::MOVE_RIGHT;
-                        else if (g_playerPos.x > mousePos.x + 1)
+                        else if (g_playerPos.x > mousePos.x)
                             g_gameInput |= GameInput::MOVE_LEFT;
                         x_error_WHATEVER -= floor(x_error_WHATEVER);
                     }
