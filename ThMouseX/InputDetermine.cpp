@@ -59,7 +59,7 @@ namespace core::inputdetermine {
                 auto yDist = mousePos.y - g_playerPos.y;
                 auto xPSpeed = previous_pos.x - g_playerPos.x;
                 auto yPSpeed = previous_pos.y - g_playerPos.y;
-                if(previous_pos = {-1, -1}){
+                if(previous_pos.x == -1){
                     xPSpeed = 0;
                     yPSpeed = 0;
                 }
@@ -73,7 +73,7 @@ namespace core::inputdetermine {
                 if(yPSpeed > xPSpeed){
                     v = yPSpeed;
                 }
-                if(xDist >= v || yDist >= v || xDist + yDist > 10)){
+                if(xDist >= v || yDist >= v || xDist + yDist > 10){
                     if(xDist > yDist){
                         if (g_playerPos.x < mousePos.x - 1)
                             g_gameInput |= GameInput::MOVE_RIGHT;
