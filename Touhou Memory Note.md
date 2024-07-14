@@ -21,9 +21,11 @@ Measurements from Touhou 19 Demo.
 ## Bottom Right
 * X = 17920
 * Y = 55296
+* Cheat Engine AOB pattern: `00 46 00 00   00 D8 00 00`
 ## Top Left
 * X = -17920
 * Y = 4096
+* Cheat Engine AOB pattern: `00 BA FF FF   00 10 00 00`
 ---
 ## Remark
 
