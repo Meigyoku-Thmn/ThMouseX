@@ -51,7 +51,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 17&emsp;&emsp;東方鬼形獣 ～ Wily Beast and Weakest Creature          (v1.00b)
 * Touhou 18&emsp;&emsp;東方虹龍洞 ～ Unconnected Marketeerss                  (v1.00a)
 * Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market           (v1.00a)
-* Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost     (v1.00a)
+* Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost     (v1.10c)
 
 It also have preconfiguration of some other games:
 * [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
@@ -136,7 +136,7 @@ The crosshair/cursor sprite may be changed:
 You can extend ThMouseX to support more Shoot 'em ups games by modifying the "[Games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt)" file. You can also use [Lua script](https://github.com/Meigyoku-Thmn/ThMouseX/tree/master/ThMouseX/ConfigScripts) for advanced cases.
 
 ### Sometime ThMouseX doesn't actually work, the game's character just keeps moving to a corner or is not bound exactly to the cursor
-Try updating your game to the latest version.
+Try updating your game to the latest version. ThMouseX currently support only a single version of a game.
 
 If it doesn't solve, then there are really rare bugs that I have yet found a way to fix. <br>
 Some workarounds:
