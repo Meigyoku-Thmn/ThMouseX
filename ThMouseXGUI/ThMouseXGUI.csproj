@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net48</TargetFramework>
@@ -8,9 +7,7 @@
 		<LangVersion>12</LangVersion>
 		<ApplicationIcon>ThMouseX.ico</ApplicationIcon>
 	</PropertyGroup>
-
 	<ItemGroup>
 	  <Content Include="ThMouseX.ico" />
 	</ItemGroup>
-
 </Project>
