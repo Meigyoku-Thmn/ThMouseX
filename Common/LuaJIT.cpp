@@ -30,10 +30,10 @@ static bool usePullMechanism = false;
 
 static lua_State* L;
 
-static bool CheckAndDisableIfError(lua_State* L, int r) {
+static bool CheckAndDisableIfError(lua_State* _L, int r) {
     if (r != 0) {
-        note::ToFile("[LuaJIT] %s", lua_tostring(L, -1));
-        lua_pop(L, 1);
+        note::ToFile("[LuaJIT] %s", lua_tostring(_L, -1));
+        lua_pop(_L, 1);
         scriptingDisabled = true;
         return false;
     }

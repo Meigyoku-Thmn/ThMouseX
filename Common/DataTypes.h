@@ -21,7 +21,7 @@ struct ErrorMessage {
     }
 };
 
-enum ModulateStage {
+enum class ModulateStage {
     WhiteInc, WhiteDec, BlackInc, BlackDec,
 };
 
@@ -56,11 +56,6 @@ struct FloatPoint {
 struct DoublePoint {
     double X;
     double Y;
-};
-
-union TypedPoint {
-    IntPoint    IntData;
-    FloatPoint  FloatData;
 };
 
 struct AddressChain {

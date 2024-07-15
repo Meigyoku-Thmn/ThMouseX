@@ -68,6 +68,7 @@ namespace common::helper {
     }
 
     void CalculateNextTone(UCHAR& tone, ModulateStage& toneStage) {
+        using enum ModulateStage;
         constexpr UCHAR Delta = 16;
         constexpr UCHAR WhiteIntensityLimit = 128;
         constexpr UCHAR BlackIntensityLimit = 16;

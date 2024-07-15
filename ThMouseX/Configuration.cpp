@@ -236,7 +236,7 @@ tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount, con
 
     auto maxSize = ARRAYSIZE(gs_gameConfigs[0].ProcessName) - 1;
     if (wProcessName.size() > maxSize) {
-        MessageBoxA(NULL, format("processName longer than {} characters at line {} in {}.",
+        MessageBoxA(nullptr, format("processName longer than {} characters at line {} in {}.",
             maxSize, lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { move(wProcessName), false };
     }

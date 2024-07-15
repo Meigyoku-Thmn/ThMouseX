@@ -144,7 +144,7 @@ namespace core::directx11 {
             return;
         }
 
-        ComPtr<ID3D11Device> device;
+        ComPtr<ID3D11Device> _device;
         ComPtr<IDXGISwapChain> swap_chain;
         DXGI_SWAP_CHAIN_DESC sd{
             .BufferDesc = DXGI_MODE_DESC{
@@ -159,8 +159,8 @@ namespace core::directx11 {
             .Windowed = TRUE,
             .SwapEffect = DXGI_SWAP_EFFECT_DISCARD
         };
-        const D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
-        auto rs = _D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &device, nullptr, nullptr);
+        D3D_FEATURE_LEVEL feature_levels[] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
+        auto rs = _D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &_device, nullptr, nullptr);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create device and swapchain of DirectX 11.", rs);
             return;
@@ -194,7 +194,7 @@ namespace core::directx11 {
             note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
             return;
         }
-        rs = device->CreateRenderTargetView(pBackBuffer.Get(), NULL, &renderTargetView);
+        rs = device->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &renderTargetView);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
             return;
@@ -204,7 +204,7 @@ namespace core::directx11 {
 
         spriteBatch = new SpriteBatch(context);
 
-        rs = device->CreatePixelShader(additiveToneShaderBlob, ARRAYSIZE(additiveToneShaderBlob), NULL, &pixelShader);
+        rs = device->CreatePixelShader(additiveToneShaderBlob, ARRAYSIZE(additiveToneShaderBlob), nullptr, &pixelShader);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "PrepareFirstStep: device->CreatePixelShader failed", rs);
             return;
@@ -219,14 +219,14 @@ namespace core::directx11 {
         g_hFocusWindow = desc.OutputWindow;
         g_isMinimized = IsIconic(g_hFocusWindow);
 
-        if (gs_textureFilePath[0] && SUCCEEDED(CreateWICTextureFromFile(device, gs_textureFilePath, NULL, &cursorTexture))) {
+        if (gs_textureFilePath[0] && SUCCEEDED(CreateWICTextureFromFile(device, gs_textureFilePath, nullptr, &cursorTexture))) {
             ComPtr<ID3D11Resource> resource;
             cursorTexture->GetResource(&resource);
             ComPtr<ID3D11Texture2D> pTextureInterface;
             resource->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
-            D3D11_TEXTURE2D_DESC desc;
-            pTextureInterface->GetDesc(&desc);
-            cursorPivot = { (desc.Height - 1) / 2.f, (desc.Width - 1) / 2.f, 0.f };
+            D3D11_TEXTURE2D_DESC _desc;
+            pTextureInterface->GetDesc(&_desc);
+            cursorPivot = { (_desc.Height - 1) / 2.f, (_desc.Width - 1) / 2.f, 0.f };
         }
     }
 
@@ -306,6 +306,7 @@ namespace core::directx11 {
     }
 
     static void RenderCursor(IDXGISwapChain* swapChain) {
+        using enum ModulateStage;
         if (!cursorTexture || !spriteBatch || !renderTargetView || !device || !context)
             return;
 

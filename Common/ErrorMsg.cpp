@@ -12,7 +12,7 @@
 using namespace std;
 
 namespace common::errormsg {
-    array<reference_wrapper<vector<ErrorMessage>>, 3> messageGroups = { cor::messages, d3d::messages, ddraw::messages };
+    reference_wrapper<vector<ErrorMessage>> messageGroups[] = {cor::messages, d3d::messages, ddraw::messages};
     string GuessErrorsFromHResult(HRESULT hr) {
         string errorMessage = "";
         for (auto const& messages : messageGroups) {

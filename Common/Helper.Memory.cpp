@@ -34,7 +34,7 @@ namespace common::helper::memory {
         return rs;
     }
 
-    void ScanImportTable(HMODULE hModule, const function<void(LPCSTR importDllName)>& callback) {
+    void ScanImportTable(HMODULE hModule, ImportTableCallbackType callback) {
         auto dosHeaders = (PIMAGE_DOS_HEADER)hModule;
         auto ntHeaders = (PIMAGE_NT_HEADERS)((DWORD_PTR)hModule + dosHeaders->e_lfanew);
         auto importsDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];

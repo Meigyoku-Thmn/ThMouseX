@@ -83,7 +83,8 @@ namespace common::minhook {
             auto proc = GetProcAddress(hModule, config.procName);
             if (!proc)
                 return false;
-            if (auto rs = MH_RemoveHook(proc); rs != MH_OK)
+            auto rs = MH_RemoveHook(proc);
+            if (rs != MH_OK)
                 return false;
             if (config.ppOriginal)
                 *config.ppOriginal = nullptr;
@@ -93,7 +94,8 @@ namespace common::minhook {
 
     bool RemoveHooks(const vector<HookConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
-            if (auto rs = MH_RemoveHook(config.pTarget); rs != MH_OK)
+            auto rs = MH_RemoveHook(config.pTarget);
+            if (rs != MH_OK)
                 return false;
             if (config.ppOriginal)
                 *config.ppOriginal = nullptr;
@@ -102,7 +104,8 @@ namespace common::minhook {
     }
 
     bool EnableAll() {
-        if (auto rs = MH_EnableHook(MH_ALL_HOOKS); rs != MH_OK) {
+        auto rs = MH_EnableHook(MH_ALL_HOOKS);
+        if (rs != MH_OK) {
             note::ToFile("[MinHook] Failed to enable all hooks: %s", MH_StatusToString(rs));
             return false;
         }

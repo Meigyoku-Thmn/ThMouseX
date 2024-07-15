@@ -61,7 +61,7 @@ namespace common::lua {
 
     static bool Validate(lua_State* L, int r) {
         if (r != 0) {
-            note::ToFile("[Lua] %s", _lua_tolstring(L, -1, 0));
+            note::ToFile("[Lua] %s", _lua_tolstring(L, -1, nullptr));
             _lua_settop(L, -2);
             scriptingDisabled = true;
             return false;
@@ -200,14 +200,13 @@ namespace common::lua {
         }
         fseek(scriptIn, 0, SEEK_END);
         auto scriptSize = ftell(scriptIn);
-        auto scriptContent = new char[scriptSize + 1];
+        auto scriptContent = vector<char>(scriptSize + 1);
         rewind(scriptIn);
-        fread(scriptContent, sizeof(*scriptContent), scriptSize + 1, scriptIn);
+        fread(scriptContent.data(), sizeof(scriptContent[0]), scriptSize + 1, scriptIn);
         scriptContent[scriptSize] = '\0';
         fclose(scriptIn);
-        if ((rs = _luaL_loadstring(L, (const char*)scriptContent)) == 0)
+        if ((rs = _luaL_loadstring(L, scriptContent.data())) == 0)
             rs = ori_lua_pcall(L, 0, LUA_MULTRET, 0);
-        delete[] scriptContent;
         if (!Validate(L, rs))
             return;
 

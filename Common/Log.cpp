@@ -19,9 +19,11 @@ namespace errormsg = common::errormsg;
 using namespace std;
 using namespace Microsoft::WRL;
 
-static tm& GetTimeNow() {
+static tm GetTimeNow() {
+    tm rs;
     auto now = time(nullptr);
-    return *localtime(&now);
+    localtime_s(&rs, &now);
+    return rs;
 }
 
 namespace common::log {
@@ -85,9 +87,9 @@ namespace common::log {
         auto description = error.Description();
         if (description.length() > 0) {
 #if _DEBUG
-            ToConsole("%s: %s", message, description);
+            ToConsole("%s: %s", message, (char*)description);
 #endif
-            ToFile("%s: %s", message, description);
+            ToFile("%s: %s", message, (char*)description);
             return;
         }
         auto errorMessage = string(error.ErrorMessage());

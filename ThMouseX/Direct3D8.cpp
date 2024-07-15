@@ -285,6 +285,7 @@ namespace core::directx8 {
     }
 
     static void RenderCursor(IDirect3DDevice8* pDevice) {
+        using enum ModulateStage;
         if (!cursorTexture)
             return;
 

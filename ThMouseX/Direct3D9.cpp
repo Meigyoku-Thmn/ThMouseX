@@ -332,6 +332,7 @@ namespace core::directx9 {
     }
 
     static void RenderCursor(IDirect3DDevice9* pDevice) {
+        using enum ModulateStage;
         if (!cursorTexture || !_D3DXMatrixTransformation2D)
             return;
 
