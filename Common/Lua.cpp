@@ -22,6 +22,7 @@ namespace luaapi = common::luaapi;
 using namespace std;
 
 static bool scriptingDisabled = false;
+static bool usePullMechanism = false;
 
 #define GET_POSITION_ADDRESS "getPositionAddress"
 
@@ -58,7 +59,7 @@ namespace common::lua {
     decltype(&lua_type) _lua_type;
     decltype(&lua_getfield) _lua_getfield;
 
-    bool Validate(lua_State* L, int r) {
+    static bool Validate(lua_State* L, int r) {
         if (r != 0) {
             note::ToFile("[Lua] %s", _lua_tolstring(L, -1, 0));
             _lua_settop(L, -2);
@@ -75,12 +76,6 @@ namespace common::lua {
 
     void Initialize() {
         if (g_currentConfig.ScriptType != ScriptType::Lua)
-            return;
-        // Only support Attached
-        if (g_currentConfig.ScriptRunPlace != ScriptRunPlace::Attached)
-            return;
-        // Can support Pull and Push
-        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::None)
             return;
 
         {
@@ -161,25 +156,25 @@ namespace common::lua {
     int luaL_callmeta_hook(lua_State *L, int obj, const char *e) {
         auto rs = ori_luaL_callmeta(L, obj, e);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _luaL_callmeta, NULL, (PVOID*)ori_luaL_callmeta } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _luaL_callmeta, nullptr , (PVOID*)ori_luaL_callmeta } });
         return rs;
     }
     void lua_call_hook(lua_State *L, int nargs, int nresults) {
         ori_lua_call(L, nargs, nresults);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_call, NULL, (PVOID*)ori_lua_call } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_call, nullptr, (PVOID*)ori_lua_call } });
         return;
     }
     int lua_cpcall_hook(lua_State *L, lua_CFunction func, void *ud) {
         auto rs = ori_lua_cpcall(L, func, ud);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_cpcall, NULL, (PVOID*)ori_lua_cpcall } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_cpcall, nullptr, (PVOID*)ori_lua_cpcall } });
         return rs;
     }
     int lua_pcall_hook(lua_State *L, int nargs, int nresults, int errfunc) {
         auto rs = ori_lua_pcall(L, nargs, nresults, errfunc);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_pcall, NULL, (PVOID*)ori_lua_pcall } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_pcall, nullptr, (PVOID*)ori_lua_pcall } });
         return rs;
     }
 
@@ -198,7 +193,7 @@ namespace common::lua {
             return;
 
         auto scriptIn = fopen(scriptPath.c_str(), "rb");
-        if (scriptIn == NULL) {
+        if (scriptIn == nullptr) {
             note::ToFile("[Lua] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
             scriptingDisabled = true;
             return;
@@ -216,15 +211,9 @@ namespace common::lua {
         if (!Validate(L, rs))
             return;
 
-        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push)
-            return;
-
         _lua_getfield(L, LUA_GLOBALSINDEX, GET_POSITION_ADDRESS);
-        if (_lua_type(L, -1) != LUA_TFUNCTION) {
-            note::ToFile("[Lua] " GET_POSITION_ADDRESS " function not found in global scope.");
-            scriptingDisabled = true;
-            return;
-        }
+        if (_lua_type(L, -1) == LUA_TFUNCTION)
+            usePullMechanism = true;
         _lua_settop(L, -2);
     }
 
@@ -232,9 +221,8 @@ namespace common::lua {
         if (scriptingDisabled)
             return NULL;
 
-        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push) {
+        if (!usePullMechanism)
             return Lua_GetPositionAddress();
-        }
 
         _lua_getfield(L, LUA_GLOBALSINDEX, GET_POSITION_ADDRESS);
         if (!Validate(L, _lua_pcall(L, 0, 1, 0)))

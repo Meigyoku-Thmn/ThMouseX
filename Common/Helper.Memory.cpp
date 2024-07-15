@@ -1,6 +1,7 @@
 #include "framework.h"
 #include <string>
 #include <format>
+#include <span>
 
 #include "Helper.Memory.h"
 #include "Variables.h"
@@ -8,11 +9,11 @@
 using namespace std;
 
 namespace common::helper::memory {
-    DWORD ResolveAddress(DWORD* offsets, int length) {
-        if (length <= 0)
+    DWORD ResolveAddress(span<const DWORD> offsets) {
+        if (offsets.size() <= 0)
             return NULL;
         auto address = offsets[0] + (DWORD)g_targetModule;
-        for (int i = 1; i < length; i++) {
+        for (int i = 1; i < offsets.size(); i++) {
             address = *PDWORD(address);
             if (!address)
                 break;
@@ -33,7 +34,7 @@ namespace common::helper::memory {
         return rs;
     }
 
-    void ScanImportTable(HMODULE hModule, ImportTableCallbackType callback) {
+    void ScanImportTable(HMODULE hModule, const function<void(LPCSTR importDllName)>& callback) {
         auto dosHeaders = (PIMAGE_DOS_HEADER)hModule;
         auto ntHeaders = (PIMAGE_NT_HEADERS)((DWORD_PTR)hModule + dosHeaders->e_lfanew);
         auto importsDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];

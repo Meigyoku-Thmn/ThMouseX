@@ -53,12 +53,12 @@ namespace core::messagequeue {
     decltype(&_ShowCursor) OriShowCursor;
 
     bool isCursorShow = true;
-    auto hCursor = LoadCursorA(NULL, IDC_ARROW);
+    auto hCursor = LoadCursorA(nullptr, IDC_ARROW);
 
-    HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
+    HCURSOR WINAPI _SetCursor(HCURSOR cursor) {
         if (g_showImGui)
-            return OriSetCursor(hCursor);
-        return NULL;
+            return OriSetCursor(cursor);
+        return nullptr;
     }
 
     int WINAPI _ShowCursor(BOOL bShow) {
@@ -67,26 +67,26 @@ namespace core::messagequeue {
 
     bool cursorNormalized;
     int cursorVisibility;
-    void ShowCursorEx(bool show) {
+    static void ShowCursorEx(bool show) {
         if (show && cursorVisibility < 0)
             cursorVisibility = OriShowCursor(TRUE);
         else if (!show && cursorVisibility >= 0)
             cursorVisibility = OriShowCursor(FALSE);
     }
 
-    void HideMousePointer() {
-        OriSetCursor(NULL);
+    static void HideMousePointer() {
+        OriSetCursor(nullptr);
         ShowCursorEx(false);
         isCursorShow = false;
     }
 
-    void ShowMousePointer() {
+    static void ShowMousePointer() {
         OriSetCursor(hCursor);
         ShowCursorEx(true);
         isCursorShow = true;
     }
 
-    void NormalizeCursor() {
+    static void NormalizeCursor() {
         // Set cursor visibility to -1, reset cursor to a normal arrow,
         // to ensure that there is a visible mouse cursor on the game's config dialog
         while (OriShowCursor(TRUE) < 0);
@@ -95,9 +95,8 @@ namespace core::messagequeue {
         ShowMousePointer();
     }
 
-    LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        auto e = (PMSG)lParam;
-        if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
+    static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
+        if (auto e = (PMSG)lParam; code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
             HandleKeyboardPress(e, gs_toggleImGuiButton, { {
                 g_showImGui = !g_showImGui;
                 if (g_showImGui) {
@@ -133,12 +132,11 @@ namespace core::messagequeue {
                     ImGui::SetWindowFocus();
             } });
         }
-        return CallNextHookEx(NULL, code, wParam, lParam);
+        return CallNextHookEx(nullptr, code, wParam, lParam);
     }
 
-    LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
-        static auto initialized = false;
-        if (!initialized) {
+    static LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
+        if (static auto initialized = false; !initialized) {
             initialized = true;
             core::Initialize();
         }
@@ -173,11 +171,11 @@ namespace core::messagequeue {
                 }
             }
         }
-        return CallNextHookEx(NULL, code, wParam, lParam);
+        return CallNextHookEx(nullptr, code, wParam, lParam);
     }
 
-    bool CheckHookProcHandle(HHOOK handle) {
-        if (handle != NULL)
+    static bool CheckHookProcHandle(HHOOK handle) {
+        if (handle != nullptr)
             return true;
         helper::ReportLastError(APP_NAME ": SetWindowsHookEx Error");
         return false;
@@ -205,7 +203,7 @@ namespace core::messagequeue {
         SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &_);
     }
 
-    void PostRenderCallback() {
+    static void PostRenderCallback() {
         static bool callbackDone = false;
         if (cursorNormalized && !callbackDone) {
             callbackDone = true;

@@ -12,6 +12,7 @@
 #include <Windows.h>
 #include <string>
 #include <format>
+#include <span>
 
 namespace note = common::log;
 namespace helper = common::helper;
@@ -22,7 +23,7 @@ namespace minhook = common::minhook;
 
 using namespace std;
 
-MH_STATUS Lua_CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal) {
+MH_STATUS Lua_CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal) {
     return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal);
 }
 
@@ -31,7 +32,7 @@ DWORD Lua_ReadUInt32(DWORD address) {
 }
 
 DWORD Lua_ResolveAddress(DWORD* offsets, int length) {
-    return memory::ResolveAddress(offsets, length);
+    return memory::ResolveAddress(span{ offsets, (size_t)length });
 }
 
 void Lua_OpenConsole() {
@@ -52,7 +53,7 @@ PointDataType Lua_GetDataType() {
     return g_currentConfig.PosDataType;
 }
 
-void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbackType callback) {
+void Lua_RegisterUninitializeCallback(callbackstore::UninitializeCallbackType callback) {
     callbackstore::RegisterUninitializeCallback(callback, true);
 }
 
@@ -60,17 +61,17 @@ string LuaJitPrepScript;
 ON_INIT{
     auto dllModule = GetModuleHandleW(L_(APP_NAME".dll"));
     auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), L"LUASCRIPT");
-    if (scriptRes == NULL)
-    return;
+    if (scriptRes == nullptr)
+        return;
     auto scriptSize = SizeofResource(dllModule, scriptRes);
     auto scriptHandle = LoadResource(dllModule, scriptRes);
-    if (scriptHandle == NULL)
-    return;
+    if (scriptHandle == nullptr)
+        return;
     LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
 };
 
 namespace common::luaapi {
-    void Uninitialize(bool isProcessTerminating) {
+    static void Uninitialize(bool isProcessTerminating) {
         Lua_SetPositionAddress(NULL);
     }
 
@@ -80,7 +81,8 @@ namespace common::luaapi {
 
     string MakePreparationScript() {
         auto thisDllPath = encoding::ConvertToUtf8((wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME)).c_str());
-        helper::Replace(thisDllPath, "\\", "\\\\");
-        return vformat(LuaJitPrepScript, make_format_args(thisDllPath, (uintptr_t)g_coreModule));
+        helper::Replace(thisDllPath, "\\", R"(\\)");
+        auto moduleHandle = (uintptr_t)g_coreModule;
+        return vformat(LuaJitPrepScript, make_format_args(thisDllPath, moduleHandle));
     }
 }

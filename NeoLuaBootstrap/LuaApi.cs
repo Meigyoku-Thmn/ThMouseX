@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#pragma warning disable S4200
+using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeoLuaBootstrap
 {
@@ -19,8 +16,6 @@ namespace NeoLuaBootstrap
         [DllImport("kernel32", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
         static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
-        static IntPtr ThMouseX_Module;
-
         static IntPtr GetFunction(this IntPtr module, string funcName) => GetProcAddress(module, funcName);
         static T GetDelegate<T>(this IntPtr funcPtr) where T : Delegate
             => Marshal.GetDelegateForFunctionPointer(funcPtr, typeof(T)) as T;
@@ -30,23 +25,23 @@ namespace NeoLuaBootstrap
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void RegisterUninitializeCallbackDelegate(UninitializeDelegate callback);
-        public static RegisterUninitializeCallbackDelegate RegisterUninitializeCallback;
+        public static RegisterUninitializeCallbackDelegate RegisterUninitializeCallback { get; private set; }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void SetPositionAddressDelegate(IntPtr address);
-        public static SetPositionAddressDelegate SetPositionAddress;
+        public static SetPositionAddressDelegate SetPositionAddress { get; private set; }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate PointDataType GetDataTypeDelegate();
-        public static GetDataTypeDelegate GetDataType;
+        public static GetDataTypeDelegate GetDataType { get; private set; }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void OpenConsoleDelegate();
-        public static OpenConsoleDelegate OpenConsole;
+        public static OpenConsoleDelegate OpenConsole { get; private set; }
 
         static public void Initialize()
         {
-            ThMouseX_Module = GetModuleHandle(ThMouseX_Path);
+            var ThMouseX_Module = GetModuleHandle(ThMouseX_Path);
             RegisterUninitializeCallback = ThMouseX_Module.GetFunction("Lua_RegisterUninitializeCallback")
                 .GetDelegate<RegisterUninitializeCallbackDelegate>();
             SetPositionAddress = ThMouseX_Module.GetFunction("Lua_SetPositionAddress")
@@ -59,7 +54,6 @@ namespace NeoLuaBootstrap
 
         static public void Uninitialize(bool isProcessTerminating)
         {
-            ThMouseX_Module = IntPtr.Zero;
             RegisterUninitializeCallback = null;
             SetPositionAddress = null;
             GetDataType = null;

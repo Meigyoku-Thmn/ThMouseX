@@ -17,7 +17,7 @@ void CalculatePosition(T position, POINT& output) {
     output.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y);
 }
 
-void CalculatePlayerPos(DWORD address) {
+static void CalculatePlayerPos(DWORD address) {
     if (g_currentConfig.PosDataType == PointDataType::Int)
         CalculatePosition((IntPoint*)address, g_playerPos);
     else if (g_currentConfig.PosDataType == PointDataType::Float)
@@ -32,16 +32,17 @@ namespace helper = common::helper;
 
 namespace core::inputdetermine {
     GameInput DetermineGameInput() {
-        g_gameInput = GameInput::NONE;
+        using enum GameInput;
+        g_gameInput = NONE;
         g_playerPos = {};
         g_playerPosRaw = {};
         DWORD address{};
         if (g_inputEnabled || g_showImGui) {
             if (g_leftMousePressed) {
-                g_gameInput |= GameInput::USE_BOMB;
+                g_gameInput |= USE_BOMB;
             }
             if (g_midMousePressed) {
-                g_gameInput |= GameInput::USE_SPECIAL;
+                g_gameInput |= USE_SPECIAL;
             }
             address = helper::CalculateAddress();
             if (address != 0) {
@@ -50,18 +51,18 @@ namespace core::inputdetermine {
                 auto mousePos = helper::GetPointerPosition();
 
                 if (g_playerPos.x < mousePos.x - 1)
-                    g_gameInput |= GameInput::MOVE_RIGHT;
+                    g_gameInput |= MOVE_RIGHT;
                 else if (g_playerPos.x > mousePos.x + 1)
-                    g_gameInput |= GameInput::MOVE_LEFT;
+                    g_gameInput |= MOVE_LEFT;
 
                 if (g_playerPos.y < mousePos.y - 1)
-                    g_gameInput |= GameInput::MOVE_DOWN;
+                    g_gameInput |= MOVE_DOWN;
                 else if (g_playerPos.y > mousePos.y + 1)
-                    g_gameInput |= GameInput::MOVE_UP;
+                    g_gameInput |= MOVE_UP;
             }
         }
         if (!g_inputEnabled) {
-            return GameInput::NONE;
+            return NONE;
         }
 
         return g_gameInput;

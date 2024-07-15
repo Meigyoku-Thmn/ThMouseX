@@ -9,18 +9,14 @@
 #include "ErrorMsg.D3D.h"
 #include "ErrorMsg.DDraw.h"
 
-
-
 using namespace std;
 
 namespace common::errormsg {
-    reference_wrapper<vector<ErrorMessage>> messageGroups[] = { cor::messages, d3d::messages, ddraw::messages };
+    array<reference_wrapper<vector<ErrorMessage>>, 3> messageGroups = { cor::messages, d3d::messages, ddraw::messages };
     string GuessErrorsFromHResult(HRESULT hr) {
         string errorMessage = "";
-        for (auto messages : messageGroups) {
-            auto messageItr = lower_bound(messages.get().begin(), messages.get().end(), hr, [](const ErrorMessage& left, HRESULT value) {
-                return left.code < DWORD(value);
-            });
+        for (auto const& messages : messageGroups) {
+            auto messageItr = ranges::lower_bound(messages.get(), hr, std::less<>(), &ErrorMessage::code);
             if (messageItr == messages.get().end() || messageItr->code != hr)
                 continue;
             while (messageItr->code == hr) {

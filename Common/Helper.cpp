@@ -2,6 +2,7 @@
 #include "macro.h"
 #include <string>
 #include <tuple>
+#include <span>
 
 #include "Helper.h"
 #include "Helper.Memory.h"
@@ -17,8 +18,8 @@ namespace common::helper {
         auto flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         auto dwErr = GetLastError();
         PSTR errorMessage{};
-        FormatMessageA(flags, NULL, dwErr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), PSTR(&errorMessage), 0, NULL);
-        MessageBoxA(NULL, errorMessage, title, MB_OK | MB_ICONERROR);
+        FormatMessageA(flags, nullptr, dwErr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), PSTR(&errorMessage), 0, nullptr);
+        MessageBoxA(nullptr, errorMessage, title, MB_OK | MB_ICONERROR);
         LocalFree(errorMessage);
     }
 
@@ -70,40 +71,47 @@ namespace common::helper {
         constexpr UCHAR Delta = 16;
         constexpr UCHAR WhiteIntensityLimit = 128;
         constexpr UCHAR BlackIntensityLimit = 16;
-        switch (toneStage) {
-            case WhiteInc:
-                if (tone == WhiteIntensityLimit) {
-                    toneStage = WhiteDec;
-                    goto WhiteDec;
-                } else {
-                    tone += Delta;
-                }
-                break;
-            case WhiteDec: WhiteDec:
-                if (tone == 0) {
-                    toneStage = BlackInc;
-                    tone = BlackIntensityLimit;
-                } else {
-                    tone -= Delta;
-                }
-                break;
-            case BlackInc:
-                if (tone == 0) {
-                    toneStage = BlackDec;
-                    goto BlackDec;
-                } else {
-                    tone -= Delta;
-                }
-                break;
-            case BlackDec: BlackDec:
-                if (tone == BlackIntensityLimit) {
-                    toneStage = WhiteInc;
-                    tone = 0;
-                } else {
-                    tone += Delta;
-                }
-                break;
-        }
+        auto _continue = false;
+        do {
+            switch (toneStage) {
+                case WhiteInc:
+                    if (tone == WhiteIntensityLimit) {
+                        toneStage = WhiteDec;
+                        _continue = true;
+                    }
+                    else {
+                        tone += Delta;
+                    }
+                    break;
+                case WhiteDec:
+                    if (tone == 0) {
+                        tone = BlackIntensityLimit;
+                        toneStage = BlackInc;
+                    }
+                    else {
+                        tone -= Delta;
+                    }
+                    break;
+                case BlackInc:
+                    if (tone == 0) {
+                        toneStage = BlackDec;
+                        _continue = true;
+                    }
+                    else {
+                        tone -= Delta;
+                    }
+                    break;
+                case BlackDec:
+                    if (tone == BlackIntensityLimit) {
+                        tone = 0;
+                        toneStage = WhiteInc;
+                    }
+                    else {
+                        tone += Delta;
+                    }
+                    break;
+            }
+        } while (_continue);
     }
 
     POINT GetPointerPosition() {
@@ -120,7 +128,7 @@ namespace common::helper {
         lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
         SetWindowLongPtrW(g_hFocusWindow, GWL_STYLE, style);
         SetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE, lExStyle);
-        SetWindowPos(g_hFocusWindow, NULL, 0, 0, width, height, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
+        SetWindowPos(g_hFocusWindow, nullptr, 0, 0, width, height, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
     }
 
     void FixWindowCoordinate(bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight) {
@@ -132,16 +140,17 @@ namespace common::helper {
             SetWindowLongPtrW(g_hFocusWindow, GWL_STYLE, style);
             SetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE, exStyle);
             auto updateFlags = SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER;
-            SetWindowPos(g_hFocusWindow, NULL, 0, 0, d3dWidth, d3dHeight, updateFlags);
-        } else if (d3dWidth > clientWidth || d3dHeight > clientHeight) {
+            SetWindowPos(g_hFocusWindow, nullptr, 0, 0, d3dWidth, d3dHeight, updateFlags);
+        }
+        else if (d3dWidth > clientWidth || d3dHeight > clientHeight) {
             // fix for Touhou 18
-            RECTSIZE size{0, 0, LONG(d3dWidth), LONG(d3dHeight)};
+            RECTSIZE size{ 0, 0, LONG(d3dWidth), LONG(d3dHeight) };
             auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
-            auto hasMenu = GetMenu(g_hFocusWindow) != NULL ? TRUE : FALSE;
+            auto hasMenu = GetMenu(g_hFocusWindow) != nullptr ? TRUE : FALSE;
             auto exStyle = GetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE);
             AdjustWindowRectEx(&size, style, hasMenu, exStyle);
             auto updateFlags = SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOREPOSITION;
-            SetWindowPos(g_hFocusWindow, NULL, 0, 0, size.width(), size.height(), updateFlags);
+            SetWindowPos(g_hFocusWindow, nullptr, 0, 0, size.width(), size.height(), updateFlags);
         }
     }
 
@@ -162,13 +171,14 @@ namespace common::helper {
     }
 
     DWORD CalculateAddress() {
-        if (g_currentConfig.ScriptType == ScriptType::LuaJIT)
+        using enum ScriptType;
+        if (g_currentConfig.ScriptType == LuaJIT)
             return luajit::GetPositionAddress();
-        else if (g_currentConfig.ScriptType == ScriptType::NeoLua)
+        else if (g_currentConfig.ScriptType == NeoLua)
             return neolua::GetPositionAddress();
-        else if (g_currentConfig.ScriptType == ScriptType::Lua)
+        else if (g_currentConfig.ScriptType == Lua)
             return lua::GetPositionAddress();
         else
-            return memory::ResolveAddress(g_currentConfig.Address.Level, g_currentConfig.Address.Length);        
+            return memory::ResolveAddress(span{ g_currentConfig.Address.Level, g_currentConfig.Address.Length });
     }
 }

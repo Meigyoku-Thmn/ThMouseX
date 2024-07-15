@@ -37,12 +37,6 @@ namespace common::neolua {
     void Initialize() {
         if (g_currentConfig.ScriptType != ScriptType::NeoLua)
             return;
-        // Only support Attached
-        if (g_currentConfig.ScriptRunPlace != ScriptRunPlace::Attached)
-            return;
-        // Only support Push
-        if (g_currentConfig.ScriptPositionGetMethod != ScriptPositionGetMethod::Push)
-            return;
 
         auto mscoree = GetModuleHandleW(L"mscoree.dll");
         if (!mscoree) {
@@ -81,13 +75,13 @@ namespace common::neolua {
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/NeoLuaBootstrap.dll";
         auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
-        DWORD _;
+        DWORD returnValue;
         result = runtimeHost->ExecuteInDefaultAppDomain(
             bootstrapDllPath.c_str(),
             L"NeoLuaBootstrap.Handlers",
             L"Initialize",
             scriptPath.c_str(),
-            (PDWORD)&_
+            &returnValue
         );
         IfFailedReturnWithLog(TAG, "Failed to invoke NeoLuaBootstrap.Handlers.Initialize", result);
     }

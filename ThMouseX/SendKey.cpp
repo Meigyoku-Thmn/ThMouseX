@@ -20,7 +20,7 @@ struct LastState {
 } lastState;
 
 // from Autoit source code: https://github.com/ellysh/au3src/blob/35517393091e7d97052d20ccdee8d9d6db36276f/src/sendkeys.cpp#L790
-bool IsVKExtended(UINT key) {
+static bool IsVKExtended(UINT key) {
     if (key == VK_INSERT || key == VK_DELETE || key == VK_END || key == VK_DOWN ||
         key == VK_NEXT || key == VK_LEFT || key == VK_RIGHT || key == VK_HOME || key == VK_UP ||
         key == VK_PRIOR || key == VK_DIVIDE || key == VK_APPS || key == VK_LWIN || key == VK_RWIN ||
@@ -36,7 +36,7 @@ bool IsVKExtended(UINT key) {
         return false;
 }
 
-void SendKeyDown(BYTE vkCode) {
+static void SendKeyDown(BYTE vkCode) {
     if ((g_currentConfig.InputMethods & InputMethod::SendMsg) == InputMethod::SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16) | 0x00000001;
         if (IsVKExtended(vkCode))
@@ -58,7 +58,7 @@ void SendKeyDown(BYTE vkCode) {
     }
 }
 
-void SendKeyUp(BYTE vkCode) {
+static void SendKeyUp(BYTE vkCode) {
     if ((g_currentConfig.InputMethods & InputMethod::SendMsg) == InputMethod::SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16) | 0xC0000001;
         if (IsVKExtended(vkCode))
@@ -80,7 +80,7 @@ void SendKeyUp(BYTE vkCode) {
     }
 }
 
-void HandleKeyPress(GameInput gameInput, bool& wasPressing, BYTE vkCode) {
+static void HandleKeyPress(GameInput gameInput, bool& wasPressing, BYTE vkCode) {
     if (gameInput != GameInput::NONE) {
         if (!wasPressing) {
             SendKeyDown(vkCode);
@@ -95,17 +95,18 @@ void HandleKeyPress(GameInput gameInput, bool& wasPressing, BYTE vkCode) {
     }
 }
 
-void TestInputAndSendKeys() {
+static void TestInputAndSendKeys() {
+    using enum GameInput;
     auto gameInput = DetermineGameInput();
-    HandleKeyPress(gameInput & GameInput::USE_BOMB, _ref lastState.bomb, gs_bombButton);
-    HandleKeyPress(gameInput & GameInput::USE_SPECIAL, _ref lastState.extra, gs_extraButton);
-    HandleKeyPress(gameInput & GameInput::MOVE_LEFT, _ref lastState.left, VK_LEFT);
-    HandleKeyPress(gameInput & GameInput::MOVE_RIGHT, _ref lastState.right, VK_RIGHT);
-    HandleKeyPress(gameInput & GameInput::MOVE_UP, _ref lastState.up, VK_UP);
-    HandleKeyPress(gameInput & GameInput::MOVE_DOWN, _ref lastState.down, VK_DOWN);
+    HandleKeyPress(gameInput & USE_BOMB, _ref lastState.bomb, gs_bombButton);
+    HandleKeyPress(gameInput & USE_SPECIAL, _ref lastState.extra, gs_extraButton);
+    HandleKeyPress(gameInput & MOVE_LEFT, _ref lastState.left, VK_LEFT);
+    HandleKeyPress(gameInput & MOVE_RIGHT, _ref lastState.right, VK_RIGHT);
+    HandleKeyPress(gameInput & MOVE_UP, _ref lastState.up, VK_UP);
+    HandleKeyPress(gameInput & MOVE_DOWN, _ref lastState.down, VK_DOWN);
 }
 
-void CleanUp(bool isProcessTerminating) {
+static void CleanUp(bool isProcessTerminating) {
     if (isProcessTerminating)
         return;
     SendKeyUp(gs_bombButton);
@@ -118,7 +119,8 @@ void CleanUp(bool isProcessTerminating) {
 
 namespace core::sendkey {
     void Initialize() {
-        if ((g_currentConfig.InputMethods & (InputMethod::SendInput | InputMethod::SendMsg)) == InputMethod::None)
+        using enum InputMethod;
+        if ((g_currentConfig.InputMethods & (SendInput | SendMsg)) == None)
             return;
         callbackstore::RegisterPostRenderCallback(TestInputAndSendKeys);
         callbackstore::RegisterUninitializeCallback(CleanUp);

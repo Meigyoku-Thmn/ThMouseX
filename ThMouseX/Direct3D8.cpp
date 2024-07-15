@@ -67,7 +67,7 @@ namespace core::directx8 {
 
     bool imGuiPrepared;
 
-    void ClearMeasurementFlags() {
+    static void ClearMeasurementFlags() {
         measurementPrepared = false;
         cursorStatePrepared = false;
     }
@@ -81,7 +81,7 @@ namespace core::directx8 {
     float               imGuiMousePosScaleX = 1.f;
     float               imGuiMousePosScaleY = 1.f;
 
-    void CleanUp(bool forReal = false) {
+    static void CleanUp(bool forReal = false) {
         ImGui_ImplDX8_InvalidateDeviceObjects();
         SAFE_RELEASE(cursorSprite);
         SAFE_RELEASE(cursorTexture);
@@ -102,7 +102,7 @@ namespace core::directx8 {
             pD3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
     }
 
-    void TearDownCallback(bool isProcessTerminating) {
+    static void TearDownCallback(bool isProcessTerminating) {
         if (isProcessTerminating)
             return;
         CleanUp(true);
@@ -129,7 +129,7 @@ namespace core::directx8 {
         }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window",
-            WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
+            WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nullptr, nullptr, nullptr, nullptr));
         if (!tmpWnd) {
             note::LastErrorToFile(TAG "Failed to create a temporary window.");
             return;
@@ -158,7 +158,6 @@ namespace core::directx8 {
             return;
         }
 
-        auto baseAddress = (DWORD)d3d8;
         auto vtable = *(DWORD**)pD3D.Get();
         auto vtable2 = *(DWORD**)pDevice.Get();
 
@@ -167,12 +166,12 @@ namespace core::directx8 {
 
         minhook::CreateHook(vector<minhook::HookConfig>{
             { PVOID(vtable[CreateDeviceIdx]), & D3DCreateDevice, (PVOID*)&OriCreateDevice },
-            {PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset},
-            {PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent},
+            { PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset },
+            { PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent },
         });
     }
 
-    void PrepareFirstStep(IDirect3DDevice8* device) {
+    static void PrepareFirstStep(IDirect3DDevice8* device) {
         if (firstStepPrepared)
             return;
         firstStepPrepared = true;
@@ -190,7 +189,7 @@ namespace core::directx8 {
             D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = {(cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f};
+            cursorPivot = { (cursorSize.Height - 1) / 2.f, (cursorSize.Width - 1) / 2.f };
         }
     }
 
@@ -205,7 +204,7 @@ namespace core::directx8 {
     - determine g_pixelRate
     - determine g_pixelOffset
     */
-    void PrepareMeasurement(IDirect3DDevice8* pDevice) {
+    static void PrepareMeasurement(IDirect3DDevice8* pDevice) {
         if (measurementPrepared)
             return;
         measurementPrepared = true;
@@ -252,7 +251,7 @@ namespace core::directx8 {
     /*
     Determine scaling
     */
-    void PrepareCursorState(IDirect3DDevice8* pDevice) {
+    static void PrepareCursorState(IDirect3DDevice8* pDevice) {
         if (cursorStatePrepared)
             return;
         cursorStatePrepared = true;
@@ -285,7 +284,7 @@ namespace core::directx8 {
         d3dScale = float(clientSize.width()) / d3dSize.Width;
     }
 
-    void RenderCursor(IDirect3DDevice8* pDevice) {
+    static void RenderCursor(IDirect3DDevice8* pDevice) {
         if (!cursorTexture)
             return;
 
@@ -327,14 +326,14 @@ namespace core::directx8 {
                 // default behaviour: texture color * diffuse color
                 // this:              texture color + diffuse color (except alpha)
                 SetTextureColorStage(pDevice, 0, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_DIFFUSE);
-                cursorSprite->Draw(cursorTexture, NULL, &cursorScale, NULL, 0, &cursorPositionD3D, ToneColor(tone));
+                cursorSprite->Draw(cursorTexture, nullptr, &cursorScale, nullptr, 0, &cursorPositionD3D, ToneColor(tone));
             }
             else {
-                cursorSprite->Draw(cursorTexture, NULL, &cursorScale, NULL, 0, &cursorPositionD3D, ToneColor(tone));
+                cursorSprite->Draw(cursorTexture, nullptr, &cursorScale, nullptr, 0, &cursorPositionD3D, ToneColor(tone));
             }
         }
         else {
-            cursorSprite->Draw(cursorTexture, NULL, &cursorScale, NULL, 0, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
+            cursorSprite->Draw(cursorTexture, nullptr, &cursorScale, nullptr, 0, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
         }
         cursorSprite->End();
 
@@ -344,7 +343,7 @@ namespace core::directx8 {
         pDevice->EndScene();
     }
 
-    void PrepareImGui(IDirect3DDevice8* pDevice) {
+    static void PrepareImGui(IDirect3DDevice8* pDevice) {
         if (imGuiPrepared)
             return;
         imGuiPrepared = true;
@@ -357,7 +356,7 @@ namespace core::directx8 {
         ImGui_ImplDX8_Init(pDevice);
     }
 
-    void ConfigureImGui(IDirect3DDevice8* pDevice) {
+    static void ConfigureImGui(IDirect3DDevice8* pDevice) {
         if (imGuiConfigured)
             return;
         imGuiConfigured = true;
@@ -381,7 +380,7 @@ namespace core::directx8 {
         imguioverlay::Configure(float(d3dSize.Height) / gs_imGuiBaseVerticalResolution);
     }
 
-    void RenderImGui(IDirect3DDevice8* pDevice) {
+    static void RenderImGui(IDirect3DDevice8* pDevice) {
         if (!g_showImGui)
             return;
         ImGui_ImplDX8_NewFrame();

@@ -13,15 +13,14 @@ namespace encoding = common::helper::encoding;
 using namespace std;
 
 namespace common::minhook {
-    void Uninitialize(bool isProcessTerminating) {
+    static void Uninitialize(bool isProcessTerminating) {
         auto rs = MH_Uninitialize();
         if (!isProcessTerminating && rs != MH_OK)
             note::ToFile("[MinHook] Failed to uninitialize MinHook: %s", MH_StatusToString(rs));
     }
 
     bool Initialize() {
-        auto rs = MH_Initialize();
-        if (rs != MH_OK) {
+        if (auto rs = MH_Initialize(); rs != MH_OK) {
             note::ToFile("[MinHook] Failed to initialize MinHook: %s", MH_StatusToString(rs));
             return false;
         }
@@ -84,29 +83,26 @@ namespace common::minhook {
             auto proc = GetProcAddress(hModule, config.procName);
             if (!proc)
                 return false;
-            auto rs = MH_RemoveHook(proc);
-            if (rs != MH_OK)
+            if (auto rs = MH_RemoveHook(proc); rs != MH_OK)
                 return false;
             if (config.ppOriginal)
-                *config.ppOriginal = NULL;
+                *config.ppOriginal = nullptr;
         }
         return true;
     }
 
     bool RemoveHooks(const vector<HookConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
-            auto rs = MH_RemoveHook(config.pTarget);
-            if (rs != MH_OK)
+            if (auto rs = MH_RemoveHook(config.pTarget); rs != MH_OK)
                 return false;
             if (config.ppOriginal)
-                *config.ppOriginal = NULL;
+                *config.ppOriginal = nullptr;
         }
         return true;
     }
 
     bool EnableAll() {
-        auto rs = MH_EnableHook(MH_ALL_HOOKS);
-        if (rs != MH_OK) {
+        if (auto rs = MH_EnableHook(MH_ALL_HOOKS); rs != MH_OK) {
             note::ToFile("[MinHook] Failed to enable all hooks: %s", MH_StatusToString(rs));
             return false;
         }

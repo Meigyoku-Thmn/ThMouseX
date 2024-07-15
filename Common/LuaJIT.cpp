@@ -24,12 +24,13 @@ namespace luaapi = common::luaapi;
 using namespace std;
 
 static bool scriptingDisabled = false;
+static bool usePullMechanism = false;
 
 #define GET_POSITION_ADDRESS "getPositionAddress"
 
 static lua_State* L;
 
-bool CheckAndDisableIfError(lua_State* L, int r) {
+static bool CheckAndDisableIfError(lua_State* L, int r) {
     if (r != 0) {
         note::ToFile("[LuaJIT] %s", lua_tostring(L, -1));
         lua_pop(L, 1);
@@ -51,19 +52,13 @@ namespace common::luajit {
             return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
     }
 
-    void Uninitialize(bool isProcessTerminating) {
-        if (L != NULL)
+    static void Uninitialize(bool isProcessTerminating) {
+        if (L != nullptr)
             lua_close(L);
     }
 
     void Initialize() {
         if (g_currentConfig.ScriptType != ScriptType::LuaJIT)
-            return;
-        // Only support Detached
-        if (g_currentConfig.ScriptRunPlace != ScriptRunPlace::Detached)
-            return;
-        // Can support Pull and Push
-        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::None)
             return;
 
         L = luaL_newstate();
@@ -88,24 +83,17 @@ namespace common::luajit {
         if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str())))
             return;
 
-        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push)
-            return;
-
         lua_getglobal(L, GET_POSITION_ADDRESS);
-        if (!lua_isfunction(L, -1)) {
-            note::ToFile("[LuaJIT] %s", GET_POSITION_ADDRESS " function not found in global scope.");
-            scriptingDisabled = true;
-            return;
-        }
+        if (lua_isfunction(L, -1))
+            usePullMechanism = true;
     }
 
     DWORD GetPositionAddress() {
         if (scriptingDisabled)
             return NULL;
 
-        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push) {
+        if (!usePullMechanism)
             return Lua_GetPositionAddress();
-        }
 
         lua_pushvalue(L, -1);
 

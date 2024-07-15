@@ -27,7 +27,7 @@ namespace common::callbackstore {
     }
 
     void TriggerUninitializeCallbacks(bool isProcessTerminating) {
-        for (auto& item : uninitializeCallbacks) {
+        for (auto const& item : uninitializeCallbacks) {
             if (isProcessTerminating && item.isFromManagedCode)
                 continue;
             item.callback(isProcessTerminating);

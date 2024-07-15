@@ -19,7 +19,7 @@ namespace errormsg = common::errormsg;
 using namespace std;
 using namespace Microsoft::WRL;
 
-tm& GetTimeNow() {
+static tm& GetTimeNow() {
     auto now = time(nullptr);
     return *localtime(&now);
 }
@@ -49,11 +49,11 @@ namespace common::log {
                 processName = encoding::ConvertToUtf8(g_currentConfig.ProcessName);
             }
             logFile = _wfsopen(logPath.c_str(), L"a+", _SH_DENYNO);
-            if (logFile != NULL)
-                setvbuf(logFile, NULL, _IONBF, 0);
+            if (logFile != nullptr)
+                setvbuf(logFile, nullptr, _IONBF, 0);
         }
-        if (logFile != NULL) {
-            auto& now = GetTimeNow();
+        if (logFile != nullptr) {
+            auto const& now = GetTimeNow();
             fprintf(logFile, "[%s %02d/%02d/%02d %02d:%02d:%02d] ",
                 processName.c_str(),
                 now.tm_mday, now.tm_mon + 1, now.tm_year + 1900,
@@ -66,12 +66,12 @@ namespace common::log {
 
     void DxErrToFile(const char* message, HRESULT hResult) {
         auto errorStr = DXGetErrorStringA(hResult);
-        if (errorStr == NULL) {
+        if (errorStr == nullptr) {
             HResultToFile(message, hResult);
             return;
         }
         auto errorDes = DXGetErrorDescriptionA(hResult);
-        auto description = errorDes != NULL ? string(errorStr) + ": " + errorDes : string(errorStr);
+        auto description = errorDes != nullptr ? string(errorStr) + ": " + errorDes : string(errorStr);
 #if _DEBUG
         ToConsole("%s: %s", message, description.c_str());
 #endif
@@ -80,7 +80,7 @@ namespace common::log {
 
     void HResultToFile(const char* message, HRESULT hResult) {
         ComPtr<IErrorInfo> errorInfo;
-        auto _ = GetErrorInfo(0, &errorInfo);
+        std::ignore = GetErrorInfo(0, &errorInfo);
         _com_error error(hResult, errorInfo.Get(), true);
         auto description = error.Description();
         if (description.length() > 0) {

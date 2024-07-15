@@ -110,7 +110,7 @@ namespace core::directx9 {
         return OriCreateDevice(pD3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
     }
 
-    void TearDownCallback(bool isProcessTerminating) {
+    static void TearDownCallback(bool isProcessTerminating) {
         if (isProcessTerminating)
             return;
         CleanUp(true);
@@ -136,7 +136,7 @@ namespace core::directx9 {
             return;
         }
 
-        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, NULL, NULL));
+        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nullptr, nullptr, nullptr, nullptr));
         if (!tmpWnd) {
             note::LastErrorToFile(TAG "Failed to create a temporary window.");
             return;
@@ -165,7 +165,6 @@ namespace core::directx9 {
             return;
         }
 
-        auto baseAddress = (DWORD)d3d9;
         auto vtable = *(DWORD**)pD3D.Get();
         auto vtable2 = *(DWORD**)pDevice.Get();
 
@@ -173,13 +172,13 @@ namespace core::directx9 {
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[CreateDeviceIdx]), &D3DCreateDevice, (PVOID*)&OriCreateDevice },
+            { PVOID(vtable[CreateDeviceIdx]), & D3DCreateDevice, (PVOID*)&OriCreateDevice },
             { PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset },
             { PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent },
         });
     }
 
-    void PrepareFirstStep(IDirect3DDevice9* device) {
+    static void PrepareFirstStep(IDirect3DDevice9* device) {
         if (firstStepPrepared)
             return;
         firstStepPrepared = true;
@@ -240,7 +239,7 @@ namespace core::directx9 {
     - determine g_pixelRate
     - determine g_pixelOffset
     */
-    void PrepareMeasurement(IDirect3DDevice9* pDevice) {
+    static void PrepareMeasurement(IDirect3DDevice9* pDevice) {
         if (measurementPrepared)
             return;
         measurementPrepared = true;
@@ -299,40 +298,40 @@ namespace core::directx9 {
     /*
     Determine scaling
     */
-    void PrepareCursorState(IDirect3DDevice9* pDevice) {
+    static void PrepareCursorState(IDirect3DDevice9* pDevice) {
         if (cursorStatePrepared)
             return;
-            cursorStatePrepared = true;
+        cursorStatePrepared = true;
 
-            if (!g_hFocusWindow)
-                return;
+        if (!g_hFocusWindow)
+            return;
 
-            ComPtr<IDirect3DSurface9> pSurface;
-            auto rs = pDevice->GetRenderTarget(0, &pSurface);
-            if (FAILED(rs)) {
-                d3dScale = 0.f;
-                note::DxErrToFile(TAG "PrepareCursorState: pDevice->GetRenderTarget failed", rs);
-                return;
-            }
-            D3DSURFACE_DESC d3dSize;
-            rs = pSurface->GetDesc(&d3dSize);
-            if (FAILED(rs)) {
-                d3dScale = 0.f;
-                note::DxErrToFile(TAG "PrepareCursorState: pSurface->GetDesc failed", rs);
-                return;
-            }
-            auto scale = float(d3dSize.Height) / gs_textureBaseHeight;
-            cursorScale = D3DXVECTOR2(scale, scale);
+        ComPtr<IDirect3DSurface9> pSurface;
+        auto rs = pDevice->GetRenderTarget(0, &pSurface);
+        if (FAILED(rs)) {
+            d3dScale = 0.f;
+            note::DxErrToFile(TAG "PrepareCursorState: pDevice->GetRenderTarget failed", rs);
+            return;
+        }
+        D3DSURFACE_DESC d3dSize;
+        rs = pSurface->GetDesc(&d3dSize);
+        if (FAILED(rs)) {
+            d3dScale = 0.f;
+            note::DxErrToFile(TAG "PrepareCursorState: pSurface->GetDesc failed", rs);
+            return;
+        }
+        auto scale = float(d3dSize.Height) / gs_textureBaseHeight;
+        cursorScale = D3DXVECTOR2(scale, scale);
 
-            RECTSIZE clientSize{};
-            if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
-                note::LastErrorToFile(TAG "PrepareCursorState: GetClientRect failed");
-                return;
-            }
-            d3dScale = float(clientSize.width()) / d3dSize.Width;
+        RECTSIZE clientSize{};
+        if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
+            note::LastErrorToFile(TAG "PrepareCursorState: GetClientRect failed");
+            return;
+        }
+        d3dScale = float(clientSize.width()) / d3dSize.Width;
     }
 
-    void RenderCursor(IDirect3DDevice9* pDevice) {
+    static void RenderCursor(IDirect3DDevice9* pDevice) {
         if (!cursorTexture || !_D3DXMatrixTransformation2D)
             return;
 
@@ -364,7 +363,7 @@ namespace core::directx9 {
         // scale cursor sprite to match the current render resolution
         D3DXVECTOR2 scalingPivotD3D(cursorPositionD3D.x, cursorPositionD3D.y);
         D3DXMATRIX scalingMatrixD3D;
-        _D3DXMatrixTransformation2D(&scalingMatrixD3D, &scalingPivotD3D, 0, &cursorScale, NULL, 0, NULL);
+        _D3DXMatrixTransformation2D(&scalingMatrixD3D, &scalingPivotD3D, 0, &cursorScale, nullptr, 0, nullptr);
         cursorSprite->SetTransform(&scalingMatrixD3D);
         // draw the cursor
         if (g_inputEnabled) {
@@ -375,14 +374,14 @@ namespace core::directx9 {
                 // default behaviour: texture color * diffuse color
                 // this:              texture color + diffuse color (except alpha)
                 SetTextureColorStage(pDevice, 0, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_DIFFUSE);
-                cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, ToneColor(tone));
+                cursorSprite->Draw(cursorTexture, nullptr, &cursorPivot, &cursorPositionD3D, ToneColor(tone));
             }
             else {
-                cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, ToneColor(tone));
+                cursorSprite->Draw(cursorTexture, nullptr, &cursorPivot, &cursorPositionD3D, ToneColor(tone));
             }
         }
         else {
-            cursorSprite->Draw(cursorTexture, NULL, &cursorPivot, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
+            cursorSprite->Draw(cursorTexture, nullptr, &cursorPivot, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
         }
         cursorSprite->End();
 
@@ -392,7 +391,7 @@ namespace core::directx9 {
         pDevice->EndScene();
     }
 
-    void PrepareImGui(IDirect3DDevice9* pDevice) {
+    static void PrepareImGui(IDirect3DDevice9* pDevice) {
         if (imGuiPrepared)
             return;
         imGuiPrepared = true;
@@ -405,7 +404,7 @@ namespace core::directx9 {
         ImGui_ImplDX9_Init(pDevice);
     }
 
-    void ConfigureImGui(IDirect3DDevice9* pDevice) {
+    static void ConfigureImGui(IDirect3DDevice9* pDevice) {
         if (imGuiConfigured)
             return;
         imGuiConfigured = true;
@@ -426,7 +425,7 @@ namespace core::directx9 {
         imguioverlay::Configure(float(d3dSize.Height) / gs_imGuiBaseVerticalResolution);
     }
 
-    void RenderImGui(IDirect3DDevice9* pDevice) {
+    static void RenderImGui(IDirect3DDevice9* pDevice) {
         if (!g_showImGui)
             return;
         ImGui_ImplDX9_NewFrame();

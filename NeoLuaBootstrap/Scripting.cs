@@ -32,7 +32,7 @@ namespace NeoLuaBootstrap
             emitter.LoadField(DelegateStoreField);
             emitter.LoadConstant(DelegateStore.Count - 1);
             emitter.Call(getItemMethod);
-            emitter.CastClass(DelegateStore.Last().GetType());
+            emitter.CastClass(DelegateStore[DelegateStore.Count - 1].GetType());
         }
 
         static DynamicMethod MakeLuaFuncionWrapper(Delegate luaFunc)
@@ -132,8 +132,7 @@ namespace NeoLuaBootstrap
                     if (config == null)
                         continue;
 
-                    var targetMethodPath = config[1] as string;
-                    if (targetMethodPath == null)
+                    if (!(config[1] is string targetMethodPath))
                     {
                         Logging.ToFile("[NeoLua] Invalid target method path in hook configuration (Index: {0}).", i + 1);
                         continue;
@@ -173,7 +172,7 @@ namespace NeoLuaBootstrap
                 Logging.ToFile("[NeoLua] {0}", e);
                 Uninitialize();
             }
-            catch (Exception e) when (e is LuaParseException || e is Exception)
+            catch (Exception e)
             {
                 Logging.ToFile("[NeoLua] {0}", e);
                 Uninitialize();

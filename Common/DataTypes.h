@@ -64,8 +64,8 @@ union TypedPoint {
 };
 
 struct AddressChain {
-    int     Length;
-    DWORD   Level[ADDRESS_CHAIN_MAX_LEN];
+    std::size_t Length;
+    DWORD       Level[ADDRESS_CHAIN_MAX_LEN];
 };
 static_assert(sizeof(void*) == sizeof(AddressChain::Level[0]));
 
@@ -92,21 +92,11 @@ enum class ScriptType {
     None, LuaJIT, NeoLua, Lua,
 };
 
-enum class ScriptRunPlace {
-    None, Detached, Attached,
-};
-
-enum class ScriptPositionGetMethod {
-    None, Pull, Push,
-};
-
 struct GameConfig {
     WCHAR                   ProcessName[PROCESS_NAME_MAX_LEN];
     AddressChain            Address;
 
     ScriptType              ScriptType;
-    ScriptRunPlace          ScriptRunPlace;
-    ScriptPositionGetMethod ScriptPositionGetMethod;
 
     PointDataType           PosDataType;
     FloatPoint              BasePixelOffset;
@@ -131,8 +121,8 @@ public:
     }
 };
 // This class must be instantiated with an initializer, preferably {}.
-typedef _GameConfigs<GameConfig, GAME_CONFIG_MAX_LEN> GameConfigs;
-static_assert(std::is_trivial<GameConfigs>::value);
+using GameConfigs = _GameConfigs<GameConfig, GAME_CONFIG_MAX_LEN>;
+static_assert(std::is_trivial_v<GameConfigs>);
 
 struct string_hash {
     using hash_type = std::hash<std::string_view>;
@@ -143,19 +133,19 @@ struct string_hash {
 };
 
 struct HMODULE_FREER {
-    typedef HMODULE pointer;
+    using pointer = HMODULE;
     void operator()(HMODULE handle) const {
-        if (handle != NULL)
+        if (handle != nullptr)
             FreeLibrary(handle);
     }
 };
-typedef std::unique_ptr<HMODULE, HMODULE_FREER> ModuleHandle;
+using ModuleHandle = std::unique_ptr<HMODULE, HMODULE_FREER>;
 
 struct HWND_DESTROYER {
-    typedef HWND pointer;
+    using pointer = HWND;
     void operator()(HWND hwnd) const {
-        if (hwnd != NULL)
+        if (hwnd != nullptr)
             DestroyWindow(hwnd);
     }
 };
-typedef std::unique_ptr<HWND, HWND_DESTROYER> WindowHandle;
+using WindowHandle = std::unique_ptr<HWND, HWND_DESTROYER>;

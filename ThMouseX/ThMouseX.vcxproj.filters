@@ -173,4 +173,7 @@
   <ItemGroup>
     <ResourceCompile Include="ThMouseX.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
 </Project>
