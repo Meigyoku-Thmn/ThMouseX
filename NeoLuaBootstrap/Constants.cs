@@ -1,7 +1,6 @@
-﻿namespace NeoLuaBootstrap
+﻿namespace NeoLuaBootstrap;
+
+static class Constants
 {
-    static class Constants
-    {
-        public const string AppName = "ThMouseX";
-    }
+    public const string AppName = "ThMouseX";
 }
