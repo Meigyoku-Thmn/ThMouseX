@@ -5,9 +5,15 @@
 
 ; Scripting
 ;  Supported Lua Interpreters:
-;   - NeoLua (Lua running in .NET, see THMHJ for an example)
-;   - LuaJIT (see Danmakai and thWWW for examples)
-;   - Lua (basically hook into the game's Lua runtime, for now this requires that the game's Lua runtime must be located in a dll, e.g: lua.dll, see DFLYT for an example)
+;   - NeoLua: Lua running in .NET, see THMHJ for an example
+;   - LuaJIT: See Danmakai and thWWW for examples
+;   - Lua:
+;       • Basically hook into the game's Lua runtime, see DFLYT for an example
+;       • ThMouseX makes the following assumptions about this mode:
+;           - the scripting engine is located in a dll file in the game's directory
+;           - the scripting engine is vanilla LuaJIT
+;           - the scripting engine has the 'ffi' library
+;           - the game calls the function 'luaL_openlibs' on startup
 
 ; processName   positionRVA         dataType   offset         baseHeight   aspectRatio   inputMethod
 
@@ -15,6 +21,7 @@
 th06            [002CA6B8]          float      (0,0)          480          4:3           DirectInput
 th06e           [002CA6B8]          float      (0,0)          480          4:3           DirectInput
 東方紅魔郷       [002CA6B8]          float      (0,0)          480          4:3           DirectInput
+“Œ•ûg–‚‹½       [002CA6B8]          float      (0,0)          480          4:3           DirectInput
 
 ; Touhou 7
 th07            [000BE408]          float      (32,16)        480          4:3           DirectInput
