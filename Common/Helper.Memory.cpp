@@ -13,7 +13,7 @@ namespace common::helper::memory {
         if (offsets.size() <= 0)
             return NULL;
         auto address = offsets[0] + DWORD(g_targetModule);
-        for (int i = 1; i < offsets.size(); i++) {
+        for (size_t i = 1; i < offsets.size(); i++) {
             address = *PDWORD(address);
             if (!address)
                 break;
@@ -27,7 +27,7 @@ namespace common::helper::memory {
             return "Using script";
         string rs;
         rs.reserve(128);
-        for (int i = 0; i < g_currentConfig.Address.Length; i++) {
+        for (size_t i = 0; i < g_currentConfig.Address.Length; i++) {
             auto offset = g_currentConfig.Address.Level[i];
             rs.append(format("[{:x}]", offset));
         }

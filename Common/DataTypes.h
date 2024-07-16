@@ -12,11 +12,11 @@ constexpr auto ADDRESS_CHAIN_MAX_LEN = 8;
 constexpr auto GAME_CONFIG_MAX_LEN = 128;
 
 struct ErrorMessage {
-    DWORD code;
+    HRESULT code;
     LPCSTR symbolicName;
     LPCSTR description;
     LPCSTR sourceHeader;
-    ErrorMessage(unsigned int code, const char* symbolicName, const char* description, const char* sourceHeader) :
+    ErrorMessage(HRESULT code, LPCSTR symbolicName, LPCSTR description, LPCSTR sourceHeader) :
         code(code), symbolicName(symbolicName), description(description), sourceHeader(sourceHeader) {
     }
 };
