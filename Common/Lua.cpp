@@ -147,7 +147,7 @@ namespace common::lua {
         _lua_getfield = ImportFunc(lua, luaDllName, lua_getfield);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            {_luaL_callmeta, & luaL_callmeta_hook, (PVOID*)&ori_luaL_callmeta},
+            { _luaL_callmeta, & luaL_callmeta_hook, (PVOID*)&ori_luaL_callmeta },
             { _lua_call, &lua_call_hook, (PVOID*)&ori_lua_call },
             { _lua_cpcall, &lua_cpcall_hook, (PVOID*)&ori_lua_cpcall },
             { _lua_pcall, &lua_pcall_hook, (PVOID*)&ori_lua_pcall },
@@ -246,7 +246,7 @@ namespace common::lua {
             return NULL;
         }
 
-        auto result = (DWORD)_lua_tointeger(L, -1);
+        auto result = DWORD(_lua_tointeger(L, -1));
         _lua_settop(L, stackSize);
         return result;
     }

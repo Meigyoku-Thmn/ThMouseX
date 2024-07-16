@@ -1,6 +1,5 @@
 #include "framework.h"
 #include <vector>
-#include <bit>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
 
@@ -97,7 +96,7 @@ namespace core::messagequeue {
     }
 
     static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        auto e = bit_cast<PMSG>(lParam);
+        auto e = PMSG(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
             HandleKeyboardPress(e, gs_toggleImGuiButton, { {
                 g_showImGui = !g_showImGui;

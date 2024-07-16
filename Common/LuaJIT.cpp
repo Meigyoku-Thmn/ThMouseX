@@ -117,7 +117,7 @@ namespace common::luajit {
             return NULL;
         }
 
-        auto result = (DWORD)lua_tointeger(L, -1);
+        auto result = DWORD(lua_tointeger(L, -1));
         lua_settop(L, stackSize);
         return result;
     }

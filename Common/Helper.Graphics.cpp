@@ -15,8 +15,8 @@ namespace common::helper::graphics {
             auto myViewPort = D3D11_VIEWPORT{
                 .TopLeftX = 0,
                 .TopLeftY = 0,
-                .Width = (float)desc.BufferDesc.Width,
-                .Height = (float)desc.BufferDesc.Height,
+                .Width = float(desc.BufferDesc.Width),
+                .Height = float(desc.BufferDesc.Height),
             };
             context->RSSetViewports(1, &myViewPort);
         }

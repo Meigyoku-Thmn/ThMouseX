@@ -25,7 +25,7 @@ namespace core::imguioverlay {
     void Configure(float fontScale) {
         auto& io = ImGui::GetIO();
         io.Fonts->Clear();
-        auto fontSize = round(gs_imGuiBaseFontSize * fontScale);
+        auto fontSize = round(float(gs_imGuiBaseFontSize) * fontScale);
         if (fontSize < 13)
             io.Fonts->AddFontDefault();
         else if (!io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(gs_imGuiFontPath).c_str(), fontSize))
@@ -33,7 +33,7 @@ namespace core::imguioverlay {
     }
     ImDrawData* Render(unsigned int renderWidth, unsigned int renderHeight, float mouseScaleX, float mouseScaleY) {
         auto& io = ImGui::GetIO();
-        io.DisplaySize = ImVec2((float)renderWidth, (float)renderHeight);
+        io.DisplaySize = ImVec2(float(renderWidth), float(renderHeight));
         ImGui_ImplWin32_SetMousePosScale(mouseScaleX, mouseScaleY);
         ImGui::NewFrame();
 

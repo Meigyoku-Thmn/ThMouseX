@@ -10,21 +10,22 @@ template <typename T>
 void CalculatePosition(T position, POINT& output) {
     RECTSIZE clientSize{};
     GetClientRect(g_hFocusWindow, &clientSize);
-    auto realWidth = clientSize.height() * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
-    auto paddingX = (clientSize.width() - realWidth) / 2;
-    g_playerPosRaw = { (double)(position)->X, (double)(position)->Y };
-    output.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X + paddingX);
-    output.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y);
+    auto realWidth = float(clientSize.height()) * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
+    auto paddingX = (float(clientSize.width()) - realWidth) / 2;
+    g_playerPosRaw = { double(position->X), double(position->Y) };
+    output.x = lrint(float(position->X) / g_pixelRate + g_pixelOffset.X + paddingX);
+    output.y = lrint(float(position->Y) / g_pixelRate + g_pixelOffset.Y);
 }
 
 static void CalculatePlayerPos(DWORD address) {
-    if (g_currentConfig.PosDataType == PointDataType::Int)
+    using enum PointDataType;
+    if (g_currentConfig.PosDataType == Int)
         CalculatePosition((IntPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == PointDataType::Float)
+    else if (g_currentConfig.PosDataType == Float)
         CalculatePosition((FloatPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == PointDataType::Short)
+    else if (g_currentConfig.PosDataType == Short)
         CalculatePosition((ShortPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == PointDataType::Double)
+    else if (g_currentConfig.PosDataType == Double)
         CalculatePosition((DoublePoint*)address, g_playerPos);
 }
 

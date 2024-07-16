@@ -12,7 +12,7 @@ namespace common::helper::memory {
     DWORD ResolveAddress(span<const DWORD> offsets) {
         if (offsets.size() <= 0)
             return NULL;
-        auto address = offsets[0] + (DWORD)g_targetModule;
+        auto address = offsets[0] + DWORD(g_targetModule);
         for (int i = 1; i < offsets.size(); i++) {
             address = *PDWORD(address);
             if (!address)
@@ -35,12 +35,12 @@ namespace common::helper::memory {
     }
 
     void ScanImportTable(HMODULE hModule, ImportTableCallbackType callback) {
-        auto dosHeaders = (PIMAGE_DOS_HEADER)hModule;
-        auto ntHeaders = (PIMAGE_NT_HEADERS)((DWORD_PTR)hModule + dosHeaders->e_lfanew);
+        auto dosHeaders = PIMAGE_DOS_HEADER(hModule);
+        auto ntHeaders = PIMAGE_NT_HEADERS(DWORD_PTR(hModule) + dosHeaders->e_lfanew);
         auto importsDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
-        auto importDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)((DWORD_PTR)hModule + importsDirectory.VirtualAddress);
+        auto importDescriptor = PIMAGE_IMPORT_DESCRIPTOR(DWORD_PTR(hModule) + importsDirectory.VirtualAddress);
         while (importDescriptor->Name != NULL) {
-            auto libraryName = (DWORD_PTR)hModule + (LPCSTR)importDescriptor->Name;
+            auto libraryName = DWORD_PTR(hModule) + LPCSTR(importDescriptor->Name);
             callback(libraryName);
             importDescriptor++;
         }

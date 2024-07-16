@@ -269,11 +269,11 @@ namespace core::directx11 {
             note::LastErrorToFile(TAG "PrepareMeasurement: GetClientRect failed");
             return;
         }
-        g_pixelRate = float(g_currentConfig.BaseHeight) / clientSize.height();
+        g_pixelRate = float(g_currentConfig.BaseHeight) / float(clientSize.height());
         g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
-        imGuiMousePosScaleX = float(clientSize.width()) / desc.BufferDesc.Width;
-        imGuiMousePosScaleY = float(clientSize.height()) / desc.BufferDesc.Height;
+        imGuiMousePosScaleX = float(clientSize.width()) / float(desc.BufferDesc.Width);
+        imGuiMousePosScaleY = float(clientSize.height()) / float(desc.BufferDesc.Height);
     }
 
     /*
@@ -294,7 +294,7 @@ namespace core::directx11 {
             return;
         }
 
-        auto scale = float(desc.BufferDesc.Height) / gs_textureBaseHeight;
+        auto scale = float(desc.BufferDesc.Height) / float(gs_textureBaseHeight);
         cursorScale = XMVECTORF32{ scale, scale };
 
         RECTSIZE clientSize{};
@@ -302,7 +302,7 @@ namespace core::directx11 {
             note::LastErrorToFile(TAG "PrepareCursorState: GetClientRect failed");
             return;
         }
-        d3dScale = float(clientSize.width()) / desc.BufferDesc.Width;
+        d3dScale = float(clientSize.width()) / float(desc.BufferDesc.Width);
     }
 
     static void RenderCursor(IDXGISwapChain* swapChain) {
@@ -374,7 +374,7 @@ namespace core::directx11 {
             return;
         }
 
-        imguioverlay::Configure(float(desc.BufferDesc.Height) / gs_imGuiBaseVerticalResolution);
+        imguioverlay::Configure(float(desc.BufferDesc.Height) / float(gs_imGuiBaseVerticalResolution));
     }
 
     static void RenderImGui(IDXGISwapChain* swapChain) {
