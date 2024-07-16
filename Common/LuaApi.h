@@ -8,7 +8,7 @@
 
 DLLEXPORT_C MH_STATUS Lua_CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
 DLLEXPORT_C DWORD Lua_ReadUInt32(DWORD address);
-DLLEXPORT_C DWORD Lua_ResolveAddress(DWORD* offsets, int length);
+DLLEXPORT_C DWORD Lua_ResolveAddress(DWORD* offsets, size_t length);
 DLLEXPORT_C void Lua_OpenConsole();
 DLLEXPORT_C void Lua_SetPositionAddress(DWORD address);
 DLLEXPORT_C DWORD Lua_GetPositionAddress();

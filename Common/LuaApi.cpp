@@ -31,8 +31,8 @@ DWORD Lua_ReadUInt32(DWORD address) {
     return *PDWORD(address);
 }
 
-DWORD Lua_ResolveAddress(DWORD* offsets, int length) {
-    return memory::ResolveAddress(span{ offsets, (size_t)length });
+DWORD Lua_ResolveAddress(DWORD* offsets, size_t length) {
+    return memory::ResolveAddress(span{ offsets, length });
 }
 
 void Lua_OpenConsole() {
