@@ -36,13 +36,13 @@ if (!_ ## funcName) { \
 }0
 
 namespace common::lua {
-    int luaL_callmeta_hook(lua_State *L, int obj, const char *e);
+    int luaL_callmeta_hook(lua_State* L, int obj, const char* e);
     decltype(&luaL_callmeta_hook) ori_luaL_callmeta;
-    void lua_call_hook(lua_State *L, int nargs, int nresults);
+    void lua_call_hook(lua_State* L, int nargs, int nresults);
     decltype(&lua_call_hook) ori_lua_call;
-    int lua_cpcall_hook(lua_State *L, lua_CFunction func, void *ud);
+    int lua_cpcall_hook(lua_State* L, lua_CFunction func, void* ud);
     decltype(&lua_cpcall_hook) ori_lua_cpcall;
-    int lua_pcall_hook(lua_State *L, int nargs, int nresults, int errfunc);
+    int lua_pcall_hook(lua_State* L, int nargs, int nresults, int errfunc);
     decltype(&lua_pcall_hook) ori_lua_pcall;
 
     decltype(&luaL_callmeta) _luaL_callmeta;
@@ -53,6 +53,7 @@ namespace common::lua {
     decltype(&luaL_loadstring) _luaL_loadstring;
     decltype(&lua_tolstring) _lua_tolstring;
     decltype(&lua_settop) _lua_settop;
+    decltype(&lua_gettop) _lua_gettop;
     decltype(&lua_tointeger) _lua_tointeger;
     decltype(&lua_isnumber) _lua_isnumber;
     decltype(&lua_pushvalue) _lua_pushvalue;
@@ -62,14 +63,13 @@ namespace common::lua {
     static bool Validate(lua_State* L, int r) {
         if (r != 0) {
             note::ToFile("[Lua] %s", _lua_tolstring(L, -1, nullptr));
-            _lua_settop(L, -2);
             scriptingDisabled = true;
             return false;
         }
         return true;
     }
 
-    void AttachScript(lua_State *L);
+    void AttachScript(lua_State* L);
 
     string luaDllName;
     string scriptPath;
@@ -139,6 +139,7 @@ namespace common::lua {
         _luaL_loadstring = ImportFunc(lua, luaDllName, luaL_loadstring);
         _lua_tolstring = ImportFunc(lua, luaDllName, lua_tolstring);
         _lua_settop = ImportFunc(lua, luaDllName, lua_settop);
+        _lua_gettop = ImportFunc(lua, luaDllName, lua_gettop);
         _lua_tointeger = ImportFunc(lua, luaDllName, lua_tointeger);
         _lua_isnumber = ImportFunc(lua, luaDllName, lua_isnumber);
         _lua_pushvalue = ImportFunc(lua, luaDllName, lua_pushvalue);
@@ -146,39 +147,39 @@ namespace common::lua {
         _lua_getfield = ImportFunc(lua, luaDllName, lua_getfield);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            {_luaL_callmeta, &luaL_callmeta_hook, (PVOID*)&ori_luaL_callmeta},
-            {_lua_call, &lua_call_hook, (PVOID*)&ori_lua_call},
-            {_lua_cpcall, &lua_cpcall_hook, (PVOID*)&ori_lua_cpcall},
-            {_lua_pcall, &lua_pcall_hook, (PVOID*)&ori_lua_pcall},
+            {_luaL_callmeta, & luaL_callmeta_hook, (PVOID*)&ori_luaL_callmeta},
+            { _lua_call, &lua_call_hook, (PVOID*)&ori_lua_call },
+            { _lua_cpcall, &lua_cpcall_hook, (PVOID*)&ori_lua_cpcall },
+            { _lua_pcall, &lua_pcall_hook, (PVOID*)&ori_lua_pcall },
         });
     }
 
-    int luaL_callmeta_hook(lua_State *L, int obj, const char *e) {
+    int luaL_callmeta_hook(lua_State* L, int obj, const char* e) {
         auto rs = ori_luaL_callmeta(L, obj, e);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _luaL_callmeta, nullptr , (PVOID*)ori_luaL_callmeta } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _luaL_callmeta, nullptr, (PVOID*)ori_luaL_callmeta } });
         return rs;
     }
-    void lua_call_hook(lua_State *L, int nargs, int nresults) {
+    void lua_call_hook(lua_State* L, int nargs, int nresults) {
         ori_lua_call(L, nargs, nresults);
         AttachScript(L);
         minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_call, nullptr, (PVOID*)ori_lua_call } });
         return;
     }
-    int lua_cpcall_hook(lua_State *L, lua_CFunction func, void *ud) {
+    int lua_cpcall_hook(lua_State* L, lua_CFunction func, void* ud) {
         auto rs = ori_lua_cpcall(L, func, ud);
         AttachScript(L);
         minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_cpcall, nullptr, (PVOID*)ori_lua_cpcall } });
         return rs;
     }
-    int lua_pcall_hook(lua_State *L, int nargs, int nresults, int errfunc) {
+    int lua_pcall_hook(lua_State* L, int nargs, int nresults, int errfunc) {
         auto rs = ori_lua_pcall(L, nargs, nresults, errfunc);
         AttachScript(L);
         minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_pcall, nullptr, (PVOID*)ori_lua_pcall } });
         return rs;
     }
 
-    void AttachScript(lua_State *L) {
+    void AttachScript(lua_State* L) {
         static bool scriptAttached = false;
         if (scriptAttached)
             return;
@@ -186,16 +187,21 @@ namespace common::lua {
 
         ::L = L;
 
+        auto stackSize = _lua_gettop(L);
+
         auto rs = 0;
         if ((rs = _luaL_loadstring(L, luaapi::MakePreparationScript().c_str())) == 0)
             rs = ori_lua_pcall(L, 0, LUA_MULTRET, 0);
-        if (!Validate(L, rs))
+        if (!Validate(L, rs)) {
+            _lua_settop(L, stackSize);
             return;
+        }
 
         auto scriptIn = fopen(scriptPath.c_str(), "rb");
         if (scriptIn == nullptr) {
             note::ToFile("[Lua] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
             scriptingDisabled = true;
+            _lua_settop(L, stackSize);
             return;
         }
         fseek(scriptIn, 0, SEEK_END);
@@ -207,13 +213,15 @@ namespace common::lua {
         fclose(scriptIn);
         if ((rs = _luaL_loadstring(L, scriptContent.data())) == 0)
             rs = ori_lua_pcall(L, 0, LUA_MULTRET, 0);
-        if (!Validate(L, rs))
+        if (!Validate(L, rs)) {
+            _lua_settop(L, stackSize);
             return;
+        }
 
         _lua_getfield(L, LUA_GLOBALSINDEX, GET_POSITION_ADDRESS);
         if (_lua_type(L, -1) == LUA_TFUNCTION)
             usePullMechanism = true;
-        _lua_settop(L, -2);
+        _lua_settop(L, stackSize);
     }
 
     DWORD GetPositionAddress() {
@@ -223,18 +231,23 @@ namespace common::lua {
         if (!usePullMechanism)
             return Lua_GetPositionAddress();
 
+        auto stackSize = _lua_gettop(L);
+
         _lua_getfield(L, LUA_GLOBALSINDEX, GET_POSITION_ADDRESS);
-        if (!Validate(L, _lua_pcall(L, 0, 1, 0)))
+        if (!Validate(L, _lua_pcall(L, 0, 1, 0))) {
+            _lua_settop(L, stackSize);
             return NULL;
+        }
 
         if (!_lua_isnumber(L, -1)) {
             note::ToFile("[Lua] The value returned from " GET_POSITION_ADDRESS " wasn't a number.");
             scriptingDisabled = true;
+            _lua_settop(L, stackSize);
             return NULL;
         }
 
         auto result = (DWORD)_lua_tointeger(L, -1);
-        _lua_settop(L, -2);
+        _lua_settop(L, stackSize);
         return result;
     }
 }

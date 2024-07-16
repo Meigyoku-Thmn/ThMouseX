@@ -33,7 +33,6 @@ static lua_State* L;
 static bool CheckAndDisableIfError(lua_State* _L, int r) {
     if (r != 0) {
         note::ToFile("[LuaJIT] %s", lua_tostring(_L, -1));
-        lua_pop(_L, 1);
         scriptingDisabled = true;
         return false;
     }
@@ -72,20 +71,27 @@ namespace common::luajit {
 
         luaL_openlibs(L);
 
+        auto stackSize = lua_gettop(L);
+
         if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::MakePreparationScript().c_str()))) {
             note::ToFile("[LuaJIT] The above error occurred in Preparation Script.");
+            lua_settop(L, stackSize);
             return;
         }
 
         auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath.c_str());
 
-        if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str())))
+        if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str()))) {
+            lua_settop(L, stackSize);
             return;
+        }
 
         lua_getglobal(L, GET_POSITION_ADDRESS);
         if (lua_isfunction(L, -1))
             usePullMechanism = true;
+        else
+            lua_settop(L, stackSize);
     }
 
     DWORD GetPositionAddress() {
@@ -97,17 +103,22 @@ namespace common::luajit {
 
         lua_pushvalue(L, -1);
 
-        if (!CheckAndDisableIfError(L, lua_pcall(L, 0, 1, 0)))
+        auto stackSize = lua_gettop(L);
+
+        if (!CheckAndDisableIfError(L, lua_pcall(L, 0, 1, 0))) {
+            lua_settop(L, stackSize);
             return NULL;
+        }
 
         if (!lua_isnumber(L, -1)) {
             note::ToFile("[LuaJIT] %s", "The value returned from " GET_POSITION_ADDRESS " wasn't a number.");
             scriptingDisabled = true;
+            lua_settop(L, stackSize);
             return NULL;
         }
 
         auto result = (DWORD)lua_tointeger(L, -1);
-        lua_pop(L, 1);
+        lua_settop(L, stackSize);
         return result;
     }
 }
