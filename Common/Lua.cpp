@@ -147,35 +147,35 @@ namespace common::lua {
         _lua_getfield = ImportFunc(lua, luaDllName, lua_getfield);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { _luaL_callmeta, & luaL_callmeta_hook, (PVOID*)&ori_luaL_callmeta },
-            { _lua_call, &lua_call_hook, (PVOID*)&ori_lua_call },
-            { _lua_cpcall, &lua_cpcall_hook, (PVOID*)&ori_lua_cpcall },
-            { _lua_pcall, &lua_pcall_hook, (PVOID*)&ori_lua_pcall },
+            { _luaL_callmeta, & luaL_callmeta_hook, &ori_luaL_callmeta },
+            { _lua_call, &lua_call_hook, &ori_lua_call },
+            { _lua_cpcall, &lua_cpcall_hook, &ori_lua_cpcall },
+            { _lua_pcall, &lua_pcall_hook, &ori_lua_pcall },
         });
     }
 
     int luaL_callmeta_hook(lua_State* L, int obj, const char* e) {
         auto rs = ori_luaL_callmeta(L, obj, e);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _luaL_callmeta, nullptr, (PVOID*)ori_luaL_callmeta } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _luaL_callmeta, nullptr, &ori_luaL_callmeta } });
         return rs;
     }
     void lua_call_hook(lua_State* L, int nargs, int nresults) {
         ori_lua_call(L, nargs, nresults);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_call, nullptr, (PVOID*)ori_lua_call } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_call, nullptr, &ori_lua_call } });
         return;
     }
     int lua_cpcall_hook(lua_State* L, lua_CFunction func, void* ud) {
         auto rs = ori_lua_cpcall(L, func, ud);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_cpcall, nullptr, (PVOID*)ori_lua_cpcall } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_cpcall, nullptr, &ori_lua_cpcall } });
         return rs;
     }
     int lua_pcall_hook(lua_State* L, int nargs, int nresults, int errfunc) {
         auto rs = ori_lua_pcall(L, nargs, nresults, errfunc);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_pcall, nullptr, (PVOID*)ori_lua_pcall } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_pcall, nullptr, &ori_lua_pcall } });
         return rs;
     }
 

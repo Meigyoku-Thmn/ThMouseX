@@ -18,10 +18,11 @@ namespace core::keyboardstate {
     decltype(&_GetKeyboardState) OriGetKeyboardState;
 
     void Initialize() {
-        if ((g_currentConfig.InputMethods & InputMethod::GetKeyboardState) == InputMethod::None)
+        using enum InputMethod;
+        if ((g_currentConfig.InputMethods & GetKeyboardState) == None)
             return;
         minhook::CreateApiHook(vector<minhook::HookApiConfig>{
-            {L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, (PVOID*)&OriGetKeyboardState},
+            { L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, &OriGetKeyboardState },
         });
     }
 

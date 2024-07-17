@@ -38,13 +38,14 @@ static bool IsVKExtended(UINT key) {
 }
 
 static void SendKeyDown(BYTE vkCode) {
-    if ((g_currentConfig.InputMethods & InputMethod::SendMsg) == InputMethod::SendMsg) {
+    using enum InputMethod;
+    if ((g_currentConfig.InputMethods & SendMsg) == SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16) | 0x00000001;
         if (IsVKExtended(vkCode))
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYDOWN, vkCode, lParam);
     }
-    else if ((g_currentConfig.InputMethods & InputMethod::SendInput) == InputMethod::SendInput) {
+    else if ((g_currentConfig.InputMethods & SendInput) == SendInput) {
         if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
             return;
         INPUT input{
@@ -55,18 +56,19 @@ static void SendKeyDown(BYTE vkCode) {
                 .dwFlags = DWORD(IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0),/*
           */},
         };
-        SendInput(1, &input, sizeof(INPUT));
+        ::SendInput(1, &input, sizeof(INPUT));
     }
 }
 
 static void SendKeyUp(BYTE vkCode) {
-    if ((g_currentConfig.InputMethods & InputMethod::SendMsg) == InputMethod::SendMsg) {
+    using enum InputMethod;
+    if ((g_currentConfig.InputMethods & SendMsg) == SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC) << 16) | 0xC0000001;
         if (IsVKExtended(vkCode))
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYUP, vkCode, lParam);
     }
-    else if ((g_currentConfig.InputMethods & InputMethod::SendInput) == InputMethod::SendInput) {
+    else if ((g_currentConfig.InputMethods & SendInput) == SendInput) {
         if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
             return;
         INPUT input{
@@ -77,12 +79,13 @@ static void SendKeyUp(BYTE vkCode) {
                 .dwFlags = DWORD(KEYEVENTF_KEYUP | (IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0)),/*
           */},
         };
-        SendInput(1, &input, sizeof(INPUT));
+        ::SendInput(1, &input, sizeof(INPUT));
     }
 }
 
 static void HandleKeyPress(GameInput gameInput, bool& wasPressing, BYTE vkCode) {
-    if (gameInput != GameInput::NONE) {
+    using enum GameInput;
+    if (gameInput != NONE) {
         if (!wasPressing) {
             SendKeyDown(vkCode);
             wasPressing = true;

@@ -31,6 +31,7 @@ namespace core::directinput {
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
     void Initialize() {
+        using enum InputMethod;
         static bool initialized = false;
         static mutex mtx;
         HMODULE dinput8{};
@@ -38,7 +39,7 @@ namespace core::directinput {
             const lock_guard lock(mtx);
             if (initialized)
                 return;
-            if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
+            if ((g_currentConfig.InputMethods & DirectInput) == None)
                 return;
             dinput8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\DInput8.dll")).c_str());
             if (!dinput8)
@@ -53,7 +54,7 @@ namespace core::directinput {
         }
 
         ComPtr<IDirectInput8A> pDInput8;
-        auto rs = _DirectInput8Create(GetModuleHandleA(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8A, (PVOID*)&pDInput8, nullptr);
+        auto rs = _DirectInput8Create(GetModuleHandleA(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8A, &pDInput8, nullptr);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create an IDirectInput8 instance", rs);
             return;
@@ -69,7 +70,7 @@ namespace core::directinput {
         auto vtable = *(DWORD**)pDevice8.Get();
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            {PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, (PVOID*)&OriGetDeviceStateDInput8},
+            { PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8 },
         });
     }
 

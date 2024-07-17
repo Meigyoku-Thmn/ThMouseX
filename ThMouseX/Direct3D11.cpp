@@ -172,8 +172,8 @@ namespace core::directx11 {
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[PresentIdx]), & D3DPresent, (PVOID*)&OriPresent },
-            { PVOID(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, (PVOID*)&OriResizeBuffers },
+            { PVOID(vtable[PresentIdx]), & D3DPresent, &OriPresent },
+            { PVOID(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, &OriResizeBuffers },
         });
     }
 

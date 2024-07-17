@@ -165,9 +165,9 @@ namespace core::directx8 {
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[CreateDeviceIdx]), & D3DCreateDevice, (PVOID*)&OriCreateDevice },
-            { PVOID(vtable2[ResetIdx]), &D3DReset, (PVOID*)&OriReset },
-            { PVOID(vtable2[PresentIdx]), &D3DPresent, (PVOID*)&OriPresent },
+            { PVOID(vtable[CreateDeviceIdx]), & D3DCreateDevice, &OriCreateDevice },
+            { PVOID(vtable2[ResetIdx]), &D3DReset, &OriReset },
+            { PVOID(vtable2[PresentIdx]), &D3DPresent, &OriPresent },
         });
     }
 
