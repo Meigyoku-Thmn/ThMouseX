@@ -87,7 +87,7 @@ namespace common::minhook {
             if (rs != MH_OK)
                 return false;
             if (config.ppOriginal)
-                *(LPVOID*)config.ppOriginal = null;
+                *(LPVOID*)config.ppOriginal = nil;
         }
         return true;
     }
@@ -98,7 +98,7 @@ namespace common::minhook {
             if (rs != MH_OK)
                 return false;
             if (config.ppOriginal)
-                *(LPVOID*)config.ppOriginal = null;
+                *(LPVOID*)config.ppOriginal = nil;
         }
         return true;
     }

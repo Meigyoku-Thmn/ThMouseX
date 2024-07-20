@@ -52,7 +52,7 @@ namespace common::luajit {
     }
 
     static void Uninitialize(bool isProcessTerminating) {
-        if (L != null)
+        if (L != nil)
             lua_close(L);
     }
 

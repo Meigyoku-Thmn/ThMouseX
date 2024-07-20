@@ -21,7 +21,7 @@ using namespace Microsoft::WRL;
 
 static tm GetTimeNow() {
     tm rs;
-    auto now = time(null);
+    auto now = time(nil);
     localtime_s(&rs, &now);
     return rs;
 }
@@ -51,10 +51,10 @@ namespace common::log {
                 processName = encoding::ConvertToUtf8(g_currentConfig.ProcessName);
             }
             logFile = _wfsopen(logPath.c_str(), L"a+", _SH_DENYNO);
-            if (logFile != null)
-                setvbuf(logFile, null, _IONBF, 0);
+            if (logFile != nil)
+                setvbuf(logFile, nil, _IONBF, 0);
         }
-        if (logFile != null) {
+        if (logFile != nil) {
             auto const& now = GetTimeNow();
             fprintf(logFile, "[%s %02d/%02d/%02d %02d:%02d:%02d] ",
                 processName.c_str(),
@@ -68,12 +68,12 @@ namespace common::log {
 
     void DxErrToFile(const char* message, HRESULT hResult) {
         auto errorStr = DXGetErrorStringA(hResult);
-        if (errorStr == null) {
+        if (errorStr == nil) {
             HResultToFile(message, hResult);
             return;
         }
         auto errorDes = DXGetErrorDescriptionA(hResult);
-        auto description = errorDes != null ? string(errorStr) + ": " + errorDes : string(errorStr);
+        auto description = errorDes != nil ? string(errorStr) + ": " + errorDes : string(errorStr);
 #if _DEBUG
         ToConsole("%s: %s", message, description.c_str());
 #endif

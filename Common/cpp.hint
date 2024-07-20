@@ -17,3 +17,4 @@
 #define DLLEXPORT_C extern "C" __declspec(dllexport)
 #define MAX_PATH
 #define null
+#define nil

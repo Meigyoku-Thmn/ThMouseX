@@ -8,7 +8,7 @@
 
 #define _ref
 
-#define null nullptr
+#define nil nullptr
 
 #define DLLEXPORT __declspec(dllexport)
 #define DLLEXPORT_C extern "C" __declspec(dllexport)
@@ -58,6 +58,6 @@ enum class EnumName: EnumType {
         (HRESULT_FACILITY(hr) == FACILITY_WIN32 ? HRESULT_CODE(hr) : (hr)))
 
 #define SAFE_RELEASE(p)    if ((p)) { (p)->Release(); (p) = 0; }0
-#define SAFE_DELETE(a)     if ((a)) { delete (a); (a) = null; }0
-#define SAFE_DELETE_ARR(a) if ((a)) { delete[] (a); (a) = null; }0
-#define SAFE_FREE_LIB(h)   if ((h)) { FreeLibrary(h); h = null; }0
+#define SAFE_DELETE(a)     if ((a)) { delete (a); (a) = nil; }0
+#define SAFE_DELETE_ARR(a) if ((a)) { delete[] (a); (a) = nil; }0
+#define SAFE_FREE_LIB(h)   if ((h)) { FreeLibrary(h); h = nil; }0

@@ -138,7 +138,7 @@ namespace core::directx11 {
             return;
         }
 
-        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, null, null, null, null));
+        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nil, nil, nil, nil));
         if (!tmpWnd) {
             note::LastErrorToFile(TAG "Failed to create a temporary window.");
             return;
@@ -160,7 +160,7 @@ namespace core::directx11 {
             .SwapEffect = DXGI_SWAP_EFFECT_DISCARD
         };
         D3D_FEATURE_LEVEL feature_levels[] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
-        auto rs = _D3D11CreateDeviceAndSwapChain(null, D3D_DRIVER_TYPE_HARDWARE, null, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &_device, null, null);
+        auto rs = _D3D11CreateDeviceAndSwapChain(nil, D3D_DRIVER_TYPE_HARDWARE, nil, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &_device, nil, nil);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create device and swapchain of DirectX 11.", rs);
             return;
@@ -194,7 +194,7 @@ namespace core::directx11 {
             note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
             return;
         }
-        rs = device->CreateRenderTargetView(pBackBuffer.Get(), null, &renderTargetView);
+        rs = device->CreateRenderTargetView(pBackBuffer.Get(), nil, &renderTargetView);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
             return;
@@ -204,7 +204,7 @@ namespace core::directx11 {
 
         spriteBatch = new SpriteBatch(context);
 
-        rs = device->CreatePixelShader(additiveToneShaderBlob, ARRAYSIZE(additiveToneShaderBlob), null, &pixelShader);
+        rs = device->CreatePixelShader(additiveToneShaderBlob, ARRAYSIZE(additiveToneShaderBlob), nil, &pixelShader);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "PrepareFirstStep: device->CreatePixelShader failed", rs);
             return;
@@ -219,7 +219,7 @@ namespace core::directx11 {
         g_hFocusWindow = desc.OutputWindow;
         g_isMinimized = IsIconic(g_hFocusWindow);
 
-        if (gs_textureFilePath[0] && SUCCEEDED(CreateWICTextureFromFile(device, gs_textureFilePath, null, &cursorTexture))) {
+        if (gs_textureFilePath[0] && SUCCEEDED(CreateWICTextureFromFile(device, gs_textureFilePath, nil, &cursorTexture))) {
             ComPtr<ID3D11Resource> resource;
             cursorTexture->GetResource(&resource);
             ComPtr<ID3D11Texture2D> pTextureInterface;
@@ -322,7 +322,7 @@ namespace core::directx11 {
         // scale cursor sprite to match the current render resolution
         auto scalingMatrixD3D = XMMatrixTransformation2D(cursorPositionD3D, 0, cursorScale, Vt0, 0, Vt0);
 
-        context->OMSetRenderTargets(1, &renderTargetView, null);
+        context->OMSetRenderTargets(1, &renderTargetView, nil);
 
         static UCHAR tone = 0;
         static auto toneStage = WhiteInc;
@@ -336,12 +336,12 @@ namespace core::directx11 {
         }
 
         // draw the cursor
-        auto setCustomShaders = usePixelShader ? []() { context->PSSetShader(pixelShader, null, 0); } : null;
+        auto setCustomShaders = usePixelShader ? []() { context->PSSetShader(pixelShader, nil, 0); } : nil;
         auto sortMode = SpriteSortMode_Deferred;
         auto m_states = std::make_unique<CommonStates>(device);
-        spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), null, null, null, setCustomShaders, scalingMatrixD3D);
+        spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), nil, nil, nil, setCustomShaders, scalingMatrixD3D);
         auto color = g_inputEnabled ? ToneColor(tone) : RGBA(255, 200, 200, 128);
-        spriteBatch->Draw(cursorTexture, cursorPositionD3D, null, color, 0, cursorPivot, 1, SpriteEffects_None);
+        spriteBatch->Draw(cursorTexture, cursorPositionD3D, nil, color, 0, cursorPivot, 1, SpriteEffects_None);
         spriteBatch->End();
 
         graphics::LoadDx11State(context, dx11State);
@@ -392,7 +392,7 @@ namespace core::directx11 {
             desc.BufferDesc.Width, desc.BufferDesc.Height,
             imGuiMousePosScaleX, imGuiMousePosScaleY
         );
-        context->OMSetRenderTargets(1, &renderTargetView, null);
+        context->OMSetRenderTargets(1, &renderTargetView, nil);
         ImGui_ImplDX11_RenderDrawData(drawData);
     }
 

@@ -54,14 +54,14 @@ namespace core::directinput {
         }
 
         ComPtr<IDirectInput8A> pDInput8;
-        auto rs = _DirectInput8Create(GetModuleHandleA(null), DIRECTINPUT_VERSION, IID_IDirectInput8A, &pDInput8, null);
+        auto rs = _DirectInput8Create(GetModuleHandleA(nil), DIRECTINPUT_VERSION, IID_IDirectInput8A, &pDInput8, nil);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create an IDirectInput8 instance", rs);
             return;
         }
 
         ComPtr<IDirectInputDevice8A> pDevice8;
-        rs = pDInput8->CreateDevice(GUID_SysKeyboard, &pDevice8, null);
+        rs = pDInput8->CreateDevice(GUID_SysKeyboard, &pDevice8, nil);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create an IDirectInputDevice8 instance", rs);
             return;

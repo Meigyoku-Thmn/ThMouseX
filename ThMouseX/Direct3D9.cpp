@@ -136,7 +136,7 @@ namespace core::directx9 {
             return;
         }
 
-        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, null, null, null, null));
+        WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nil, nil, nil, nil));
         if (!tmpWnd) {
             note::LastErrorToFile(TAG "Failed to create a temporary window.");
             return;
@@ -364,7 +364,7 @@ namespace core::directx9 {
         // scale cursor sprite to match the current render resolution
         D3DXVECTOR2 scalingPivotD3D(cursorPositionD3D.x, cursorPositionD3D.y);
         D3DXMATRIX scalingMatrixD3D;
-        _D3DXMatrixTransformation2D(&scalingMatrixD3D, &scalingPivotD3D, 0, &cursorScale, null, 0, null);
+        _D3DXMatrixTransformation2D(&scalingMatrixD3D, &scalingPivotD3D, 0, &cursorScale, nil, 0, nil);
         cursorSprite->SetTransform(&scalingMatrixD3D);
         // draw the cursor
         if (g_inputEnabled) {
@@ -375,14 +375,14 @@ namespace core::directx9 {
                 // default behaviour: texture color * diffuse color
                 // this:              texture color + diffuse color (except alpha)
                 SetTextureColorStage(pDevice, 0, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_DIFFUSE);
-                cursorSprite->Draw(cursorTexture, null, &cursorPivot, &cursorPositionD3D, ToneColor(tone));
+                cursorSprite->Draw(cursorTexture, nil, &cursorPivot, &cursorPositionD3D, ToneColor(tone));
             }
             else {
-                cursorSprite->Draw(cursorTexture, null, &cursorPivot, &cursorPositionD3D, ToneColor(tone));
+                cursorSprite->Draw(cursorTexture, nil, &cursorPivot, &cursorPositionD3D, ToneColor(tone));
             }
         }
         else {
-            cursorSprite->Draw(cursorTexture, null, &cursorPivot, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
+            cursorSprite->Draw(cursorTexture, nil, &cursorPivot, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
         }
         cursorSprite->End();
 

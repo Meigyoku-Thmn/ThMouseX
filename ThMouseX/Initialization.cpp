@@ -71,7 +71,7 @@ namespace core {
         setlocale(LC_ALL, ".UTF8");
         setlocale(LC_NUMERIC, "C");
 
-        g_targetModule = GetModuleHandleW(null);
+        g_targetModule = GetModuleHandleW(nil);
 
         GetSystemDirectoryW(g_systemDirPath, ARRAYSIZE(g_systemDirPath));
 
@@ -124,7 +124,7 @@ namespace core {
 
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto rs = OriLoadLibraryExW(lpLibFileName, hFile, dwFlags);
-        if (rs != null && !(dwFlags & LOAD_LIBRARY_AS_RES)) {
+        if (rs != nil && !(dwFlags & LOAD_LIBRARY_AS_RES)) {
             auto fileName = PathFindFileNameW(lpLibFileName);
             TryMatchAndInitializeModuleW(fileName, memory::ScanImportTable(rs, [](auto dllName) {
                 TryMatchAndInitializeModuleA(dllName, 0);
