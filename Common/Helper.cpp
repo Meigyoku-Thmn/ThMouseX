@@ -18,8 +18,8 @@ namespace common::helper {
         auto flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         auto dwErr = GetLastError();
         PSTR errorMessage{};
-        FormatMessageA(flags, nullptr, dwErr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), PSTR(&errorMessage), 0, nullptr);
-        MessageBoxA(nullptr, errorMessage, title, MB_OK | MB_ICONERROR);
+        FormatMessageA(flags, null, dwErr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), PSTR(&errorMessage), 0, null);
+        MessageBoxA(null, errorMessage, title, MB_OK | MB_ICONERROR);
         LocalFree(errorMessage);
     }
 
@@ -36,7 +36,7 @@ namespace common::helper {
 
     tuple<float, const char*> ConvertToFloat(const string& input) {
         char* endPtr;
-        const char* message = nullptr;
+        const char* message = null;
         auto result = strtof(input.c_str(), &endPtr);
         if (errno == ERANGE)
             message = "out of range (type float)";
@@ -47,7 +47,7 @@ namespace common::helper {
 
     tuple<long, const char*> ConvertToLong(const string& input, int base) {
         char* endPtr;
-        const char* message = nullptr;
+        const char* message = null;
         auto result = strtol(input.c_str(), &endPtr, base);
         if (errno == ERANGE)
             message = "out of range (type long)";
@@ -58,7 +58,7 @@ namespace common::helper {
 
     tuple<unsigned long, const char*> ConvertToULong(const string& input, int base) {
         char* endPtr;
-        const char* message = nullptr;
+        const char* message = null;
         auto result = strtoul(input.c_str(), &endPtr, base);
         if (errno == ERANGE)
             message = "out of range (type unsigned long)";
@@ -129,7 +129,7 @@ namespace common::helper {
         lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
         SetWindowLongPtrW(g_hFocusWindow, GWL_STYLE, style);
         SetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE, lExStyle);
-        SetWindowPos(g_hFocusWindow, nullptr, 0, 0, width, height, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
+        SetWindowPos(g_hFocusWindow, null, 0, 0, width, height, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
     }
 
     void FixWindowCoordinate(bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight) {
@@ -141,17 +141,17 @@ namespace common::helper {
             SetWindowLongPtrW(g_hFocusWindow, GWL_STYLE, style);
             SetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE, exStyle);
             auto updateFlags = SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER;
-            SetWindowPos(g_hFocusWindow, nullptr, 0, 0, d3dWidth, d3dHeight, updateFlags);
+            SetWindowPos(g_hFocusWindow, null, 0, 0, d3dWidth, d3dHeight, updateFlags);
         }
         else if (d3dWidth > clientWidth || d3dHeight > clientHeight) {
             // fix for Touhou 18
             RECTSIZE size{ 0, 0, LONG(d3dWidth), LONG(d3dHeight) };
             auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
-            auto hasMenu = GetMenu(g_hFocusWindow) != nullptr ? TRUE : FALSE;
+            auto hasMenu = GetMenu(g_hFocusWindow) != null ? TRUE : FALSE;
             auto exStyle = GetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE);
             AdjustWindowRectEx(&size, style, hasMenu, exStyle);
             auto updateFlags = SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOREPOSITION;
-            SetWindowPos(g_hFocusWindow, nullptr, 0, 0, size.width(), size.height(), updateFlags);
+            SetWindowPos(g_hFocusWindow, null, 0, 0, size.width(), size.height(), updateFlags);
         }
     }
 

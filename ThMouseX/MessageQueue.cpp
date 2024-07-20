@@ -53,12 +53,12 @@ namespace core::messagequeue {
     decltype(&_ShowCursor) OriShowCursor;
 
     bool isCursorShow = true;
-    auto hCursor = LoadCursorA(nullptr, IDC_ARROW);
+    auto hCursor = LoadCursorA(null, IDC_ARROW);
 
     HCURSOR WINAPI _SetCursor(HCURSOR cursor) {
         if (g_showImGui)
             return OriSetCursor(cursor);
-        return nullptr;
+        return null;
     }
 
     int WINAPI _ShowCursor(BOOL bShow) {
@@ -75,7 +75,7 @@ namespace core::messagequeue {
     }
 
     static void HideMousePointer() {
-        OriSetCursor(nullptr);
+        OriSetCursor(null);
         ShowCursorEx(false);
         isCursorShow = false;
     }
@@ -133,7 +133,7 @@ namespace core::messagequeue {
                     ImGui::SetWindowFocus();
             } });
         }
-        return CallNextHookEx(nullptr, code, wParam, lParam);
+        return CallNextHookEx(null, code, wParam, lParam);
     }
 
     static LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
@@ -172,11 +172,11 @@ namespace core::messagequeue {
                 }
             }
         }
-        return CallNextHookEx(nullptr, code, wParam, lParam);
+        return CallNextHookEx(null, code, wParam, lParam);
     }
 
     static bool CheckHookProcHandle(HHOOK handle) {
-        if (handle != nullptr)
+        if (handle != null)
             return true;
         helper::ReportLastError(APP_NAME ": SetWindowsHookEx Error");
         return false;

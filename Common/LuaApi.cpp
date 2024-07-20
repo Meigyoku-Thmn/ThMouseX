@@ -61,11 +61,11 @@ string LuaJitPrepScript;
 ON_INIT{
     auto dllModule = GetModuleHandleW(L_(APP_NAME".dll"));
     auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), L"LUASCRIPT");
-    if (scriptRes == nullptr)
+    if (scriptRes == null)
         return;
     auto scriptSize = SizeofResource(dllModule, scriptRes);
     auto scriptHandle = LoadResource(dllModule, scriptRes);
-    if (scriptHandle == nullptr)
+    if (scriptHandle == null)
         return;
     LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
 };

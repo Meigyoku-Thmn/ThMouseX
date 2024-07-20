@@ -129,7 +129,7 @@ namespace core::directx8 {
         }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window",
-            WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nullptr, nullptr, nullptr, nullptr));
+            WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, null, null, null, null));
         if (!tmpWnd) {
             note::LastErrorToFile(TAG "Failed to create a temporary window.");
             return;
@@ -327,14 +327,14 @@ namespace core::directx8 {
                 // default behaviour: texture color * diffuse color
                 // this:              texture color + diffuse color (except alpha)
                 SetTextureColorStage(pDevice, 0, D3DTOP_ADD, D3DTA_TEXTURE, D3DTA_DIFFUSE);
-                cursorSprite->Draw(cursorTexture, nullptr, &cursorScale, nullptr, 0, &cursorPositionD3D, ToneColor(tone));
+                cursorSprite->Draw(cursorTexture, null, &cursorScale, null, 0, &cursorPositionD3D, ToneColor(tone));
             }
             else {
-                cursorSprite->Draw(cursorTexture, nullptr, &cursorScale, nullptr, 0, &cursorPositionD3D, ToneColor(tone));
+                cursorSprite->Draw(cursorTexture, null, &cursorScale, null, 0, &cursorPositionD3D, ToneColor(tone));
             }
         }
         else {
-            cursorSprite->Draw(cursorTexture, nullptr, &cursorScale, nullptr, 0, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
+            cursorSprite->Draw(cursorTexture, null, &cursorScale, null, 0, &cursorPositionD3D, D3DCOLOR_RGBA(255, 200, 200, 128));
         }
         cursorSprite->End();
 

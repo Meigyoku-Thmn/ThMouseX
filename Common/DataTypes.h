@@ -130,7 +130,7 @@ struct string_hash {
 struct HMODULE_FREER {
     using pointer = HMODULE;
     void operator()(HMODULE handle) const {
-        if (handle != nullptr)
+        if (handle != null)
             FreeLibrary(handle);
     }
 };
@@ -139,7 +139,7 @@ using ModuleHandle = std::unique_ptr<HMODULE, HMODULE_FREER>;
 struct HWND_DESTROYER {
     using pointer = HWND;
     void operator()(HWND hwnd) const {
-        if (hwnd != nullptr)
+        if (hwnd != null)
             DestroyWindow(hwnd);
     }
 };

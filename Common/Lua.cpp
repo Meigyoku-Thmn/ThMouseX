@@ -62,7 +62,7 @@ namespace common::lua {
 
     static bool Validate(lua_State* L, int r) {
         if (r != 0) {
-            note::ToFile("[Lua] %s", _lua_tolstring(L, -1, nullptr));
+            note::ToFile("[Lua] %s", _lua_tolstring(L, -1, null));
             scriptingDisabled = true;
             return false;
         }
@@ -157,25 +157,25 @@ namespace common::lua {
     int luaL_callmeta_hook(lua_State* L, int obj, const char* e) {
         auto rs = ori_luaL_callmeta(L, obj, e);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _luaL_callmeta, nullptr, &ori_luaL_callmeta } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _luaL_callmeta, null, &ori_luaL_callmeta } });
         return rs;
     }
     void lua_call_hook(lua_State* L, int nargs, int nresults) {
         ori_lua_call(L, nargs, nresults);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_call, nullptr, &ori_lua_call } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_call, null, &ori_lua_call } });
         return;
     }
     int lua_cpcall_hook(lua_State* L, lua_CFunction func, void* ud) {
         auto rs = ori_lua_cpcall(L, func, ud);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_cpcall, nullptr, &ori_lua_cpcall } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_cpcall, null, &ori_lua_cpcall } });
         return rs;
     }
     int lua_pcall_hook(lua_State* L, int nargs, int nresults, int errfunc) {
         auto rs = ori_lua_pcall(L, nargs, nresults, errfunc);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_pcall, nullptr, &ori_lua_pcall } });
+        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_pcall, null, &ori_lua_pcall } });
         return rs;
     }
 
@@ -198,7 +198,7 @@ namespace common::lua {
         }
 
         auto scriptIn = fopen(scriptPath.c_str(), "rb");
-        if (scriptIn == nullptr) {
+        if (scriptIn == null) {
             note::ToFile("[Lua] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
             scriptingDisabled = true;
             _lua_settop(L, stackSize);
