@@ -19,14 +19,18 @@ namespace errormsg = common::errormsg;
 using namespace std;
 using namespace Microsoft::WRL;
 
-static tm GetTimeNow() {
-    tm rs;
-    auto now = time(nil);
-    localtime_s(&rs, &now);
-    return rs;
-}
-
 namespace common::log {
+    FILE* __logFile;
+    wstring __logPath;
+    string __processName;
+
+    tm GetTimeNow() {
+        tm rs;
+        auto now = time(nil);
+        localtime_s(&rs, &now);
+        return rs;
+    }
+
     void OpenConsole() {
         if (AllocConsole() == FALSE)
             return;
@@ -37,33 +41,6 @@ namespace common::log {
         freopen("conout$", "w", stderr);
 #pragma warning(pop)
         printf("Debugging Window:\n\n");
-    }
-
-    FILE* logFile;
-    wstring logPath;
-    string processName;
-    void ToFile(const char* _Format, ...) {
-        va_list args;
-        va_start(args, _Format);
-        if (!logFile) {
-            if (logPath.size() == 0) {
-                logPath = wstring(g_currentModuleDirPath) + L"/log.txt";
-                processName = encoding::ConvertToUtf8(g_currentConfig.ProcessName);
-            }
-            logFile = _wfsopen(logPath.c_str(), L"a+", _SH_DENYNO);
-            if (logFile != nil)
-                setvbuf(logFile, nil, _IONBF, 0);
-        }
-        if (logFile != nil) {
-            auto const& now = GetTimeNow();
-            fprintf(logFile, "[%s %02d/%02d/%02d %02d:%02d:%02d] ",
-                processName.c_str(),
-                now.tm_mday, now.tm_mon + 1, now.tm_year + 1900,
-                now.tm_hour, now.tm_min, now.tm_sec);
-            vfprintf(logFile, _Format, args);
-            fprintf(logFile, "\n");
-        }
-        va_end(args);
     }
 
     void DxErrToFile(const char* message, HRESULT hResult) {
@@ -115,15 +92,6 @@ namespace common::log {
         ToConsole("%s: %s", message, detail);
 #endif
         ToFile("%s: %s", message, detail);
-    }
-
-    void ToConsole(const char* _Format, ...) {
-        OpenConsole();
-        va_list args;
-        va_start(args, _Format);
-        vprintf(_Format, args);
-        printf("\n");
-        va_end(args);
     }
 
     void FpsToConsole() {

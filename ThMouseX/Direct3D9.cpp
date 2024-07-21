@@ -31,12 +31,15 @@ namespace imguioverlay = core::imguioverlay;
 
 #define TAG "[DirectX9] "
 
-#define ToneColor(i) D3DCOLOR_RGBA(i, i, i, 255)
+static constexpr D3DCOLOR ToneColor(UCHAR i) {
+    return D3DCOLOR_RGBA(i, i, i, 255);
+}
 
-#define SetTextureColorStage(dev, i, op, arg1, arg2)      \
-    dev->SetTextureStageState(i, D3DTSS_COLOROP, op);     \
-    dev->SetTextureStageState(i, D3DTSS_COLORARG1, arg1); \
-    dev->SetTextureStageState(i, D3DTSS_COLORARG2, arg2)
+static void SetTextureColorStage(IDirect3DDevice9* dev, DWORD stage, DWORD op, DWORD arg1, DWORD arg2) {
+    dev->SetTextureStageState(stage, D3DTSS_COLOROP, op);
+    dev->SetTextureStageState(stage, D3DTSS_COLORARG1, arg1);
+    dev->SetTextureStageState(stage, D3DTSS_COLORARG2, arg2);
+}
 
 constexpr auto CreateDeviceIdx = 16;
 
@@ -370,7 +373,7 @@ namespace core::directx9 {
         if (g_inputEnabled) {
             static UCHAR tone = 0;
             static auto toneStage = WhiteInc;
-            helper::CalculateNextTone(_ref tone, _ref toneStage);
+            helper::CalculateNextTone(tone, toneStage);
             if (toneStage == WhiteInc || toneStage == WhiteDec) {
                 // default behaviour: texture color * diffuse color
                 // this:              texture color + diffuse color (except alpha)

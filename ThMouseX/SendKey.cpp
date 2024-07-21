@@ -102,12 +102,12 @@ static void HandleKeyPress(GameInput gameInput, bool& wasPressing, BYTE vkCode) 
 static void TestInputAndSendKeys() {
     using enum GameInput;
     auto gameInput = DetermineGameInput();
-    HandleKeyPress(gameInput & USE_BOMB, _ref lastState.bomb, gs_bombButton);
-    HandleKeyPress(gameInput & USE_SPECIAL, _ref lastState.extra, gs_extraButton);
-    HandleKeyPress(gameInput & MOVE_LEFT, _ref lastState.left, VK_LEFT);
-    HandleKeyPress(gameInput & MOVE_RIGHT, _ref lastState.right, VK_RIGHT);
-    HandleKeyPress(gameInput & MOVE_UP, _ref lastState.up, VK_UP);
-    HandleKeyPress(gameInput & MOVE_DOWN, _ref lastState.down, VK_DOWN);
+    HandleKeyPress(gameInput & USE_BOMB, lastState.bomb, gs_bombButton);
+    HandleKeyPress(gameInput & USE_SPECIAL, lastState.extra, gs_extraButton);
+    HandleKeyPress(gameInput & MOVE_LEFT, lastState.left, VK_LEFT);
+    HandleKeyPress(gameInput & MOVE_RIGHT, lastState.right, VK_RIGHT);
+    HandleKeyPress(gameInput & MOVE_UP, lastState.up, VK_UP);
+    HandleKeyPress(gameInput & MOVE_DOWN, lastState.down, VK_DOWN);
 }
 
 static void CleanUp(bool isProcessTerminating) {

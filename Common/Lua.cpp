@@ -28,7 +28,7 @@ static bool usePullMechanism = false;
 
 static lua_State* L;
 
-#define ImportFunc(lua, luaDllName, funcName) \
+#define ImportFuncOrLogErrorThenReturn(lua, luaDllName, funcName) \
 (decltype(&funcName))GetProcAddress(lua, #funcName); \
 if (!_ ## funcName) { \
     note::ToFile("[Lua] Failed to import %s|" #funcName ".", luaDllName.c_str()); \
@@ -131,20 +131,20 @@ namespace common::lua {
             return;
         }
 
-        _luaL_callmeta = ImportFunc(lua, luaDllName, luaL_callmeta);
-        _lua_call = ImportFunc(lua, luaDllName, lua_call);
-        _lua_cpcall = ImportFunc(lua, luaDllName, lua_cpcall);
-        _lua_pcall = ImportFunc(lua, luaDllName, lua_pcall);
+        _luaL_callmeta = ImportFuncOrLogErrorThenReturn(lua, luaDllName, luaL_callmeta);
+        _lua_call = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_call);
+        _lua_cpcall = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_cpcall);
+        _lua_pcall = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_pcall);
 
-        _luaL_loadstring = ImportFunc(lua, luaDllName, luaL_loadstring);
-        _lua_tolstring = ImportFunc(lua, luaDllName, lua_tolstring);
-        _lua_settop = ImportFunc(lua, luaDllName, lua_settop);
-        _lua_gettop = ImportFunc(lua, luaDllName, lua_gettop);
-        _lua_tointeger = ImportFunc(lua, luaDllName, lua_tointeger);
-        _lua_isnumber = ImportFunc(lua, luaDllName, lua_isnumber);
-        _lua_pushvalue = ImportFunc(lua, luaDllName, lua_pushvalue);
-        _lua_type = ImportFunc(lua, luaDllName, lua_type);
-        _lua_getfield = ImportFunc(lua, luaDllName, lua_getfield);
+        _luaL_loadstring = ImportFuncOrLogErrorThenReturn(lua, luaDllName, luaL_loadstring);
+        _lua_tolstring = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_tolstring);
+        _lua_settop = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_settop);
+        _lua_gettop = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_gettop);
+        _lua_tointeger = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_tointeger);
+        _lua_isnumber = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_isnumber);
+        _lua_pushvalue = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_pushvalue);
+        _lua_type = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_type);
+        _lua_getfield = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_getfield);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
             { _luaL_callmeta, & luaL_callmeta_hook, &ori_luaL_callmeta },

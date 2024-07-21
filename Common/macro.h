@@ -6,16 +6,12 @@
 #define L_(str) L_IMPL(str)
 #define L_IMPL(str) L##str
 
-#define _ref
-
 #define nil nullptr
+
+#define NOUSE [[maybe_unused]]
 
 #define DLLEXPORT __declspec(dllexport)
 #define DLLEXPORT_C extern "C" __declspec(dllexport)
-
-#define QUOTE(x) #x
-
-#define SINGLE_ARG(...) __VA_ARGS__
 
 #define EVAL_DISCARD(expr) EVAL_DISCARD_IMPL(__COUNTER__, expr)
 #define EVAL_DISCARD_IMPL(counter, expr) EVAL_DISCARD_IMPL_EXPAND(counter, expr)

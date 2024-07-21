@@ -6,8 +6,8 @@
 #include "../Common/DataTypes.h"
 #include "InputDetermine.h"
 
-template <typename T>
-void CalculatePosition(T position, POINT& output) {
+template <typename TPointer>
+void CalculatePosition(TPointer position, POINT& output) {
     RECTSIZE clientSize{};
     GetClientRect(g_hFocusWindow, &clientSize);
     auto realWidth = float(clientSize.height()) * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;

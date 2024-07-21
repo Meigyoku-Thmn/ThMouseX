@@ -41,27 +41,32 @@ namespace note = common::log;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
 
-#define LOAD_LIBRARY_AS_RES (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE)
+constexpr auto LOAD_LIBRARY_AS_RES = LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE;
 
-#define InitializeAndEnableHook(initializeBlock) initializeBlock; minhook::EnableAll(); 0
-#define TryMatchAndInitializeModuleA(moduleName, ...) TryMatchAndInitializeModule(moduleName, __VA_ARGS__, _str,  )
-#define TryMatchAndInitializeModuleW(moduleName, ...) TryMatchAndInitializeModule(moduleName, __VA_ARGS__, _wcs, L)
-#define TryMatchAndInitializeModule(moduleName, elseBlock, cmpPrefix, strPrefix)    \
-    if (cmpPrefix##icmp(moduleName, strPrefix"d3d8.dll") == 0) {                    \
-        InitializeAndEnableHook(directx8::Initialize());                            \
-    }                                                                               \
-    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d9.dll") == 0) {               \
-        InitializeAndEnableHook(directx9::Initialize());                            \
-    }                                                                               \
-    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d11.dll") == 0) {              \
-        InitializeAndEnableHook(directx11::Initialize());                           \
-    }                                                                               \
-    else if (cmpPrefix##icmp(moduleName, strPrefix"DInput8.dll") == 0) {            \
-        InitializeAndEnableHook(directinput::Initialize());                         \
-    }                                                                               \
-    else {                                                                          \
-        elseBlock;                                                                  \
-    }                                                                               
+template <typename CStringType>
+bool TryMatchAndInitializeModule(CStringType moduleName) {
+    bool rs = false;
+    auto comparer = TEMPL_TEXT_COMPARER(CStringType);
+    if (comparer(moduleName, TEMPL_TEXT(CStringType, "d3d8.dll")) == 0) {
+        directx8::Initialize();
+        rs = true;
+    }
+    else if (comparer(moduleName, TEMPL_TEXT(CStringType, "d3d9.dll")) == 0) {
+        directx9::Initialize();
+        rs = true;
+    }
+    else if (comparer(moduleName, TEMPL_TEXT(CStringType, "d3d11.dll")) == 0) {
+        directx11::Initialize();
+        rs = true;
+    }
+    else if (comparer(moduleName, TEMPL_TEXT(CStringType, "DInput8.dll")) == 0) {
+        directinput::Initialize();
+        rs = true;
+    }
+    if (rs)
+        minhook::EnableAll();
+    return rs;
+}
 
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
@@ -126,9 +131,8 @@ namespace core {
         auto rs = OriLoadLibraryExW(lpLibFileName, hFile, dwFlags);
         if (rs != nil && !(dwFlags & LOAD_LIBRARY_AS_RES)) {
             auto fileName = PathFindFileNameW(lpLibFileName);
-            TryMatchAndInitializeModuleW(fileName, memory::ScanImportTable(rs, [](auto dllName) {
-                TryMatchAndInitializeModuleA(dllName, 0);
-            }));
+            if (!TryMatchAndInitializeModule(fileName))
+                memory::ScanImportTable(rs, [](auto dllName) { TryMatchAndInitializeModule(dllName); });
         }
         return rs;
     }

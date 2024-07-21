@@ -30,58 +30,70 @@ namespace directinput = core::directinput;
 #define VirtualKeyCodesFile "VirtualKeyCodes.txt"
 #define ThMouseXFile APP_NAME ".ini"
 
-#define INI_GET_BUTTON(section, ini_key, buttonNames, output) INI_GET_BUTTON_IMPL(__COUNTER__, section, ini_key, buttonNames, output)
-#define INI_GET_BUTTON_IMPL(counter, section, ini_key, buttonNames, output) \
-std::string MAKE_UNIQUE_VAR(counter); \
-if (!inipp::get_value(section, ini_key, MAKE_UNIQUE_VAR(counter))) { \
-        MessageBoxA(NULL, ThMouseXFile ": Missing " ini_key " value.", APP_NAME, MB_OK | MB_ICONERROR); \
-        return false; \
-} \
-else { \
-    auto vkCode = buttonNames.find(MAKE_UNIQUE_VAR(counter)); \
-    if (vkCode == buttonNames.end()) { \
-        MessageBoxA(NULL, ThMouseXFile ": Invalid " ini_key " value.", APP_NAME, MB_OK | MB_ICONERROR); \
-        return false; \
-    } \
-    output = vkCode->second; \
-}0
-
-#define INI_GET_WSTR_PATH(section, ini_key, output) INI_GET_WSTR_PATH_IMPL(__COUNTER__, section, ini_key, output)
-#define INI_GET_WSTR_PATH_IMPL(counter, section, ini_key, output) \
-std::string MAKE_UNIQUE_VAR(counter); \
-if (!inipp::get_value(section, ini_key, MAKE_UNIQUE_VAR(counter))) { \
-    MessageBoxA(NULL, ThMouseXFile ": Missing " ini_key " value.", APP_NAME, MB_OK | MB_ICONERROR); \
-    return false; \
-} \
-else { \
-    if (MAKE_UNIQUE_VAR(counter).size() == 0) { \
-        MessageBoxA(NULL, ThMouseXFile ": Invalid " ini_key " value.", APP_NAME, MB_OK | MB_ICONERROR); \
-        return false; \
-    } \
-    auto wStr = encoding::ConvertToUtf16(MAKE_UNIQUE_VAR(counter).c_str()); \
-    GetFullPathNameW(wStr.c_str(), ARRAYSIZE(output), output, NULL); \
-}0 \
-
-#define INI_GET_ULONG(section, ini_key, output) INI_GET_ULONG_IMPL(__COUNTER__, section, ini_key, output)
-#define INI_GET_ULONG_IMPL(counter, section, ini_key, output) \
-std::string MAKE_UNIQUE_VAR(counter); \
-if (!inipp::get_value(section, ini_key, MAKE_UNIQUE_VAR(counter))) { \
-    MessageBoxA(NULL, ThMouseXFile ": Missing " ini_key " value.", APP_NAME, MB_OK | MB_ICONERROR); \
-    return false; \
-} \
-else { \
-    auto [value, convMessage] = helper::ConvertToULong(MAKE_UNIQUE_VAR(counter), 10); \
-    if (convMessage != nil) { \
-        MessageBoxA(NULL, std::format(ThMouseXFile ": Invalid " ini_key " value: {}.", convMessage).c_str(), \
-            APP_NAME, MB_OK | MB_ICONERROR); \
-        return false; \
-    } \
-    output = value; \
-}0
-
 using namespace std;
 
 using VkCodes = unordered_map<string, BYTE, string_hash, equal_to<>>;
+
+template<CompileTimeString ini_key, typename OutputType>
+static bool IniGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType output) {
+    string input;
+    if (!inipp::get_value(section, ini_key.data, input)) {
+        constexpr auto msg = ThMouseXFile ": Missing " + ini_key + " value.";
+        MessageBoxA(nil, msg.data, APP_NAME, MB_OK | MB_ICONERROR);
+        return false;
+    }
+    else {
+        auto vkCode = buttonNames.find(input);
+        if (vkCode == buttonNames.end()) {
+            constexpr auto msg = ThMouseXFile ": Invalid " + ini_key + " value.";
+            MessageBoxA(nil, msg.data, APP_NAME, MB_OK | MB_ICONERROR);
+            return false;
+        }
+        output = vkCode->second;
+    }
+    return true;
+}
+
+template<CompileTimeString ini_key, std::size_t output_len>
+static bool IniTryGetWstrPath(const inipp::Ini<char>::Section& section, WCHAR(&output)[output_len]) {
+    string input;
+    if (!inipp::get_value(section, ini_key.data, input)) {
+        constexpr auto msg = ThMouseXFile ": Missing " + ini_key + " value.";
+        MessageBoxA(nil, msg.data, APP_NAME, MB_OK | MB_ICONERROR);
+        return false;
+    }
+    else {
+        if (input.size() == 0) {
+            constexpr auto msg = ThMouseXFile ": Invalid " + ini_key + " value.";
+            MessageBoxA(nil, msg.data, APP_NAME, MB_OK | MB_ICONERROR);
+            return false;
+        }
+        auto wStr = encoding::ConvertToUtf16(input.c_str());
+        GetFullPathNameW(wStr.c_str(), output_len, output, nil);
+    }
+    return true;
+}
+
+template<CompileTimeString ini_key>
+static bool IniTryGetULong(const inipp::Ini<char>::Section& section, DWORD& output) {
+    string input;
+    if (!inipp::get_value(section, ini_key.data, input)) {
+        constexpr auto msg = ThMouseXFile ": Missing " + ini_key + " value.";
+        MessageBoxA(nil, msg.data, APP_NAME, MB_OK | MB_ICONERROR);
+        return false;
+    }
+    else {
+        auto [value, convMessage] = helper::ConvertToULong(input, 10);
+        if (convMessage != nil) {
+            constexpr auto fmt = ThMouseXFile ": Invalid " + ini_key + " value: {}.";
+            auto msg = vformat(fmt.data, make_format_args(convMessage));
+            MessageBoxA(nil, msg.c_str(), APP_NAME, MB_OK | MB_ICONERROR);
+            return false;
+        }
+        output = value;
+    }
+    return true;
+}
 
 #pragma region method declaration
 bool IsCommentLine(stringstream& stream);
@@ -202,18 +214,18 @@ namespace core::configuration {
         ini.strip_trailing_comments();
         auto const& defaultSection = ini.sections[""];
 
-        INI_GET_BUTTON(defaultSection, "BombButton", vkCodes, gs_bombButton);
-        INI_GET_BUTTON(defaultSection, "ExtraButton", vkCodes, gs_extraButton);
+        if (!IniGetButton<"BombButton">(defaultSection, vkCodes, gs_bombButton)) return false;
+        if (!IniGetButton<"ExtraButton">(defaultSection, vkCodes, gs_extraButton)) return false;
 
-        INI_GET_BUTTON(defaultSection, "ToggleOsCursorButton", vkCodes, gs_toggleOsCursorButton);
-        INI_GET_BUTTON(defaultSection, "ToggleImGuiButton", vkCodes, gs_toggleImGuiButton);
+        if (!IniGetButton<"ToggleOsCursorButton">(defaultSection, vkCodes, gs_toggleOsCursorButton)) return false;
+        if (!IniGetButton<"ToggleImGuiButton">(defaultSection, vkCodes, gs_toggleImGuiButton)) return false;
 
-        INI_GET_WSTR_PATH(defaultSection, "ImGuiFontPath", gs_imGuiFontPath);
-        INI_GET_ULONG(defaultSection, "ImGuiBaseFontSize", gs_imGuiBaseFontSize);
-        INI_GET_ULONG(defaultSection, "ImGuiBaseVerticalResolution", gs_imGuiBaseVerticalResolution);
+        if (!IniTryGetWstrPath<"ImGuiFontPath">(defaultSection, gs_imGuiFontPath)) return false;
+        if (!IniTryGetULong<"ImGuiBaseFontSize">(defaultSection, gs_imGuiBaseFontSize)) return false;
+        if (!IniTryGetULong<"ImGuiBaseVerticalResolution">(defaultSection, gs_imGuiBaseVerticalResolution)) return false;
 
-        INI_GET_WSTR_PATH(defaultSection, "CursorTexture", gs_textureFilePath);
-        INI_GET_ULONG(defaultSection, "CursorBaseHeight", gs_textureBaseHeight);
+        if (!IniTryGetWstrPath<"CursorTexture">(defaultSection, gs_textureFilePath)) return false;
+        if (!IniTryGetULong<"CursorBaseHeight">(defaultSection, gs_textureBaseHeight)) return false;
 
         return true;
     }
@@ -319,7 +331,7 @@ tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const
     stream >> posOffsetStr;
 
     if (posOffsetStr[0] != '(' || posOffsetStr[posOffsetStr.length() - 1] != ')') {
-        MessageBoxA(nil , format("Invalid offset: expected wrapping '(' and ')' at line {} in {}.",
+        MessageBoxA(nil, format("Invalid offset: expected wrapping '(' and ')' at line {} in {}.",
             lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
         return { FloatPoint(), false };
     }

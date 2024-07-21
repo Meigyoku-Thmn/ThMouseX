@@ -39,18 +39,20 @@ namespace imguioverlay = core::imguioverlay;
 
 #define TAG "[DirectX11] "
 
-#define Vt0 XMVECTOR()
-
-#define RGBA(r, g, b, a) XMVECTORF32{(r&0xFF)/255.f, (g&0xFF)/255.f, (b&0xFF)/255.f, (a&0xFF)/255.f}
-
-#define ToneColor(i) RGBA(i, i, i, 255)
-
-constexpr auto ResizeBuffersIdx = 13;
-constexpr auto PresentIdx = 8;
-
 using namespace std;
 using namespace DirectX;
 using namespace Microsoft::WRL;
+
+static constexpr XMVECTORF32 RGBA(UCHAR r, UCHAR g, UCHAR b, UCHAR a) {
+    return XMVECTORF32{ (r & 0xFF) / 255.f, (g & 0xFF) / 255.f, (b & 0xFF) / 255.f, (a & 0xFF) / 255.f };
+}
+
+static constexpr XMVECTORF32 ToneColor(UCHAR i) {
+    return RGBA(i, i, i, 255);
+}
+
+constexpr auto ResizeBuffersIdx = 13;
+constexpr auto PresentIdx = 8;
 
 using CallbackType = void (*)(void);
 using ID3D11DevicePtr = ID3D11Device*;
@@ -159,7 +161,7 @@ namespace core::directx11 {
             .Windowed = TRUE,
             .SwapEffect = DXGI_SWAP_EFFECT_DISCARD
         };
-        D3D_FEATURE_LEVEL feature_levels[] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
+        D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
         auto rs = _D3D11CreateDeviceAndSwapChain(nil, D3D_DRIVER_TYPE_HARDWARE, nil, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &_device, nil, nil);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create device and swapchain of DirectX 11.", rs);
@@ -320,7 +322,7 @@ namespace core::directx11 {
         }
 
         // scale cursor sprite to match the current render resolution
-        auto scalingMatrixD3D = XMMatrixTransformation2D(cursorPositionD3D, 0, cursorScale, Vt0, 0, Vt0);
+        auto scalingMatrixD3D = XMMatrixTransformation2D(cursorPositionD3D, 0, cursorScale, XMVECTOR(), 0, XMVECTOR());
 
         context->OMSetRenderTargets(1, &renderTargetView, nil);
 
@@ -328,7 +330,7 @@ namespace core::directx11 {
         static auto toneStage = WhiteInc;
         auto usePixelShader = false;
         if (g_inputEnabled) {
-            helper::CalculateNextTone(_ref tone, _ref toneStage);
+            helper::CalculateNextTone(tone, toneStage);
             if (toneStage == WhiteInc || toneStage == WhiteDec)
                 // default behaviour: texture color * diffuse color
                 // this shader: texture color + diffuse color (except alpha)
