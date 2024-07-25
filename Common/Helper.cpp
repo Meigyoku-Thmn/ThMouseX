@@ -72,47 +72,44 @@ namespace common::helper {
         constexpr UCHAR Delta = 16;
         constexpr UCHAR WhiteIntensityLimit = 128;
         constexpr UCHAR BlackIntensityLimit = 16;
-        auto _continue = false;
-        do {
-            switch (toneStage) {
-                case WhiteInc:
-                    if (tone == WhiteIntensityLimit) {
-                        toneStage = WhiteDec;
-                        _continue = true;
-                    }
-                    else {
-                        tone += Delta;
-                    }
-                    break;
-                case WhiteDec:
-                    if (tone == 0) {
-                        tone = BlackIntensityLimit;
-                        toneStage = BlackInc;
-                    }
-                    else {
-                        tone -= Delta;
-                    }
-                    break;
-                case BlackInc:
-                    if (tone == 0) {
-                        toneStage = BlackDec;
-                        _continue = true;
-                    }
-                    else {
-                        tone -= Delta;
-                    }
-                    break;
-                case BlackDec:
-                    if (tone == BlackIntensityLimit) {
-                        tone = 0;
-                        toneStage = WhiteInc;
-                    }
-                    else {
-                        tone += Delta;
-                    }
-                    break;
-            }
-        } while (_continue);
+        switch (toneStage) {
+            case WhiteInc:
+                if (tone == WhiteIntensityLimit) {
+                    toneStage = WhiteDec;
+                    goto WhiteDec;
+                }
+                else {
+                    tone += Delta;
+                }
+                break;
+            case WhiteDec: WhiteDec:
+                if (tone == 0) {
+                    toneStage = BlackInc;
+                    tone = BlackIntensityLimit;
+                }
+                else {
+                    tone -= Delta;
+                }
+                break;
+            case BlackInc:
+                if (tone == 0) {
+                    toneStage = BlackDec;
+                    goto BlackDec;
+                }
+                else {
+                    tone -= Delta;
+                }
+                break;
+            case BlackDec: BlackDec:
+                if (tone == BlackIntensityLimit) {
+                    toneStage = WhiteInc;
+                    tone = 0;
+                }
+                else {
+                    tone += Delta;
+                }
+                break;
+        }
     }
 
     POINT GetPointerPosition() {
