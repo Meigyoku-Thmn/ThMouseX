@@ -30,6 +30,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "inipp", "inipp", "{044C7786
 		vcpkg_custom_ports\inipp\vcpkg.json = vcpkg_custom_ports\inipp\vcpkg.json
 	EndProjectSection
 EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "th10", "..\..\SteamLibrary\steamapps\common\th10\th10.exe", "{5D9187AB-ED58-4671-85A9-5BFC28051C44}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = D:\SteamLibrary\steamapps\common\th10\th10.exe
+		RemoteMachine = MEIGYOKU-THMN-P
+		StartingDirectory = D:\SteamLibrary\steamapps\common\th10
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		UseLegacyDebugEngines = No
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+		IORedirection = Auto
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +102,12 @@ Global
 		{D91DA069-F70E-4961-A49C-AB7CE1923FFD}.Release|x64.Build.0 = Release|Any CPU
 		{D91DA069-F70E-4961-A49C-AB7CE1923FFD}.Release|x86.ActiveCfg = Release|Any CPU
 		{D91DA069-F70E-4961-A49C-AB7CE1923FFD}.Release|x86.Build.0 = Release|Any CPU
+		{5D9187AB-ED58-4671-85A9-5BFC28051C44}.Debug|Any CPU.ActiveCfg = Release|x86
+		{5D9187AB-ED58-4671-85A9-5BFC28051C44}.Debug|x64.ActiveCfg = Release|x86
+		{5D9187AB-ED58-4671-85A9-5BFC28051C44}.Debug|x86.ActiveCfg = Release|x86
+		{5D9187AB-ED58-4671-85A9-5BFC28051C44}.Release|Any CPU.ActiveCfg = Release|x86
+		{5D9187AB-ED58-4671-85A9-5BFC28051C44}.Release|x64.ActiveCfg = Release|x86
+		{5D9187AB-ED58-4671-85A9-5BFC28051C44}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

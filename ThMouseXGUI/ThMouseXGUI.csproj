@@ -6,8 +6,13 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>12</LangVersion>
 		<ApplicationIcon>ThMouseX.ico</ApplicationIcon>
+		<Prefer32Bit>true</Prefer32Bit>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Content Include="ThMouseX.ico" />
+		<Content Include="ThMouseX.ico" />
 	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="xcopy &quot;$(SolutionDir)$(Configuration)\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /y /d" />
+	</Target>
 </Project>
