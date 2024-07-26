@@ -8,6 +8,8 @@ static class Program
     public const string DllName = AppName + ".dll";
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    static extern bool MarkThMouseXProcess();
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     static extern bool InstallHooks();
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     static extern void RemoveHooks();
@@ -22,6 +24,8 @@ static class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
+        MarkThMouseXProcess();
+
         using var mutex = new Mutex(true, AppName, out var mutexIsCreated);
         if (!mutexIsCreated)
         {
@@ -29,13 +33,7 @@ static class Program
             Environment.Exit(1);
         }
 
-        if (!ReadGamesFile())
-            Environment.Exit(1);
-
-        if (!ReadGeneralConfigFile())
-            Environment.Exit(1);
-
-        if (!InstallHooks())
+        if (!MarkThMouseXProcess() || !ReadGamesFile() || !ReadGeneralConfigFile() || !InstallHooks())
             Environment.Exit(1);
 
         Application.Run(new ThMouseApplicationContext());

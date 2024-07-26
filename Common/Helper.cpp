@@ -183,4 +183,11 @@ namespace common::helper {
         else
             return memory::ResolveAddress(span{ g_currentConfig.Address.Level, g_currentConfig.Address.Length });
     }
+
+    bool IsCurrentProcessThMouseX() {
+        auto envVal = getenv(APP_NAME);
+        if (envVal == nullptr)
+            return false;
+        return strcmp(envVal, APP_NAME) == 0;
+    }
 }

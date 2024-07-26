@@ -8,6 +8,7 @@
 		<ApplicationIcon>ThMouseX.ico</ApplicationIcon>
 		<Prefer32Bit>true</Prefer32Bit>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+        <Version>3.0.0</Version>
 	</PropertyGroup>
 	<ItemGroup>
 		<Content Include="ThMouseX.ico" />

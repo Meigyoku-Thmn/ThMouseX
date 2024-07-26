@@ -7,6 +7,7 @@
 
 #include "../Common/macro.h"
 #include "../Common/Log.h"
+#include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
 #include "../Common/Helper.Memory.h"
 #include "../Common/MinHook.h"
@@ -38,6 +39,7 @@ namespace directx11 = core::directx11;
 namespace directinput = core::directinput;
 namespace keyboardstate = core::keyboardstate;
 namespace note = common::log;
+namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
 
@@ -90,9 +92,7 @@ namespace core {
         PathStripPathW(currentProcessName);
         PathRemoveExtensionW(currentProcessName);
 
-        if (_wcsicmp(currentProcessName, L_(APP_NAME)) == 0)
-            return;
-        if (_wcsicmp(currentProcessName, L_(APP_NAME "GUI")) == 0)
+        if (helper::IsCurrentProcessThMouseX())
             return;
 
         for (auto ord = gs_gameConfigs.length(); ord > 0; ord--) {

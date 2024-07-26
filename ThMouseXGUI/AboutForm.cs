@@ -12,7 +12,7 @@ public partial class AboutForm : Form
         Icon = AppIcon;
         imgMouse.Image = Logo;
         Text = string.Format(Text, Program.AppName);
-        lblDescription1.Text = string.Format(lblDescription1.Text, Program.AppName);
+        lblDescription1.Text = string.Format(lblDescription1.Text, Program.AppName, Assembly.GetEntryAssembly().GetName().Version.ToString(3));
         lblDescription2.Text = string.Format(lblDescription2.Text, Program.AppName);
     }
 

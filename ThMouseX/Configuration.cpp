@@ -10,6 +10,7 @@
 
 #include "../Common/macro.h"
 #include "../Common/Variables.h"
+#include "../Common/Log.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
 #include "Direct3D8.h"
@@ -18,6 +19,7 @@
 #include "DirectInput.h"
 #include "Configuration.h"
 
+namespace note = common::log;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace directx8 = core::directx8;
@@ -108,6 +110,12 @@ tuple<VkCodes, bool> ReadVkCodes();
 #pragma endregion
 
 namespace core::configuration {
+    bool MarkThMouseXProcess() {
+        auto rs = _putenv(APP_NAME "=" APP_NAME);
+        if (rs != 0)
+            note::ToFile("[Configuration] MarkThMouseXProcess failed.");
+        return true;
+    }
     bool ReadGamesFile(const char* gameConfigPath, bool overrding = false);
     bool ReadGamesFile() {
         auto rs = ReadGamesFile(GameFile);
