@@ -37,7 +37,7 @@ using namespace std;
 using VkCodes = unordered_map<string, BYTE, string_hash, equal_to<>>;
 
 template<CompileTimeString ini_key, typename OutputType>
-static bool IniGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType output) {
+static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType output) {
     string input;
     if (!inipp::get_value(section, ini_key.data, input)) {
         constexpr auto msg = ThMouseXFile ": Missing " + ini_key + " value.";
@@ -222,11 +222,11 @@ namespace core::configuration {
         ini.strip_trailing_comments();
         auto const& defaultSection = ini.sections[""];
 
-        if (!IniGetButton<"BombButton">(defaultSection, vkCodes, gs_bombButton)) return false;
-        if (!IniGetButton<"ExtraButton">(defaultSection, vkCodes, gs_extraButton)) return false;
+        if (!IniTryGetButton<"BombButton">(defaultSection, vkCodes, gs_bombButton)) return false;
+        if (!IniTryGetButton<"ExtraButton">(defaultSection, vkCodes, gs_extraButton)) return false;
 
-        if (!IniGetButton<"ToggleOsCursorButton">(defaultSection, vkCodes, gs_toggleOsCursorButton)) return false;
-        if (!IniGetButton<"ToggleImGuiButton">(defaultSection, vkCodes, gs_toggleImGuiButton)) return false;
+        if (!IniTryGetButton<"ToggleOsCursorButton">(defaultSection, vkCodes, gs_toggleOsCursorButton)) return false;
+        if (!IniTryGetButton<"ToggleImGuiButton">(defaultSection, vkCodes, gs_toggleImGuiButton)) return false;
 
         if (!IniTryGetWstrPath<"ImGuiFontPath">(defaultSection, gs_imGuiFontPath)) return false;
         if (!IniTryGetULong<"ImGuiBaseFontSize">(defaultSection, gs_imGuiBaseFontSize)) return false;

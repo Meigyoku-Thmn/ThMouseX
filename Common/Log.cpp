@@ -78,7 +78,7 @@ namespace common::log {
             errorMessage = errormsg::GuessErrorsFromHResult(hResult);
             if (errorMessage != "") {
 #if _DEBUG
-                ToConsole("%s", errorMessage.c_str());
+                ToConsole(errorMessage.c_str());
 #endif
                 ToFile(errorMessage.c_str());
             }

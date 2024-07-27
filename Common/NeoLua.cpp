@@ -19,16 +19,6 @@ using namespace Microsoft::WRL;
 
 #define TAG "[NeoLua] "
 
-#define ReturnWithErrorMessage(message) { \
-    note::ToFile(TAG message); \
-    return; \
-}0
-
-#define IfFailedReturnWithLog(tag, message, result) if (FAILED(result)) { \
-    note::HResultToFile(tag message, result); \
-    return; \
-}0
-
 namespace common::neolua {
     DWORD GetPositionAddress() {
         return Lua_GetPositionAddress();
@@ -52,7 +42,9 @@ namespace common::neolua {
 
         ComPtr<ICLRMetaHost> metaHost;
         auto result = _CLRCreateInstance(CLSID_CLRMetaHost, IID_PPV_ARGS(&metaHost));
-        IfFailedReturnWithLog(TAG, "Cannot create ICLRMetaHost instance", result);
+        if (FAILED(result)) {
+            note::HResultToFile(TAG "Cannot create ICLRMetaHost instance", result); return;
+        }
 
         ComPtr<IEnumUnknown> enumerator;
         for (auto i = 0; i < 5; i++) {
@@ -61,17 +53,27 @@ namespace common::neolua {
             if (WIN32_FROM_HRESULT(result) != ERROR_BAD_LENGTH)
                 break;
         }
-        IfFailedReturnWithLog(TAG, "Cannot enumerate loaded clr runtimes", result);
+        if (FAILED(result)) {
+            note::HResultToFile(TAG "Cannot enumerate loaded clr runtimes", result); return;
+        }
         ComPtr<ICLRRuntimeInfo> runtimeInfo;
         ULONG count = 0;
         result = enumerator->Next(1, (IUnknown**)&runtimeInfo, &count);
-        IfFailedReturnWithLog(TAG, "Cannot enumerate on IEnum", result);
-        if (count == 0)
-            ReturnWithErrorMessage("There is no loaded clr runtime.");
+        if (FAILED(result)) {
+            note::HResultToFile(TAG "Cannot enumerate on IEnum", result);
+            return;
+        }
+        if (count == 0) {
+            note::ToFile(TAG "There is no loaded clr runtime.");
+            return;
+        }
 
         ComPtr<ICLRRuntimeHost> runtimeHost;
         result = runtimeInfo->GetInterface(CLSID_CLRRuntimeHost, IID_PPV_ARGS(&runtimeHost));
-        IfFailedReturnWithLog(TAG, "Cannot get ICLRRuntimeHost instance", result);
+        if (FAILED(result)) {
+            note::HResultToFile(TAG "Cannot get ICLRRuntimeHost instance", result);
+            return;
+        }
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/NeoLuaBootstrap.dll";
         auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
@@ -83,6 +85,9 @@ namespace common::neolua {
             scriptPath.c_str(),
             &returnValue
         );
-        IfFailedReturnWithLog(TAG, "Failed to invoke NeoLuaBootstrap.Handlers.Initialize", result);
+        if (FAILED(result)) {
+            note::HResultToFile(TAG "Failed to invoke NeoLuaBootstrap.Handlers.Initialize", result);
+            return;
+        }
     }
 }

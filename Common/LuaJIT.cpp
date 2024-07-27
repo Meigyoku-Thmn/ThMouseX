@@ -32,11 +32,7 @@ static lua_State* L;
 
 static bool CheckAndDisableIfError(lua_State* _L, int r) {
     if (r != LUA_OK) {
-        auto defaultMsg = "<No detail message>";
-        auto errMsg = !lua_isnil(L, -1) ? lua_tostring(_L, -1) : defaultMsg;
-        if (errMsg == nil)
-            errMsg = defaultMsg;
-        note::ToFile("[LuaJIT] Error: %s", errMsg);
+        note::ToFile("[LuaJIT] %s", lua_tostring(_L, -1));
         scriptingDisabled = true;
         return false;
     }
@@ -105,9 +101,9 @@ namespace common::luajit {
         if (!usePullMechanism)
             return Lua_GetPositionAddress();
 
-        lua_pushvalue(L, -1);
-
         auto oldStackSize = lua_gettop(L);
+
+        lua_pushvalue(L, -1);
 
         if (!CheckAndDisableIfError(L, lua_pcall(L, 0, 1, 0))) {
             lua_settop(L, oldStackSize);

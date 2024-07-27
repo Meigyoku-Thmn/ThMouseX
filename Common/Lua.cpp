@@ -35,6 +35,17 @@ if (!_ ## funcName) { \
     return; \
 }0
 
+template <CompileTimeString funcName, typename FuncType>
+static bool TryImportFunc(FuncType& func, HMODULE lua, const string& luaDllName) {
+    func = (FuncType)GetProcAddress(lua, funcName.data);
+    if (!func) {
+        auto msg = "[Lua] Failed to import %s|" + funcName + ".";
+        note::ToFile(msg.data, luaDllName.c_str());
+        return false;
+    }
+    return true;
+}
+
 namespace common::lua {
     int luaL_callmeta_hook(lua_State* L, int obj, const char* e);
     decltype(&luaL_callmeta_hook) ori_luaL_callmeta;
@@ -131,20 +142,20 @@ namespace common::lua {
             return;
         }
 
-        _luaL_callmeta = ImportFuncOrLogErrorThenReturn(lua, luaDllName, luaL_callmeta);
-        _lua_call = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_call);
-        _lua_cpcall = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_cpcall);
-        _lua_pcall = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_pcall);
+        if (!TryImportFunc<SYM_NAME(luaL_callmeta)>(_luaL_callmeta, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_call)>(_lua_call, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_cpcall)>(_lua_cpcall, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_pcall)>(_lua_pcall, lua, luaDllName)) return;
 
-        _luaL_loadstring = ImportFuncOrLogErrorThenReturn(lua, luaDllName, luaL_loadstring);
-        _lua_tolstring = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_tolstring);
-        _lua_settop = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_settop);
-        _lua_gettop = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_gettop);
-        _lua_tointeger = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_tointeger);
-        _lua_isnumber = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_isnumber);
-        _lua_pushvalue = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_pushvalue);
-        _lua_type = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_type);
-        _lua_getfield = ImportFuncOrLogErrorThenReturn(lua, luaDllName, lua_getfield);
+        if (!TryImportFunc<SYM_NAME(luaL_loadstring)>(_luaL_loadstring, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_tolstring)>(_lua_tolstring, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_settop)>(_lua_settop, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_gettop)>(_lua_gettop, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_tointeger)>(_lua_tointeger, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_isnumber)>(_lua_isnumber, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_pushvalue)>(_lua_pushvalue, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_type)>(_lua_type, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_getfield)>(_lua_getfield, lua, luaDllName)) return;
 
         minhook::CreateHook(vector<minhook::HookConfig>{
             { _luaL_callmeta, & luaL_callmeta_hook, &ori_luaL_callmeta },

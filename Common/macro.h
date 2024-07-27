@@ -8,6 +8,8 @@
 
 #define nil nullptr
 
+#define SYM_NAME(name) #name
+
 #define NOUSE [[maybe_unused]]
 
 #define DLLEXPORT __declspec(dllexport)
