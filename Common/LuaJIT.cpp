@@ -31,8 +31,12 @@ static bool usePullMechanism = false;
 static lua_State* L;
 
 static bool CheckAndDisableIfError(lua_State* _L, int r) {
-    if (r != 0) {
-        note::ToFile("[LuaJIT] %s", lua_tostring(_L, -1));
+    if (r != LUA_OK) {
+        auto defaultMsg = "<No detail message>";
+        auto errMsg = !lua_isnil(L, -1) ? lua_tostring(_L, -1) : defaultMsg;
+        if (errMsg == nil)
+            errMsg = defaultMsg;
+        note::ToFile("[LuaJIT] Error: %s", errMsg);
         scriptingDisabled = true;
         return false;
     }
@@ -71,11 +75,11 @@ namespace common::luajit {
 
         luaL_openlibs(L);
 
-        auto stackSize = lua_gettop(L);
+        auto oldStackSize = lua_gettop(L);
 
         if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::MakePreparationScript().c_str()))) {
             note::ToFile("[LuaJIT] The above error occurred in Preparation Script.");
-            lua_settop(L, stackSize);
+            lua_settop(L, oldStackSize);
             return;
         }
 
@@ -83,7 +87,7 @@ namespace common::luajit {
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath.c_str());
 
         if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str()))) {
-            lua_settop(L, stackSize);
+            lua_settop(L, oldStackSize);
             return;
         }
 
@@ -91,7 +95,7 @@ namespace common::luajit {
         if (lua_isfunction(L, -1))
             usePullMechanism = true;
         else
-            lua_settop(L, stackSize);
+            lua_settop(L, oldStackSize);
     }
 
     DWORD GetPositionAddress() {
@@ -103,22 +107,22 @@ namespace common::luajit {
 
         lua_pushvalue(L, -1);
 
-        auto stackSize = lua_gettop(L);
+        auto oldStackSize = lua_gettop(L);
 
         if (!CheckAndDisableIfError(L, lua_pcall(L, 0, 1, 0))) {
-            lua_settop(L, stackSize);
+            lua_settop(L, oldStackSize);
             return NULL;
         }
 
         if (!lua_isnumber(L, -1)) {
             note::ToFile("[LuaJIT] %s", "The value returned from " GET_POSITION_ADDRESS " wasn't a number.");
             scriptingDisabled = true;
-            lua_settop(L, stackSize);
+            lua_settop(L, oldStackSize);
             return NULL;
         }
 
         auto result = DWORD(lua_tointeger(L, -1));
-        lua_settop(L, stackSize);
+        lua_settop(L, oldStackSize);
         return result;
     }
 }

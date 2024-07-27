@@ -14,6 +14,6 @@
 		<Content Include="ThMouseX.ico" />
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy &quot;$(SolutionDir)$(Configuration)\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /y /d" />
+		<Exec Command="xcopy &quot;$(SolutionDir)$(Configuration)\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /y /s /d" />
 	</Target>
 </Project>

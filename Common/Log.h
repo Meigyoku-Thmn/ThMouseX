@@ -6,6 +6,7 @@
 
 #include <string>
 #include <cstdio>
+#include <utility>
 
 namespace common::log {
     extern FILE* __logFile;
@@ -14,7 +15,7 @@ namespace common::log {
     tm GetTimeNow();
     void OpenConsole();
     template <typename... Targs>
-    void ToFile(const char* _Format, Targs... args) {
+    void ToFile(const char* _Format, Targs&&... args) {
         namespace encoding = common::helper::encoding;
         if (!__logFile) {
             if (__logPath.size() == 0) {
@@ -31,7 +32,7 @@ namespace common::log {
                 __processName.c_str(),
                 now.tm_mday, now.tm_mon + 1, now.tm_year + 1900,
                 now.tm_hour, now.tm_min, now.tm_sec);
-            fprintf(__logFile, _Format, &args...);
+            fprintf(__logFile, _Format, std::forward<Targs>(args)...);
             fprintf(__logFile, "\n");
         }
     }
@@ -39,9 +40,9 @@ namespace common::log {
     void HResultToFile(const char* message, HRESULT hResult);
     void LastErrorToFile(const char* message);
     template <typename... Targs>
-    void ToConsole(const char* _Format, Targs... args) {
+    void ToConsole(const char* _Format, Targs&&... args) {
         OpenConsole();
-        printf(_Format, &args...);
+        printf(_Format, std::forward<Targs>(args)...);
         printf("\n");
     }
     void FpsToConsole();

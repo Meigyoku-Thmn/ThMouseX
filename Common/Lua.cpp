@@ -187,13 +187,13 @@ namespace common::lua {
 
         ::L = L;
 
-        auto stackSize = _lua_gettop(L);
+        auto oldStackSize = _lua_gettop(L);
 
         auto rs = 0;
         if ((rs = _luaL_loadstring(L, luaapi::MakePreparationScript().c_str())) == 0)
             rs = ori_lua_pcall(L, 0, LUA_MULTRET, 0);
         if (!Validate(L, rs)) {
-            _lua_settop(L, stackSize);
+            _lua_settop(L, oldStackSize);
             return;
         }
 
@@ -201,7 +201,7 @@ namespace common::lua {
         if (scriptIn == nil) {
             note::ToFile("[Lua] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
             scriptingDisabled = true;
-            _lua_settop(L, stackSize);
+            _lua_settop(L, oldStackSize);
             return;
         }
         fseek(scriptIn, 0, SEEK_END);
@@ -214,14 +214,14 @@ namespace common::lua {
         if ((rs = _luaL_loadstring(L, scriptContent.data())) == 0)
             rs = ori_lua_pcall(L, 0, LUA_MULTRET, 0);
         if (!Validate(L, rs)) {
-            _lua_settop(L, stackSize);
+            _lua_settop(L, oldStackSize);
             return;
         }
 
         _lua_getfield(L, LUA_GLOBALSINDEX, GET_POSITION_ADDRESS);
         if (_lua_type(L, -1) == LUA_TFUNCTION)
             usePullMechanism = true;
-        _lua_settop(L, stackSize);
+        _lua_settop(L, oldStackSize);
     }
 
     DWORD GetPositionAddress() {
