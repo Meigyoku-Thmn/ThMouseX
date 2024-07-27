@@ -5,5 +5,5 @@
 #include "../Common/MinHook.h"
 
 namespace core::directinput {
-    void Initialize();
+    bool Initialize();
 }

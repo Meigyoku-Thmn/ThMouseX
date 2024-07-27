@@ -50,20 +50,16 @@ bool TryMatchAndInitializeModule(CStringType moduleName) {
     bool rs = false;
     auto comparer = TEMPL_TEXT_COMPARER(CStringType);
     if (comparer(moduleName, TEMPL_TEXT(CStringType, "d3d8.dll")) == 0) {
-        directx8::Initialize();
-        rs = true;
+        rs = directx8::Initialize();
     }
     else if (comparer(moduleName, TEMPL_TEXT(CStringType, "d3d9.dll")) == 0) {
-        directx9::Initialize();
-        rs = true;
+        rs = directx9::Initialize();
     }
     else if (comparer(moduleName, TEMPL_TEXT(CStringType, "d3d11.dll")) == 0) {
-        directx11::Initialize();
-        rs = true;
+        rs = directx11::Initialize();
     }
     else if (comparer(moduleName, TEMPL_TEXT(CStringType, "DInput8.dll")) == 0) {
-        directinput::Initialize();
-        rs = true;
+        rs = directinput::Initialize();
     }
     if (rs)
         minhook::EnableAll();

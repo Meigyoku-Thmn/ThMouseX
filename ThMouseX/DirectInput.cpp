@@ -30,7 +30,7 @@ namespace core::directinput {
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
-    void Initialize() {
+    bool Initialize() {
         using enum InputMethod;
         static bool initialized = false;
         static mutex mtx;
@@ -38,33 +38,33 @@ namespace core::directinput {
         {
             const lock_guard lock(mtx);
             if (initialized)
-                return;
+                return true;
             if ((g_currentConfig.InputMethods & DirectInput) == None)
-                return;
+                return false;
             dinput8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\DInput8.dll")).c_str());
             if (!dinput8)
-                return;
+                return false;
             initialized = true;
         }
 
         auto _DirectInput8Create = (decltype(&DirectInput8Create))GetProcAddress(dinput8, "DirectInput8Create");
         if (!_DirectInput8Create) {
             note::LastErrorToFile(TAG "Failed to import DInput8.dll|DirectInput8Create.");
-            return;
+            return true;
         }
 
         ComPtr<IDirectInput8A> pDInput8;
         auto rs = _DirectInput8Create(GetModuleHandleA(nil), DIRECTINPUT_VERSION, IID_IDirectInput8A, &pDInput8, nil);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create an IDirectInput8 instance", rs);
-            return;
+            return true;
         }
 
         ComPtr<IDirectInputDevice8A> pDevice8;
         rs = pDInput8->CreateDevice(GUID_SysKeyboard, &pDevice8, nil);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create an IDirectInputDevice8 instance", rs);
-            return;
+            return true;
         }
 
         auto vtable = *(DWORD**)pDevice8.Get();
@@ -72,6 +72,8 @@ namespace core::directinput {
         minhook::CreateHook(vector<minhook::HookConfig>{
             { PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8 },
         });
+
+        return true;
     }
 
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData) {

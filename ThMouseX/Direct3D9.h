@@ -5,5 +5,5 @@
 #include "../Common/MinHook.h"
 
 namespace core::directx9 {
-    void Initialize();
+    bool Initialize();
 }

@@ -119,37 +119,37 @@ namespace core::directx9 {
         CleanUp(true);
     }
 
-    void Initialize() {
+    bool Initialize() {
         static bool initialized = false;
         static mutex mtx;
         HMODULE d3d9{};
         {
             const lock_guard lock(mtx);
             if (initialized)
-                return;
+                return true;
             d3d9 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d9.dll")).c_str());
             if (!d3d9)
-                return;
+                return false;
             initialized = true;
         }
 
         auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9, "Direct3DCreate9");
         if (!_Direct3DCreate9) {
             note::LastErrorToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9.");
-            return;
+            return true;
         }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nil, nil, nil, nil));
         if (!tmpWnd) {
             note::LastErrorToFile(TAG "Failed to create a temporary window.");
-            return;
+            return true;
         }
 
         ComPtr<IDirect3D9> pD3D;
         pD3D.Attach(_Direct3DCreate9(D3D_SDK_VERSION));
         if (!pD3D) {
             note::ToFile(TAG "Failed to create an IDirect3D9 instance.");
-            return;
+            return true;
         }
 
         D3DPRESENT_PARAMETERS d3dpp{
@@ -165,7 +165,7 @@ namespace core::directx9 {
         auto rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create an IDirect3DDevice9 instance", rs);
-            return;
+            return true;
         }
 
         auto vtable = *(DWORD**)pD3D.Get();
@@ -179,6 +179,8 @@ namespace core::directx9 {
             { PVOID(vtable2[ResetIdx]), &D3DReset, &OriReset },
             { PVOID(vtable2[PresentIdx]), &D3DPresent, &OriPresent },
         });
+
+        return true;
     }
 
     static void PrepareFirstStep(IDirect3DDevice9* device) {

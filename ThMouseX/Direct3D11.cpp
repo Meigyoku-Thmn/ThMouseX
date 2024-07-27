@@ -120,30 +120,30 @@ namespace core::directx11 {
         CleanUp(true);
     }
 
-    void Initialize() {
+    bool Initialize() {
         static bool initialized = false;
         static mutex mtx;
         HMODULE d3d11{};
         {
             const lock_guard lock(mtx);
             if (initialized)
-                return;
+                return true;
             d3d11 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d11.dll")).c_str());
             if (!d3d11)
-                return;
+                return false;
             initialized = true;
         }
 
         auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11, "D3D11CreateDeviceAndSwapChain");
         if (!_D3D11CreateDeviceAndSwapChain) {
             note::LastErrorToFile(TAG "Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain.");
-            return;
+            return true;
         }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nil, nil, nil, nil));
         if (!tmpWnd) {
             note::LastErrorToFile(TAG "Failed to create a temporary window.");
-            return;
+            return true;
         }
 
         ComPtr<ID3D11Device> _device;
@@ -165,7 +165,7 @@ namespace core::directx11 {
         auto rs = _D3D11CreateDeviceAndSwapChain(nil, D3D_DRIVER_TYPE_HARDWARE, nil, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &_device, nil, nil);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create device and swapchain of DirectX 11.", rs);
-            return;
+            return true;
         }
 
         auto vtable = *(DWORD**)swap_chain.Get();
@@ -177,6 +177,8 @@ namespace core::directx11 {
             { PVOID(vtable[PresentIdx]), & D3DPresent, &OriPresent },
             { PVOID(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, &OriResizeBuffers },
         });
+
+        return true;
     }
 
     static void PrepareFirstStep(IDXGISwapChain* swapChain) {
