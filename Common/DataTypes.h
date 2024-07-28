@@ -200,22 +200,3 @@ template<std::size_t s1, std::size_t s2>
 consteval auto operator==(const char(&str)[s2], CompileTimeString<s1> fs) {
     return CompileTimeString<s2>(str) == fs;
 }
-
-// https://stackoverflow.com/questions/29856311/fitting-string-literals-for-different-string-classes
-template <typename T>
-struct templ_text {
-    using char_type = std::remove_cv_t<T>;
-    static const auto is_char = std::is_same_v<char_type, char>;
-    using comparer_type = std::conditional_t<is_char, decltype(&_stricmp), decltype(&_wcsicmp)>;
-    static consteval comparer_type comparer() {
-        if (is_char) return (comparer_type)_stricmp;
-        return (comparer_type)_wcsicmp;
-    }
-    static consteval const char_type* choose(const char* narrow, const wchar_t* wide) {
-        if (is_char) return (const char_type*)narrow;
-        return (const char_type*)wide;
-    }
-};
-
-#define TEMPL_TEXT(StringType, str) templ_text<typename std::pointer_traits<StringType>::element_type>::choose(str, L##str)
-#define TEMPL_TEXT_COMPARER(StringType) templ_text<typename std::pointer_traits<StringType>::element_type>::comparer()

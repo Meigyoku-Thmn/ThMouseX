@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace ThMouseX;
 
@@ -6,6 +7,8 @@ static class Program
 {
     public const string AppName = "ThMouseX";
     public const string DllName = AppName + ".dll";
+    public static readonly string RootDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    public static readonly string LogPath = Path.Combine(RootDir, "log.txt");
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     static extern bool MarkThMouseXProcess();

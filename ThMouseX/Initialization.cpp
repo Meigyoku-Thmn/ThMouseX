@@ -43,27 +43,6 @@ namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
 
-template <typename CStringType>
-bool TryMatchAndInitializeModule(CStringType moduleName) {
-    bool rs = false;
-    auto comparer = TEMPL_TEXT_COMPARER(CStringType);
-    if (comparer(moduleName, TEMPL_TEXT(CStringType, "d3d8.dll")) == 0) {
-        rs = directx8::Initialize();
-    }
-    else if (comparer(moduleName, TEMPL_TEXT(CStringType, "d3d9.dll")) == 0) {
-        rs = directx9::Initialize();
-    }
-    else if (comparer(moduleName, TEMPL_TEXT(CStringType, "d3d11.dll")) == 0) {
-        rs = directx11::Initialize();
-    }
-    else if (comparer(moduleName, TEMPL_TEXT(CStringType, "DInput8.dll")) == 0) {
-        rs = directinput::Initialize();
-    }
-    if (rs)
-        minhook::EnableAll();
-    return rs;
-}
-
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
     decltype(&_LoadLibraryExW) OriLoadLibraryExW;
@@ -123,12 +102,10 @@ namespace core {
 
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto rs = OriLoadLibraryExW(lpLibFileName, hFile, dwFlags);
-        constexpr auto LOAD_LIBRARY_AS_RES = LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE;
-        if (rs != nil && !(dwFlags & LOAD_LIBRARY_AS_RES)) {
-            auto fileName = PathFindFileNameW(lpLibFileName);
-            if (!TryMatchAndInitializeModule(fileName))
-                memory::ScanImportTable(rs, [](auto dllName) { TryMatchAndInitializeModule(dllName); });
-        }
+        directx11::Initialize();
+        directx9::Initialize();
+        directx8::Initialize();
+        directinput::Initialize();
         return rs;
     }
 

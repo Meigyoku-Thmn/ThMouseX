@@ -111,38 +111,38 @@ namespace core::directx8 {
         CleanUp(true);
     }
 
-    bool Initialize() {
+    void Initialize() {
         static bool initialized = false;
         static mutex mtx;
         HMODULE d3d8{};
         {
             const lock_guard lock(mtx);
             if (initialized)
-                return true;
+                return;
             d3d8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d8.dll")).c_str());
             if (!d3d8)
-                return false;
+                return;
             initialized = true;
         }
 
         auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8, "Direct3DCreate8");
         if (!_Direct3DCreate8) {
             note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8.");
-            return true;
+            return;
         }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window",
             WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nil, nil, nil, nil));
         if (!tmpWnd) {
             note::LastErrorToFile(TAG "Failed to create a temporary window.");
-            return true;
+            return;
         }
 
         ComPtr<IDirect3D8> pD3D;
         pD3D.Attach(_Direct3DCreate8(D3D_SDK_VERSION));
         if (!pD3D) {
             note::ToFile(TAG "Failed to create an IDirect3D8 instance.");
-            return true;
+            return;
         }
 
         D3DPRESENT_PARAMETERS d3dpp{
@@ -158,7 +158,7 @@ namespace core::directx8 {
         auto rs = pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &pDevice);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create an IDirect3DDevice8 instance", rs);
-            return true;
+            return;
         }
 
         auto vtable = *(DWORD**)pD3D.Get();
@@ -172,8 +172,6 @@ namespace core::directx8 {
             { PVOID(vtable2[ResetIdx]), &D3DReset, &OriReset },
             { PVOID(vtable2[PresentIdx]), &D3DPresent, &OriPresent },
         });
-
-        return true;
     }
 
     static void PrepareFirstStep(IDirect3DDevice8* device) {

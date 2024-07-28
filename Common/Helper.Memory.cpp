@@ -33,16 +33,4 @@ namespace common::helper::memory {
         }
         return rs;
     }
-
-    void ScanImportTable(HMODULE hModule, ImportTableCallbackType callback) {
-        auto dosHeaders = PIMAGE_DOS_HEADER(hModule);
-        auto ntHeaders = PIMAGE_NT_HEADERS(DWORD_PTR(hModule) + dosHeaders->e_lfanew);
-        auto importsDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
-        auto importDescriptor = PIMAGE_IMPORT_DESCRIPTOR(DWORD_PTR(hModule) + importsDirectory.VirtualAddress);
-        while (importDescriptor->Name != NULL) {
-            auto libraryName = DWORD_PTR(hModule) + LPCSTR(importDescriptor->Name);
-            callback(libraryName);
-            importDescriptor++;
-        }
-    }
 }
