@@ -106,6 +106,7 @@ namespace core {
         directx9::Initialize();
         directx8::Initialize();
         directinput::Initialize();
+        minhook::EnableAll();
         return rs;
     }
 
