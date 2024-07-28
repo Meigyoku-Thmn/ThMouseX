@@ -1,5 +1,6 @@
 #include "framework.h"
 #include <cmath>
+#include <random>
 
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
@@ -31,6 +32,11 @@ void CalculatePlayerPos(DWORD address) {
 namespace helper = common::helper;
 
 namespace core::inputdetermine {
+    double x_error_WHATEVER = 0.0;
+    double y_error_WHATEVER = 0.0;
+    long prev_xPSpeed = 1;
+    long prev_yPSpeed = 1;
+    POINT previous_pos = {-1, -1};
     GameInput DetermineGameInput() {
         g_gameInput = GameInput::NONE;
         g_playerPos = {};
@@ -49,15 +55,67 @@ namespace core::inputdetermine {
 
                 auto mousePos = helper::GetPointerPosition();
 
-                if (g_playerPos.x < mousePos.x - 1)
-                    g_gameInput |= GameInput::MOVE_RIGHT;
-                else if (g_playerPos.x > mousePos.x + 1)
-                    g_gameInput |= GameInput::MOVE_LEFT;
+                auto xDist = mousePos.x - g_playerPos.x;
+                auto yDist = mousePos.y - g_playerPos.y;
+                auto xPSpeed = previous_pos.x - g_playerPos.x;
+                auto yPSpeed = previous_pos.y - g_playerPos.y;
+                if(previous_pos.x == -1){
+                    xPSpeed = 0;
+                    yPSpeed = 0;
+                }
+                if(xPSpeed == 0) xPSpeed = prev_xPSpeed;
+                if(yPSpeed == 0) yPSpeed = prev_yPSpeed;
+                if(xDist < 0) xDist = -xDist;
+                if(yDist < 0) yDist = -yDist;
+                if(xPSpeed < 0) xPSpeed = -xPSpeed;
+                if(yPSpeed < 0) yPSpeed = -yPSpeed;
+                auto v = xPSpeed;
+                if(yPSpeed > xPSpeed){
+                    v = yPSpeed;
+                }
+                if(xDist > v + 1 || yDist > v + 1 || xDist + yDist > 10){
+                    if(xDist > yDist){
+                        if (g_playerPos.x < mousePos.x)
+                            g_gameInput |= GameInput::MOVE_RIGHT;
+                        else if (g_playerPos.x > mousePos.x)
+                            g_gameInput |= GameInput::MOVE_LEFT;
+                        double error = (double)yDist / xDist;
+                        y_error_WHATEVER += error;
+                    }else{
+                        if (g_playerPos.y < mousePos.y)
+                            g_gameInput |= GameInput::MOVE_DOWN;
+                        else if (g_playerPos.y > mousePos.y)
+                            g_gameInput |= GameInput::MOVE_UP;
+                        double error = (double)xDist / yDist;
+                        x_error_WHATEVER += error;
+                    }
+                    if(y_error_WHATEVER > 1){
+                        if (g_playerPos.y < mousePos.y)
+                            g_gameInput |= GameInput::MOVE_DOWN;
+                        else if (g_playerPos.y > mousePos.y)
+                            g_gameInput |= GameInput::MOVE_UP;
+                        y_error_WHATEVER -= floor(y_error_WHATEVER);
+                    }
+                    if(x_error_WHATEVER > 1){
+                        if (g_playerPos.x < mousePos.x)
+                            g_gameInput |= GameInput::MOVE_RIGHT;
+                        else if (g_playerPos.x > mousePos.x)
+                            g_gameInput |= GameInput::MOVE_LEFT;
+                        x_error_WHATEVER -= floor(x_error_WHATEVER);
+                    }
+                }
+                previous_pos = g_playerPos;
+                prev_xPSpeed = xPSpeed;
+                prev_yPSpeed = yPSpeed;
+                // if (g_playerPos.x < mousePos.x - 1)
+                //     g_gameInput |= GameInput::MOVE_RIGHT;
+                // else if (g_playerPos.x > mousePos.x + 1)
+                //     g_gameInput |= GameInput::MOVE_LEFT;
 
-                if (g_playerPos.y < mousePos.y - 1)
-                    g_gameInput |= GameInput::MOVE_DOWN;
-                else if (g_playerPos.y > mousePos.y + 1)
-                    g_gameInput |= GameInput::MOVE_UP;
+                // if (g_playerPos.y < mousePos.y - 1)
+                //     g_gameInput |= GameInput::MOVE_DOWN;
+                // else if (g_playerPos.y > mousePos.y + 1)
+                //     g_gameInput |= GameInput::MOVE_UP;
             }
         }
         if (!g_inputEnabled) {
