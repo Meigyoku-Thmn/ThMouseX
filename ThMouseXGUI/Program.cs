@@ -27,7 +27,8 @@ static class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
-        MarkThMouseXProcess();
+        if (!MarkThMouseXProcess())
+            Environment.Exit(1);
 
         using var mutex = new Mutex(true, AppName, out var mutexIsCreated);
         if (!mutexIsCreated)
@@ -36,7 +37,7 @@ static class Program
             Environment.Exit(1);
         }
 
-        if (!MarkThMouseXProcess() || !ReadGamesFile() || !ReadGeneralConfigFile() || !InstallHooks())
+        if (!ReadGamesFile() || !ReadGeneralConfigFile() || !InstallHooks())
             Environment.Exit(1);
 
         Application.Run(new ThMouseApplicationContext());

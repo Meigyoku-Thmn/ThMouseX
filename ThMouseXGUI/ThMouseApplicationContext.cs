@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
 
 namespace ThMouseX;
 
@@ -21,9 +20,19 @@ class ThMouseApplicationContext : ApplicationContext
         notifyIcon.ShowBalloonTip(2000, Program.AppName, $"{Program.AppName} is activated.", ToolTipIcon.Info);
     }
 
+    AboutForm aboutForm;
+
     void ShowDialog()
     {
-        if (new AboutForm().ShowDialog() == DialogResult.Abort)
+        if (aboutForm != null)
+        {
+            aboutForm.Focus();
+            return;
+        }
+        aboutForm = new AboutForm();
+        var rs = aboutForm.ShowDialog();
+        aboutForm = null;
+        if (rs == DialogResult.Abort)
             Exit();
     }
 
@@ -31,7 +40,7 @@ class ThMouseApplicationContext : ApplicationContext
     {
         try
         {
-            new Process { StartInfo = new() { UseShellExecute = true, FileName = Program.RootDir } }.Start();
+            Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = Program.RootDir });
         }
         catch (Exception ex)
         {
@@ -44,7 +53,7 @@ class ThMouseApplicationContext : ApplicationContext
         try
         {
             new FileStream(Program.LogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 1).Dispose();
-            new Process { StartInfo = new() { UseShellExecute = true, FileName = Program.LogPath } }.Start();
+            Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = Program.LogPath });
         }
         catch (Exception ex)
         {
