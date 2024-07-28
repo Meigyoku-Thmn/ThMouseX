@@ -13,15 +13,14 @@ namespace encoding = common::helper::encoding;
 using namespace std;
 
 namespace common::minhook {
-    void Uninitialize(bool isProcessTerminating) {
+    static void Uninitialize(bool isProcessTerminating) {
         auto rs = MH_Uninitialize();
         if (!isProcessTerminating && rs != MH_OK)
             note::ToFile("[MinHook] Failed to uninitialize MinHook: %s", MH_StatusToString(rs));
     }
 
     bool Initialize() {
-        auto rs = MH_Initialize();
-        if (rs != MH_OK) {
+        if (auto rs = MH_Initialize(); rs != MH_OK) {
             note::ToFile("[MinHook] Failed to initialize MinHook: %s", MH_StatusToString(rs));
             return false;
         }
@@ -31,7 +30,7 @@ namespace common::minhook {
 
     bool CreateHook(const vector<HookConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
-            auto rs = MH_CreateHook(config.pTarget, config.pDetour, config.ppOriginal);
+            auto rs = MH_CreateHook(config.pTarget, config.pDetour, (LPVOID*)config.ppOriginal);
             if (rs != MH_OK) {
                 note::ToFile("[MinHook] Failed to create hook for target %p: %s", config.pTarget, MH_StatusToString(rs));
                 return false;
@@ -42,7 +41,7 @@ namespace common::minhook {
 
     bool CreateApiHook(const vector<HookApiConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
-            auto rs = MH_CreateHookApi(config.moduleName, config.procName, config.pDetour, config.ppOriginal);
+            auto rs = MH_CreateHookApi(config.moduleName, config.procName, config.pDetour, (LPVOID*)config.ppOriginal);
             if (rs != MH_OK) {
                 auto moduleName = encoding::ConvertToUtf8(config.moduleName);
                 note::ToFile("[MinHook] Failed to create hook for api %s|%s: %s", moduleName.c_str(), config.procName, MH_StatusToString(rs));
@@ -88,7 +87,7 @@ namespace common::minhook {
             if (rs != MH_OK)
                 return false;
             if (config.ppOriginal)
-                *config.ppOriginal = NULL;
+                *(LPVOID*)config.ppOriginal = nil;
         }
         return true;
     }
@@ -99,7 +98,7 @@ namespace common::minhook {
             if (rs != MH_OK)
                 return false;
             if (config.ppOriginal)
-                *config.ppOriginal = NULL;
+                *(LPVOID*)config.ppOriginal = nil;
         }
         return true;
     }

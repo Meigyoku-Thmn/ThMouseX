@@ -23,28 +23,36 @@ using namespace std;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-#define HandleMousePress(e, __ev, downAction, upAction) HandleMousePressImpl(e, __ev, downAction, upAction, __COUNTER__)
-#define HandleMousePressImpl(e, __ev, downAction, upAction, unique) \
-static bool MAKE_UNIQUE_VAR(unique) = false; \
-if (e->message == __ev##DOWN && MAKE_UNIQUE_VAR(unique) == false) { \
-    MAKE_UNIQUE_VAR(unique) = true; \
-    downAction; \
-} \
-else if (e->message == __ev##UP && MAKE_UNIQUE_VAR(unique) == true) { \
-    MAKE_UNIQUE_VAR(unique) = false; \
-    upAction; \
-}0
+using Action = function<void()>;
 
-#define HandleKeyboardPress(e, __ev, action) HandleKeyboardPressImpl(e, __ev, action, __COUNTER__)
-#define HandleKeyboardPressImpl(e, __ev, action, unique) \
-static bool MAKE_UNIQUE_VAR(unique) = false; \
-if (e->wParam == __ev && e->message == WM_KEYDOWN && MAKE_UNIQUE_VAR(unique) == false) { \
-    MAKE_UNIQUE_VAR(unique) = true; \
-    action; \
-} \
-else if (e->wParam == __ev && e->message == WM_KEYUP && MAKE_UNIQUE_VAR(unique) == true) { \
-    MAKE_UNIQUE_VAR(unique) = false; \
-}0
+enum class EventUseCase {
+    ImGuiBtn, OsCursorBtn, LeftMouseBtn, MiddleMouseBtn, RightMouseBtn
+};
+
+template <EventUseCase T>
+static void HandleMousePress(PMSG e, DWORD msgDown, DWORD msgUp, const Action& downAction, const Action& upAction) {
+    static bool isOn = false;
+    if (e->message == msgDown && isOn == false) {
+        isOn = true;
+        if (downAction) downAction();
+    }
+    else if (e->message == msgUp && isOn == true) {
+        isOn = false;
+        if (upAction) upAction();
+    }
+}
+
+template <EventUseCase T>
+static void HandleKeyboardPress(PMSG e, DWORD keyId, const Action& action) {
+    static bool isOn = false;
+    if (e->wParam == keyId && e->message == WM_KEYDOWN && isOn == false) {
+        isOn = true;
+        if (action) action();
+    }
+    else if (e->wParam == keyId && e->message == WM_KEYUP && isOn == true) {
+        isOn = false;
+    }
+}
 
 namespace core::messagequeue {
     HCURSOR WINAPI _SetCursor(HCURSOR hCursor);
@@ -53,12 +61,12 @@ namespace core::messagequeue {
     decltype(&_ShowCursor) OriShowCursor;
 
     bool isCursorShow = true;
-    auto hCursor = LoadCursorA(NULL, IDC_ARROW);
+    auto hCursor = LoadCursorA(nil, IDC_ARROW);
 
-    HCURSOR WINAPI _SetCursor(HCURSOR hCursor) {
+    HCURSOR WINAPI _SetCursor(HCURSOR cursor) {
         if (g_showImGui)
-            return OriSetCursor(hCursor);
-        return NULL;
+            return OriSetCursor(cursor);
+        return nil;
     }
 
     int WINAPI _ShowCursor(BOOL bShow) {
@@ -67,26 +75,26 @@ namespace core::messagequeue {
 
     bool cursorNormalized;
     int cursorVisibility;
-    void ShowCursorEx(bool show) {
+    static void ShowCursorEx(bool show) {
         if (show && cursorVisibility < 0)
             cursorVisibility = OriShowCursor(TRUE);
         else if (!show && cursorVisibility >= 0)
             cursorVisibility = OriShowCursor(FALSE);
     }
 
-    void HideMousePointer() {
-        OriSetCursor(NULL);
+    static void HideMousePointer() {
+        OriSetCursor(nil);
         ShowCursorEx(false);
         isCursorShow = false;
     }
 
-    void ShowMousePointer() {
+    static void ShowMousePointer() {
         OriSetCursor(hCursor);
         ShowCursorEx(true);
         isCursorShow = true;
     }
 
-    void NormalizeCursor() {
+    static void NormalizeCursor() {
         // Set cursor visibility to -1, reset cursor to a normal arrow,
         // to ensure that there is a visible mouse cursor on the game's config dialog
         while (OriShowCursor(TRUE) < 0);
@@ -95,10 +103,11 @@ namespace core::messagequeue {
         ShowMousePointer();
     }
 
-    LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        auto e = (PMSG)lParam;
+    static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
+        using enum EventUseCase;
+        auto e = PMSG(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
-            HandleKeyboardPress(e, gs_toggleImGuiButton, { {
+            HandleKeyboardPress<ImGuiBtn>(e, gs_toggleImGuiButton, []() {
                 g_showImGui = !g_showImGui;
                 if (g_showImGui) {
                     g_inputEnabled = false;
@@ -106,39 +115,43 @@ namespace core::messagequeue {
                 }
                 else
                     HideMousePointer();
-                } }
-            );
+                });
+
             if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
             else {
-                HandleKeyboardPress(e, gs_toggleOsCursorButton, isCursorShow ? HideMousePointer() : ShowMousePointer());
+                HandleKeyboardPress<OsCursorBtn>(e, gs_toggleOsCursorButton,
+                    []() { isCursorShow ? HideMousePointer() : ShowMousePointer(); });
             }
+
             auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
-            HandleMousePress(e, WM_LBUTTON, { {
+
+            HandleMousePress<LeftMouseBtn>(e, WM_LBUTTONDOWN, WM_LBUTTONUP, [wantCaptureMouse]() {
                 g_leftMousePressed = wantCaptureMouse ? false : true;
                 if (wantCaptureMouse)
                     g_inputEnabled = false;
-            } }, g_leftMousePressed = false);
-            HandleMousePress(e, WM_MBUTTON, { {
+                }, []() { g_leftMousePressed = false; });
+
+            HandleMousePress<MiddleMouseBtn>(e, WM_MBUTTONDOWN, WM_MBUTTONUP, [wantCaptureMouse]() {
                 g_midMousePressed = wantCaptureMouse ? false : true;
                 if (wantCaptureMouse)
                     g_inputEnabled = false;
                 else
                     ImGui::SetWindowFocus();
-            } }, g_midMousePressed = false);
-            HandleMousePress(e, WM_RBUTTON, 0, { {
+                }, []() { g_midMousePressed = false; });
+
+            HandleMousePress<RightMouseBtn>(e, WM_RBUTTONDOWN, WM_RBUTTONUP, nil, [wantCaptureMouse]() {
                 g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
                 if (!wantCaptureMouse)
                     ImGui::SetWindowFocus();
-            } });
+                });
         }
-        return CallNextHookEx(NULL, code, wParam, lParam);
+        return CallNextHookEx(nil, code, wParam, lParam);
     }
 
-    LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
-        static auto initialized = false;
-        if (!initialized) {
+    static LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
+        if (static auto initialized = false; !initialized) {
             initialized = true;
             core::Initialize();
         }
@@ -173,11 +186,11 @@ namespace core::messagequeue {
                 }
             }
         }
-        return CallNextHookEx(NULL, code, wParam, lParam);
+        return CallNextHookEx(nil, code, wParam, lParam);
     }
 
-    bool CheckHookProcHandle(HHOOK handle) {
-        if (handle != NULL)
+    static bool CheckHookProcHandle(HHOOK handle) {
+        if (handle != nil)
             return true;
         helper::ReportLastError(APP_NAME ": SetWindowsHookEx Error");
         return false;
@@ -205,7 +218,7 @@ namespace core::messagequeue {
         SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &_);
     }
 
-    void PostRenderCallback() {
+    static void PostRenderCallback() {
         static bool callbackDone = false;
         if (cursorNormalized && !callbackDone) {
             callbackDone = true;
@@ -217,8 +230,8 @@ namespace core::messagequeue {
         // Hide the mouse cursor when D3D is running, but only after cursor normalization
         callbackstore::RegisterPostRenderCallback(PostRenderCallback);
         minhook::CreateApiHook(vector<minhook::HookApiConfig>{
-            { L"USER32.DLL", "SetCursor", &_SetCursor, (PVOID*)&OriSetCursor },
-            { L"USER32.DLL", "ShowCursor", &_ShowCursor, (PVOID*)&OriShowCursor },
+            { L"USER32.DLL", "SetCursor", &_SetCursor, &OriSetCursor },
+            { L"USER32.DLL", "ShowCursor", &_ShowCursor, &OriShowCursor },
         });
     }
 }

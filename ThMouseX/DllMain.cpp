@@ -12,7 +12,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         case DLL_THREAD_DETACH:
             break;
         case DLL_PROCESS_DETACH:
-            core::Uninitialize(lpReserved != 0);
+            core::Uninitialize(lpReserved != nil);
             break;
     }
     return TRUE;

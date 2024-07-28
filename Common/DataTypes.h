@@ -6,22 +6,23 @@
 #include <memory>
 #include <array>
 #include <type_traits>
+#include <algorithm>
 
 constexpr auto PROCESS_NAME_MAX_LEN = 64;
 constexpr auto ADDRESS_CHAIN_MAX_LEN = 8;
 constexpr auto GAME_CONFIG_MAX_LEN = 128;
 
 struct ErrorMessage {
-    DWORD code;
+    HRESULT code;
     LPCSTR symbolicName;
     LPCSTR description;
     LPCSTR sourceHeader;
-    ErrorMessage(unsigned int code, const char* symbolicName, const char* description, const char* sourceHeader) :
+    ErrorMessage(HRESULT code, LPCSTR symbolicName, LPCSTR description, LPCSTR sourceHeader) :
         code(code), symbolicName(symbolicName), description(description), sourceHeader(sourceHeader) {
     }
 };
 
-enum ModulateStage {
+enum class ModulateStage {
     WhiteInc, WhiteDec, BlackInc, BlackDec,
 };
 
@@ -58,16 +59,11 @@ struct DoublePoint {
     double Y;
 };
 
-union TypedPoint {
-    IntPoint    IntData;
-    FloatPoint  FloatData;
-};
-
 struct AddressChain {
-    int     Length;
-    DWORD   Level[ADDRESS_CHAIN_MAX_LEN];
+    std::size_t Length;
+    DWORD       Level[ADDRESS_CHAIN_MAX_LEN];
 };
-static_assert(sizeof(void*) == sizeof(AddressChain::Level[0]));
+static_assert(sizeof(void*) == sizeof(AddressChain::Level[0]), "Support 32-bit system only!");
 
 BEGIN_FLAG_ENUM(GameInput, DWORD)
 NONE/*        */ = 0,
@@ -92,21 +88,11 @@ enum class ScriptType {
     None, LuaJIT, NeoLua, Lua,
 };
 
-enum class ScriptRunPlace {
-    None, Detached, Attached,
-};
-
-enum class ScriptPositionGetMethod {
-    None, Pull, Push,
-};
-
 struct GameConfig {
     WCHAR                   ProcessName[PROCESS_NAME_MAX_LEN];
     AddressChain            Address;
 
     ScriptType              ScriptType;
-    ScriptRunPlace          ScriptRunPlace;
-    ScriptPositionGetMethod ScriptPositionGetMethod;
 
     PointDataType           PosDataType;
     FloatPoint              BasePixelOffset;
@@ -131,8 +117,8 @@ public:
     }
 };
 // This class must be instantiated with an initializer, preferably {}.
-typedef _GameConfigs<GameConfig, GAME_CONFIG_MAX_LEN> GameConfigs;
-static_assert(std::is_trivial<GameConfigs>::value);
+using GameConfigs = _GameConfigs<GameConfig, GAME_CONFIG_MAX_LEN>;
+static_assert(std::is_trivial_v<GameConfigs>);
 
 struct string_hash {
     using hash_type = std::hash<std::string_view>;
@@ -143,19 +129,74 @@ struct string_hash {
 };
 
 struct HMODULE_FREER {
-    typedef HMODULE pointer;
+    using pointer = HMODULE;
     void operator()(HMODULE handle) const {
-        if (handle != NULL)
+        if (handle != nil)
             FreeLibrary(handle);
     }
 };
-typedef std::unique_ptr<HMODULE, HMODULE_FREER> ModuleHandle;
+using ModuleHandle = std::unique_ptr<HMODULE, HMODULE_FREER>;
 
 struct HWND_DESTROYER {
-    typedef HWND pointer;
+    using pointer = HWND;
     void operator()(HWND hwnd) const {
-        if (hwnd != NULL)
+        if (hwnd != nil)
             DestroyWindow(hwnd);
     }
 };
-typedef std::unique_ptr<HWND, HWND_DESTROYER> WindowHandle;
+using WindowHandle = std::unique_ptr<HWND, HWND_DESTROYER>;
+
+// https://dev.to/sgf4/strings-as-template-parameters-c20-4joh
+template<std::size_t N>
+struct CompileTimeString {
+    char data[N]{};
+
+    explicit(false) consteval CompileTimeString(const char(&str)[N]) {
+        std::copy_n(str, N, data);
+    }
+
+    consteval bool operator==(const CompileTimeString<N> str) const {
+        return std::equal(str.data, str.data + N, data);
+    }
+
+    template<std::size_t N2>
+    consteval bool operator==(NOUSE const CompileTimeString<N2> s) const {
+        return false;
+    }
+
+    template<std::size_t N2>
+    consteval CompileTimeString<N + N2 - 1> operator+(const CompileTimeString<N2> str) const {
+        char newchar[N + N2 - 1]{};
+        std::copy_n(data, N - 1, newchar);
+        std::copy_n(str.data, N2, newchar + N - 1);
+        return newchar;
+    }
+
+    consteval char operator[](std::size_t n) const {
+        return data[n];
+    }
+
+    consteval std::size_t size() const {
+        return N - 1;
+    }
+};
+
+template<std::size_t s1, std::size_t s2>
+consteval auto operator+(CompileTimeString<s1> fs, const char(&str)[s2]) {
+    return fs + CompileTimeString<s2>(str);
+}
+
+template<std::size_t s1, std::size_t s2>
+consteval auto operator+(const char(&str)[s2], CompileTimeString<s1> fs) {
+    return CompileTimeString<s2>(str) + fs;
+}
+
+template<std::size_t s1, std::size_t s2>
+consteval auto operator==(CompileTimeString<s1> fs, const char(&str)[s2]) {
+    return fs == CompileTimeString<s2>(str);
+}
+
+template<std::size_t s1, std::size_t s2>
+consteval auto operator==(const char(&str)[s2], CompileTimeString<s1> fs) {
+    return CompileTimeString<s2>(str) == fs;
+}

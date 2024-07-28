@@ -7,14 +7,14 @@ namespace common::minhook {
     struct HookConfig {
         LPVOID  pTarget;
         LPVOID  pDetour;
-        LPVOID* ppOriginal;
+        LPVOID  ppOriginal;
     };
 
     struct HookApiConfig {
         LPCWSTR moduleName;
         LPCSTR  procName;
         LPVOID  pDetour;
-        LPVOID* ppOriginal;
+        LPVOID  ppOriginal;
     };
 
     bool Initialize();

@@ -147,5 +147,6 @@
     <None Include="PreparationScript.lua">
       <Filter>Source Files\LuaScript</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

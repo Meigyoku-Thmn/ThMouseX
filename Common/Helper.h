@@ -18,4 +18,5 @@ namespace common::helper {
     // use for directx8
     bool TestFullscreenHeuristically();
     DWORD CalculateAddress();
+    bool IsCurrentProcessThMouseX();
 }

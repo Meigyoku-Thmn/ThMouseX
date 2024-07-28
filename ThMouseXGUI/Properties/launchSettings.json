@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ThMouseXGUI": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

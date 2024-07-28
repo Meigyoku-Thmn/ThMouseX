@@ -25,7 +25,7 @@ namespace core::imguioverlay {
     void Configure(float fontScale) {
         auto& io = ImGui::GetIO();
         io.Fonts->Clear();
-        auto fontSize = round(gs_imGuiBaseFontSize * fontScale);
+        auto fontSize = round(float(gs_imGuiBaseFontSize) * fontScale);
         if (fontSize < 13)
             io.Fonts->AddFontDefault();
         else if (!io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(gs_imGuiFontPath).c_str(), fontSize))
@@ -33,7 +33,7 @@ namespace core::imguioverlay {
     }
     ImDrawData* Render(unsigned int renderWidth, unsigned int renderHeight, float mouseScaleX, float mouseScaleY) {
         auto& io = ImGui::GetIO();
-        io.DisplaySize = ImVec2((float)renderWidth, (float)renderHeight);
+        io.DisplaySize = ImVec2(float(renderWidth), float(renderHeight));
         ImGui_ImplWin32_SetMousePosScale(mouseScaleX, mouseScaleY);
         ImGui::NewFrame();
 
@@ -91,15 +91,11 @@ namespace core::imguioverlay {
                         static auto procName = encoding::ConvertToUtf8(g_currentConfig.ProcessName);
                         static auto procAddr = memory::GetAddressConfigAsString();
                         static auto scriptType = string(NAMEOF_ENUM(g_currentConfig.ScriptType));
-                        static auto scriptRunPlace = string(NAMEOF_ENUM(g_currentConfig.ScriptRunPlace));
-                        static auto scriptPosGetMethod = string(NAMEOF_ENUM(g_currentConfig.ScriptPositionGetMethod));
                         static auto posDataType = string(NAMEOF_ENUM(g_currentConfig.PosDataType));
                         static auto inputMethod = string(NAMEOF_ENUM_FLAG(g_currentConfig.InputMethods));
                         ImGui::Text("Process Name:\t%s", procName.c_str());
                         ImGui::Text("Position Address:\t%s", procAddr.c_str());
                         ImGui::Text("Script Type:\t%s", scriptType.c_str());
-                        ImGui::Text("Script Run Place:\t%s", scriptRunPlace.c_str());
-                        ImGui::Text("Script Position Get Method:\t%s", scriptPosGetMethod.c_str());
                         ImGui::Text("Position Data Type:\t%s", posDataType.c_str());
                         ImGui::Text("Base Pixel Offset:\t(%g,%g)", g_currentConfig.BasePixelOffset.X, g_currentConfig.BasePixelOffset.Y);
                         ImGui::Text("Base Height:\t%d", g_currentConfig.BaseHeight);

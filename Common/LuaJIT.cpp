@@ -24,15 +24,15 @@ namespace luaapi = common::luaapi;
 using namespace std;
 
 static bool scriptingDisabled = false;
+static bool usePullMechanism = false;
 
 #define GET_POSITION_ADDRESS "getPositionAddress"
 
 static lua_State* L;
 
-bool CheckAndDisableIfError(lua_State* L, int r) {
-    if (r != 0) {
-        note::ToFile("[LuaJIT] %s", lua_tostring(L, -1));
-        lua_pop(L, 1);
+static bool CheckAndDisableIfError(lua_State* _L, int r) {
+    if (r != LUA_OK) {
+        note::ToFile("[LuaJIT] %s", lua_tostring(_L, -1));
         scriptingDisabled = true;
         return false;
     }
@@ -51,19 +51,13 @@ namespace common::luajit {
             return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
     }
 
-    void Uninitialize(bool isProcessTerminating) {
-        if (L != NULL)
+    static void Uninitialize(bool isProcessTerminating) {
+        if (L != nil)
             lua_close(L);
     }
 
     void Initialize() {
         if (g_currentConfig.ScriptType != ScriptType::LuaJIT)
-            return;
-        // Only support Detached
-        if (g_currentConfig.ScriptRunPlace != ScriptRunPlace::Detached)
-            return;
-        // Can support Pull and Push
-        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::None)
             return;
 
         L = luaL_newstate();
@@ -77,49 +71,54 @@ namespace common::luajit {
 
         luaL_openlibs(L);
 
+        auto oldStackSize = lua_gettop(L);
+
         if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::MakePreparationScript().c_str()))) {
             note::ToFile("[LuaJIT] The above error occurred in Preparation Script.");
+            lua_settop(L, oldStackSize);
             return;
         }
 
         auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath.c_str());
 
-        if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str())))
-            return;
-
-        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push)
-            return;
-
-        lua_getglobal(L, GET_POSITION_ADDRESS);
-        if (!lua_isfunction(L, -1)) {
-            note::ToFile("[LuaJIT] %s", GET_POSITION_ADDRESS " function not found in global scope.");
-            scriptingDisabled = true;
+        if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str()))) {
+            lua_settop(L, oldStackSize);
             return;
         }
+
+        lua_getglobal(L, GET_POSITION_ADDRESS);
+        if (lua_isfunction(L, -1))
+            usePullMechanism = true;
+        else
+            lua_settop(L, oldStackSize);
     }
 
     DWORD GetPositionAddress() {
         if (scriptingDisabled)
             return NULL;
 
-        if (g_currentConfig.ScriptPositionGetMethod == ScriptPositionGetMethod::Push) {
+        if (!usePullMechanism)
             return Lua_GetPositionAddress();
-        }
+
+        auto oldStackSize = lua_gettop(L);
 
         lua_pushvalue(L, -1);
 
-        if (!CheckAndDisableIfError(L, lua_pcall(L, 0, 1, 0)))
+        if (!CheckAndDisableIfError(L, lua_pcall(L, 0, 1, 0))) {
+            lua_settop(L, oldStackSize);
             return NULL;
+        }
 
         if (!lua_isnumber(L, -1)) {
             note::ToFile("[LuaJIT] %s", "The value returned from " GET_POSITION_ADDRESS " wasn't a number.");
             scriptingDisabled = true;
+            lua_settop(L, oldStackSize);
             return NULL;
         }
 
-        auto result = (DWORD)lua_tointeger(L, -1);
-        lua_pop(L, 1);
+        auto result = DWORD(lua_tointeger(L, -1));
+        lua_settop(L, oldStackSize);
         return result;
     }
 }

@@ -1,126 +1,115 @@
 ; This file tells ThMouseX how to find player position data.
 ; Each line for a game.
-; Use quotes "" for process names that have spaces.
-; Required encoding is UTF-8 without BOM
+; Use quotes "" for executable file names that have spaces.
+; Required encoding is "UTF-8 without BOM"
 
 ; Scripting
-; Type/Place/PosGetMethod
-; - Type: NeoLua, LuaJIT, Lua
-; - Place: Detached, Attached
-; - PosGetMethod: Pull, Push
+;  Supported Lua Interpreters:
+;   - NeoLua: Lua running in .NET, see THMHJ for an example
+;   - LuaJIT: See Danmakai and thWWW for examples
+;   - Lua:
+;       • Basically hook into the game's Lua runtime, see DFLYT for an example
+;       • ThMouseX makes the following assumptions about this mode:
+;           - the scripting engine is located in a dll file in the game's directory
+;           - the scripting engine is vanilla LuaJIT
+;           - the scripting engine has the 'ffi' library
+;           - the game calls the function 'luaL_openlibs' on startup
 
-; NeoLua/Attached/Push
-; LuaJIT/Detached/Pull
-; LuaJIT/Detached/Push
-; Lua/Attached/Pull
-; Lua/Attached/Push
-
-; NeoLua:
-; - Supported Place: Attached
-; - Supported PosGetMethod: Push (this actually hooks into .NET Framework)
-
-; LuaJIT:
-; - Supported Place: Detached
-; - Supported PosGetMethod: Pull, Push (But you can do anything inside LuaJIT script)
-
-; Lua:
-; - Supported Place: Attached
-; - Supported PosGetMethod: Pull, Push (Basically hook into an existing Lua runtime, be it vanila Lua or LuaJIT)
-
-; processName   positionRVA             dataType   offset         baseHeight   aspectRatio   inputMethod
+; processName   positionRVA         dataType   offset         baseHeight   aspectRatio   inputMethod
 
 ; Touhou 6
-th06            [002CA6B8]              float      (0,0)          480          4:3           DirectInput
-th06e           [002CA6B8]              float      (0,0)          480          4:3           DirectInput
-東方紅魔郷       [002CA6B8]              float      (0,0)          480          4:3           DirectInput
+th06            [002CA6B8]          float      (0,0)          480          4:3           DirectInput
+th06e           [002CA6B8]          float      (0,0)          480          4:3           DirectInput
+東方紅魔郷       [002CA6B8]          float      (0,0)          480          4:3           DirectInput
+“Œ•ûg–‚‹½       [002CA6B8]          float      (0,0)          480          4:3           DirectInput
 
 ; Touhou 7
-th07            [000BE408]              float      (32,16)        480          4:3           DirectInput
-th07e           [000BE408]              float      (32,16)        480          4:3           DirectInput
+th07            [000BE408]          float      (32,16)        480          4:3           DirectInput
+th07e           [000BE408]          float      (32,16)        480          4:3           DirectInput
 
 ; Touhou 8
-th08            [013D6110]              float      (0,0)          480          4:3           DirectInput
-th08e           [013D6110]              float      (0,0)          480          4:3           DirectInput
+th08            [013D6110]          float      (0,0)          480          4:3           DirectInput
+th08e           [013D6110]          float      (0,0)          480          4:3           DirectInput
 
 ; Touhou 9
-th09            [000A7D94][1B88]        float      (161,17)       480          4:3           DirectInput
-th09e           [000A7D94][1B88]        float      (161,17)       480          4:3           DirectInput
+th09            [000A7D94][1B88]    float      (161,17)       480          4:3           DirectInput
+th09e           [000A7D94][1B88]    float      (161,17)       480          4:3           DirectInput
 
 ; Touhou 9.5
-th095           [000C4E70][15C]         float      (0,0)          480          4:3           DirectInput
-th095e          [000C4E70][15C]         float      (0,0)          480          4:3           DirectInput
+th095           [000C4E70][15C]     float      (0,0)          480          4:3           DirectInput
+th095e          [000C4E70][15C]     float      (0,0)          480          4:3           DirectInput
 
 ; Touhou 10
-th10            [00077834][3CC]         int        (22400,1600)   48000        4:3           DirectInput
-th10e           [00077834][3CC]         int        (22400,1600)   48000        4:3           DirectInput
+th10            [00077834][3CC]     int        (22400,1600)   48000        4:3           DirectInput
+th10e           [00077834][3CC]     int        (22400,1600)   48000        4:3           DirectInput
 
 ; Touhou 11
-th11            [000A8EB4][888]         int        (28672,2048)   61440        4:3           DirectInput/GetKeyboardState
-th11e           [000A8EB4][888]         int        (28672,2048)   61440        4:3           DirectInput/GetKeyboardState
+th11            [000A8EB4][888]     int        (28672,2048)   61440        4:3           DirectInput/GetKeyboardState
+th11e           [000A8EB4][888]     int        (28672,2048)   61440        4:3           DirectInput/GetKeyboardState
 
 ; Touhou 12
-th12            [000B4514][988]         int        (28672,2048)   61440        4:3           DirectInput
-th12e           [000B4514][988]         int        (28672,2048)   61440        4:3           DirectInput
+th12            [000B4514][988]     int        (28672,2048)   61440        4:3           DirectInput
+th12e           [000B4514][988]     int        (28672,2048)   61440        4:3           DirectInput
 
 ; Touhou 12.5
-th125           [000B68C8][604]         int        (40960,2048)   61440        4:3           DirectInput
-th125e          [000B68C8][604]         int        (40960,2048)   61440        4:3           DirectInput
+th125           [000B68C8][604]     int        (40960,2048)   61440        4:3           DirectInput
+th125e          [000B68C8][604]     int        (40960,2048)   61440        4:3           DirectInput
 
 ; Touhou 12.8
-th128           [000B8A80][ED8]         int        (40960,2048)   61440        4:3           DirectInput
-th128e          [000B8A80][ED8]         int        (40960,2048)   61440        4:3           DirectInput
+th128           [000B8A80][ED8]     int        (40960,2048)   61440        4:3           DirectInput
+th128e          [000B8A80][ED8]     int        (40960,2048)   61440        4:3           DirectInput
 
 ; Touhou 13
-th13            [000C22C4][5C4]         int        (28672,2048)   61440        4:3           DirectInput
-th13e           [000C22C4][5C4]         int        (28672,2048)   61440        4:3           DirectInput
+th13            [000C22C4][5C4]     int        (28672,2048)   61440        4:3           DirectInput
+th13e           [000C22C4][5C4]     int        (28672,2048)   61440        4:3           DirectInput
 
 ; Touhou 14
-th14            [000DB67C][5EC]         int        (28672,2048)   61440        4:3           DirectInput
+th14            [000DB67C][5EC]     int        (28672,2048)   61440        4:3           DirectInput
 
 ; Touhou 14.3
-th143           [000E6B88][5EC]         int        (40960,2048)   61440        4:3           DirectInput
+th143           [000E6B88][5EC]     int        (40960,2048)   61440        4:3           DirectInput
 
 ; Touhou 15
-th15            [000E9BB8][624]         int        (28672,2048)   61440        4:3           DirectInput
+th15            [000E9BB8][624]     int        (28672,2048)   61440        4:3           DirectInput
 
 ; Touhou 16
-th16            [000A6EF8][61C]         int        (28672,2048)   61440        4:3           DirectInput
+th16            [000A6EF8][61C]     int        (28672,2048)   61440        4:3           DirectInput
 
 ; Touhou 16.5
-th165           [000B5654][618]         int        (40960,2048)   61440        4:3           DirectInput
+th165           [000B5654][618]     int        (40960,2048)   61440        4:3           DirectInput
 
 ; Touhou 17
-th17            [000B77D0][61C]         int        (28672,2048)   61440        4:3           DirectInput
+th17            [000B77D0][61C]     int        (28672,2048)   61440        4:3           DirectInput
 
 ; Touhou 18
-th18            [000CF410][62C]         int        (28672,2048)   61440        4:3           GetKeyboardState
+th18            [000CF410][62C]     int        (28672,2048)   61440        4:3           GetKeyboardState
 
 ; Touhou 18.5
-th185           [000D7C3C][62C]         int        (40960,2048)   61440        4:3           GetKeyboardState
+th185           [000D7C3C][62C]     int        (40960,2048)   61440        4:3           GetKeyboardState
 
 ; Touhou 19
-th19            [001D1A64][698]         int        (20992,2048)   61440        4:3           GetKeyboardState
+th19            [001D1A64][698]     int        (20992,2048)   61440        4:3           GetKeyboardState
 
 ; DANMAKAI: Red Forbidden Fruit
-Danmakai        LuaJIT/Detached/Pull    float      (239.5,13.5)   540          16:9          SendMessage
+Danmakai        LuaJIT              float      (239.5,13.5)   540          16:9          SendMessage
 
 ; Fantastic Danmaku Festival I & II
-THMHJ           NeoLua/Attached/Push    float      (-0.5,-1.5)    480          4:3           GetKeyboardState
+THMHJ           NeoLua              float      (-0.5,-1.5)    480          4:3           GetKeyboardState
 
 ; Wonderful Waking World
-thWWW           LuaJIT/Detached/Pull    float      (155.5,20.5)   540          16:9          SendMessage
+thWWW           LuaJIT              float      (155.5,20.5)   540          16:9          SendMessage
 
-; Chaos of Black Loong (offset is done in Lua script)
-DFLYT           Lua/Attached/Pull       double     (0,0)          480          4:3           SendInput
+; Chaos of Black Loong (offsetting is done in Lua script)
+DFLYT           Lua                 double     (0,0)          480          4:3           SendInput
 
 ; Len'en 1: Evanescent Existence
-Le01            [00AE693C][0]           float      (32,16)        480          4:3           GetKeyboardState
+Le01            [00AE693C][0]       float      (32,16)        480          4:3           GetKeyboardState
 
 ; Len'en 2: Earthen Miraculous Sword
-Le02            [00ADD1A4][0]           float      (32,16)        480          4:3           GetKeyboardState
+Le02            [00ADD1A4][0]       float      (32,16)        480          4:3           GetKeyboardState
 
 ; Len'en 3: Reactivate Majestical Imperial
-Le03            [00B095EC][0]           float      (32,16)        480          4:3           GetKeyboardState
+Le03            [00B095EC][0]       float      (32,16)        480          4:3           GetKeyboardState
 
 ; Len'en 4: Brilliant Pagoda or Haze Castle
-Le04            [02BB05B4][0]           float      (121,19)       480          4:3           GetKeyboardState
+Le04            [02BB05B4][0]       float      (121,19)       480          4:3           GetKeyboardState

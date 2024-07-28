@@ -6,14 +6,14 @@
 #define L_(str) L_IMPL(str)
 #define L_IMPL(str) L##str
 
-#define _ref
+#define nil nullptr
+
+#define SYM_NAME(name) #name
+
+#define NOUSE [[maybe_unused]]
 
 #define DLLEXPORT __declspec(dllexport)
 #define DLLEXPORT_C extern "C" __declspec(dllexport)
-
-#define QUOTE(x) #x
-
-#define SINGLE_ARG(...) __VA_ARGS__
 
 #define EVAL_DISCARD(expr) EVAL_DISCARD_IMPL(__COUNTER__, expr)
 #define EVAL_DISCARD_IMPL(counter, expr) EVAL_DISCARD_IMPL_EXPAND(counter, expr)
@@ -56,6 +56,6 @@ enum class EnumName: EnumType {
         (HRESULT_FACILITY(hr) == FACILITY_WIN32 ? HRESULT_CODE(hr) : (hr)))
 
 #define SAFE_RELEASE(p)    if ((p)) { (p)->Release(); (p) = 0; }0
-#define SAFE_DELETE(a)     if ((a)) { delete (a); (a) = NULL; }0
-#define SAFE_DELETE_ARR(a) if ((a)) { delete[] (a); (a) = NULL; }0
-#define SAFE_FREE_LIB(h)   if ((h)) { FreeLibrary(h); h = NULL; }0
+#define SAFE_DELETE(a)     if ((a)) { delete (a); (a) = nil; }0
+#define SAFE_DELETE_ARR(a) if ((a)) { delete[] (a); (a) = nil; }0
+#define SAFE_FREE_LIB(h)   if ((h)) { FreeLibrary(h); h = nil; }0

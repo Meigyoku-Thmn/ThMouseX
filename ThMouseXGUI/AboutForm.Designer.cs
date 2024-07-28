@@ -44,7 +44,7 @@
             this.lblDescription1.Name = "lblDescription1";
             this.lblDescription1.Size = new System.Drawing.Size(257, 32);
             this.lblDescription1.TabIndex = 0;
-            this.lblDescription1.Text = "{0} Version 2.1.0 by Meigyoku Thmn\nA fork from ThMouse Version 0.31 of HWei";
+            this.lblDescription1.Text = "{0} Version {1} by Meigyoku Thmn\nA fork from ThMouse Version 0.31 of HWei";
             // 
             // lblDescription2
             // 

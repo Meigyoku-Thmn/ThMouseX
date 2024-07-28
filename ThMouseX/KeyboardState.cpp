@@ -18,28 +18,30 @@ namespace core::keyboardstate {
     decltype(&_GetKeyboardState) OriGetKeyboardState;
 
     void Initialize() {
-        if ((g_currentConfig.InputMethods & InputMethod::GetKeyboardState) == InputMethod::None)
+        using enum InputMethod;
+        if ((g_currentConfig.InputMethods & GetKeyboardState) == None)
             return;
         minhook::CreateApiHook(vector<minhook::HookApiConfig>{
-            {L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, (PVOID*)&OriGetKeyboardState},
+            { L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, &OriGetKeyboardState },
         });
     }
 
     BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState) {
         auto rs = OriGetKeyboardState(lpKeyState);
         if (rs != FALSE) {
+            using enum GameInput;
             auto gameInput = DetermineGameInput();
-            if ((gameInput & GameInput::USE_BOMB) == GameInput::USE_BOMB)
+            if ((gameInput & USE_BOMB) == USE_BOMB)
                 lpKeyState[gs_bombButton] |= 0x80;
-            if ((gameInput & GameInput::USE_SPECIAL) == GameInput::USE_SPECIAL)
+            if ((gameInput & USE_SPECIAL) == USE_SPECIAL)
                 lpKeyState[gs_extraButton] |= 0x80;
-            if ((gameInput & GameInput::MOVE_LEFT) == GameInput::MOVE_LEFT)
+            if ((gameInput & MOVE_LEFT) == MOVE_LEFT)
                 lpKeyState[VK_LEFT] |= 0x80;
-            if ((gameInput & GameInput::MOVE_RIGHT) == GameInput::MOVE_RIGHT)
+            if ((gameInput & MOVE_RIGHT) == MOVE_RIGHT)
                 lpKeyState[VK_RIGHT] |= 0x80;
-            if ((gameInput & GameInput::MOVE_UP) == GameInput::MOVE_UP)
+            if ((gameInput & MOVE_UP) == MOVE_UP)
                 lpKeyState[VK_UP] |= 0x80;
-            if ((gameInput & GameInput::MOVE_DOWN) == GameInput::MOVE_DOWN)
+            if ((gameInput & MOVE_DOWN) == MOVE_DOWN)
                 lpKeyState[VK_DOWN] |= 0x80;
         }
         return rs;

@@ -7,25 +7,26 @@
 #include "../Common/DataTypes.h"
 #include "InputDetermine.h"
 
-template <typename T>
-void CalculatePosition(T position, POINT& output) {
+template <typename TPointer>
+void CalculatePosition(TPointer position, POINT& output) {
     RECTSIZE clientSize{};
     GetClientRect(g_hFocusWindow, &clientSize);
-    auto realWidth = clientSize.height() * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
-    auto paddingX = (clientSize.width() - realWidth) / 2;
-    g_playerPosRaw = { (double)(position)->X, (double)(position)->Y };
-    output.x = lrint((position)->X / g_pixelRate + g_pixelOffset.X + paddingX);
-    output.y = lrint((position)->Y / g_pixelRate + g_pixelOffset.Y);
+    auto realWidth = float(clientSize.height()) * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
+    auto paddingX = (float(clientSize.width()) - realWidth) / 2;
+    g_playerPosRaw = { double(position->X), double(position->Y) };
+    output.x = lrint(float(position->X) / g_pixelRate + g_pixelOffset.X + paddingX);
+    output.y = lrint(float(position->Y) / g_pixelRate + g_pixelOffset.Y);
 }
 
-void CalculatePlayerPos(DWORD address) {
-    if (g_currentConfig.PosDataType == PointDataType::Int)
+static void CalculatePlayerPos(DWORD address) {
+    using enum PointDataType;
+    if (g_currentConfig.PosDataType == Int)
         CalculatePosition((IntPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == PointDataType::Float)
+    else if (g_currentConfig.PosDataType == Float)
         CalculatePosition((FloatPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == PointDataType::Short)
+    else if (g_currentConfig.PosDataType == Short)
         CalculatePosition((ShortPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == PointDataType::Double)
+    else if (g_currentConfig.PosDataType == Double)
         CalculatePosition((DoublePoint*)address, g_playerPos);
 }
 
@@ -36,18 +37,19 @@ namespace core::inputdetermine {
     double y_error_WHATEVER = 0.0;
     long prev_xPSpeed = 1;
     long prev_yPSpeed = 1;
-    POINT previous_pos = {-1, -1};
+    POINT previous_pos = { -1, -1 };
     GameInput DetermineGameInput() {
-        g_gameInput = GameInput::NONE;
+        using enum GameInput;
+        g_gameInput = NONE;
         g_playerPos = {};
         g_playerPosRaw = {};
         DWORD address{};
         if (g_inputEnabled || g_showImGui) {
             if (g_leftMousePressed) {
-                g_gameInput |= GameInput::USE_BOMB;
+                g_gameInput |= USE_BOMB;
             }
             if (g_midMousePressed) {
-                g_gameInput |= GameInput::USE_SPECIAL;
+                g_gameInput |= USE_SPECIAL;
             }
             address = helper::CalculateAddress();
             if (address != 0) {
@@ -59,29 +61,30 @@ namespace core::inputdetermine {
                 auto yDist = mousePos.y - g_playerPos.y;
                 auto xPSpeed = previous_pos.x - g_playerPos.x;
                 auto yPSpeed = previous_pos.y - g_playerPos.y;
-                if(previous_pos.x == -1){
+                if (previous_pos.x == -1) {
                     xPSpeed = 0;
                     yPSpeed = 0;
                 }
-                if(xPSpeed == 0) xPSpeed = prev_xPSpeed;
-                if(yPSpeed == 0) yPSpeed = prev_yPSpeed;
-                if(xDist < 0) xDist = -xDist;
-                if(yDist < 0) yDist = -yDist;
-                if(xPSpeed < 0) xPSpeed = -xPSpeed;
-                if(yPSpeed < 0) yPSpeed = -yPSpeed;
+                if (xPSpeed == 0) xPSpeed = prev_xPSpeed;
+                if (yPSpeed == 0) yPSpeed = prev_yPSpeed;
+                if (xDist < 0) xDist = -xDist;
+                if (yDist < 0) yDist = -yDist;
+                if (xPSpeed < 0) xPSpeed = -xPSpeed;
+                if (yPSpeed < 0) yPSpeed = -yPSpeed;
                 auto v = xPSpeed;
-                if(yPSpeed > xPSpeed){
+                if (yPSpeed > xPSpeed) {
                     v = yPSpeed;
                 }
-                if(xDist > v + 1 || yDist > v + 1 || xDist + yDist > 10){
-                    if(xDist > yDist){
+                if (xDist > v + 1 || yDist > v + 1 || xDist + yDist > 10) {
+                    if (xDist > yDist) {
                         if (g_playerPos.x < mousePos.x)
                             g_gameInput |= GameInput::MOVE_RIGHT;
                         else if (g_playerPos.x > mousePos.x)
                             g_gameInput |= GameInput::MOVE_LEFT;
                         double error = (double)yDist / xDist;
                         y_error_WHATEVER += error;
-                    }else{
+                    }
+                    else {
                         if (g_playerPos.y < mousePos.y)
                             g_gameInput |= GameInput::MOVE_DOWN;
                         else if (g_playerPos.y > mousePos.y)
@@ -89,14 +92,14 @@ namespace core::inputdetermine {
                         double error = (double)xDist / yDist;
                         x_error_WHATEVER += error;
                     }
-                    if(y_error_WHATEVER > 1){
+                    if (y_error_WHATEVER > 1) {
                         if (g_playerPos.y < mousePos.y)
                             g_gameInput |= GameInput::MOVE_DOWN;
                         else if (g_playerPos.y > mousePos.y)
                             g_gameInput |= GameInput::MOVE_UP;
                         y_error_WHATEVER -= floor(y_error_WHATEVER);
                     }
-                    if(x_error_WHATEVER > 1){
+                    if (x_error_WHATEVER > 1) {
                         if (g_playerPos.x < mousePos.x)
                             g_gameInput |= GameInput::MOVE_RIGHT;
                         else if (g_playerPos.x > mousePos.x)
@@ -107,19 +110,10 @@ namespace core::inputdetermine {
                 previous_pos = g_playerPos;
                 prev_xPSpeed = xPSpeed;
                 prev_yPSpeed = yPSpeed;
-                // if (g_playerPos.x < mousePos.x - 1)
-                //     g_gameInput |= GameInput::MOVE_RIGHT;
-                // else if (g_playerPos.x > mousePos.x + 1)
-                //     g_gameInput |= GameInput::MOVE_LEFT;
-
-                // if (g_playerPos.y < mousePos.y - 1)
-                //     g_gameInput |= GameInput::MOVE_DOWN;
-                // else if (g_playerPos.y > mousePos.y + 1)
-                //     g_gameInput |= GameInput::MOVE_UP;
             }
         }
         if (!g_inputEnabled) {
-            return GameInput::NONE;
+            return NONE;
         }
 
         return g_gameInput;

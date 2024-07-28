@@ -7,6 +7,7 @@
 
 #include "../Common/macro.h"
 #include "../Common/Log.h"
+#include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
 #include "../Common/Helper.Memory.h"
 #include "../Common/MinHook.h"
@@ -38,30 +39,9 @@ namespace directx11 = core::directx11;
 namespace directinput = core::directinput;
 namespace keyboardstate = core::keyboardstate;
 namespace note = common::log;
+namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
-
-#define LOAD_LIBRARY_AS_RES (LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE | LOAD_LIBRARY_AS_IMAGE_RESOURCE)
-
-#define InitializeAndEnableHook(initializeBlock) initializeBlock; minhook::EnableAll(); 0
-#define TryMatchAndInitializeModuleA(moduleName, ...) TryMatchAndInitializeModule(moduleName, __VA_ARGS__, _str,  )
-#define TryMatchAndInitializeModuleW(moduleName, ...) TryMatchAndInitializeModule(moduleName, __VA_ARGS__, _wcs, L)
-#define TryMatchAndInitializeModule(moduleName, elseBlock, cmpPrefix, strPrefix)    \
-    if (cmpPrefix##icmp(moduleName, strPrefix"d3d8.dll") == 0) {                    \
-        InitializeAndEnableHook(directx8::Initialize());                            \
-    }                                                                               \
-    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d9.dll") == 0) {               \
-        InitializeAndEnableHook(directx9::Initialize());                            \
-    }                                                                               \
-    else if (cmpPrefix##icmp(moduleName, strPrefix"d3d11.dll") == 0) {              \
-        InitializeAndEnableHook(directx11::Initialize());                           \
-    }                                                                               \
-    else if (cmpPrefix##icmp(moduleName, strPrefix"DInput8.dll") == 0) {            \
-        InitializeAndEnableHook(directinput::Initialize());                         \
-    }                                                                               \
-    else {                                                                          \
-        elseBlock;                                                                  \
-    }                                                                               
 
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
@@ -71,7 +51,7 @@ namespace core {
         setlocale(LC_ALL, ".UTF8");
         setlocale(LC_NUMERIC, "C");
 
-        g_targetModule = GetModuleHandleW(NULL);
+        g_targetModule = GetModuleHandleW(nil);
 
         GetSystemDirectoryW(g_systemDirPath, ARRAYSIZE(g_systemDirPath));
 
@@ -85,9 +65,7 @@ namespace core {
         PathStripPathW(currentProcessName);
         PathRemoveExtensionW(currentProcessName);
 
-        if (_wcsicmp(currentProcessName, L_(APP_NAME)) == 0)
-            return;
-        if (_wcsicmp(currentProcessName, L_(APP_NAME "GUI")) == 0)
+        if (helper::IsCurrentProcessThMouseX())
             return;
 
         for (auto ord = gs_gameConfigs.length(); ord > 0; ord--) {
@@ -111,7 +89,7 @@ namespace core {
                 messagequeue::Initialize();
 
                 minhook::CreateApiHook(std::vector<minhook::HookApiConfig> {
-                    { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, (PVOID*)&OriLoadLibraryExW },
+                    { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, &OriLoadLibraryExW },
                 });
 
                 minhook::EnableAll();
@@ -124,12 +102,10 @@ namespace core {
 
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto rs = OriLoadLibraryExW(lpLibFileName, hFile, dwFlags);
-        if (rs != NULL && !(dwFlags & LOAD_LIBRARY_AS_RES)) {
-            auto fileName = PathFindFileNameW(lpLibFileName);
-            TryMatchAndInitializeModuleW(fileName, memory::ScanImportTable(rs, [](auto dllName) {
-                TryMatchAndInitializeModuleA(dllName, 0);
-            }));
-        }
+        directx11::Initialize();
+        directx9::Initialize();
+        directx8::Initialize();
+        directinput::Initialize();
         return rs;
     }
 

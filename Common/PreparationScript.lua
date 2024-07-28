@@ -15,7 +15,7 @@ function InitializeForLuaJIT()
         
         LPVOID      GetProcAddress(HMODULE hModule, LPCSTR lpProcName);
         typedef DWORD   (*Lua_ReadUInt32)(DWORD address);
-        typedef DWORD   (*Lua_ResolveAddress)(DWORD* offsets, int length);
+        typedef DWORD   (*Lua_ResolveAddress)(DWORD* offsets, size_t length);
         typedef void    (*Lua_OpenConsole)();
         typedef void    (*Lua_SetPositionAddress)(DWORD address);
         typedef int     (*Lua_GetDataType)();

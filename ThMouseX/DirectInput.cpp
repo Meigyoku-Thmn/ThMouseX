@@ -31,6 +31,7 @@ namespace core::directinput {
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
     void Initialize() {
+        using enum InputMethod;
         static bool initialized = false;
         static mutex mtx;
         HMODULE dinput8{};
@@ -38,7 +39,7 @@ namespace core::directinput {
             const lock_guard lock(mtx);
             if (initialized)
                 return;
-            if ((g_currentConfig.InputMethods & InputMethod::DirectInput) == InputMethod::None)
+            if ((g_currentConfig.InputMethods & DirectInput) == None)
                 return;
             dinput8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\DInput8.dll")).c_str());
             if (!dinput8)
@@ -53,43 +54,43 @@ namespace core::directinput {
         }
 
         ComPtr<IDirectInput8A> pDInput8;
-        auto rs = _DirectInput8Create(GetModuleHandleA(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8A, (PVOID*)&pDInput8, NULL);
+        auto rs = _DirectInput8Create(GetModuleHandleA(nil), DIRECTINPUT_VERSION, IID_IDirectInput8A, &pDInput8, nil);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create an IDirectInput8 instance", rs);
             return;
         }
 
         ComPtr<IDirectInputDevice8A> pDevice8;
-        rs = pDInput8->CreateDevice(GUID_SysKeyboard, &pDevice8, NULL);
+        rs = pDInput8->CreateDevice(GUID_SysKeyboard, &pDevice8, nil);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "Failed to create an IDirectInputDevice8 instance", rs);
             return;
         }
 
         auto vtable = *(DWORD**)pDevice8.Get();
-        auto baseAddress = (DWORD)dinput8;
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            {PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, (PVOID*)&OriGetDeviceStateDInput8},
+            { PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8 },
         });
     }
 
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData) {
+        using enum GameInput;
         auto hr = OriGetDeviceStateDInput8(pDevice, cbData, lpvData);
         if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
             auto keys = PBYTE(lpvData);
             auto gameInput = DetermineGameInput();
-            if ((gameInput & GameInput::USE_BOMB) == GameInput::USE_BOMB)
+            if ((gameInput & USE_BOMB) == USE_BOMB)
                 keys[DIK_X] |= 0x80;
-            if ((gameInput & GameInput::USE_SPECIAL) == GameInput::USE_SPECIAL)
+            if ((gameInput & USE_SPECIAL) == USE_SPECIAL)
                 keys[DIK_C] |= 0x80;
-            if ((gameInput & GameInput::MOVE_LEFT) == GameInput::MOVE_LEFT)
+            if ((gameInput & MOVE_LEFT) == MOVE_LEFT)
                 keys[DIK_LEFT] |= 0x80;
-            if ((gameInput & GameInput::MOVE_RIGHT) == GameInput::MOVE_RIGHT)
+            if ((gameInput & MOVE_RIGHT) == MOVE_RIGHT)
                 keys[DIK_RIGHT] |= 0x80;
-            if ((gameInput & GameInput::MOVE_UP) == GameInput::MOVE_UP)
+            if ((gameInput & MOVE_UP) == MOVE_UP)
                 keys[DIK_UP] |= 0x80;
-            if ((gameInput & GameInput::MOVE_DOWN) == GameInput::MOVE_DOWN)
+            if ((gameInput & MOVE_DOWN) == MOVE_DOWN)
                 keys[DIK_DOWN] |= 0x80;
         }
         return hr;
