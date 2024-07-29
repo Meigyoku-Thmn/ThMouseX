@@ -38,94 +38,92 @@ namespace core::imguioverlay {
         ImGui::NewFrame();
 
         static auto showVariableViewer = false;
-        static auto showImGuiDemoWindow = false;
+
+        static auto useRawInput = false;
+        static auto mouseSensitivity = 1.0f;
+        static auto movementAlgorithm = 0;
 
         if (ImGui::Begin("ThMouseX")) {
+            ImGui::Checkbox("Use Raw Input", &useRawInput);
+
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Sensitivity:");
+            ImGui::InvisibleButton("##padding-left", ImVec2(10, 1)); ImGui::SameLine();
+            ImGui::SliderFloat("##Sensitivity", &mouseSensitivity, 0.4f, 3.0f, "%.2fx", ImGuiSliderFlags_AlwaysClamp);
+
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("Movement Algorithm:");
+            ImGui::InvisibleButton("##padding-left", ImVec2(5, 1)); ImGui::SameLine();
+            ImGui::RadioButton("Bresenham's Line", &movementAlgorithm, 0); ImGui::SameLine();
+            ImGui::RadioButton("Simple", &movementAlgorithm, 1);
+
             ImGui::Checkbox("Show Variable Viewer", &showVariableViewer);
-            ImGui::Checkbox("Show ImGui Demo Window", &showImGuiDemoWindow);
         }
         ImGui::End();
 
-        if (showImGuiDemoWindow) {
-            ImGui::ShowDemoWindow(&showImGuiDemoWindow);
-        }
-
         if (showVariableViewer) {
             if (ImGui::Begin("ThMouseX's Variable Viewer", &showVariableViewer)) {
-                static auto showDirPaths = false;
-                ImGui::Checkbox("Show Directory Paths", &showDirPaths);
-                if (showDirPaths) {
-                    auto child_size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 3.5f);
-                    if (ImGui::BeginChildFrame(ImGui::GetID("Debug_DirPaths"), child_size)) {
-                        static auto thMouseDir = encoding::ConvertToUtf8(g_currentModuleDirPath);
-                        static auto systemDir = encoding::ConvertToUtf8(g_systemDirPath);
-                        static auto gameDir = encoding::ConvertToUtf8(g_currentProcessDirPath);
-                        ImGui::Text("ThMouseX:\t%s", thMouseDir.c_str());
-                        ImGui::Text("System:\t%s", systemDir.c_str());
-                        ImGui::Text("Game:\t%s", gameDir.c_str());
-                    }
-                    ImGui::EndChildFrame();
-                }
+                if (ImGui::CollapsingHeader("Directory Paths")) {
+                    static auto thMouseDir = encoding::ConvertToUtf8(g_currentModuleDirPath);
+                    ImGui::Text("ThMouseX:\t%s", thMouseDir.c_str());
 
-                static auto showState = false;
-                ImGui::Checkbox("Show State", &showState);
-                if (showState) {
-                    auto child_size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 6.5f);
-                    if (ImGui::BeginChildFrame(ImGui::GetID("Debug_State"), child_size)) {
-                        auto mousePos = helper::GetPointerPosition();
-                        auto simulatedInput = string(NAMEOF_ENUM_FLAG(g_gameInput));
-                        ImGui::Text("Mouse Position:\t(%d,%d)", mousePos.x, mousePos.y);
-                        ImGui::Text("Player Position (Scaled):\t(%d,%d)", g_playerPos.x, g_playerPos.y);
-                        ImGui::Text("Player Position (Raw):\t(%g,%g)", g_playerPosRaw.X, g_playerPosRaw.Y);
-                        ImGui::Text("Simulated Input:\t%s", simulatedInput.c_str());
-                        ImGui::Text("Pixel Rate:\t%g", g_pixelRate);
-                        ImGui::Text("Pixel Offset:\t(%g,%g)", g_pixelOffset.X, g_pixelOffset.Y);
-                    }
-                    ImGui::EndChildFrame();
+                    static auto systemDir = encoding::ConvertToUtf8(g_systemDirPath);
+                    ImGui::Text("System:\t%s", systemDir.c_str());
+
+                    static auto gameDir = encoding::ConvertToUtf8(g_currentProcessDirPath);
+                    ImGui::Text("Game:\t%s", gameDir.c_str());
                 }
-                static auto showGameConfig = false;
-                ImGui::Checkbox("Show Game Config", &showGameConfig);
-                if (showGameConfig) {
-                    auto child_size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 10.5f);
-                    if (ImGui::BeginChildFrame(ImGui::GetID("Debug_GameConfig"), child_size)) {
-                        static auto procName = encoding::ConvertToUtf8(g_currentConfig.ProcessName);
-                        static auto procAddr = memory::GetAddressConfigAsString();
-                        static auto scriptType = string(NAMEOF_ENUM(g_currentConfig.ScriptType));
-                        static auto posDataType = string(NAMEOF_ENUM(g_currentConfig.PosDataType));
-                        static auto inputMethod = string(NAMEOF_ENUM_FLAG(g_currentConfig.InputMethods));
-                        ImGui::Text("Process Name:\t%s", procName.c_str());
-                        ImGui::Text("Position Address:\t%s", procAddr.c_str());
-                        ImGui::Text("Script Type:\t%s", scriptType.c_str());
-                        ImGui::Text("Position Data Type:\t%s", posDataType.c_str());
-                        ImGui::Text("Base Pixel Offset:\t(%g,%g)", g_currentConfig.BasePixelOffset.X, g_currentConfig.BasePixelOffset.Y);
-                        ImGui::Text("Base Height:\t%d", g_currentConfig.BaseHeight);
-                        ImGui::Text("Aspect Ratio:\t(%g,%g)", g_currentConfig.AspectRatio.X, g_currentConfig.AspectRatio.Y);
-                        ImGui::Text("Input Method(s):\t%s", inputMethod.c_str());
-                    }
-                    ImGui::EndChildFrame();
+                if (ImGui::CollapsingHeader("State")) {
+                    auto mousePos = helper::GetPointerPosition();
+                    ImGui::Text("Mouse Position:\t(%d,%d)", mousePos.x, mousePos.y);
+                    ImGui::Text("Player Position (Scaled):\t(%d,%d)", g_playerPos.x, g_playerPos.y);
+                    ImGui::Text("Player Position (Raw):\t(%g,%g)", g_playerPosRaw.X, g_playerPosRaw.Y);
+
+                    auto simulatedInput = NAMEOF_ENUM_FLAG(g_gameInput);
+                    ImGui::Text("Simulated Input:\t%s", simulatedInput.c_str());
+                    ImGui::Text("Pixel Rate:\t%g", g_pixelRate);
+                    ImGui::Text("Pixel Offset:\t(%g,%g)", g_pixelOffset.X, g_pixelOffset.Y);
                 }
-                static auto showGlobalConfig = false;
-                ImGui::Checkbox("Show Global Config", &showGlobalConfig);
-                if (showGlobalConfig) {
-                    auto child_size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 9.5f);
-                    if (ImGui::BeginChildFrame(ImGui::GetID("Debug_GlobalConfig"), child_size)) {
-                        static auto bombBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_bombButton);
-                        static auto extraBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_extraButton);
-                        static auto toggleCurBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_toggleOsCursorButton);
-                        static auto toggleImGBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_toggleImGuiButton);
-                        static auto texturePath = encoding::ConvertToUtf8(gs_textureFilePath);
-                        static auto imGuiFontPath = encoding::ConvertToUtf8(gs_imGuiFontPath);
-                        ImGui::Text("Bomb Button:\t\"%s\" 0x%X", ImGui::GetKeyName(bombBtn), gs_bombButton);
-                        ImGui::Text("Extra Button:\t\"%s\" 0x%X", ImGui::GetKeyName(extraBtn), gs_extraButton);
-                        ImGui::Text("Toggle Os Cursor Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleCurBtn), gs_toggleOsCursorButton);
-                        ImGui::Text("Toggle ImGUI Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleImGBtn), gs_toggleImGuiButton);
-                        ImGui::Text("Cursor Texture File Path:\t%s", texturePath.c_str());
-                        ImGui::Text("Cursor Texture Base Height:\t%d", gs_textureBaseHeight);
-                        ImGui::Text("ImGUI Font Path:\t%s", imGuiFontPath.c_str());
-                        ImGui::Text("ImGUI Base Font Size:\t%d", gs_imGuiBaseFontSize);
-                        ImGui::Text("ImGUI Base Vertical Resolution:\t%d", gs_imGuiBaseVerticalResolution);
-                    }
-                    ImGui::EndChildFrame();
+                if (ImGui::CollapsingHeader("Game Config")) {
+                    static auto procName = encoding::ConvertToUtf8(g_currentConfig.ProcessName);
+                    ImGui::Text("Process Name:\t%s", procName.c_str());
+
+                    static auto procAddr = memory::GetAddressConfigAsString();
+                    ImGui::Text("Position Address:\t%s", procAddr.c_str());
+
+                    static auto scriptEngine = NAMEOF_ENUM(g_currentConfig.ScriptType);
+                    ImGui::Text("Script Engine:\t%s", scriptEngine.data());
+
+                    static auto posDataType = NAMEOF_ENUM(g_currentConfig.PosDataType);
+                    ImGui::Text("Position Data Type:\t%s", posDataType.data());
+                    ImGui::Text("Base Pixel Offset:\t(%g,%g)", g_currentConfig.BasePixelOffset.X, g_currentConfig.BasePixelOffset.Y);
+                    ImGui::Text("Base Height:\t%d", g_currentConfig.BaseHeight);
+                    ImGui::Text("Aspect Ratio:\t(%g,%g)", g_currentConfig.AspectRatio.X, g_currentConfig.AspectRatio.Y);
+
+                    static auto inputMethod = NAMEOF_ENUM_FLAG(g_currentConfig.InputMethods);
+                    ImGui::Text("Input Method(s):\t%s", inputMethod.c_str());
+                }
+                if (ImGui::CollapsingHeader("Global Config")) {
+                    static auto bombBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_bombButton);
+                    ImGui::Text("Bomb Button:\t\"%s\" 0x%X", ImGui::GetKeyName(bombBtn), gs_bombButton);
+
+                    static auto extraBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_extraButton);
+                    ImGui::Text("Extra Button:\t\"%s\" 0x%X", ImGui::GetKeyName(extraBtn), gs_extraButton);
+
+                    static auto toggleCurBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_toggleOsCursorButton);
+                    ImGui::Text("Toggle Os Cursor Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleCurBtn), gs_toggleOsCursorButton);
+
+                    static auto toggleImGBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_toggleImGuiButton);
+                    ImGui::Text("Toggle ImGUI Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleImGBtn), gs_toggleImGuiButton);
+
+                    static auto texturePath = encoding::ConvertToUtf8(gs_textureFilePath);
+                    ImGui::Text("Cursor Texture File Path:\t%s", texturePath.c_str());
+                    ImGui::Text("Cursor Texture Base Height:\t%d", gs_textureBaseHeight);
+
+                    static auto imGuiFontPath = encoding::ConvertToUtf8(gs_imGuiFontPath);
+                    ImGui::Text("ImGUI Font Path:\t%s", imGuiFontPath.c_str());
+                    ImGui::Text("ImGUI Base Font Size:\t%d", gs_imGuiBaseFontSize);
+                    ImGui::Text("ImGUI Base Vertical Resolution:\t%d", gs_imGuiBaseVerticalResolution);
                 }
             }
             ImGui::End();
