@@ -56,56 +56,49 @@ namespace core::inputdetermine {
 
                 auto mousePos = helper::GetPointerPosition();
 
-                auto xDist = mousePos.x - g_playerPos.x;
-                auto yDist = mousePos.y - g_playerPos.y;
-                auto xPSpeed = previous_pos.x - g_playerPos.x;
-                auto yPSpeed = previous_pos.y - g_playerPos.y;
-                if (previous_pos.x == -1) {
-                    xPSpeed = 0;
-                    yPSpeed = 0;
-                }
+                auto xDist = abs(mousePos.x - g_playerPos.x);
+                auto yDist = abs(mousePos.y - g_playerPos.y);
+
+                auto xPSpeed = previous_pos.x == -1 ? 0 : abs(previous_pos.x - g_playerPos.x);
+                auto yPSpeed = previous_pos.x == -1 ? 0 : abs(previous_pos.y - g_playerPos.y);
                 if (xPSpeed == 0) xPSpeed = prev_xPSpeed;
                 if (yPSpeed == 0) yPSpeed = prev_yPSpeed;
-                if (xDist < 0) xDist = -xDist;
-                if (yDist < 0) yDist = -yDist;
-                if (xPSpeed < 0) xPSpeed = -xPSpeed;
-                if (yPSpeed < 0) yPSpeed = -yPSpeed;
-                auto v = xPSpeed;
-                if (yPSpeed > xPSpeed) {
-                    v = yPSpeed;
-                }
-                if (xDist > v + 1 || yDist > v + 1 || xDist + yDist > 10) {
+
+                auto pSpeed = yPSpeed > xPSpeed ? yPSpeed : xPSpeed;
+
+                if (xDist > pSpeed + 1 || yDist > pSpeed + 1 || xDist + yDist > 10) {
                     if (xDist > yDist) {
                         if (g_playerPos.x < mousePos.x)
-                            g_gameInput |= GameInput::MOVE_RIGHT;
+                            g_gameInput |= MOVE_RIGHT;
                         else if (g_playerPos.x > mousePos.x)
-                            g_gameInput |= GameInput::MOVE_LEFT;
-                        double error = (double)yDist / xDist;
+                            g_gameInput |= MOVE_LEFT;
+                        auto error = (double)yDist / xDist;
                         y_error_WHATEVER += error;
                     }
                     else {
                         if (g_playerPos.y < mousePos.y)
-                            g_gameInput |= GameInput::MOVE_DOWN;
+                            g_gameInput |= MOVE_DOWN;
                         else if (g_playerPos.y > mousePos.y)
-                            g_gameInput |= GameInput::MOVE_UP;
-                        double error = (double)xDist / yDist;
+                            g_gameInput |= MOVE_UP;
+                        auto error = (double)xDist / yDist;
                         x_error_WHATEVER += error;
                     }
                     if (y_error_WHATEVER > 1) {
                         if (g_playerPos.y < mousePos.y)
-                            g_gameInput |= GameInput::MOVE_DOWN;
+                            g_gameInput |= MOVE_DOWN;
                         else if (g_playerPos.y > mousePos.y)
-                            g_gameInput |= GameInput::MOVE_UP;
+                            g_gameInput |= MOVE_UP;
                         y_error_WHATEVER -= floor(y_error_WHATEVER);
                     }
                     if (x_error_WHATEVER > 1) {
                         if (g_playerPos.x < mousePos.x)
-                            g_gameInput |= GameInput::MOVE_RIGHT;
+                            g_gameInput |= MOVE_RIGHT;
                         else if (g_playerPos.x > mousePos.x)
-                            g_gameInput |= GameInput::MOVE_LEFT;
+                            g_gameInput |= MOVE_LEFT;
                         x_error_WHATEVER -= floor(x_error_WHATEVER);
                     }
                 }
+
                 previous_pos = g_playerPos;
                 prev_xPSpeed = xPSpeed;
                 prev_yPSpeed = yPSpeed;
