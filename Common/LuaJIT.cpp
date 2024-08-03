@@ -45,7 +45,7 @@ namespace common::luajit {
 
     HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto thisDllPath = wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME);
-        if (strcmp(lpLibFileName, encoding::ConvertToUtf8(thisDllPath.c_str()).c_str()) == 0)
+        if (encoding::ConvertToUtf8(thisDllPath).compare(lpLibFileName) == 0)
             return g_coreModule;
         else
             return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
@@ -80,7 +80,7 @@ namespace common::luajit {
         }
 
         auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
-        auto scriptPath = encoding::ConvertToUtf8(wScriptPath.c_str());
+        auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
 
         if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str()))) {
             lua_settop(L, oldStackSize);

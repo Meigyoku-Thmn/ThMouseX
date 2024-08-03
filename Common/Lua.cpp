@@ -91,7 +91,7 @@ namespace common::lua {
 
         {
             auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
-            scriptPath = encoding::ConvertToUtf8(wScriptPath.c_str());
+            scriptPath = encoding::ConvertToUtf8(wScriptPath);
             ifstream scriptFile(scriptPath.c_str());
             if (!scriptFile) {
                 note::ToFile("[Lua] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
@@ -134,7 +134,7 @@ namespace common::lua {
             luaDllName = token;
         }
 
-        auto luaPath = g_currentProcessDirPath + wstring(L"\\") + encoding::ConvertToUtf16(luaDllName.c_str());
+        auto luaPath = g_currentProcessDirPath + wstring(L"\\") + encoding::ConvertToUtf16(luaDllName);
         auto lua = GetModuleHandleW(luaPath.c_str());
         if (!lua) {
             note::ToFile("[Lua] Failed to load %s from the game's directory.", luaDllName.c_str());

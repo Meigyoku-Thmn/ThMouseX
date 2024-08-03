@@ -29,6 +29,8 @@ using namespace Microsoft::WRL;
 namespace core::directinput {
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
+    BYTE bombDikCode = DIK_X;
+    BYTE specialDikCode = DIK_C;
 
     void Initialize() {
         using enum InputMethod;
@@ -41,15 +43,39 @@ namespace core::directinput {
                 return;
             if ((g_currentConfig.InputMethods & DirectInput) == None)
                 return;
+
             dinput8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\DInput8.dll")).c_str());
             if (!dinput8)
                 return;
+
+            do {
+                auto utilityPath = g_currentModuleDirPath + wstring(L"\\Utility.exe");
+                auto [exitCode, message] = helper::CallProcess(utilityPath, L"GetDirectInputMappingTableId");
+                if (exitCode == -1) {
+                    if (message.size() > 0)
+                        note::LastErrorToFile(message.c_str());
+                    break;
+                }
+                auto resHandle = FindResourceW(dinput8, MAKEINTRESOURCEW(exitCode), (LPWSTR)RT_RCDATA);
+                if (resHandle == nil) {
+                    note::LastErrorToFile(TAG "Failed to get the mapping table from DInput8.dll");
+                    break;
+                }
+                auto mappingTable = (BYTE*)LoadResource(dinput8, resHandle);
+                if (mappingTable == nil) {
+                    note::LastErrorToFile(TAG "Failed to get the mapping table from DInput8.dll");
+                    break;
+                }
+                bombDikCode = helper::MapVk2Dik(gs_bombButton, mappingTable);
+                specialDikCode = helper::MapVk2Dik(gs_extraButton, mappingTable);
+            } while (false);
+
             initialized = true;
         }
 
         auto _DirectInput8Create = (decltype(&DirectInput8Create))GetProcAddress(dinput8, "DirectInput8Create");
         if (!_DirectInput8Create) {
-            note::LastErrorToFile(TAG "Failed to import DInput8.dll|DirectInput8Create.");
+            note::LastErrorToFile(TAG "Failed to import DInput8.dll|DirectInput8Create");
             return;
         }
 
@@ -81,9 +107,9 @@ namespace core::directinput {
             auto keys = PBYTE(lpvData);
             auto gameInput = DetermineGameInput();
             if ((gameInput & USE_BOMB) == USE_BOMB)
-                keys[DIK_X] |= 0x80;
+                keys[bombDikCode] |= 0x80;
             if ((gameInput & USE_SPECIAL) == USE_SPECIAL)
-                keys[DIK_C] |= 0x80;
+                keys[specialDikCode] |= 0x80;
             if ((gameInput & MOVE_LEFT) == MOVE_LEFT)
                 keys[DIK_LEFT] |= 0x80;
             if ((gameInput & MOVE_RIGHT) == MOVE_RIGHT)

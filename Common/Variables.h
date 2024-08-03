@@ -6,6 +6,7 @@
 extern WCHAR    g_currentModuleDirPath[MAX_PATH];
 extern WCHAR    g_systemDirPath[MAX_PATH];
 extern WCHAR    g_currentProcessDirPath[MAX_PATH];
+extern WCHAR    g_currentProcessName[MAX_PATH];
 
 // single game config
 extern GameConfig  g_currentConfig;
@@ -27,6 +28,7 @@ extern POINT        g_playerPos;
 extern DoublePoint  g_playerPosRaw;
 extern GameInput    g_gameInput;
 
+#ifndef UTILITY_PROJECT
 // configuration from main exe
 extern GameConfigs  gs_gameConfigs;
 extern BYTE         gs_bombButton;
@@ -38,3 +40,4 @@ extern DWORD        gs_textureBaseHeight;
 extern WCHAR        gs_imGuiFontPath[MAX_PATH];
 extern DWORD        gs_imGuiBaseFontSize;
 extern DWORD        gs_imGuiBaseVerticalResolution;
+#endif

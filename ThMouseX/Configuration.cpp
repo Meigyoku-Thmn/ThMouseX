@@ -252,7 +252,7 @@ bool IsCommentLine(stringstream& stream) {
 tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount, const char* gameConfigPath) {
     string processName;
     stream >> quoted(processName);
-    auto wProcessName = encoding::ConvertToUtf16(processName.c_str());
+    auto wProcessName = encoding::ConvertToUtf16(processName);
 
     auto maxSize = ARRAYSIZE(gs_gameConfigs[0].ProcessName) - 1;
     if (wProcessName.size() > maxSize) {

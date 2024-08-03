@@ -20,7 +20,7 @@ namespace common::log {
         if (!__logFile) {
             if (__logPath.size() == 0) {
                 __logPath = std::wstring(g_currentModuleDirPath) + L"/log.txt";
-                __processName = encoding::ConvertToUtf8(g_currentConfig.ProcessName);
+                __processName = encoding::ConvertToUtf8(g_currentProcessName);
             }
             __logFile = _wfsopen(__logPath.c_str(), L"a+", _SH_DENYNO);
             if (__logFile != nil)

@@ -19,4 +19,7 @@ namespace common::helper {
     bool TestFullscreenHeuristically();
     DWORD CalculateAddress();
     bool IsCurrentProcessThMouseX();
+    std::tuple<DWORD, std::string> CallProcess(const std::wstring& processPath, const std::wstring& cmdLine);
+    bool IsVKExtended(UINT key);
+    BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable);
 }

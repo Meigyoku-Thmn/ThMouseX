@@ -3,9 +3,11 @@
 #include <string>
 #include <tuple>
 #include <span>
+#include <format>
 
 #include "Helper.h"
 #include "Helper.Memory.h"
+#include "Helper.Encoding.h"
 #include "Lua.h"
 #include "LuaJIT.h"
 #include "NeoLua.h"
@@ -186,8 +188,45 @@ namespace common::helper {
 
     bool IsCurrentProcessThMouseX() {
         auto envVal = getenv(APP_NAME);
-        if (envVal == nullptr)
+        if (envVal == nil)
             return false;
         return strcmp(envVal, APP_NAME) == 0;
+    }
+
+    tuple<DWORD, string> CallProcess(const wstring& processPath, const wstring& cmdLine) {
+        STARTUPINFOW info = { sizeof(info) };
+        PROCESS_INFORMATION processInfo;
+        wstring _cmdLine = cmdLine;
+        auto rs = CreateProcessW(processPath.c_str(), _cmdLine.data(), nil, nil, FALSE, 0, nil, nil, &info, &processInfo);
+        if (!rs)
+            return tuple(-1, move(format("Failed to create process '{}'", encoding::ConvertToUtf8(processPath))));
+        WaitForSingleObject(processInfo.hProcess, INFINITE);
+        DWORD exitCode;
+        rs = GetExitCodeProcess(processInfo.hProcess, &exitCode);
+        CloseHandle(processInfo.hProcess);
+        CloseHandle(processInfo.hThread);
+        if (!rs)
+            return tuple(-1, move(format("Failed to get the exit code of process '{}'", encoding::ConvertToUtf8(processPath))));
+        return tuple(exitCode, string());
+    }
+
+    // from Autoit source code: https://github.com/ellysh/au3src/blob/35517393091e7d97052d20ccdee8d9d6db36276f/src/sendkeys.cpp#L790
+    bool IsVKExtended(UINT key) {
+        return key == VK_INSERT || key == VK_DELETE || key == VK_END || key == VK_DOWN ||
+            key == VK_NEXT || key == VK_LEFT || key == VK_RIGHT || key == VK_HOME || key == VK_UP ||
+            key == VK_PRIOR || key == VK_DIVIDE || key == VK_APPS || key == VK_LWIN || key == VK_RWIN ||
+            key == VK_RMENU || key == VK_RCONTROL || key == VK_SLEEP || key == VK_BROWSER_BACK ||
+            key == VK_BROWSER_FORWARD || key == VK_BROWSER_REFRESH || key == VK_BROWSER_STOP ||
+            key == VK_BROWSER_SEARCH || key == VK_BROWSER_FAVORITES || key == VK_BROWSER_HOME ||
+            key == VK_VOLUME_MUTE || key == VK_VOLUME_DOWN || key == VK_VOLUME_UP || key == VK_MEDIA_NEXT_TRACK ||
+            key == VK_MEDIA_PREV_TRACK || key == VK_MEDIA_STOP || key == VK_MEDIA_PLAY_PAUSE ||
+            key == VK_LAUNCH_MAIL || key == VK_LAUNCH_MEDIA_SELECT || key == VK_LAUNCH_APP1 || key == VK_LAUNCH_APP2;
+    }
+
+    BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable) {
+        auto scancode = (BYTE)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX);
+        if (IsVKExtended(vkCode))
+            scancode = scancode | 0x80;
+        return mappingTable[scancode];
     }
 }

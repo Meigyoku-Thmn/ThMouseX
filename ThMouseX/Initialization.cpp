@@ -58,19 +58,18 @@ namespace core {
         GetModuleFileNameW(g_coreModule, g_currentModuleDirPath, ARRAYSIZE(g_currentModuleDirPath));
         PathRemoveFileSpecW(g_currentModuleDirPath);
 
-        WCHAR currentProcessName[MAX_PATH];
-        GetModuleFileNameW(g_targetModule, currentProcessName, ARRAYSIZE(currentProcessName));
-        wcscpy(g_currentProcessDirPath, currentProcessName);
+        GetModuleFileNameW(g_targetModule, g_currentProcessName, ARRAYSIZE(g_currentProcessName));
+        wcscpy(g_currentProcessDirPath, g_currentProcessName);
         PathRemoveFileSpecW(g_currentProcessDirPath);
-        PathStripPathW(currentProcessName);
-        PathRemoveExtensionW(currentProcessName);
+        PathStripPathW(g_currentProcessName);
+        PathRemoveExtensionW(g_currentProcessName);
 
         if (helper::IsCurrentProcessThMouseX())
             return;
 
         for (auto ord = gs_gameConfigs.length(); ord > 0; ord--) {
             auto i = ord - 1;
-            if (_wcsicmp(currentProcessName, gs_gameConfigs[i].ProcessName) == 0) {
+            if (_wcsicmp(g_currentProcessName, gs_gameConfigs[i].ProcessName) == 0) {
                 g_currentConfig = gs_gameConfigs[i];
 
                 minhook::Initialize();

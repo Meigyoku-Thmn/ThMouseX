@@ -30,6 +30,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "inipp", "inipp", "{044C7786
 		vcpkg_custom_ports\inipp\vcpkg.json = vcpkg_custom_ports\inipp\vcpkg.json
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utility", "Utility\Utility.vcxproj", "{79B700FB-2407-4280-A89F-12B0ECCD2D0B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{47C2EE88-18D4-4367-8E67-6DAA01AB4451} = {47C2EE88-18D4-4367-8E67-6DAA01AB4451}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +93,18 @@ Global
 		{D91DA069-F70E-4961-A49C-AB7CE1923FFD}.Release|x64.Build.0 = Release|Any CPU
 		{D91DA069-F70E-4961-A49C-AB7CE1923FFD}.Release|x86.ActiveCfg = Release|Any CPU
 		{D91DA069-F70E-4961-A49C-AB7CE1923FFD}.Release|x86.Build.0 = Release|Any CPU
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Debug|Any CPU.Build.0 = Debug|x64
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Debug|x64.ActiveCfg = Debug|x64
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Debug|x64.Build.0 = Debug|x64
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Debug|x86.ActiveCfg = Debug|Win32
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Debug|x86.Build.0 = Debug|Win32
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Release|Any CPU.ActiveCfg = Release|x64
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Release|Any CPU.Build.0 = Release|x64
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Release|x64.ActiveCfg = Release|x64
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Release|x64.Build.0 = Release|x64
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Release|x86.ActiveCfg = Release|Win32
+		{79B700FB-2407-4280-A89F-12B0ECCD2D0B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

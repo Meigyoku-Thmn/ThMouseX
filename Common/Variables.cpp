@@ -6,6 +6,7 @@
 WCHAR   g_currentModuleDirPath[MAX_PATH];
 WCHAR   g_systemDirPath[MAX_PATH];
 WCHAR   g_currentProcessDirPath[MAX_PATH];
+WCHAR   g_currentProcessName[MAX_PATH];
 
 // single game config
 GameConfig      g_currentConfig;
@@ -27,6 +28,7 @@ POINT       g_playerPos;
 DoublePoint g_playerPosRaw;
 GameInput   g_gameInput;
 
+#ifndef UTILITY_PROJECT
 // configuration from main exe
 #pragma data_seg(".SHRCONF")
 GameConfigs gs_gameConfigs{};
@@ -42,3 +44,4 @@ DWORD       gs_imGuiBaseVerticalResolution = 960;
 #pragma data_seg()
 // make the above segment shared across processes
 #pragma comment(linker, "/SECTION:.SHRCONF,RWS")
+#endif

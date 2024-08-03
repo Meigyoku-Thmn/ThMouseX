@@ -15,6 +15,10 @@ namespace common::helper::encoding {
         return output;
     }
 
+    wstring ConvertToUtf16(const string& utf8str) {
+        return ConvertToUtf16(utf8str.c_str());
+    }
+
     string ConvertToUtf8(const wchar_t* utf16str) {
         auto byteCount = WideCharToMultiByte(CP_UTF8, 0, utf16str, -1, nil, 0, nil, nil);
         if (byteCount == 0)
@@ -22,5 +26,9 @@ namespace common::helper::encoding {
         string output(byteCount - 1, '\0');
         WideCharToMultiByte(CP_UTF8, 0, utf16str, -1, output.data(), byteCount, nil, nil);
         return output;
+    }
+
+    string ConvertToUtf8(const wstring& utf16str) {
+        return ConvertToUtf8(utf16str.c_str());
     }
 }
