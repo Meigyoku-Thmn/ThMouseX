@@ -196,7 +196,7 @@ namespace common::helper {
     tuple<DWORD, string> CallProcess(const wstring& processPath, const wstring& cmdLine) {
         STARTUPINFOW info = { sizeof(info) };
         PROCESS_INFORMATION processInfo;
-        wstring _cmdLine = cmdLine;
+        wstring _cmdLine = L"\"" + processPath + L"\" " + cmdLine;
         auto rs = CreateProcessW(processPath.c_str(), _cmdLine.data(), nil, nil, FALSE, 0, nil, nil, &info, &processInfo);
         if (!rs)
             return tuple(-1, move(format("Failed to create process '{}'", encoding::ConvertToUtf8(processPath))));
