@@ -212,7 +212,8 @@ namespace common::helper {
 
     // from Autoit source code: https://github.com/ellysh/au3src/blob/35517393091e7d97052d20ccdee8d9d6db36276f/src/sendkeys.cpp#L790
     bool IsVKExtended(UINT key) {
-        return key == VK_INSERT || key == VK_DELETE || key == VK_END || key == VK_DOWN ||
+        return
+            key == VK_INSERT || key == VK_DELETE || key == VK_END || key == VK_DOWN ||
             key == VK_NEXT || key == VK_LEFT || key == VK_RIGHT || key == VK_HOME || key == VK_UP ||
             key == VK_PRIOR || key == VK_DIVIDE || key == VK_APPS || key == VK_LWIN || key == VK_RWIN ||
             key == VK_RMENU || key == VK_RCONTROL || key == VK_SLEEP || key == VK_BROWSER_BACK ||
@@ -220,13 +221,16 @@ namespace common::helper {
             key == VK_BROWSER_SEARCH || key == VK_BROWSER_FAVORITES || key == VK_BROWSER_HOME ||
             key == VK_VOLUME_MUTE || key == VK_VOLUME_DOWN || key == VK_VOLUME_UP || key == VK_MEDIA_NEXT_TRACK ||
             key == VK_MEDIA_PREV_TRACK || key == VK_MEDIA_STOP || key == VK_MEDIA_PLAY_PAUSE ||
-            key == VK_LAUNCH_MAIL || key == VK_LAUNCH_MEDIA_SELECT || key == VK_LAUNCH_APP1 || key == VK_LAUNCH_APP2;
+            key == VK_LAUNCH_MAIL || key == VK_LAUNCH_MEDIA_SELECT || key == VK_LAUNCH_APP1 || key == VK_LAUNCH_APP2 ||
+            key == VK_CANCEL;
     }
 
     BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable) {
         auto scancode = (BYTE)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX);
-        if (IsVKExtended(vkCode))
-            scancode = scancode | 0x80;
+        if (vkCode == VK_PAUSE)
+            scancode = 0x45;
+        else if (vkCode == VK_NUMLOCK && scancode == 0x45 || IsVKExtended(vkCode))
+            scancode |= 0x80;
         return mappingTable[scancode];
     }
 }
