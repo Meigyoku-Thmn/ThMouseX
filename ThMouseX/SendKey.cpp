@@ -28,7 +28,7 @@ static void SendKeyDown(BYTE vkCode) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX) << 16) | 0x00000001;
         if (helper::IsVKExtended(vkCode))
             lParam |= 0x01000000;
-        SendMessageW(g_hFocusWindow, WM_KEYDOWN, vkCode, lParam);
+        SendMessageW(g_hFocusWindow, WM_KEYDOWN, helper::NormalizeLeftRightVkCode(vkCode), lParam);
     }
     else if ((g_currentConfig.InputMethods & SendInput) == SendInput) {
         if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
@@ -36,7 +36,7 @@ static void SendKeyDown(BYTE vkCode) {
         INPUT input{
             .type = INPUT_KEYBOARD,
             .ki = {
-                .wVk = vkCode,
+                .wVk = helper::NormalizeLeftRightVkCode(vkCode),
                 .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX),
                 .dwFlags = DWORD(helper::IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0),/*
           */},
@@ -51,7 +51,7 @@ static void SendKeyUp(BYTE vkCode) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX) << 16) | 0xC0000001;
         if (helper::IsVKExtended(vkCode))
             lParam |= 0x01000000;
-        SendMessageW(g_hFocusWindow, WM_KEYUP, vkCode, lParam);
+        SendMessageW(g_hFocusWindow, WM_KEYUP, helper::NormalizeLeftRightVkCode(vkCode), lParam);
     }
     else if ((g_currentConfig.InputMethods & SendInput) == SendInput) {
         if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
@@ -59,7 +59,7 @@ static void SendKeyUp(BYTE vkCode) {
         INPUT input{
             .type = INPUT_KEYBOARD,
             .ki = {
-                .wVk = vkCode,
+                .wVk = helper::NormalizeLeftRightVkCode(vkCode),
                 .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX),
                 .dwFlags = DWORD(KEYEVENTF_KEYUP | (helper::IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0)),/*
           */},

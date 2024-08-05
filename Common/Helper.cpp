@@ -199,19 +199,19 @@ namespace common::helper {
         wstring _cmdLine = L"\"" + processPath + L"\" " + cmdLine;
         auto rs = CreateProcessW(processPath.c_str(), _cmdLine.data(), nil, nil, FALSE, 0, nil, nil, &info, &processInfo);
         if (!rs)
-            return tuple(-1, move(format("Failed to create process '{}'", encoding::ConvertToUtf8(processPath))));
+            return tuple(-1, format("Failed to create process '{}'", encoding::ConvertToUtf8(processPath)));
         WaitForSingleObject(processInfo.hProcess, INFINITE);
         DWORD exitCode;
         rs = GetExitCodeProcess(processInfo.hProcess, &exitCode);
         CloseHandle(processInfo.hProcess);
         CloseHandle(processInfo.hThread);
         if (!rs)
-            return tuple(-1, move(format("Failed to get the exit code of process '{}'", encoding::ConvertToUtf8(processPath))));
+            return tuple(-1, format("Failed to get the exit code of process '{}'", encoding::ConvertToUtf8(processPath)));
         return tuple(exitCode, string());
     }
 
     // from Autoit source code: https://github.com/ellysh/au3src/blob/35517393091e7d97052d20ccdee8d9d6db36276f/src/sendkeys.cpp#L790
-    bool IsVKExtended(UINT key) {
+    bool IsVKExtended(BYTE key) {
         return
             key == VK_INSERT || key == VK_DELETE || key == VK_END || key == VK_DOWN ||
             key == VK_NEXT || key == VK_LEFT || key == VK_RIGHT || key == VK_HOME || key == VK_UP ||
@@ -232,5 +232,15 @@ namespace common::helper {
         else if (vkCode == VK_NUMLOCK && scancode == 0x45 || IsVKExtended(vkCode))
             scancode |= 0x80;
         return mappingTable[scancode];
+    }
+
+    BYTE NormalizeLeftRightVkCode(BYTE vkCode) {
+        if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL)
+            return VK_CONTROL;
+        if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT)
+            return VK_SHIFT;
+        if (vkCode == VK_LMENU || vkCode == VK_RMENU)
+            return VK_MENU;
+        return vkCode;
     }
 }
