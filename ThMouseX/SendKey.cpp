@@ -26,7 +26,7 @@ static void SendKeyDown(BYTE vkCode) {
     using enum InputMethod;
     if ((g_currentConfig.InputMethods & SendMsg) == SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX) << 16) | 0x00000001;
-        if (helper::IsVKExtended(vkCode))
+        if (helper::ShouldBeVkExtended(vkCode))
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYDOWN, helper::NormalizeLeftRightVkCode(vkCode), lParam);
     }
@@ -38,7 +38,7 @@ static void SendKeyDown(BYTE vkCode) {
             .ki = {
                 .wVk = helper::NormalizeLeftRightVkCode(vkCode),
                 .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX),
-                .dwFlags = DWORD(helper::IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0),/*
+                .dwFlags = DWORD(helper::ShouldBeVkExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0),/*
           */},
         };
         ::SendInput(1, &input, sizeof(INPUT));
@@ -49,7 +49,7 @@ static void SendKeyUp(BYTE vkCode) {
     using enum InputMethod;
     if ((g_currentConfig.InputMethods & SendMsg) == SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX) << 16) | 0xC0000001;
-        if (helper::IsVKExtended(vkCode))
+        if (helper::ShouldBeVkExtended(vkCode))
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYUP, helper::NormalizeLeftRightVkCode(vkCode), lParam);
     }
@@ -61,7 +61,7 @@ static void SendKeyUp(BYTE vkCode) {
             .ki = {
                 .wVk = helper::NormalizeLeftRightVkCode(vkCode),
                 .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX),
-                .dwFlags = DWORD(KEYEVENTF_KEYUP | (helper::IsVKExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0)),/*
+                .dwFlags = DWORD(KEYEVENTF_KEYUP | (helper::ShouldBeVkExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0)),/*
           */},
         };
         ::SendInput(1, &input, sizeof(INPUT));

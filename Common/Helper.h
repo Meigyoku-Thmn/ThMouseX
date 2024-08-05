@@ -20,7 +20,7 @@ namespace common::helper {
     DWORD CalculateAddress();
     bool IsCurrentProcessThMouseX();
     std::tuple<DWORD, std::string> CallProcess(const std::wstring& processPath, const std::wstring& cmdLine);
-    bool IsVKExtended(BYTE key);
+    bool ShouldBeVkExtended(BYTE key);
     BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable);
     BYTE NormalizeLeftRightVkCode(BYTE vkCode);
 }
