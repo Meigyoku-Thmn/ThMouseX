@@ -225,12 +225,16 @@ namespace common::helper {
             key == VK_CANCEL;
     }
 
-    BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable) {
+    BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable, BYTE defaultDikCode = 0) {
+        if (vkCode == 0)
+            return defaultDikCode;
         auto scancode = (BYTE)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX);
         if (vkCode == VK_PAUSE)
             scancode = 0x45;
         else if (vkCode == VK_NUMLOCK && scancode == 0x45 || ShouldBeVkExtended(vkCode))
             scancode |= 0x80;
+        if (scancode == 0)
+            return defaultDikCode;
         return mappingTable[scancode];
     }
 

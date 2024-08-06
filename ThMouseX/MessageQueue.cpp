@@ -26,7 +26,9 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 using Action = function<void()>;
 
 enum class EventUseCase {
-    ImGuiBtn, OsCursorBtn, LeftMouseBtn, MiddleMouseBtn, RightMouseBtn
+    ImGuiBtn, OsCursorBtn,
+    LeftMouseBtn, MiddleMouseBtn, RightMouseBtn,
+    ForwardMouseBtn, BackwardMouseBtn,
 };
 
 template <EventUseCase T>
@@ -128,18 +130,18 @@ namespace core::messagequeue {
             auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
 
             HandleMousePress<LeftMouseBtn>(e, WM_LBUTTONDOWN, WM_LBUTTONUP, [wantCaptureMouse]() {
-                g_leftMousePressed = wantCaptureMouse ? false : true;
+                g_leftClicked = wantCaptureMouse ? false : true;
                 if (wantCaptureMouse)
                     g_inputEnabled = false;
-                }, []() { g_leftMousePressed = false; });
+                }, []() { g_leftClicked = false; });
 
             HandleMousePress<MiddleMouseBtn>(e, WM_MBUTTONDOWN, WM_MBUTTONUP, [wantCaptureMouse]() {
-                g_midMousePressed = wantCaptureMouse ? false : true;
+                g_middleClicked = wantCaptureMouse ? false : true;
                 if (wantCaptureMouse)
                     g_inputEnabled = false;
                 else
                     ImGui::SetWindowFocus();
-                }, []() { g_midMousePressed = false; });
+                }, []() { g_middleClicked = false; });
 
             HandleMousePress<RightMouseBtn>(e, WM_RBUTTONDOWN, WM_RBUTTONUP, nil, [wantCaptureMouse]() {
                 g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;

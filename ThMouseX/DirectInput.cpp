@@ -13,6 +13,7 @@
 #include "../Common/Helper.h"
 #include "InputDetermine.h"
 #include "DirectInput.h"
+#include "InputMap.h"
 
 namespace minhook = common::minhook;
 namespace note = common::log;
@@ -29,8 +30,6 @@ using namespace Microsoft::WRL;
 namespace core::directinput {
     HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
     decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
-    BYTE bombDikCode = DIK_X;
-    BYTE specialDikCode = DIK_C;
 
     void Initialize() {
         using enum InputMethod;
@@ -66,8 +65,15 @@ namespace core::directinput {
                     note::LastErrorToFile(TAG "Failed to get the mapping table from DInput8.dll");
                     break;
                 }
-                bombDikCode = helper::MapVk2Dik(gs_bombButton, mappingTable);
-                specialDikCode = helper::MapVk2Dik(gs_extraButton, mappingTable);
+                dikCodeForLeftClick = helper::MapVk2Dik(gs_vkCodeForLeftClick, mappingTable, dikCodeForLeftClick);
+                dikCodeForMiddleClick = helper::MapVk2Dik(gs_vkCodeForMiddleClick, mappingTable, dikCodeForMiddleClick);
+                dikCodeForRightClick = helper::MapVk2Dik(gs_vkCodeForRightClick, mappingTable);
+                dikCodeForForwardClick = helper::MapVk2Dik(gs_vkCodeForForwardClick, mappingTable);
+                dikCodeForBackwardClick = helper::MapVk2Dik(gs_vkCodeForBackwardClick, mappingTable);
+                dikCodeForScrollUp = helper::MapVk2Dik(gs_vkCodeForScrollUp, mappingTable);
+                dikCodeForScrollDown = helper::MapVk2Dik(gs_vkCodeForScrollDown, mappingTable);
+                dikCodeForScrollLeft = helper::MapVk2Dik(gs_vkCodeForScrollLeft, mappingTable);
+                dikCodeForScrollRight = helper::MapVk2Dik(gs_vkCodeForScrollRight, mappingTable);
             } while (false);
 
             initialized = true;
@@ -106,10 +112,10 @@ namespace core::directinput {
         if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
             auto keys = PBYTE(lpvData);
             auto gameInput = DetermineGameInput();
-            if ((gameInput & USE_BOMB) == USE_BOMB)
-                keys[bombDikCode] |= 0x80;
-            if ((gameInput & USE_SPECIAL) == USE_SPECIAL)
-                keys[specialDikCode] |= 0x80;
+            if ((gameInput & CLICK_LEFT) == CLICK_LEFT)
+                keys[dikCodeForLeftClick] |= 0x80;
+            if ((gameInput & CLICK_MIDDLE) == CLICK_MIDDLE)
+                keys[dikCodeForMiddleClick] |= 0x80;
             if ((gameInput & MOVE_LEFT) == MOVE_LEFT)
                 keys[DIK_LEFT] |= 0x80;
             if ((gameInput & MOVE_RIGHT) == MOVE_RIGHT)

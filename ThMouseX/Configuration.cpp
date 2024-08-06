@@ -222,8 +222,15 @@ namespace core::configuration {
         ini.strip_trailing_comments();
         auto const& defaultSection = ini.sections[""];
 
-        if (!IniTryGetButton<"BombButton">(defaultSection, vkCodes, gs_bombButton)) return false;
-        if (!IniTryGetButton<"ExtraButton">(defaultSection, vkCodes, gs_extraButton)) return false;
+        if (!IniTryGetButton<"LeftClick">(defaultSection, vkCodes, gs_vkCodeForLeftClick)) return false;
+        if (!IniTryGetButton<"MiddleClick">(defaultSection, vkCodes, gs_vkCodeForMiddleClick)) return false;
+        if (!IniTryGetButton<"RightClick">(defaultSection, vkCodes, gs_vkCodeForRightClick)) return false;
+        if (!IniTryGetButton<"ForwardClick">(defaultSection, vkCodes, gs_vkCodeForForwardClick)) return false;
+        if (!IniTryGetButton<"BackwardClick">(defaultSection, vkCodes, gs_vkCodeForBackwardClick)) return false;
+        if (!IniTryGetButton<"ScrollUp">(defaultSection, vkCodes, gs_vkCodeForScrollUp)) return false;
+        if (!IniTryGetButton<"ScrollDown">(defaultSection, vkCodes, gs_vkCodeForScrollDown)) return false;
+        if (!IniTryGetButton<"ScrollLeft">(defaultSection, vkCodes, gs_vkCodeForScrollLeft)) return false;
+        if (!IniTryGetButton<"ScrollRight">(defaultSection, vkCodes, gs_vkCodeForScrollRight)) return false;
 
         if (!IniTryGetButton<"ToggleOsCursorButton">(defaultSection, vkCodes, gs_toggleOsCursorButton)) return false;
         if (!IniTryGetButton<"ToggleImGuiButton">(defaultSection, vkCodes, gs_toggleImGuiButton)) return false;

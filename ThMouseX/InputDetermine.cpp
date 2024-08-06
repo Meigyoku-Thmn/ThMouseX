@@ -44,11 +44,11 @@ namespace core::inputdetermine {
         g_playerPosRaw = {};
         DWORD address{};
         if (g_inputEnabled || g_showImGui) {
-            if (g_leftMousePressed) {
-                g_gameInput |= USE_BOMB;
+            if (g_leftClicked) {
+                g_gameInput |= CLICK_LEFT;
             }
-            if (g_midMousePressed) {
-                g_gameInput |= USE_SPECIAL;
+            if (g_middleClicked) {
+                g_gameInput |= CLICK_MIDDLE;
             }
             address = helper::CalculateAddress();
             if (address != 0) {

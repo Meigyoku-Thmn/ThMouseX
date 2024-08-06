@@ -195,6 +195,7 @@
     <ClCompile Include="CompilerConfig.cpp" />
     <ClCompile Include="Direct3D9.cpp" />
     <ClCompile Include="DirectInput.cpp" />
+    <ClCompile Include="InputMap.cpp" />
     <ClCompile Include="KeyboardState.cpp" />
     <ClCompile Include="MessageQueue.cpp" />
     <ClCompile Include="SendKey.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="imgui_impl_dx11.h" />
     <ClInclude Include="imgui_impl_dx8.h" />
     <ClInclude Include="InputDetermine.h" />
+    <ClInclude Include="InputMap.h" />
     <ClInclude Include="KeyboardState.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MessageQueue.h" />

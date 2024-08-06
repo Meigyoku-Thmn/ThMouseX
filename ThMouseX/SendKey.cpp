@@ -87,8 +87,8 @@ static void HandleKeyPress(GameInput gameInput, bool& wasPressing, BYTE vkCode) 
 static void TestInputAndSendKeys() {
     using enum GameInput;
     auto gameInput = DetermineGameInput();
-    HandleKeyPress(gameInput & USE_BOMB, lastState.bomb, gs_bombButton);
-    HandleKeyPress(gameInput & USE_SPECIAL, lastState.extra, gs_extraButton);
+    HandleKeyPress(gameInput & CLICK_LEFT, lastState.bomb, gs_vkCodeForLeftClick);
+    HandleKeyPress(gameInput & CLICK_MIDDLE, lastState.extra, gs_vkCodeForMiddleClick);
     HandleKeyPress(gameInput & MOVE_LEFT, lastState.left, VK_LEFT);
     HandleKeyPress(gameInput & MOVE_RIGHT, lastState.right, VK_RIGHT);
     HandleKeyPress(gameInput & MOVE_UP, lastState.up, VK_UP);
@@ -98,8 +98,8 @@ static void TestInputAndSendKeys() {
 static void CleanUp(bool isProcessTerminating) {
     if (isProcessTerminating)
         return;
-    SendKeyUp(gs_bombButton);
-    SendKeyUp(gs_extraButton);
+    SendKeyUp(gs_vkCodeForLeftClick);
+    SendKeyUp(gs_vkCodeForMiddleClick);
     SendKeyUp(VK_LEFT);
     SendKeyUp(VK_RIGHT);
     SendKeyUp(VK_UP);

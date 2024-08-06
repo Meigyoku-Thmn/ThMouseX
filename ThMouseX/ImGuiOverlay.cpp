@@ -104,11 +104,11 @@ namespace core::imguioverlay {
                     ImGui::Text("Input Method(s):\t%s", inputMethod.c_str());
                 }
                 if (ImGui::CollapsingHeader("Global Config")) {
-                    static auto bombBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_bombButton);
-                    ImGui::Text("Bomb Button:\t\"%s\" 0x%X", ImGui::GetKeyName(bombBtn), gs_bombButton);
+                    static auto bombBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_vkCodeForLeftClick);
+                    ImGui::Text("Left Click Map:\t\"%s\" 0x%X", ImGui::GetKeyName(bombBtn), gs_vkCodeForLeftClick);
 
-                    static auto extraBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_extraButton);
-                    ImGui::Text("Extra Button:\t\"%s\" 0x%X", ImGui::GetKeyName(extraBtn), gs_extraButton);
+                    static auto extraBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_vkCodeForMiddleClick);
+                    ImGui::Text("Middle Click Map:\t\"%s\" 0x%X", ImGui::GetKeyName(extraBtn), gs_vkCodeForMiddleClick);
 
                     static auto toggleCurBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_toggleOsCursorButton);
                     ImGui::Text("Toggle Os Cursor Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleCurBtn), gs_toggleOsCursorButton);

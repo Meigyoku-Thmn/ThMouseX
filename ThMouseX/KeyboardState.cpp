@@ -31,10 +31,10 @@ namespace core::keyboardstate {
         if (rs != FALSE) {
             using enum GameInput;
             auto gameInput = DetermineGameInput();
-            if ((gameInput & USE_BOMB) == USE_BOMB)
-                lpKeyState[gs_bombButton] |= 0x80;
-            if ((gameInput & USE_SPECIAL) == USE_SPECIAL)
-                lpKeyState[gs_extraButton] |= 0x80;
+            if ((gameInput & CLICK_LEFT) == CLICK_LEFT)
+                lpKeyState[gs_vkCodeForLeftClick] |= 0x80;
+            if ((gameInput & CLICK_MIDDLE) == CLICK_MIDDLE)
+                lpKeyState[gs_vkCodeForMiddleClick] |= 0x80;
             if ((gameInput & MOVE_LEFT) == MOVE_LEFT)
                 lpKeyState[VK_LEFT] |= 0x80;
             if ((gameInput & MOVE_RIGHT) == MOVE_RIGHT)

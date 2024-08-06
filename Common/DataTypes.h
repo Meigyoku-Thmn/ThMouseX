@@ -66,14 +66,21 @@ struct AddressChain {
 static_assert(sizeof(void*) == sizeof(AddressChain::Level[0]), "Support 32-bit system only!");
 
 BEGIN_FLAG_ENUM(GameInput, DWORD)
-NONE/*        */ = 0,
-USE_BOMB/*    */ = 0b0000'0001,
-USE_SPECIAL/* */ = 0b0000'0010,
+NONE/*          */ = 0,
+CLICK_LEFT/*    */ = 1 << 0,
+CLICK_MIDDLE/*  */ = 1 << 1,
+CLICK_RIGHT/*   */ = 1 << 2,
+CLICK_FORWARD/* */ = 1 << 3,
+CLICK_BACKWARD/**/ = 1 << 4,
+SCROLL_UP/*     */ = 1 << 5,
+SCROLL_DOWN/*   */ = 1 << 6,
+SCROLL_LEFT/*   */ = 1 << 7,
+SCROLL_RIGHT/*  */ = 1 << 8,
 
-MOVE_LEFT/*   */ = 0b1000'0000,
-MOVE_RIGHT/*  */ = 0b0100'0000,
-MOVE_UP/*     */ = 0b0010'0000,
-MOVE_DOWN/*   */ = 0b0001'0000,
+MOVE_LEFT/*   */ = 1 << 9,
+MOVE_RIGHT/*  */ = 1 << 10,
+MOVE_UP/*     */ = 1 << 11,
+MOVE_DOWN/*   */ = 1 << 12
 END_FLAG_ENUM()
 
 BEGIN_FLAG_ENUM(InputMethod, int)
