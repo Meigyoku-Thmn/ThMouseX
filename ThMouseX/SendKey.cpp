@@ -1,26 +1,42 @@
 #include "SendKey.h"
 #include "framework.h"
 
+#include <span>
+
 #include "../Common/macro.h"
 #include "../Common/Variables.h"
 #include "../Common/CallbackStore.h"
 #include "../Common/Helper.h"
 #include "InputDetermine.h"
 
-using namespace core::inputdetermine;
-
 namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
+namespace inputdetermine = core::inputdetermine;
 
-struct LastState {
-    bool bomb;
-    bool extra;
-    bool left;
-    bool right;
-    bool up;
-    bool down;
+using namespace std;
+
+struct InputRuleStateItem {
+    PBYTE       vkCodePtr;
+    BYTE        vkCodeStatic;
+    bool        lastState;
+    GameInput   input;
 };
-LastState lastState;
+
+static InputRuleStateItem inputRule[]{
+     { &gs_vkCodeForLeftClick,       0,         false,  GameInput::CLICK_LEFT      },
+     { &gs_vkCodeForMiddleClick,     0,         false,  GameInput::CLICK_MIDDLE    },
+     { &gs_vkCodeForRightClick,      0,         false,  GameInput::CLICK_RIGHT     },
+     { &gs_vkCodeForForwardClick,    0,         false,  GameInput::CLICK_FORWARD   },
+     { &gs_vkCodeForBackwardClick,   0,         false,  GameInput::CLICK_BACKWARD  },
+     { &gs_vkCodeForScrollUp,        0,         false,  GameInput::SCROLL_UP       },
+     { &gs_vkCodeForScrollDown,      0,         false,  GameInput::SCROLL_DOWN     },
+     { &gs_vkCodeForScrollLeft,      0,         false,  GameInput::SCROLL_LEFT     },
+     { &gs_vkCodeForScrollRight,     0,         false,  GameInput::SCROLL_RIGHT    },
+     { nil,                          VK_LEFT,   false,  GameInput::MOVE_LEFT       },
+     { nil,                          VK_RIGHT,  false,  GameInput::MOVE_RIGHT      },
+     { nil,                          VK_UP,     false,  GameInput::MOVE_UP         },
+     { nil,                          VK_DOWN,   false,  GameInput::MOVE_DOWN       },
+};
 
 static void SendKeyDown(BYTE vkCode) {
     using enum InputMethod;
@@ -86,24 +102,20 @@ static void HandleKeyPress(GameInput gameInput, bool& wasPressing, BYTE vkCode) 
 
 static void TestInputAndSendKeys() {
     using enum GameInput;
-    auto gameInput = DetermineGameInput();
-    HandleKeyPress(gameInput & CLICK_LEFT, lastState.bomb, gs_vkCodeForLeftClick);
-    HandleKeyPress(gameInput & CLICK_MIDDLE, lastState.extra, gs_vkCodeForMiddleClick);
-    HandleKeyPress(gameInput & MOVE_LEFT, lastState.left, VK_LEFT);
-    HandleKeyPress(gameInput & MOVE_RIGHT, lastState.right, VK_RIGHT);
-    HandleKeyPress(gameInput & MOVE_UP, lastState.up, VK_UP);
-    HandleKeyPress(gameInput & MOVE_DOWN, lastState.down, VK_DOWN);
+    auto gameInput = inputdetermine::DetermineGameInput();
+    for (auto& ruleItem : inputRule) {
+        auto vkCode = ruleItem.vkCodePtr == nil ? ruleItem.vkCodeStatic : *ruleItem.vkCodePtr;
+        HandleKeyPress(gameInput & ruleItem.input, ruleItem.lastState, vkCode);
+    }
 }
 
 static void CleanUp(bool isProcessTerminating) {
     if (isProcessTerminating)
         return;
-    SendKeyUp(gs_vkCodeForLeftClick);
-    SendKeyUp(gs_vkCodeForMiddleClick);
-    SendKeyUp(VK_LEFT);
-    SendKeyUp(VK_RIGHT);
-    SendKeyUp(VK_UP);
-    SendKeyUp(VK_DOWN);
+    for (const auto& ruleItem : inputRule) {
+        auto vkCode = ruleItem.vkCodePtr == nil ? ruleItem.vkCodeStatic : *ruleItem.vkCodePtr;
+        SendKeyUp(vkCode);
+    }
 }
 
 namespace core::sendkey {

@@ -42,24 +42,25 @@ GameInput   g_gameInput;
 #pragma data_seg(".SHRCONF")
 GameConfigs gs_gameConfigs{};
 
-BYTE        gs_vkCodeForLeftClick = 0x58; // VK_X
-BYTE        gs_vkCodeForMiddleClick = 0x43; // VK_C
-BYTE        gs_vkCodeForRightClick = 0;
-BYTE        gs_vkCodeForForwardClick = 0;
-BYTE        gs_vkCodeForBackwardClick = 0;
-BYTE        gs_vkCodeForScrollUp = 0;
-BYTE        gs_vkCodeForScrollDown = 0;
-BYTE        gs_vkCodeForScrollLeft = 0;
-BYTE        gs_vkCodeForScrollRight = 0;
+BYTE    gs_vkCodeForLeftClick = 0x58; // VK_X
+BYTE    gs_vkCodeForMiddleClick = 0x43; // VK_C
+BYTE    gs_vkCodeForRightClick = 0;
+BYTE    gs_vkCodeForForwardClick = 0;
+BYTE    gs_vkCodeForBackwardClick = 0;
+BYTE    gs_vkCodeForScrollUp = 0;
+BYTE    gs_vkCodeForScrollDown = 0;
+BYTE    gs_vkCodeForScrollLeft = 0;
+BYTE    gs_vkCodeForScrollRight = 0;
 
-DWORD       gs_toggleMouseControl = VK_RBUTTON;
-DWORD       gs_toggleOsCursorButton = 0x4D; // VK_M
-DWORD       gs_toggleImGuiButton = 0xC0; // VK_BACK_QUOTE
-WCHAR       gs_textureFilePath[MAX_PATH]{};
-DWORD       gs_textureBaseHeight = 480;
-WCHAR       gs_imGuiFontPath[MAX_PATH]{};
-DWORD       gs_imGuiBaseFontSize = 20;
-DWORD       gs_imGuiBaseVerticalResolution = 960;
+BYTE    gs_toggleMouseControl = VK_RBUTTON;
+BYTE    gs_toggleOsCursorButton = 0x4D; // VK_M
+BYTE    gs_toggleImGuiButton = 0xC0; // VK_BACK_QUOTE
+
+WCHAR   gs_textureFilePath[MAX_PATH]{};
+DWORD   gs_textureBaseHeight = 480;
+WCHAR   gs_imGuiFontPath[MAX_PATH]{};
+DWORD   gs_imGuiBaseFontSize = 20;
+DWORD   gs_imGuiBaseVerticalResolution = 960;
 #pragma data_seg()
 // make the above segment shared across processes
 #pragma comment(linker, "/SECTION:.SHRCONF,RWS")

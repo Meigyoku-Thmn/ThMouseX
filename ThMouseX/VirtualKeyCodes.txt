@@ -1,6 +1,12 @@
 ; Reference: https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 ; Required encoding is UTF-8 without BOM
 ; Constant      Value   Description
+; ThMouse Specific Codes
+SCROLL_UP       0x97    Scroll Up Event
+SCROLL_DOWN     0x98    Scroll Down Event
+SCROLL_LEFT     0x99    Scroll Left Event
+SCROLL_RIGHT    0x9A    Scroll Right Event
+; Standard VK Codes
 VK_BACK         0x08    BACKSPACE key
 VK_TAB          0x09    TAB key
 VK_RETURN       0x0D    ENTER key

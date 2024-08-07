@@ -86,9 +86,6 @@
     <ClCompile Include="SendKey.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="InputMap.cpp">
-      <Filter>Source Files\Input</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -142,9 +139,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputMap.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Cursor.png" />
@@ -178,8 +172,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ThMouseX.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

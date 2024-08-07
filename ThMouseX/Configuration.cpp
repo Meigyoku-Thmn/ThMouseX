@@ -232,6 +232,7 @@ namespace core::configuration {
         if (!IniTryGetButton<"ScrollLeft">(defaultSection, vkCodes, gs_vkCodeForScrollLeft)) return false;
         if (!IniTryGetButton<"ScrollRight">(defaultSection, vkCodes, gs_vkCodeForScrollRight)) return false;
 
+        if (!IniTryGetButton<"ToggleMouseControl">(defaultSection, vkCodes, gs_toggleMouseControl)) return false;
         if (!IniTryGetButton<"ToggleOsCursorButton">(defaultSection, vkCodes, gs_toggleOsCursorButton)) return false;
         if (!IniTryGetButton<"ToggleImGuiButton">(defaultSection, vkCodes, gs_toggleImGuiButton)) return false;
 

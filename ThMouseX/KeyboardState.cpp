@@ -1,5 +1,4 @@
 #include "framework.h"
-#include <mmsystem.h>
 #include <vector>
 
 #include "../Common/MinHook.h"
@@ -9,13 +8,37 @@
 #include "InputDetermine.h"
 
 namespace minhook = common::minhook;
+namespace inputdetermine = core::inputdetermine;
 
 using namespace std;
-using namespace core::inputdetermine;
+
+struct InputRuleItem {
+    PBYTE       vkCodePtr;
+    BYTE        vkCodeStatic;
+    GameInput   input;
+};
 
 namespace core::keyboardstate {
-    BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState);
-    decltype(&_GetKeyboardState) OriGetKeyboardState;
+    using enum GameInput;
+
+    static BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState);
+    static decltype(&_GetKeyboardState) OriGetKeyboardState;
+
+    static InputRuleItem inputRule[]{
+        { &gs_vkCodeForLeftClick,       0,          CLICK_LEFT      },
+        { &gs_vkCodeForMiddleClick,     0,          CLICK_MIDDLE    },
+        { &gs_vkCodeForRightClick,      0,          CLICK_RIGHT     },
+        { &gs_vkCodeForForwardClick,    0,          CLICK_FORWARD   },
+        { &gs_vkCodeForBackwardClick,   0,          CLICK_BACKWARD  },
+        { &gs_vkCodeForScrollUp,        0,          SCROLL_UP       },
+        { &gs_vkCodeForScrollDown,      0,          SCROLL_DOWN     },
+        { &gs_vkCodeForScrollLeft,      0,          SCROLL_LEFT     },
+        { &gs_vkCodeForScrollRight,     0,          SCROLL_RIGHT    },
+        { nil,                          VK_LEFT,    MOVE_LEFT       },
+        { nil,                          VK_RIGHT,   MOVE_RIGHT      },
+        { nil,                          VK_UP,      MOVE_UP         },
+        { nil,                          VK_DOWN,    MOVE_DOWN       },
+    };
 
     void Initialize() {
         using enum InputMethod;
@@ -26,23 +49,16 @@ namespace core::keyboardstate {
         });
     }
 
-    BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState) {
+    static BOOL WINAPI _GetKeyboardState(PBYTE lpKeyState) {
         auto rs = OriGetKeyboardState(lpKeyState);
         if (rs != FALSE) {
             using enum GameInput;
-            auto gameInput = DetermineGameInput();
-            if ((gameInput & CLICK_LEFT) == CLICK_LEFT)
-                lpKeyState[gs_vkCodeForLeftClick] |= 0x80;
-            if ((gameInput & CLICK_MIDDLE) == CLICK_MIDDLE)
-                lpKeyState[gs_vkCodeForMiddleClick] |= 0x80;
-            if ((gameInput & MOVE_LEFT) == MOVE_LEFT)
-                lpKeyState[VK_LEFT] |= 0x80;
-            if ((gameInput & MOVE_RIGHT) == MOVE_RIGHT)
-                lpKeyState[VK_RIGHT] |= 0x80;
-            if ((gameInput & MOVE_UP) == MOVE_UP)
-                lpKeyState[VK_UP] |= 0x80;
-            if ((gameInput & MOVE_DOWN) == MOVE_DOWN)
-                lpKeyState[VK_DOWN] |= 0x80;
+            auto gameInput = inputdetermine::DetermineGameInput();
+            for (auto const& ruleItem : inputRule) {
+                auto vkCode = ruleItem.vkCodePtr == nil ? ruleItem.vkCodeStatic : *ruleItem.vkCodePtr;
+                if ((gameInput & ruleItem.input) == ruleItem.input)
+                    lpKeyState[vkCode] |= 0x80;
+            }
         }
         return rs;
     }

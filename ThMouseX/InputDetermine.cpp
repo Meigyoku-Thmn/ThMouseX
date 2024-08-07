@@ -31,24 +31,41 @@ static void CalculatePlayerPos(DWORD address) {
 
 namespace helper = common::helper;
 
+struct InputRule {
+    bool* btnOnPtr;
+    GameInput gameInput;
+};
+
 namespace core::inputdetermine {
-    double x_error_WHATEVER = 0.0;
-    double y_error_WHATEVER = 0.0;
-    long prev_xPSpeed = 1;
-    long prev_yPSpeed = 1;
-    POINT previous_pos = { -1, -1 };
+    using enum GameInput;
+
+    InputRule inputRule[]{
+        { &g_leftClicked, CLICK_LEFT },
+        { &g_middleClicked, CLICK_MIDDLE },
+        { &g_rightClicked, CLICK_RIGHT },
+        { &g_forwardClicked, CLICK_FORWARD },
+        { &g_backwardClicked, CLICK_BACKWARD },
+        { &g_scrolledUp, SCROLL_UP },
+        { &g_scrolledDown, SCROLL_DOWN },
+        { &g_scrolledLeft, SCROLL_LEFT },
+        { &g_scrolledRight, SCROLL_RIGHT },
+    };
+
+    static double x_error_WHATEVER = 0.0;
+    static double y_error_WHATEVER = 0.0;
+    static long prev_xPSpeed = 1;
+    static long prev_yPSpeed = 1;
+    static POINT previous_pos = { -1, -1 };
+
     GameInput DetermineGameInput() {
-        using enum GameInput;
         g_gameInput = NONE;
         g_playerPos = {};
         g_playerPosRaw = {};
         DWORD address{};
         if (g_inputEnabled || g_showImGui) {
-            if (g_leftClicked) {
-                g_gameInput |= CLICK_LEFT;
-            }
-            if (g_middleClicked) {
-                g_gameInput |= CLICK_MIDDLE;
+            for (const auto& ruleItem : inputRule) {
+                if (*ruleItem.btnOnPtr)
+                    g_gameInput |= ruleItem.gameInput;
             }
             address = helper::CalculateAddress();
             if (address != 0) {

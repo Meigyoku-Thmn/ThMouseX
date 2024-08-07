@@ -24,11 +24,26 @@ using namespace std;
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 using Action = function<void()>;
+using SideEffect = void (*)(bool isUp, bool wantCaptureMouse);
+
+struct InputRuleItemVk2SideEffect {
+    PBYTE vkCodePtr;
+    BYTE vkCodeStatic;
+    SideEffect sideEffect;
+    bool isOn;
+};
+
+struct InputRuleItemMouseBtn2Function {
+    BYTE vkCode;
+    bool* clickState;
+    bool isOn;
+};
 
 enum class EventUseCase {
-    ImGuiBtn, OsCursorBtn,
-    LeftMouseBtn, MiddleMouseBtn, RightMouseBtn,
-    ForwardMouseBtn, BackwardMouseBtn,
+    ImGuiBtn, OsCursorBtn, MouseControlBtn,
+    MouseLeftClick, MouseMiddleClick, MouseRightClick,
+    MouseForwardClick, MouseBackwardClick,
+    MouseScrollUp, MouseScrollDown, MouseScrollLeft, MouseScrollRight,
 };
 
 template <EventUseCase T>
@@ -45,13 +60,13 @@ static void HandleMousePress(PMSG e, DWORD msgDown, DWORD msgUp, const Action& d
 }
 
 template <EventUseCase T>
-static void HandleKeyboardPress(PMSG e, DWORD keyId, const Action& action) {
+static void HandleKeyboardPress(PMSG e, BYTE vkCode, const Action& action) {
     static bool isOn = false;
-    if (e->wParam == keyId && e->message == WM_KEYDOWN && isOn == false) {
+    if (e->wParam == vkCode && e->message == WM_KEYDOWN && isOn == false) {
         isOn = true;
         if (action) action();
     }
-    else if (e->wParam == keyId && e->message == WM_KEYUP && isOn == true) {
+    else if (e->wParam == vkCode && e->message == WM_KEYUP && isOn == true) {
         isOn = false;
     }
 }
@@ -105,10 +120,57 @@ namespace core::messagequeue {
         ShowMousePointer();
     }
 
+    static InputRuleItemVk2SideEffect InputRuleVk2SideEffect[]{
+        { &gs_toggleImGuiButton, 0, [](NOUSE bool _, NOUSE bool __) {
+            g_showImGui = !g_showImGui;
+            if (g_showImGui) {
+                g_inputEnabled = false;
+                ShowMousePointer();
+            }
+            else
+                HideMousePointer();
+        } },
+        { &gs_toggleOsCursorButton, 0, [](NOUSE bool _, NOUSE bool __) {
+            isCursorShow ? HideMousePointer() : ShowMousePointer();
+        } },
+        { &gs_toggleMouseControl, 0, [](NOUSE bool _, bool wantCaptureMouse) {
+            g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
+            if (!wantCaptureMouse)
+                ImGui::SetWindowFocus();
+        } },
+        { nil, VK_LBUTTON, [](NOUSE bool _, bool wantCaptureMouse) {
+            if (wantCaptureMouse)
+                g_inputEnabled = false;
+
+        } },
+        { nil, VK_MBUTTON, [](NOUSE bool _, bool wantCaptureMouse) {
+            if (wantCaptureMouse)
+                g_inputEnabled = false;
+            else
+                ImGui::SetWindowFocus();
+        } },
+        { nil, VK_RBUTTON, [](bool isUp, bool wantCaptureMouse) {
+            if (!isUp) return;
+            if (!wantCaptureMouse)
+                ImGui::SetWindowFocus();
+        } },
+    };
+
+    static InputRuleItemMouseBtn2Function InputRuleMouseBtn2ClickState[]{
+        { VK_LBUTTON, &g_leftClicked },
+        { VK_MBUTTON, &g_middleClicked },
+        { VK_RBUTTON, &g_rightClicked },
+        { VK_XBUTTON1, &g_forwardClicked },
+        { VK_XBUTTON2, &g_backwardClicked },
+    };
+
     static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
         using enum EventUseCase;
         auto e = PMSG(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
+
+
+
             HandleKeyboardPress<ImGuiBtn>(e, gs_toggleImGuiButton, []() {
                 g_showImGui = !g_showImGui;
                 if (g_showImGui) {
@@ -127,15 +189,15 @@ namespace core::messagequeue {
                     []() { isCursorShow ? HideMousePointer() : ShowMousePointer(); });
             }
 
-            auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
-
-            HandleMousePress<LeftMouseBtn>(e, WM_LBUTTONDOWN, WM_LBUTTONUP, [wantCaptureMouse]() {
+            HandleMousePress<MouseLeftClick>(e, WM_LBUTTONDOWN, WM_LBUTTONUP, []() {
+                auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
                 g_leftClicked = wantCaptureMouse ? false : true;
                 if (wantCaptureMouse)
                     g_inputEnabled = false;
                 }, []() { g_leftClicked = false; });
 
-            HandleMousePress<MiddleMouseBtn>(e, WM_MBUTTONDOWN, WM_MBUTTONUP, [wantCaptureMouse]() {
+            HandleMousePress<MouseMiddleClick>(e, WM_MBUTTONDOWN, WM_MBUTTONUP, []() {
+                auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
                 g_middleClicked = wantCaptureMouse ? false : true;
                 if (wantCaptureMouse)
                     g_inputEnabled = false;
@@ -143,7 +205,8 @@ namespace core::messagequeue {
                     ImGui::SetWindowFocus();
                 }, []() { g_middleClicked = false; });
 
-            HandleMousePress<RightMouseBtn>(e, WM_RBUTTONDOWN, WM_RBUTTONUP, nil, [wantCaptureMouse]() {
+            HandleMousePress<MouseRightClick>(e, WM_RBUTTONDOWN, WM_RBUTTONUP, nil, []() {
+                auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
                 g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
                 if (!wantCaptureMouse)
                     ImGui::SetWindowFocus();
@@ -232,7 +295,7 @@ namespace core::messagequeue {
         // Hide the mouse cursor when D3D is running, but only after cursor normalization
         callbackstore::RegisterPostRenderCallback(PostRenderCallback);
         minhook::CreateApiHook(vector<minhook::HookApiConfig>{
-            { L"USER32.DLL", "SetCursor", &_SetCursor, &OriSetCursor },
+            { L"USER32.DLL", "SetCursor", & _SetCursor, & OriSetCursor },
             { L"USER32.DLL", "ShowCursor", &_ShowCursor, &OriShowCursor },
         });
     }

@@ -13,23 +13,46 @@
 #include "../Common/Helper.h"
 #include "InputDetermine.h"
 #include "DirectInput.h"
-#include "InputMap.h"
 
 namespace minhook = common::minhook;
 namespace note = common::log;
 namespace helper = common::helper;
+namespace inputdetermine = core::inputdetermine;
 
 constexpr auto GetDeviceStateIdx = 9;
 
 using namespace std;
-using namespace core::inputdetermine;
 using namespace Microsoft::WRL;
 
 #define TAG "[DirectInput] "
 
+struct InputRuleItemForDInput {
+    PBYTE       vkCodeSrcPtr;
+    BYTE        dikCodeDest;
+    GameInput   input;
+};
+
 namespace core::directinput {
-    HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
-    decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
+    using enum GameInput;
+
+    static HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData);
+    static decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
+
+    static InputRuleItemForDInput inputRule[]{
+        { &gs_vkCodeForLeftClick,       DIK_X,      CLICK_LEFT      },
+        { &gs_vkCodeForMiddleClick,     DIK_C,      CLICK_MIDDLE    },
+        { &gs_vkCodeForRightClick,      0,          CLICK_RIGHT     },
+        { &gs_vkCodeForForwardClick,    0,          CLICK_FORWARD   },
+        { &gs_vkCodeForBackwardClick,   0,          CLICK_BACKWARD  },
+        { &gs_vkCodeForScrollUp,        0,          SCROLL_UP       },
+        { &gs_vkCodeForScrollDown,      0,          SCROLL_DOWN     },
+        { &gs_vkCodeForScrollLeft,      0,          SCROLL_LEFT     },
+        { &gs_vkCodeForScrollRight,     0,          SCROLL_RIGHT    },
+        { nil,                          DIK_LEFT,   MOVE_LEFT       },
+        { nil,                          DIK_RIGHT,  MOVE_RIGHT      },
+        { nil,                          DIK_UP,     MOVE_UP         },
+        { nil,                          DIK_DOWN,   MOVE_DOWN       },
+    };
 
     void Initialize() {
         using enum InputMethod;
@@ -65,15 +88,10 @@ namespace core::directinput {
                     note::LastErrorToFile(TAG "Failed to get the mapping table from DInput8.dll");
                     break;
                 }
-                dikCodeForLeftClick = helper::MapVk2Dik(gs_vkCodeForLeftClick, mappingTable, dikCodeForLeftClick);
-                dikCodeForMiddleClick = helper::MapVk2Dik(gs_vkCodeForMiddleClick, mappingTable, dikCodeForMiddleClick);
-                dikCodeForRightClick = helper::MapVk2Dik(gs_vkCodeForRightClick, mappingTable);
-                dikCodeForForwardClick = helper::MapVk2Dik(gs_vkCodeForForwardClick, mappingTable);
-                dikCodeForBackwardClick = helper::MapVk2Dik(gs_vkCodeForBackwardClick, mappingTable);
-                dikCodeForScrollUp = helper::MapVk2Dik(gs_vkCodeForScrollUp, mappingTable);
-                dikCodeForScrollDown = helper::MapVk2Dik(gs_vkCodeForScrollDown, mappingTable);
-                dikCodeForScrollLeft = helper::MapVk2Dik(gs_vkCodeForScrollLeft, mappingTable);
-                dikCodeForScrollRight = helper::MapVk2Dik(gs_vkCodeForScrollRight, mappingTable);
+                for (auto& ruleItem : inputRule) {
+                    auto vkCodeSrc = ruleItem.vkCodeSrcPtr == nil ? (BYTE)0 : *ruleItem.vkCodeSrcPtr;
+                    ruleItem.dikCodeDest = helper::MapVk2Dik(vkCodeSrc, mappingTable, ruleItem.dikCodeDest);
+                }
             } while (false);
 
             initialized = true;
@@ -102,28 +120,20 @@ namespace core::directinput {
         auto vtable = *(DWORD**)pDevice8.Get();
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8 },
+            { PVOID(vtable[GetDeviceStateIdx]), & GetDeviceStateDInput8, & OriGetDeviceStateDInput8 },
         });
     }
 
-    HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData) {
+    static HRESULT WINAPI GetDeviceStateDInput8(IDirectInputDevice8A* pDevice, DWORD cbData, LPVOID lpvData) {
         using enum GameInput;
         auto hr = OriGetDeviceStateDInput8(pDevice, cbData, lpvData);
         if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
             auto keys = PBYTE(lpvData);
-            auto gameInput = DetermineGameInput();
-            if ((gameInput & CLICK_LEFT) == CLICK_LEFT)
-                keys[dikCodeForLeftClick] |= 0x80;
-            if ((gameInput & CLICK_MIDDLE) == CLICK_MIDDLE)
-                keys[dikCodeForMiddleClick] |= 0x80;
-            if ((gameInput & MOVE_LEFT) == MOVE_LEFT)
-                keys[DIK_LEFT] |= 0x80;
-            if ((gameInput & MOVE_RIGHT) == MOVE_RIGHT)
-                keys[DIK_RIGHT] |= 0x80;
-            if ((gameInput & MOVE_UP) == MOVE_UP)
-                keys[DIK_UP] |= 0x80;
-            if ((gameInput & MOVE_DOWN) == MOVE_DOWN)
-                keys[DIK_DOWN] |= 0x80;
+            auto gameInput = inputdetermine::DetermineGameInput();
+            for (const auto& ruleItem : inputRule) {
+                if ((gameInput & ruleItem.input) == ruleItem.input)
+                    keys[ruleItem.dikCodeDest] |= 0x80;
+            }
         }
         return hr;
     }

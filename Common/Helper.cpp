@@ -225,7 +225,7 @@ namespace common::helper {
             key == VK_CANCEL;
     }
 
-    BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable, BYTE defaultDikCode = 0) {
+    BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable, BYTE defaultDikCode) {
         if (vkCode == 0)
             return defaultDikCode;
         auto scancode = (BYTE)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX);

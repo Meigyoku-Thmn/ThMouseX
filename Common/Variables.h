@@ -41,22 +41,23 @@ extern GameInput    g_gameInput;
 // configuration from main exe
 extern GameConfigs  gs_gameConfigs;
 
-extern BYTE         gs_vkCodeForLeftClick;
-extern BYTE         gs_vkCodeForMiddleClick;
-extern BYTE         gs_vkCodeForRightClick;
-extern BYTE         gs_vkCodeForForwardClick;
-extern BYTE         gs_vkCodeForBackwardClick;
-extern BYTE         gs_vkCodeForScrollUp;
-extern BYTE         gs_vkCodeForScrollDown;
-extern BYTE         gs_vkCodeForScrollLeft;
-extern BYTE         gs_vkCodeForScrollRight;
+extern BYTE     gs_vkCodeForLeftClick;
+extern BYTE     gs_vkCodeForMiddleClick;
+extern BYTE     gs_vkCodeForRightClick;
+extern BYTE     gs_vkCodeForForwardClick;
+extern BYTE     gs_vkCodeForBackwardClick;
+extern BYTE     gs_vkCodeForScrollUp;
+extern BYTE     gs_vkCodeForScrollDown;
+extern BYTE     gs_vkCodeForScrollLeft;
+extern BYTE     gs_vkCodeForScrollRight;
 
-extern DWORD        gs_toggleMouseControl;
-extern DWORD        gs_toggleOsCursorButton;
-extern DWORD        gs_toggleImGuiButton;
-extern WCHAR        gs_textureFilePath[MAX_PATH];
-extern DWORD        gs_textureBaseHeight;
-extern WCHAR        gs_imGuiFontPath[MAX_PATH];
-extern DWORD        gs_imGuiBaseFontSize;
-extern DWORD        gs_imGuiBaseVerticalResolution;
+extern BYTE     gs_toggleMouseControl;
+extern BYTE     gs_toggleOsCursorButton;
+extern BYTE     gs_toggleImGuiButton;
+
+extern WCHAR    gs_textureFilePath[MAX_PATH];
+extern DWORD    gs_textureBaseHeight;
+extern WCHAR    gs_imGuiFontPath[MAX_PATH];
+extern DWORD    gs_imGuiBaseFontSize;
+extern DWORD    gs_imGuiBaseVerticalResolution;
 #endif
