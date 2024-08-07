@@ -10,6 +10,11 @@
 
 #define SYM_NAME(name) #name
 
+#define SCROLL_UP_EVENT       0x97
+#define SCROLL_DOWN_EVENT     0x98
+#define SCROLL_LEFT_EVENT     0x99
+#define SCROLL_RIGHT_EVENT    0x9A
+
 #define NOUSE [[maybe_unused]]
 
 #define DLLEXPORT __declspec(dllexport)

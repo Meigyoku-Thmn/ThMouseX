@@ -4,6 +4,7 @@
 #include <tuple>
 #include <span>
 #include <format>
+#include <optional>
 
 #include "Helper.h"
 #include "Helper.Memory.h"
@@ -246,5 +247,57 @@ namespace common::helper {
         if (vkCode == VK_LMENU || vkCode == VK_RMENU)
             return VK_MENU;
         return vkCode;
+    }
+
+    VkCodeMessage ConvertVkCodeToMessage(BYTE vkCode) {
+        if (vkCode == VK_LBUTTON)
+            return VkCodeMessage(
+                WM_LBUTTONUP, nil, nil,
+                WM_LBUTTONDOWN, nil, nil
+            );
+        if (vkCode == VK_MBUTTON)
+            return VkCodeMessage(
+                WM_MBUTTONUP, nil, nil,
+                WM_MBUTTONDOWN, nil, nil
+            );
+        if (vkCode == VK_RBUTTON)
+            return VkCodeMessage(
+                WM_RBUTTONUP, nil, nil,
+                WM_RBUTTONDOWN, nil, nil
+            );
+        if (vkCode == VK_XBUTTON1)
+            return VkCodeMessage(
+                WM_XBUTTONUP, [](auto wParam, auto _) { return (wParam & (XBUTTON1 << 16)) != 0; }, nil,
+                WM_XBUTTONDOWN, [](auto wParam, auto _) { return (wParam & (XBUTTON1 << 16)) != 0; }, nil
+            );
+        if (vkCode == VK_XBUTTON2)
+            return VkCodeMessage(
+                WM_XBUTTONUP, [](auto wParam, auto _) { return (wParam & (XBUTTON2 << 16)) != 0; }, nil,
+                WM_XBUTTONDOWN, [](auto wParam, auto _) { return (wParam & (XBUTTON2 << 16)) != 0; }, nil
+            );
+        if (vkCode == SCROLL_UP_EVENT)
+            return VkCodeMessage(
+                WM_NULL, nil, nil,
+                WM_MOUSEWHEEL, [](auto wParam, auto _) { return WORD(wParam >> 16) > 0; }, nil
+            );
+        if (vkCode == SCROLL_DOWN_EVENT)
+            return VkCodeMessage(
+                WM_NULL, nil, nil,
+                WM_MOUSEWHEEL, [](auto wParam, auto _) { return WORD(wParam >> 16) < 0; }, nil
+            );
+        if (vkCode == SCROLL_LEFT_EVENT)
+            return VkCodeMessage(
+                WM_NULL, nil, nil,
+                WM_MOUSEHWHEEL, [](auto wParam, auto _) { return WORD(wParam >> 16) < 0; }, nil
+            );
+        if (vkCode == SCROLL_RIGHT_EVENT)
+            return VkCodeMessage(
+                WM_NULL, nil, nil,
+                WM_MOUSEHWHEEL, [](auto wParam, auto _) { return WORD(wParam >> 16) > 0; }, nil
+            );
+        return VkCodeMessage(
+            WM_KEYUP, [](auto wParam, auto vkCode) { return wParam == vkCode; }, nil,
+            WM_KEYDOWN, [](auto wParam, auto vkCode) { return wParam == vkCode; }, nil
+        );
     }
 }

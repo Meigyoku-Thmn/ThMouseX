@@ -3,9 +3,16 @@
 #include "macro.h"
 #include <tuple>
 #include <string>
+#include <optional>
 #include "DataTypes.h"
 
 namespace common::helper {
+    using WParamPredicate = bool (*)(WPARAM wParam, BYTE vkCode);
+    using LParamPredicate = bool (*)(LPARAM lParam, BYTE vkCode);
+    using VkCodeMessage = std::tuple<
+        std::optional<UINT>, WParamPredicate, LParamPredicate,
+        std::optional<UINT>, WParamPredicate, LParamPredicate
+    >;
     void ReportLastError(const char* title);
     std::string& Replace(std::string& input, const char* keyword, const char* replacement);
     std::tuple<float, const char*> ConvertToFloat(const std::string& input);
@@ -23,4 +30,5 @@ namespace common::helper {
     bool ShouldBeVkExtended(BYTE key);
     BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable, BYTE defaultDikCode = 0);
     BYTE NormalizeLeftRightVkCode(BYTE vkCode);
+    VkCodeMessage ConvertVkCodeToMessage(BYTE vkCode);
 }

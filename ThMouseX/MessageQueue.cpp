@@ -23,8 +23,15 @@ using namespace std;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-using Action = function<void()>;
+struct InputRuleItemVk2SideEffect;
+struct InputRuleItemMouseBtn2Function;
+
 using SideEffect = void (*)(bool isUp, bool wantCaptureMouse);
+using PostSideEffect = void (*)(InputRuleItemMouseBtn2Function& ruleItem);
+
+enum class MatchStatus {
+    None, Up, Down, Trigger
+};
 
 struct InputRuleItemVk2SideEffect {
     PBYTE vkCodePtr;
@@ -35,41 +42,10 @@ struct InputRuleItemVk2SideEffect {
 
 struct InputRuleItemMouseBtn2Function {
     BYTE vkCode;
-    bool* clickState;
+    bool* clickStatePtr;
     bool isOn;
+    PostSideEffect postSideEffect;
 };
-
-enum class EventUseCase {
-    ImGuiBtn, OsCursorBtn, MouseControlBtn,
-    MouseLeftClick, MouseMiddleClick, MouseRightClick,
-    MouseForwardClick, MouseBackwardClick,
-    MouseScrollUp, MouseScrollDown, MouseScrollLeft, MouseScrollRight,
-};
-
-template <EventUseCase T>
-static void HandleMousePress(PMSG e, DWORD msgDown, DWORD msgUp, const Action& downAction, const Action& upAction) {
-    static bool isOn = false;
-    if (e->message == msgDown && isOn == false) {
-        isOn = true;
-        if (downAction) downAction();
-    }
-    else if (e->message == msgUp && isOn == true) {
-        isOn = false;
-        if (upAction) upAction();
-    }
-}
-
-template <EventUseCase T>
-static void HandleKeyboardPress(PMSG e, BYTE vkCode, const Action& action) {
-    static bool isOn = false;
-    if (e->wParam == vkCode && e->message == WM_KEYDOWN && isOn == false) {
-        isOn = true;
-        if (action) action();
-    }
-    else if (e->wParam == vkCode && e->message == WM_KEYUP && isOn == true) {
-        isOn = false;
-    }
-}
 
 namespace core::messagequeue {
     HCURSOR WINAPI _SetCursor(HCURSOR hCursor);
@@ -131,7 +107,8 @@ namespace core::messagequeue {
                 HideMousePointer();
         } },
         { &gs_toggleOsCursorButton, 0, [](NOUSE bool _, NOUSE bool __) {
-            isCursorShow ? HideMousePointer() : ShowMousePointer();
+            if (!g_showImGui)
+                isCursorShow ? HideMousePointer() : ShowMousePointer();
         } },
         { &gs_toggleMouseControl, 0, [](NOUSE bool _, bool wantCaptureMouse) {
             g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
@@ -157,60 +134,84 @@ namespace core::messagequeue {
     };
 
     static InputRuleItemMouseBtn2Function InputRuleMouseBtn2ClickState[]{
-        { VK_LBUTTON, &g_leftClicked },
-        { VK_MBUTTON, &g_middleClicked },
-        { VK_RBUTTON, &g_rightClicked },
-        { VK_XBUTTON1, &g_forwardClicked },
-        { VK_XBUTTON2, &g_backwardClicked },
+        { VK_LBUTTON,           &g_leftClicked      },
+        { VK_MBUTTON,           &g_middleClicked    },
+        { VK_RBUTTON,           &g_rightClicked     },
+        { VK_XBUTTON1,          &g_forwardClicked   },
+        { VK_XBUTTON2,          &g_backwardClicked  },
+        { SCROLL_UP_EVENT ,     &g_scrolledUp       },
+        { SCROLL_DOWN_EVENT,    &g_scrolledDown     },
+        { SCROLL_LEFT_EVENT,    &g_scrolledLeft     },
+        { SCROLL_RIGHT_EVENT,   &g_scrolledRight    },
     };
 
+    static MatchStatus TestVkCode(PMSG e, BYTE vkCode) {
+        auto [messageUp, wParamUp, lParamUp, messageDown, wParamDown, lParamDown] = helper::ConvertVkCodeToMessage(vkCode);
+        if (messageUp.has_value() && messageUp.value() == WM_NULL &&
+            messageDown.has_value() && messageDown.value() == e->message &&
+            wParamDown && wParamDown(e->wParam, vkCode) &&
+            lParamDown && lParamDown(e->lParam, vkCode)) {
+            return MatchStatus::Trigger;
+        }
+        auto matched = true;
+        if (messageUp.has_value() && messageUp.value() != e->message
+            || wParamUp && !wParamUp(e->wParam, vkCode)
+            || lParamUp && !lParamUp(e->lParam, vkCode)
+            || !messageUp.has_value() && !wParamUp && !lParamUp)
+            matched = false;
+        if (matched)
+            return MatchStatus::Up;
+        matched = true;
+        if (messageDown.has_value() && messageDown.value() != e->message
+            || wParamDown && !wParamDown(e->wParam, vkCode)
+            || lParamDown && !lParamDown(e->lParam, vkCode)
+            || !messageDown.has_value() && !wParamDown && !lParamDown)
+            matched = false;
+        if (matched)
+            return MatchStatus::Down;
+        return MatchStatus::None;
+    }
+
     static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        using enum EventUseCase;
         auto e = PMSG(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
-
-
-
-            HandleKeyboardPress<ImGuiBtn>(e, gs_toggleImGuiButton, []() {
-                g_showImGui = !g_showImGui;
-                if (g_showImGui) {
-                    g_inputEnabled = false;
-                    ShowMousePointer();
-                }
-                else
-                    HideMousePointer();
-                });
-
             if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
-            else {
-                HandleKeyboardPress<OsCursorBtn>(e, gs_toggleOsCursorButton,
-                    []() { isCursorShow ? HideMousePointer() : ShowMousePointer(); });
+            for (auto& ruleItem : InputRuleVk2SideEffect) {
+                auto vkCode = ruleItem.vkCodePtr == nil ? ruleItem.vkCodeStatic : *ruleItem.vkCodePtr;
+                auto matchStatus = TestVkCode(e, vkCode);
+                if (matchStatus == MatchStatus::Trigger) {
+                    ruleItem.sideEffect(false, g_showImGui && ImGui::GetIO().WantCaptureMouse);
+                }
+                else if (matchStatus == MatchStatus::Up && ruleItem.isOn == true) {
+                    ruleItem.isOn = false;
+                    ruleItem.sideEffect(true, g_showImGui && ImGui::GetIO().WantCaptureMouse);
+                }
+                else if (matchStatus == MatchStatus::Down && ruleItem.isOn == false) {
+                    ruleItem.isOn = true;
+                    ruleItem.sideEffect(false, g_showImGui && ImGui::GetIO().WantCaptureMouse);
+                }
             }
-
-            HandleMousePress<MouseLeftClick>(e, WM_LBUTTONDOWN, WM_LBUTTONUP, []() {
-                auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
-                g_leftClicked = wantCaptureMouse ? false : true;
-                if (wantCaptureMouse)
-                    g_inputEnabled = false;
-                }, []() { g_leftClicked = false; });
-
-            HandleMousePress<MouseMiddleClick>(e, WM_MBUTTONDOWN, WM_MBUTTONUP, []() {
-                auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
-                g_middleClicked = wantCaptureMouse ? false : true;
-                if (wantCaptureMouse)
-                    g_inputEnabled = false;
-                else
-                    ImGui::SetWindowFocus();
-                }, []() { g_middleClicked = false; });
-
-            HandleMousePress<MouseRightClick>(e, WM_RBUTTONDOWN, WM_RBUTTONUP, nil, []() {
-                auto wantCaptureMouse = g_showImGui && ImGui::GetIO().WantCaptureMouse;
-                g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
-                if (!wantCaptureMouse)
-                    ImGui::SetWindowFocus();
-                });
+            for (auto& ruleItem : InputRuleMouseBtn2ClickState) {
+                if (ruleItem.postSideEffect) {
+                    ruleItem.postSideEffect(ruleItem);
+                    ruleItem.postSideEffect = nil;
+                }
+                auto matchStatus = TestVkCode(e, ruleItem.vkCode);
+                if (matchStatus == MatchStatus::Trigger) {
+                    ruleItem.postSideEffect = [](auto& ruleItem) { *ruleItem.clickStatePtr = true; };
+                    *ruleItem.clickStatePtr = true;
+                }
+                else if (matchStatus == MatchStatus::Up && ruleItem.isOn == true) {
+                    ruleItem.isOn = false;
+                    *ruleItem.clickStatePtr = false;
+                }
+                else if (matchStatus == MatchStatus::Down && ruleItem.isOn == false) {
+                    ruleItem.isOn = true;
+                    *ruleItem.clickStatePtr = true;
+                }
+            }
         }
         return CallNextHookEx(nil, code, wParam, lParam);
     }
