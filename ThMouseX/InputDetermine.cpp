@@ -40,15 +40,15 @@ namespace core::inputdetermine {
     using enum GameInput;
 
     InputRule inputRule[]{
-        { &g_leftClicked, CLICK_LEFT },
-        { &g_middleClicked, CLICK_MIDDLE },
-        { &g_rightClicked, CLICK_RIGHT },
-        { &g_forwardClicked, CLICK_FORWARD },
-        { &g_backwardClicked, CLICK_BACKWARD },
-        { &g_scrolledUp, SCROLL_UP },
-        { &g_scrolledDown, SCROLL_DOWN },
-        { &g_scrolledLeft, SCROLL_LEFT },
-        { &g_scrolledRight, SCROLL_RIGHT },
+        { &g_leftClicked,       CLICK_LEFT      },
+        { &g_middleClicked,     CLICK_MIDDLE    },
+        { &g_rightClicked,      CLICK_RIGHT     },
+        { &g_xButton1Clicked,   CLICK_XBUTTON1  },
+        { &g_xButton2Clicked,   CLICK_XBUTTON2  },
+        { &g_scrolledUp,        SCROLL_UP       },
+        { &g_scrolledDown,      SCROLL_DOWN     },
+        { &g_scrolledLeft,      SCROLL_LEFT     },
+        { &g_scrolledRight,     SCROLL_RIGHT    },
     };
 
     static double x_error_WHATEVER = 0.0;
@@ -62,7 +62,7 @@ namespace core::inputdetermine {
         g_playerPos = {};
         g_playerPosRaw = {};
         DWORD address{};
-        if (g_inputEnabled || g_showImGui) {
+        if (g_inputEnabled) {
             for (const auto& ruleItem : inputRule) {
                 if (*ruleItem.btnOnPtr)
                     g_gameInput |= ruleItem.gameInput;

@@ -37,7 +37,7 @@ using namespace std;
 using VkCodes = unordered_map<string, BYTE, string_hash, equal_to<>>;
 
 template<CompileTimeString ini_key, typename OutputType>
-static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType output) {
+static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType& output) {
     string input;
     if (!inipp::get_value(section, ini_key.data, input)) {
         constexpr auto msg = ThMouseXFile ": Missing " + ini_key + " value.";
@@ -45,13 +45,17 @@ static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCo
         return false;
     }
     else {
-        auto vkCode = buttonNames.find(input);
-        if (vkCode == buttonNames.end()) {
-            constexpr auto msg = ThMouseXFile ": Invalid " + ini_key + " value.";
-            MessageBoxA(nil, msg.data, APP_NAME, MB_OK | MB_ICONERROR);
-            return false;
+        if (input.empty())
+            output = 0;
+        else {
+            auto vkCode = buttonNames.find(input);
+            if (vkCode == buttonNames.end()) {
+                constexpr auto msg = ThMouseXFile ": Invalid " + ini_key + " value.";
+                MessageBoxA(nil, msg.data, APP_NAME, MB_OK | MB_ICONERROR);
+                return false;
+            }
+            output = vkCode->second;
         }
-        output = vkCode->second;
     }
     return true;
 }
@@ -225,8 +229,8 @@ namespace core::configuration {
         if (!IniTryGetButton<"LeftClick">(defaultSection, vkCodes, gs_vkCodeForLeftClick)) return false;
         if (!IniTryGetButton<"MiddleClick">(defaultSection, vkCodes, gs_vkCodeForMiddleClick)) return false;
         if (!IniTryGetButton<"RightClick">(defaultSection, vkCodes, gs_vkCodeForRightClick)) return false;
-        if (!IniTryGetButton<"ForwardClick">(defaultSection, vkCodes, gs_vkCodeForForwardClick)) return false;
-        if (!IniTryGetButton<"BackwardClick">(defaultSection, vkCodes, gs_vkCodeForBackwardClick)) return false;
+        if (!IniTryGetButton<"XButton1Click">(defaultSection, vkCodes, gs_vkCodeForXButton1Click)) return false;
+        if (!IniTryGetButton<"XButton2Click">(defaultSection, vkCodes, gs_vkCodeForXButton2Click)) return false;
         if (!IniTryGetButton<"ScrollUp">(defaultSection, vkCodes, gs_vkCodeForScrollUp)) return false;
         if (!IniTryGetButton<"ScrollDown">(defaultSection, vkCodes, gs_vkCodeForScrollDown)) return false;
         if (!IniTryGetButton<"ScrollLeft">(defaultSection, vkCodes, gs_vkCodeForScrollLeft)) return false;

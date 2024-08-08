@@ -97,7 +97,8 @@ namespace core::messagequeue {
     }
 
     static InputRuleItemVk2SideEffect InputRuleVk2SideEffect[]{
-        { &gs_toggleImGuiButton, 0, [](NOUSE bool _, NOUSE bool __) {
+        { &gs_toggleImGuiButton, 0, [](bool isUp, NOUSE bool __) {
+            if (isUp) return;
             g_showImGui = !g_showImGui;
             if (g_showImGui) {
                 g_inputEnabled = false;
@@ -106,30 +107,14 @@ namespace core::messagequeue {
             else
                 HideMousePointer();
         } },
-        { &gs_toggleOsCursorButton, 0, [](NOUSE bool _, NOUSE bool __) {
+        { &gs_toggleOsCursorButton, 0, [](bool isUp, NOUSE bool __) {
+            if (isUp) return;
             if (!g_showImGui)
                 isCursorShow ? HideMousePointer() : ShowMousePointer();
         } },
-        { &gs_toggleMouseControl, 0, [](NOUSE bool _, bool wantCaptureMouse) {
-            g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
-            if (!wantCaptureMouse)
-                ImGui::SetWindowFocus();
-        } },
-        { nil, VK_LBUTTON, [](NOUSE bool _, bool wantCaptureMouse) {
-            if (wantCaptureMouse)
-                g_inputEnabled = false;
-
-        } },
-        { nil, VK_MBUTTON, [](NOUSE bool _, bool wantCaptureMouse) {
-            if (wantCaptureMouse)
-                g_inputEnabled = false;
-            else
-                ImGui::SetWindowFocus();
-        } },
-        { nil, VK_RBUTTON, [](bool isUp, bool wantCaptureMouse) {
+        { &gs_toggleMouseControl, 0, [](bool isUp, bool wantCaptureMouse) {
             if (!isUp) return;
-            if (!wantCaptureMouse)
-                ImGui::SetWindowFocus();
+            g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
         } },
     };
 
@@ -137,9 +122,9 @@ namespace core::messagequeue {
         { VK_LBUTTON,           &g_leftClicked      },
         { VK_MBUTTON,           &g_middleClicked    },
         { VK_RBUTTON,           &g_rightClicked     },
-        { VK_XBUTTON1,          &g_forwardClicked   },
-        { VK_XBUTTON2,          &g_backwardClicked  },
-        { SCROLL_UP_EVENT ,     &g_scrolledUp       },
+        { VK_XBUTTON1,          &g_xButton1Clicked  },
+        { VK_XBUTTON2,          &g_xButton2Clicked  },
+        { SCROLL_UP_EVENT,      &g_scrolledUp       },
         { SCROLL_DOWN_EVENT,    &g_scrolledDown     },
         { SCROLL_LEFT_EVENT,    &g_scrolledLeft     },
         { SCROLL_RIGHT_EVENT,   &g_scrolledRight    },

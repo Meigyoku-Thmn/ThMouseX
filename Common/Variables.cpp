@@ -21,8 +21,8 @@ bool        g_isMinimized;
 bool        g_leftClicked;
 bool        g_middleClicked;
 bool        g_rightClicked;
-bool        g_forwardClicked;
-bool        g_backwardClicked;
+bool        g_xButton1Clicked;
+bool        g_xButton2Clicked;
 bool        g_scrolledUp;
 bool        g_scrolledDown;
 bool        g_scrolledLeft;
@@ -45,8 +45,8 @@ GameConfigs gs_gameConfigs{};
 BYTE    gs_vkCodeForLeftClick = 0x58; // VK_X
 BYTE    gs_vkCodeForMiddleClick = 0x43; // VK_C
 BYTE    gs_vkCodeForRightClick = 0;
-BYTE    gs_vkCodeForForwardClick = 0;
-BYTE    gs_vkCodeForBackwardClick = 0;
+BYTE    gs_vkCodeForXButton1Click = 0;
+BYTE    gs_vkCodeForXButton2Click = 0;
 BYTE    gs_vkCodeForScrollUp = 0;
 BYTE    gs_vkCodeForScrollDown = 0;
 BYTE    gs_vkCodeForScrollLeft = 0;
