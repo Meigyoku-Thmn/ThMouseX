@@ -15,7 +15,7 @@
 #define SCROLL_LEFT_EVENT     0x99
 #define SCROLL_RIGHT_EVENT    0x9A
 
-#define NOUSE [[maybe_unused]]
+#define UNUSED [[maybe_unused]]
 
 #define DLLEXPORT __declspec(dllexport)
 #define DLLEXPORT_C extern "C" __declspec(dllexport)

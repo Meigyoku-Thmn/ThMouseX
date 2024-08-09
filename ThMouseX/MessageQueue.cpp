@@ -44,7 +44,7 @@ struct InputRuleItemMouseBtn2Function {
     BYTE vkCode;
     bool* clickStatePtr;
     bool isOn;
-    PostSideEffect postSideEffect;
+    PostSideEffect nextFrameSideEffect;
 };
 
 namespace core::messagequeue {
@@ -97,7 +97,7 @@ namespace core::messagequeue {
     }
 
     static InputRuleItemVk2SideEffect InputRuleVk2SideEffect[]{
-        { &gs_toggleImGuiButton, 0, [](bool isUp, NOUSE bool __) {
+        { &gs_toggleImGuiButton, 0, [](bool isUp, UNUSED bool __) {
             if (isUp) return;
             g_showImGui = !g_showImGui;
             if (g_showImGui) {
@@ -107,7 +107,7 @@ namespace core::messagequeue {
             else
                 HideMousePointer();
         } },
-        { &gs_toggleOsCursorButton, 0, [](bool isUp, NOUSE bool __) {
+        { &gs_toggleOsCursorButton, 0, [](bool isUp, UNUSED bool __) {
             if (isUp) return;
             if (!g_showImGui)
                 isCursorShow ? HideMousePointer() : ShowMousePointer();
@@ -157,44 +157,53 @@ namespace core::messagequeue {
         return MatchStatus::None;
     }
 
+    static bool IsMouseAndKeyboardInput(PMSG e) {
+        auto msg = e->message;
+        return msg == WM_KEYUP || msg == WM_KEYDOWN ||
+            msg == WM_LBUTTONUP || msg == WM_LBUTTONDOWN ||
+            msg == WM_MBUTTONUP || msg == WM_MBUTTONDOWN ||
+            msg == WM_RBUTTONUP || msg == WM_RBUTTONDOWN ||
+            msg == WM_XBUTTONUP || msg == WM_XBUTTONDOWN ||
+            msg == WM_MOUSEWHEEL || msg == WM_MOUSEHWHEEL;
+    }
+
     static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
         auto e = PMSG(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
+            using enum MatchStatus;
             if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
-            for (auto& ruleItem : InputRuleVk2SideEffect) {
-                auto vkCode = ruleItem.vkCodePtr == nil ? ruleItem.vkCodeStatic : *ruleItem.vkCodePtr;
-                auto matchStatus = TestVkCode(e, vkCode);
-                if (matchStatus == MatchStatus::Trigger) {
-                    ruleItem.sideEffect(false, g_showImGui && ImGui::GetIO().WantCaptureMouse);
+            if (IsMouseAndKeyboardInput(e)) {
+                for (auto& ruleItem : InputRuleVk2SideEffect) {
+                    auto vkCode = ruleItem.vkCodePtr == nil ? ruleItem.vkCodeStatic : *ruleItem.vkCodePtr;
+                    auto matchStatus = TestVkCode(e, vkCode);
+                    if (matchStatus == Trigger) {
+                        ruleItem.sideEffect(false, g_showImGui && ImGui::GetIO().WantCaptureMouse);
+                    }
+                    else if (matchStatus == Up && ruleItem.isOn == true) {
+                        ruleItem.isOn = false;
+                        ruleItem.sideEffect(true, g_showImGui && ImGui::GetIO().WantCaptureMouse);
+                    }
+                    else if (matchStatus == Down && ruleItem.isOn == false) {
+                        ruleItem.isOn = true;
+                        ruleItem.sideEffect(false, g_showImGui && ImGui::GetIO().WantCaptureMouse);
+                    }
                 }
-                else if (matchStatus == MatchStatus::Up && ruleItem.isOn == true) {
-                    ruleItem.isOn = false;
-                    ruleItem.sideEffect(true, g_showImGui && ImGui::GetIO().WantCaptureMouse);
-                }
-                else if (matchStatus == MatchStatus::Down && ruleItem.isOn == false) {
-                    ruleItem.isOn = true;
-                    ruleItem.sideEffect(false, g_showImGui && ImGui::GetIO().WantCaptureMouse);
-                }
-            }
-            for (auto& ruleItem : InputRuleMouseBtn2ClickState) {
-                if (ruleItem.postSideEffect) {
-                    ruleItem.postSideEffect(ruleItem);
-                    ruleItem.postSideEffect = nil;
-                }
-                auto matchStatus = TestVkCode(e, ruleItem.vkCode);
-                if (matchStatus == MatchStatus::Trigger) {
-                    ruleItem.postSideEffect = [](auto& ruleItem) { *ruleItem.clickStatePtr = true; };
-                    *ruleItem.clickStatePtr = true;
-                }
-                else if (matchStatus == MatchStatus::Up && ruleItem.isOn == true) {
-                    ruleItem.isOn = false;
-                    *ruleItem.clickStatePtr = false;
-                }
-                else if (matchStatus == MatchStatus::Down && ruleItem.isOn == false) {
-                    ruleItem.isOn = true;
-                    *ruleItem.clickStatePtr = true;
+                for (auto& ruleItem : InputRuleMouseBtn2ClickState) {
+                    auto matchStatus = TestVkCode(e, ruleItem.vkCode);
+                    if (matchStatus == Trigger) {
+                        ruleItem.nextFrameSideEffect = [](auto& _ruleItem) { *_ruleItem.clickStatePtr = true; };
+                        *ruleItem.clickStatePtr = true;
+                    }
+                    else if (matchStatus == Up && ruleItem.isOn == true) {
+                        ruleItem.isOn = false;
+                        *ruleItem.clickStatePtr = false;
+                    }
+                    else if (matchStatus == Down && ruleItem.isOn == false) {
+                        ruleItem.isOn = true;
+                        *ruleItem.clickStatePtr = true;
+                    }
                 }
             }
         }
@@ -270,6 +279,12 @@ namespace core::messagequeue {
     }
 
     static void PostRenderCallback() {
+        for (auto& ruleItem : InputRuleMouseBtn2ClickState) {
+            if (ruleItem.nextFrameSideEffect) {
+                ruleItem.nextFrameSideEffect(ruleItem);
+                ruleItem.nextFrameSideEffect = nil;
+            }
+        }
         static bool callbackDone = false;
         if (cursorNormalized && !callbackDone) {
             callbackDone = true;

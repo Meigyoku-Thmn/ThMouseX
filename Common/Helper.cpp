@@ -267,37 +267,37 @@ namespace common::helper {
             );
         if (vkCode == VK_XBUTTON1)
             return VkCodeMessage(
-                WM_XBUTTONUP, [](auto wParam, auto _) { return (wParam & (XBUTTON1 << 16)) != 0; }, nil,
-                WM_XBUTTONDOWN, [](auto wParam, auto _) { return (wParam & (XBUTTON1 << 16)) != 0; }, nil
+                WM_XBUTTONUP, [](auto _wParam, UNUSED auto _) { return (_wParam & (XBUTTON1 << 16)) != 0; }, nil,
+                WM_XBUTTONDOWN, [](auto _wParam, UNUSED auto _) { return (_wParam & (XBUTTON1 << 16)) != 0; }, nil
             );
         if (vkCode == VK_XBUTTON2)
             return VkCodeMessage(
-                WM_XBUTTONUP, [](auto wParam, auto _) { return (wParam & (XBUTTON2 << 16)) != 0; }, nil,
-                WM_XBUTTONDOWN, [](auto wParam, auto _) { return (wParam & (XBUTTON2 << 16)) != 0; }, nil
+                WM_XBUTTONUP, [](auto _wParam, UNUSED auto _) { return (_wParam & (XBUTTON2 << 16)) != 0; }, nil,
+                WM_XBUTTONDOWN, [](auto _wParam, UNUSED auto _) { return (_wParam & (XBUTTON2 << 16)) != 0; }, nil
             );
         if (vkCode == SCROLL_UP_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEWHEEL, [](auto wParam, auto _) { return WORD(wParam >> 16) > 0; }, nil
+                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return WORD(_wParam >> 16) > 0; }, nil
             );
         if (vkCode == SCROLL_DOWN_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEWHEEL, [](auto wParam, auto _) { return WORD(wParam >> 16) < 0; }, nil
+                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return WORD(_wParam >> 16) < 0; }, nil
             );
         if (vkCode == SCROLL_LEFT_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEHWHEEL, [](auto wParam, auto _) { return WORD(wParam >> 16) < 0; }, nil
+                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return WORD(_wParam >> 16) < 0; }, nil
             );
         if (vkCode == SCROLL_RIGHT_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEHWHEEL, [](auto wParam, auto _) { return WORD(wParam >> 16) > 0; }, nil
+                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return WORD(_wParam >> 16) > 0; }, nil
             );
         return VkCodeMessage(
-            WM_KEYUP, [](auto wParam, auto vkCode) { return wParam == vkCode; }, nil,
-            WM_KEYDOWN, [](auto wParam, auto vkCode) { return wParam == vkCode; }, nil
+            WM_KEYUP, [](auto _wParam, auto _vkCode) { return _wParam == _vkCode; }, nil,
+            WM_KEYDOWN, [](auto _wParam, auto _vkCode) { return _wParam == _vkCode; }, nil
         );
     }
 }

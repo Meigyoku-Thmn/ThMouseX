@@ -167,7 +167,7 @@ struct CompileTimeString {
     }
 
     template<std::size_t N2>
-    consteval bool operator==(NOUSE const CompileTimeString<N2> s) const {
+    consteval bool operator==(UNUSED const CompileTimeString<N2> s) const {
         return false;
     }
 
