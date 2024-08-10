@@ -96,7 +96,8 @@ namespace core::directx11 {
     float                       imGuiMousePosScaleY = 1.f;
 
     static void CleanUp(bool forReal = false) {
-        ImGui_ImplDX11_InvalidateDeviceObjects();
+        if (imGuiPrepared)
+            ImGui_ImplDX11_InvalidateDeviceObjects();
         SAFE_RELEASE(pixelShader);
         SAFE_DELETE(spriteBatch);
         SAFE_RELEASE(cursorTexture);

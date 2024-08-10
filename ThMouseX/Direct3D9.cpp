@@ -90,8 +90,9 @@ namespace core::directx9 {
     decltype(&D3DXCreateTextureFromFileW) _D3DXCreateTextureFromFileW;
     decltype(&D3DXMatrixTransformation2D) _D3DXMatrixTransformation2D;
 
-    void CleanUp(bool forReal = false) {
-        ImGui_ImplDX9_InvalidateDeviceObjects();
+    static void CleanUp(bool forReal = false) {
+        if (imGuiPrepared)
+            ImGui_ImplDX9_InvalidateDeviceObjects();
         SAFE_RELEASE(cursorSprite);
         SAFE_RELEASE(cursorTexture);
         firstStepPrepared = false;

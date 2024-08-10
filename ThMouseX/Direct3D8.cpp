@@ -85,7 +85,8 @@ namespace core::directx8 {
     float               imGuiMousePosScaleY = 1.f;
 
     static void CleanUp(bool forReal = false) {
-        ImGui_ImplDX8_InvalidateDeviceObjects();
+        if (imGuiPrepared)
+            ImGui_ImplDX8_InvalidateDeviceObjects();
         SAFE_RELEASE(cursorSprite);
         SAFE_RELEASE(cursorTexture);
         firstStepPrepared = false;
