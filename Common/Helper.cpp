@@ -4,7 +4,6 @@
 #include <tuple>
 #include <span>
 #include <format>
-#include <optional>
 
 #include "Helper.h"
 #include "Helper.Memory.h"
@@ -278,22 +277,22 @@ namespace common::helper {
         if (vkCode == SCROLL_UP_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return WORD(_wParam >> 16) > 0; }, nil
+                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) > 0; }, nil
             );
         if (vkCode == SCROLL_DOWN_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return WORD(_wParam >> 16) < 0; }, nil
+                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) < 0; }, nil
             );
         if (vkCode == SCROLL_LEFT_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return WORD(_wParam >> 16) < 0; }, nil
+                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) < 0; }, nil
             );
         if (vkCode == SCROLL_RIGHT_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return WORD(_wParam >> 16) > 0; }, nil
+                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) > 0; }, nil
             );
         return VkCodeMessage(
             WM_KEYUP, [](auto _wParam, auto _vkCode) { return _wParam == _vkCode; }, nil,

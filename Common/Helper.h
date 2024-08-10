@@ -3,15 +3,14 @@
 #include "macro.h"
 #include <tuple>
 #include <string>
-#include <optional>
 #include "DataTypes.h"
 
 namespace common::helper {
     using WParamPredicate = bool (*)(WPARAM wParam, BYTE vkCode);
     using LParamPredicate = bool (*)(LPARAM lParam, BYTE vkCode);
     using VkCodeMessage = std::tuple<
-        std::optional<UINT>, WParamPredicate, LParamPredicate,
-        std::optional<UINT>, WParamPredicate, LParamPredicate
+        UINT, WParamPredicate, LParamPredicate,
+        UINT, WParamPredicate, LParamPredicate
     >;
     void ReportLastError(const char* title);
     std::string& Replace(std::string& input, const char* keyword, const char* replacement);

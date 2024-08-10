@@ -132,25 +132,23 @@ namespace core::messagequeue {
 
     static MatchStatus TestVkCode(PMSG e, BYTE vkCode) {
         auto [messageUp, wParamUp, lParamUp, messageDown, wParamDown, lParamDown] = helper::ConvertVkCodeToMessage(vkCode);
-        if (messageUp.has_value() && messageUp.value() == WM_NULL &&
-            messageDown.has_value() && messageDown.value() == e->message &&
-            wParamDown && wParamDown(e->wParam, vkCode) &&
-            lParamDown && lParamDown(e->lParam, vkCode)) {
+        if (messageUp == WM_NULL &&
+            messageDown == e->message &&
+            (!wParamDown || wParamDown(e->wParam, vkCode)) &&
+            (!lParamDown || lParamDown(e->lParam, vkCode))) {
             return MatchStatus::Trigger;
         }
         auto matched = true;
-        if (messageUp.has_value() && messageUp.value() != e->message
+        if (messageUp != e->message
             || wParamUp && !wParamUp(e->wParam, vkCode)
-            || lParamUp && !lParamUp(e->lParam, vkCode)
-            || !messageUp.has_value() && !wParamUp && !lParamUp)
+            || lParamUp && !lParamUp(e->lParam, vkCode))
             matched = false;
         if (matched)
             return MatchStatus::Up;
         matched = true;
-        if (messageDown.has_value() && messageDown.value() != e->message
+        if (messageDown != e->message
             || wParamDown && !wParamDown(e->wParam, vkCode)
-            || lParamDown && !lParamDown(e->lParam, vkCode)
-            || !messageDown.has_value() && !wParamDown && !lParamDown)
+            || lParamDown && !lParamDown(e->lParam, vkCode))
             matched = false;
         if (matched)
             return MatchStatus::Down;
@@ -189,11 +187,13 @@ namespace core::messagequeue {
                         ruleItem.isOn = true;
                         ruleItem.sideEffect(false, g_showImGui && ImGui::GetIO().WantCaptureMouse);
                     }
+                    if (matchStatus != None)
+                        break;
                 }
                 for (auto& ruleItem : InputRuleMouseBtn2ClickState) {
                     auto matchStatus = TestVkCode(e, ruleItem.vkCode);
                     if (matchStatus == Trigger) {
-                        ruleItem.nextFrameSideEffect = [](auto& _ruleItem) { *_ruleItem.clickStatePtr = true; };
+                        ruleItem.nextFrameSideEffect = [](auto& _ruleItem) { *_ruleItem.clickStatePtr = false; };
                         *ruleItem.clickStatePtr = true;
                     }
                     else if (matchStatus == Up && ruleItem.isOn == true) {
@@ -204,6 +204,8 @@ namespace core::messagequeue {
                         ruleItem.isOn = true;
                         *ruleItem.clickStatePtr = true;
                     }
+                    if (matchStatus != None)
+                        break;
                 }
             }
         }
