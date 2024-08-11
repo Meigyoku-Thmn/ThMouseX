@@ -193,19 +193,24 @@ namespace core::directx11 {
 
         device->GetImmediateContext(&context);
 
-        context->OMGetRenderTargets(1, &renderTargetView, nil);
-        if (!renderTargetView) {
-            ComPtr<ID3D11Texture2D> pBackBuffer;
-            rs = swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-            if (FAILED(rs)) {
-                note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
-                return;
-            }
-            rs = device->CreateRenderTargetView(pBackBuffer.Get(), nil, &renderTargetView);
-            if (FAILED(rs)) {
-                note::DxErrToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
-                return;
-            }
+        DXGI_SWAP_CHAIN_DESC desc{};
+        rs = swapChain->GetDesc(&desc);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetDesc failed", rs);
+            return;
+        }
+
+        ComPtr<ID3D11Texture2D> pBackBuffer;
+        rs = swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
+            return;
+        }
+
+        rs = device->CreateRenderTargetView(pBackBuffer.Get(), nil, &renderTargetView);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
+            return;
         }
 
         spriteBatch = new SpriteBatch(context);
@@ -216,12 +221,6 @@ namespace core::directx11 {
             return;
         }
 
-        DXGI_SWAP_CHAIN_DESC desc{};
-        rs = swapChain->GetDesc(&desc);
-        if (FAILED(rs)) {
-            note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetDesc failed", rs);
-            return;
-        }
         g_hFocusWindow = desc.OutputWindow;
         g_isMinimized = IsIconic(g_hFocusWindow);
 
