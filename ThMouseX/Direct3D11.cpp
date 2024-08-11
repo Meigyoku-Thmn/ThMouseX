@@ -95,6 +95,8 @@ namespace core::directx11 {
     float                       imGuiMousePosScaleX = 1.f;
     float                       imGuiMousePosScaleY = 1.f;
 
+    HMODULE d3d11;
+
     static void CleanUp(bool forReal = false) {
         if (imGuiPrepared)
             ImGui_ImplDX11_InvalidateDeviceObjects();
@@ -108,10 +110,13 @@ namespace core::directx11 {
         measurementPrepared = false;
         cursorStatePrepared = false;
         imGuiConfigured = false;
-        if (forReal && imGuiPrepared) {
-            ImGui_ImplDX11_Shutdown();
-            ImGui_ImplWin32_Shutdown();
-            ImGui::DestroyContext();
+        if (forReal) {
+            if (imGuiPrepared) {
+                ImGui_ImplDX11_Shutdown();
+                ImGui_ImplWin32_Shutdown();
+                ImGui::DestroyContext();
+            }
+            helper::SafeFreeLib(d3d11);
         }
     }
 
@@ -124,12 +129,11 @@ namespace core::directx11 {
     void Initialize() {
         static bool initialized = false;
         static mutex mtx;
-        HMODULE d3d11{};
         {
             const lock_guard lock(mtx);
             if (initialized)
                 return;
-            d3d11 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d11.dll")).c_str());
+            GetModuleHandleExW(0, (g_systemDirPath + wstring(L"\\d3d11.dll")).c_str(), &d3d11);
             if (!d3d11)
                 return;
             initialized = true;

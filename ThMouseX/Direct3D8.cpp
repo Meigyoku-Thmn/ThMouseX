@@ -84,6 +84,8 @@ namespace core::directx8 {
     float               imGuiMousePosScaleX = 1.f;
     float               imGuiMousePosScaleY = 1.f;
 
+    HMODULE d3d8;
+
     static void CleanUp(bool forReal = false) {
         if (imGuiPrepared)
             ImGui_ImplDX8_InvalidateDeviceObjects();
@@ -93,10 +95,13 @@ namespace core::directx8 {
         measurementPrepared = false;
         cursorStatePrepared = false;
         imGuiConfigured = false;
-        if (forReal && imGuiPrepared) {
-            ImGui_ImplDX8_Shutdown();
-            ImGui_ImplWin32_Shutdown();
-            ImGui::DestroyContext();
+        if (forReal) {
+            if (imGuiPrepared) {
+                ImGui_ImplDX8_Shutdown();
+                ImGui_ImplWin32_Shutdown();
+                ImGui::DestroyContext();
+            }
+            helper::SafeFreeLib(d3d8);
         }
     }
 
@@ -115,12 +120,11 @@ namespace core::directx8 {
     void Initialize() {
         static bool initialized = false;
         static mutex mtx;
-        HMODULE d3d8{};
         {
             const lock_guard lock(mtx);
             if (initialized)
                 return;
-            d3d8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d8.dll")).c_str());
+            GetModuleHandleExW(0, (g_systemDirPath + wstring(L"\\d3d8.dll")).c_str(), &d3d8);
             if (!d3d8)
                 return;
             initialized = true;
