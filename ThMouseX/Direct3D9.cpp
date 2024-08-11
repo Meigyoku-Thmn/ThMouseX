@@ -93,8 +93,8 @@ namespace core::directx9 {
     static void CleanUp(bool forReal = false) {
         if (imGuiPrepared)
             ImGui_ImplDX9_InvalidateDeviceObjects();
-        SAFE_RELEASE(cursorSprite);
-        SAFE_RELEASE(cursorTexture);
+        helper::SafeRelease(cursorSprite);
+        helper::SafeRelease(cursorTexture);
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
@@ -105,7 +105,7 @@ namespace core::directx9 {
                 ImGui_ImplWin32_Shutdown();
                 ImGui::DestroyContext();
             }
-            SAFE_FREE_LIB(d3dx9_43);
+            helper::SafeFreeLib(d3dx9_43);
         }
     }
 

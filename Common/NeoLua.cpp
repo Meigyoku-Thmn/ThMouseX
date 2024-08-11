@@ -11,8 +11,10 @@
 #include "Log.h"
 #include "Variables.h"
 #include "LuaApi.h"
+#include "Helper.h"
 
 namespace note = common::log;
+namespace helper = common::helper;
 
 using namespace std;
 using namespace Microsoft::WRL;
@@ -50,7 +52,7 @@ namespace common::neolua {
         for (auto i = 0; i < 5; i++) {
             // It seems that EnumerateLoadedRuntimes call CreateToolhelp32Snapshot internally, which can fail with ERROR_BAD_LENGTH for no obvious reason. So, just retry if that's the case.
             result = metaHost->EnumerateLoadedRuntimes(GetCurrentProcess(), &enumerator);
-            if (WIN32_FROM_HRESULT(result) != ERROR_BAD_LENGTH)
+            if (helper::Win32FromHResult(result) != ERROR_BAD_LENGTH)
                 break;
         }
         if (FAILED(result)) {

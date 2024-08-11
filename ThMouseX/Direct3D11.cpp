@@ -98,12 +98,12 @@ namespace core::directx11 {
     static void CleanUp(bool forReal = false) {
         if (imGuiPrepared)
             ImGui_ImplDX11_InvalidateDeviceObjects();
-        SAFE_RELEASE(pixelShader);
-        SAFE_DELETE(spriteBatch);
-        SAFE_RELEASE(cursorTexture);
-        SAFE_RELEASE(renderTargetView);
-        SAFE_RELEASE(context);
-        SAFE_RELEASE(device);
+        helper::SafeRelease(pixelShader);
+        helper::SafeDelete(spriteBatch);
+        helper::SafeRelease(cursorTexture);
+        helper::SafeRelease(renderTargetView);
+        helper::SafeRelease(context);
+        helper::SafeRelease(device);
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
@@ -191,19 +191,22 @@ namespace core::directx11 {
             return;
         }
 
-        ComPtr<ID3D11Texture2D> pBackBuffer;
-        rs = swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-        if (FAILED(rs)) {
-            note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
-            return;
-        }
-        rs = device->CreateRenderTargetView(pBackBuffer.Get(), nil, &renderTargetView);
-        if (FAILED(rs)) {
-            note::DxErrToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
-            return;
-        }
-
         device->GetImmediateContext(&context);
+
+        context->OMGetRenderTargets(1, &renderTargetView, nil);
+        if (!renderTargetView) {
+            ComPtr<ID3D11Texture2D> pBackBuffer;
+            rs = swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+            if (FAILED(rs)) {
+                note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
+                return;
+            }
+            rs = device->CreateRenderTargetView(pBackBuffer.Get(), nil, &renderTargetView);
+            if (FAILED(rs)) {
+                note::DxErrToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
+                return;
+            }
+        }
 
         spriteBatch = new SpriteBatch(context);
 

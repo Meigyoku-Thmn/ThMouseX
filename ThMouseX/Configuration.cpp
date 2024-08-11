@@ -74,7 +74,7 @@ static bool IniTryGetWstrPath(const inipp::Ini<char>::Section& section, WCHAR(&o
             MessageBoxA(nil, msg.data, APP_NAME, MB_OK | MB_ICONERROR);
             return false;
         }
-        auto wStr = encoding::ConvertToUtf16(input.c_str());
+        auto wStr = helper::ExpandEnvStr(encoding::ConvertToUtf16(input.c_str()));
         GetFullPathNameW(wStr.c_str(), output_len, output, nil);
     }
     return true;

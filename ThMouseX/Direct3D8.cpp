@@ -87,8 +87,8 @@ namespace core::directx8 {
     static void CleanUp(bool forReal = false) {
         if (imGuiPrepared)
             ImGui_ImplDX8_InvalidateDeviceObjects();
-        SAFE_RELEASE(cursorSprite);
-        SAFE_RELEASE(cursorTexture);
+        helper::SafeRelease(cursorSprite);
+        helper::SafeRelease(cursorTexture);
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;

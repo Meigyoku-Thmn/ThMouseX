@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "macro.h"
 #include "Helper.Graphics.h"
+#include "Helper.h"
 
 namespace common::helper::graphics {
     Dx11BackupState SaveDx11State(IDXGISwapChain* swapChain, ID3D11DeviceContext* context) {
@@ -27,6 +28,6 @@ namespace common::helper::graphics {
         context->IASetIndexBuffer(state.indexBuffer, state.indexBufferFormat, state.indexBufferOffset);
         if (state.needRestoreViewport)
             context->RSSetViewports(state.nViewPorts, state.viewPorts);
-        SAFE_RELEASE(state.indexBuffer);
+        helper::SafeRelease(state.indexBuffer);
     }
 }

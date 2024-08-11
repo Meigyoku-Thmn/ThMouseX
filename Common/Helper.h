@@ -30,4 +30,29 @@ namespace common::helper {
     BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable, BYTE defaultDikCode = 0);
     BYTE NormalizeLeftRightVkCode(BYTE vkCode);
     VkCodeMessage ConvertVkCodeToMessage(BYTE vkCode);
+    HRESULT Win32FromHResult(HRESULT hr);
+    template<typename ComPtrT>
+    void SafeRelease(ComPtrT& p) {
+        if (p) {
+            p->Release();
+            p = nil;
+        }
+    }
+    template<typename PtrT>
+    void SafeDelete(PtrT& a) {
+        if (a) {
+            delete a;
+            a = nil;
+        }
+    }
+    template<typename PtrT>
+    void SafeDeleteArr(PtrT& arr) {
+        if (arr) {
+            delete[] arr;
+            arr = nil;
+        }
+    }
+    void SafeFreeLib(HMODULE& hLibModule);
+    std::wstring ExpandEnvStr(const wchar_t* str);
+    std::wstring ExpandEnvStr(const std::wstring& str);
 }
