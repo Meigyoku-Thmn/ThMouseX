@@ -61,6 +61,7 @@ using ID3D11RenderTargetViewPtr = ID3D11RenderTargetView*;
 using SpriteBatchPtr = SpriteBatch*;
 using ID3D11PixelShaderPtr = ID3D11PixelShader*;
 using ID3D11ShaderResourceViewPtr = ID3D11ShaderResourceView*;
+using ID3D11DepthStencilViewPtr = ID3D11DepthStencilView*;
 
 namespace core::directx11 {
     HRESULT WINAPI D3DResizeBuffers(IDXGISwapChain* swapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
@@ -319,8 +320,6 @@ namespace core::directx11 {
         if (!cursorTexture || !spriteBatch || !renderTargetView || !device || !context)
             return;
 
-        auto dx11State = graphics::SaveDx11State(swapChain, context);
-
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         auto pointerPosition = helper::GetPointerPosition();
         XMVECTOR cursorPositionD3D = XMVECTORF32{ float(pointerPosition.x), float(pointerPosition.y) };
@@ -352,8 +351,6 @@ namespace core::directx11 {
         auto color = g_inputEnabled ? ToneColor(tone) : RGBA(255, 200, 200, 128);
         spriteBatch->Draw(cursorTexture, cursorPositionD3D, nil, color, 0, cursorPivot, 1, SpriteEffects_None);
         spriteBatch->End();
-
-        graphics::LoadDx11State(context, dx11State);
     }
 
     static void PrepareImGui() {
@@ -411,8 +408,10 @@ namespace core::directx11 {
         PrepareCursorState(swapChain);
         PrepareImGui();
         ConfigureImGui(swapChain);
+        auto dx11State = graphics::SaveDx11State(swapChain, context);
         RenderCursor(swapChain);
         RenderImGui(swapChain);
+        graphics::LoadDx11State(context, dx11State);
         callbackstore::TriggerPostRenderCallbacks();
         return OriPresent(swapChain, SyncInterval, Flags);
     }
