@@ -193,7 +193,7 @@ namespace core::directx9 {
         d3dx9_43 = LoadLibraryW(L"d3dx9_43.dll");
         if (!d3dx9_43) {
             d3dx9_43_failed = true;
-            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to load d3d11.dll.");
+            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to load d3dx9_43.dll.");
             return;
         }
         _D3DXCreateSprite = (decltype(&D3DXCreateSprite))GetProcAddress(d3dx9_43, "D3DXCreateSprite");

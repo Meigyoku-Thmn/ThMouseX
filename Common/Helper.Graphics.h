@@ -10,7 +10,6 @@ namespace common::helper::graphics {
         UINT                    indexBufferOffset;
         D3D11_VIEWPORT          viewPorts[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
         UINT                    nViewPorts;
-        bool                    needRestoreViewport;
     };
 
     Dx11BackupState SaveDx11State(IDXGISwapChain* swapChain, ID3D11DeviceContext* context);

@@ -330,6 +330,18 @@ namespace core::directx11 {
         // scale cursor sprite to match the current render resolution
         auto scalingMatrixD3D = XMMatrixTransformation2D(cursorPositionD3D, 0, cursorScale, XMVECTOR(), 0, XMVECTOR());
 
+        DXGI_SWAP_CHAIN_DESC desc{};
+        auto rs = swapChain->GetDesc(&desc);
+        if (SUCCEEDED(rs)) {
+            auto myViewPort = D3D11_VIEWPORT{
+                .TopLeftX = 0,
+                .TopLeftY = 0,
+                .Width = float(desc.BufferDesc.Width),
+                .Height = float(desc.BufferDesc.Height),
+            };
+            context->RSSetViewports(1, &myViewPort);
+        }
+
         context->OMSetRenderTargets(1, &renderTargetView, nil);
 
         static UCHAR tone = 0;

@@ -131,12 +131,13 @@ namespace core::messagequeue {
     };
 
     static MatchStatus TestVkCode(PMSG e, BYTE vkCode) {
+        using enum MatchStatus;
         auto [messageUp, wParamUp, lParamUp, messageDown, wParamDown, lParamDown] = helper::ConvertVkCodeToMessage(vkCode);
         if (messageUp == WM_NULL &&
             messageDown == e->message &&
             (!wParamDown || wParamDown(e->wParam, vkCode)) &&
             (!lParamDown || lParamDown(e->lParam, vkCode))) {
-            return MatchStatus::Trigger;
+            return Trigger;
         }
         auto matched = true;
         if (messageUp != e->message
@@ -144,15 +145,15 @@ namespace core::messagequeue {
             || lParamUp && !lParamUp(e->lParam, vkCode))
             matched = false;
         if (matched)
-            return MatchStatus::Up;
+            return Up;
         matched = true;
         if (messageDown != e->message
             || wParamDown && !wParamDown(e->wParam, vkCode)
             || lParamDown && !lParamDown(e->lParam, vkCode))
             matched = false;
         if (matched)
-            return MatchStatus::Down;
-        return MatchStatus::None;
+            return Down;
+        return None;
     }
 
     static bool IsMouseAndKeyboardInput(PMSG e) {
