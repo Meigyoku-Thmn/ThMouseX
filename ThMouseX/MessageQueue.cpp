@@ -57,7 +57,7 @@ namespace core::messagequeue {
     auto hCursor = LoadCursorA(nil, IDC_ARROW);
 
     HCURSOR WINAPI _SetCursor(HCURSOR cursor) {
-        if (g_showImGui)
+        if (g_showImGui && ImGui_ImplWin32_MouseCursorIsBeingUpdated())
             return OriSetCursor(cursor);
         return nil;
     }
@@ -88,7 +88,7 @@ namespace core::messagequeue {
     }
 
     static void NormalizeCursor() {
-        // Set cursor visibility to -1, reset cursor to a normal arrow,
+        // Set cursor visibility to -1, then reset cursor to a normal arrow,
         // to ensure that there is a visible mouse cursor on the game's config dialog
         while (OriShowCursor(TRUE) < 0);
         while (OriShowCursor(FALSE) >= 0);
