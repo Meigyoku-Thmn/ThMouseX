@@ -105,6 +105,7 @@ struct ImGui_ImplWin32_Data {
 
     ImVec2                      MousePosScale;
     bool                        MouseIsCaptured;
+    bool                        MouseCursorIsBeingUpdated;
 
     ImGui_ImplWin32_Data() {
         memset((void*)this, 0, sizeof(*this));
@@ -118,6 +119,11 @@ struct ImGui_ImplWin32_Data {
 // FIXME: some shared resources (mouse cursor shape, gamepad) are mishandled when using multi-context.
 static ImGui_ImplWin32_Data* ImGui_ImplWin32_GetBackendData() {
     return ImGui::GetCurrentContext() ? (ImGui_ImplWin32_Data*)ImGui::GetIO().BackendPlatformUserData : nullptr;
+}
+
+bool ImGui_ImplWin32_MouseCursorIsBeingUpdated() {
+    ImGui_ImplWin32_Data* bd = ImGui_ImplWin32_GetBackendData();
+    return bd != nullptr && bd->MouseCursorIsBeingUpdated;
 }
 
 void ImGui_ImplWin32_SetMousePosScale(float xScale, float yScale) {
@@ -203,9 +209,12 @@ void    ImGui_ImplWin32_Shutdown() {
 }
 
 static bool ImGui_ImplWin32_UpdateMouseCursor() {
+    ImGui_ImplWin32_Data* bd = ImGui_ImplWin32_GetBackendData();
     ImGuiIO& io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
         return false;
+
+    bd->MouseCursorIsBeingUpdated = true;
 
     ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
     if (imgui_cursor == ImGuiMouseCursor_None || io.MouseDrawCursor) {
@@ -228,6 +237,9 @@ static bool ImGui_ImplWin32_UpdateMouseCursor() {
         }
         ::SetCursor(::LoadCursor(nullptr, win32_cursor));
     }
+
+    bd->MouseCursorIsBeingUpdated = false;
+
     return true;
 }
 

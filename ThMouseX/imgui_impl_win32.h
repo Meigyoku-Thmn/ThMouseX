@@ -19,6 +19,7 @@
 #include <imgui.h>      // IMGUI_IMPL_API
 #include <Windows.h>
 
+IMGUI_IMPL_API bool     ImGui_ImplWin32_MouseCursorIsBeingUpdated();
 IMGUI_IMPL_API void     ImGui_ImplWin32_SetMousePosScale(float xScale, float yScale);
 IMGUI_IMPL_API ImGuiKey ImGui_ImplWin32_VirtualKeyToImGuiKey(WPARAM wParam);
 IMGUI_IMPL_API bool     ImGui_ImplWin32_Init(void* hwnd);

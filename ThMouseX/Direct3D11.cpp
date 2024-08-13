@@ -61,6 +61,7 @@ using ID3D11RenderTargetViewPtr = ID3D11RenderTargetView*;
 using SpriteBatchPtr = SpriteBatch*;
 using ID3D11PixelShaderPtr = ID3D11PixelShader*;
 using ID3D11ShaderResourceViewPtr = ID3D11ShaderResourceView*;
+using ID3D11DepthStencilViewPtr = ID3D11DepthStencilView*;
 
 namespace core::directx11 {
     HRESULT WINAPI D3DResizeBuffers(IDXGISwapChain* swapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
@@ -95,22 +96,28 @@ namespace core::directx11 {
     float                       imGuiMousePosScaleX = 1.f;
     float                       imGuiMousePosScaleY = 1.f;
 
+    HMODULE d3d11;
+
     static void CleanUp(bool forReal = false) {
-        ImGui_ImplDX11_InvalidateDeviceObjects();
-        SAFE_RELEASE(pixelShader);
-        SAFE_DELETE(spriteBatch);
-        SAFE_RELEASE(cursorTexture);
-        SAFE_RELEASE(renderTargetView);
-        SAFE_RELEASE(context);
-        SAFE_RELEASE(device);
+        if (imGuiPrepared)
+            ImGui_ImplDX11_InvalidateDeviceObjects();
+        helper::SafeRelease(pixelShader);
+        helper::SafeDelete(spriteBatch);
+        helper::SafeRelease(cursorTexture);
+        helper::SafeRelease(renderTargetView);
+        helper::SafeRelease(context);
+        helper::SafeRelease(device);
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
         imGuiConfigured = false;
-        if (forReal && imGuiPrepared) {
-            ImGui_ImplDX11_Shutdown();
-            ImGui_ImplWin32_Shutdown();
-            ImGui::DestroyContext();
+        if (forReal) {
+            if (imGuiPrepared) {
+                ImGui_ImplDX11_Shutdown();
+                ImGui_ImplWin32_Shutdown();
+                ImGui::DestroyContext();
+            }
+            helper::SafeFreeLib(d3d11);
         }
     }
 
@@ -123,12 +130,11 @@ namespace core::directx11 {
     void Initialize() {
         static bool initialized = false;
         static mutex mtx;
-        HMODULE d3d11{};
         {
             const lock_guard lock(mtx);
             if (initialized)
                 return;
-            d3d11 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d11.dll")).c_str());
+            GetModuleHandleExW(0, (g_systemDirPath + wstring(L"\\d3d11.dll")).c_str(), &d3d11);
             if (!d3d11)
                 return;
             initialized = true;
@@ -190,19 +196,27 @@ namespace core::directx11 {
             return;
         }
 
+        device->GetImmediateContext(&context);
+
+        DXGI_SWAP_CHAIN_DESC desc{};
+        rs = swapChain->GetDesc(&desc);
+        if (FAILED(rs)) {
+            note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetDesc failed", rs);
+            return;
+        }
+
         ComPtr<ID3D11Texture2D> pBackBuffer;
         rs = swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetBuffer failed", rs);
             return;
         }
+
         rs = device->CreateRenderTargetView(pBackBuffer.Get(), nil, &renderTargetView);
         if (FAILED(rs)) {
             note::DxErrToFile(TAG "PrepareFirstStep: device->CreateRenderTargetView failed", rs);
             return;
         }
-
-        device->GetImmediateContext(&context);
 
         spriteBatch = new SpriteBatch(context);
 
@@ -212,12 +226,6 @@ namespace core::directx11 {
             return;
         }
 
-        DXGI_SWAP_CHAIN_DESC desc{};
-        rs = swapChain->GetDesc(&desc);
-        if (FAILED(rs)) {
-            note::DxErrToFile(TAG "PrepareFirstStep: swapChain->GetDesc failed", rs);
-            return;
-        }
         g_hFocusWindow = desc.OutputWindow;
         g_isMinimized = IsIconic(g_hFocusWindow);
 
@@ -312,8 +320,6 @@ namespace core::directx11 {
         if (!cursorTexture || !spriteBatch || !renderTargetView || !device || !context)
             return;
 
-        auto dx11State = graphics::SaveDx11State(swapChain, context);
-
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         auto pointerPosition = helper::GetPointerPosition();
         XMVECTOR cursorPositionD3D = XMVECTORF32{ float(pointerPosition.x), float(pointerPosition.y) };
@@ -345,8 +351,6 @@ namespace core::directx11 {
         auto color = g_inputEnabled ? ToneColor(tone) : RGBA(255, 200, 200, 128);
         spriteBatch->Draw(cursorTexture, cursorPositionD3D, nil, color, 0, cursorPivot, 1, SpriteEffects_None);
         spriteBatch->End();
-
-        graphics::LoadDx11State(context, dx11State);
     }
 
     static void PrepareImGui() {
@@ -404,8 +408,10 @@ namespace core::directx11 {
         PrepareCursorState(swapChain);
         PrepareImGui();
         ConfigureImGui(swapChain);
+        auto dx11State = graphics::SaveDx11State(swapChain, context);
         RenderCursor(swapChain);
         RenderImGui(swapChain);
+        graphics::LoadDx11State(context, dx11State);
         callbackstore::TriggerPostRenderCallbacks();
         return OriPresent(swapChain, SyncInterval, Flags);
     }

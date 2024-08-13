@@ -99,13 +99,19 @@ namespace core {
         }
     }
 
+    thread_local UINT loadLibraryReentrantCount = 0;
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
+        auto allowInitialization = loadLibraryReentrantCount == 0;
+        loadLibraryReentrantCount++;
         auto rs = OriLoadLibraryExW(lpLibFileName, hFile, dwFlags);
-        directx11::Initialize();
-        directx9::Initialize();
-        directx8::Initialize();
-        directinput::Initialize();
-        minhook::EnableAll();
+        loadLibraryReentrantCount--;
+        if (allowInitialization) {
+            directx11::Initialize();
+            directx9::Initialize();
+            directx8::Initialize();
+            directinput::Initialize();
+            minhook::EnableAll();
+        }
         return rs;
     }
 

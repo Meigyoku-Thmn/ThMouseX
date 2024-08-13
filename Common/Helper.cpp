@@ -299,4 +299,33 @@ namespace common::helper {
             WM_KEYDOWN, [](auto _wParam, auto _vkCode) { return _wParam == _vkCode; }, nil
         );
     }
+
+    // If facility of hresult is win32 then return the lower 16bit, else return unchanged
+    HRESULT Win32FromHResult(HRESULT hr) {
+        if (SUCCEEDED(hr))
+            return ERROR_SUCCESS;
+        if (HRESULT_FACILITY(hr) == FACILITY_WIN32)
+            return HRESULT_CODE(hr);
+        return hr;
+    }
+
+    void SafeFreeLib(HMODULE& hLibModule) {
+        if (hLibModule) {
+            FreeLibrary(hLibModule);
+            hLibModule = nil;
+        }
+    }
+
+    wstring ExpandEnvStr(const wchar_t* str) {
+        auto chrCount = ExpandEnvironmentStringsW(str, nil, 0);
+        if (chrCount == 0)
+            return wstring();
+        wstring output(chrCount - 1, '\0');
+        ExpandEnvironmentStringsW(str, output.data(), chrCount);
+        return output;
+    }
+
+    wstring ExpandEnvStr(const wstring& str) {
+        return ExpandEnvStr(str.c_str());
+    }
 }

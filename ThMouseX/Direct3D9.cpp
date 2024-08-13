@@ -83,17 +83,18 @@ namespace core::directx9 {
     float               imGuiMousePosScaleX = 1.f;
     float               imGuiMousePosScaleY = 1.f;
 
-    // d3dx9_43.dll
+    HMODULE d3d9;
     HMODULE d3dx9_43;
     bool d3dx9_43_failed = false;
     decltype(&D3DXCreateSprite) _D3DXCreateSprite;
     decltype(&D3DXCreateTextureFromFileW) _D3DXCreateTextureFromFileW;
     decltype(&D3DXMatrixTransformation2D) _D3DXMatrixTransformation2D;
 
-    void CleanUp(bool forReal = false) {
-        ImGui_ImplDX9_InvalidateDeviceObjects();
-        SAFE_RELEASE(cursorSprite);
-        SAFE_RELEASE(cursorTexture);
+    static void CleanUp(bool forReal = false) {
+        if (imGuiPrepared)
+            ImGui_ImplDX9_InvalidateDeviceObjects();
+        helper::SafeRelease(cursorSprite);
+        helper::SafeRelease(cursorTexture);
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
@@ -104,7 +105,8 @@ namespace core::directx9 {
                 ImGui_ImplWin32_Shutdown();
                 ImGui::DestroyContext();
             }
-            SAFE_FREE_LIB(d3dx9_43);
+            helper::SafeFreeLib(d3dx9_43);
+            helper::SafeFreeLib(d3d9);
         }
     }
 
@@ -122,12 +124,11 @@ namespace core::directx9 {
     void Initialize() {
         static bool initialized = false;
         static mutex mtx;
-        HMODULE d3d9{};
         {
             const lock_guard lock(mtx);
             if (initialized)
                 return;
-            d3d9 = GetModuleHandleW((g_systemDirPath + wstring(L"\\d3d9.dll")).c_str());
+            GetModuleHandleExW(0, (g_systemDirPath + wstring(L"\\d3d9.dll")).c_str(), &d3d9);
             if (!d3d9)
                 return;
             initialized = true;
