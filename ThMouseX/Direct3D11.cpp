@@ -23,7 +23,6 @@
 #include "../Common/DataTypes.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
-#include "../Common/Helper.Graphics.h"
 #include "../Common/Log.h"
 #include "Direct3D11.h"
 
@@ -33,7 +32,6 @@ namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
-namespace graphics = common::helper::graphics;
 namespace note = common::log;
 namespace imguioverlay = core::imguioverlay;
 
@@ -420,10 +418,12 @@ namespace core::directx11 {
         PrepareCursorState(swapChain);
         PrepareImGui();
         ConfigureImGui(swapChain);
-        auto dx11State = graphics::SaveDx11State(swapChain, context);
+
+        auto dxState = ImGui_ImplDX11_BackupDx11State();
         RenderCursor(swapChain);
         RenderImGui(swapChain);
-        graphics::LoadDx11State(context, dx11State);
+        ImGui_ImplDX11_RestoreDx11State(dxState);
+
         callbackstore::TriggerPostRenderCallbacks();
         return OriPresent(swapChain, SyncInterval, Flags);
     }

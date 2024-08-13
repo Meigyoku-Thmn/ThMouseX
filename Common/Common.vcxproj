@@ -177,7 +177,6 @@
     <ClInclude Include="ErrorMsg.DDraw.h" />
     <ClInclude Include="ErrorMsg.h" />
     <ClInclude Include="Helper.Encoding.h" />
-    <ClInclude Include="Helper.Graphics.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="Helper.Memory.h" />
     <ClInclude Include="Log.h" />
@@ -199,7 +198,6 @@
     <ClCompile Include="ErrorMsg.cpp" />
     <ClCompile Include="Helper.Encoding.cpp" />
     <ClCompile Include="Helper.cpp" />
-    <ClCompile Include="Helper.Graphics.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Helper.Memory.cpp" />
     <ClCompile Include="Lua.cpp" />
