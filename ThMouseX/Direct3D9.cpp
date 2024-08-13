@@ -91,20 +91,19 @@ namespace core::directx9 {
     decltype(&D3DXMatrixTransformation2D) _D3DXMatrixTransformation2D;
 
     static void CleanUp(bool forReal = false) {
-        if (imGuiPrepared)
-            ImGui_ImplDX9_InvalidateDeviceObjects();
+        if (imGuiPrepared) {
+            ImGui_ImplDX9_Shutdown();
+            ImGui_ImplWin32_Shutdown();
+            ImGui::DestroyContext();
+        }
         helper::SafeRelease(cursorSprite);
         helper::SafeRelease(cursorTexture);
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
         imGuiConfigured = false;
+        imGuiPrepared = false;
         if (forReal) {
-            if (imGuiPrepared) {
-                ImGui_ImplDX9_Shutdown();
-                ImGui_ImplWin32_Shutdown();
-                ImGui::DestroyContext();
-            }
             helper::SafeFreeLib(d3dx9_43);
             helper::SafeFreeLib(d3d9);
         }

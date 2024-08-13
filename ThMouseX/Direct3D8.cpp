@@ -87,20 +87,19 @@ namespace core::directx8 {
     HMODULE d3d8;
 
     static void CleanUp(bool forReal = false) {
-        if (imGuiPrepared)
-            ImGui_ImplDX8_InvalidateDeviceObjects();
+        if (imGuiPrepared) {
+            ImGui_ImplDX8_Shutdown();
+            ImGui_ImplWin32_Shutdown();
+            ImGui::DestroyContext();
+        }
         helper::SafeRelease(cursorSprite);
         helper::SafeRelease(cursorTexture);
         firstStepPrepared = false;
         measurementPrepared = false;
         cursorStatePrepared = false;
         imGuiConfigured = false;
+        imGuiPrepared = false;
         if (forReal) {
-            if (imGuiPrepared) {
-                ImGui_ImplDX8_Shutdown();
-                ImGui_ImplWin32_Shutdown();
-                ImGui::DestroyContext();
-            }
             helper::SafeFreeLib(d3d8);
         }
     }

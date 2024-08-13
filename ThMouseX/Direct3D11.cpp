@@ -97,8 +97,11 @@ namespace core::directx11 {
     HMODULE d3d11;
 
     static void CleanUp(bool forReal = false) {
-        if (imGuiPrepared)
-            ImGui_ImplDX11_InvalidateDeviceObjects();
+        if (imGuiPrepared) {
+            ImGui_ImplDX11_Shutdown();
+            ImGui_ImplWin32_Shutdown();
+            ImGui::DestroyContext();
+        }
         helper::SafeRelease(pixelShader);
         helper::SafeDelete(spriteBatch);
         helper::SafeRelease(cursorTexture);
@@ -109,12 +112,8 @@ namespace core::directx11 {
         measurementPrepared = false;
         cursorStatePrepared = false;
         imGuiConfigured = false;
+        imGuiPrepared = false;
         if (forReal) {
-            if (imGuiPrepared) {
-                ImGui_ImplDX11_Shutdown();
-                ImGui_ImplWin32_Shutdown();
-                ImGui::DestroyContext();
-            }
             helper::SafeFreeLib(d3d11);
         }
     }
