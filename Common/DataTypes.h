@@ -3,6 +3,7 @@
 #include "macro.h"
 #include <functional>
 #include <string_view>
+#include <string>
 #include <memory>
 #include <array>
 #include <type_traits>

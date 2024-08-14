@@ -69,6 +69,7 @@ namespace core::directx8 {
     bool imGuiConfigured;
 
     bool imGuiPrepared;
+    bool imGuiCorePrepared;
 
     static void ClearMeasurementFlags() {
         measurementPrepared = false;
@@ -90,7 +91,6 @@ namespace core::directx8 {
         if (imGuiPrepared) {
             ImGui_ImplDX8_Shutdown();
             ImGui_ImplWin32_Shutdown();
-            ImGui::DestroyContext();
         }
         helper::SafeRelease(cursorSprite);
         helper::SafeRelease(cursorTexture);
@@ -100,6 +100,8 @@ namespace core::directx8 {
         imGuiConfigured = false;
         imGuiPrepared = false;
         if (forReal) {
+            if (imGuiCorePrepared)
+                ImGui::DestroyContext();
             helper::SafeFreeLib(d3d8);
         }
     }
@@ -359,7 +361,10 @@ namespace core::directx8 {
         if (!g_hFocusWindow)
             return;
 
-        imguioverlay::Prepare();
+        if (!imGuiCorePrepared) {
+            imguioverlay::Prepare();
+            imGuiCorePrepared = true;
+        }
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX8_Init(pDevice);
     }

@@ -68,6 +68,7 @@ namespace core::directx9 {
     bool imGuiConfigured;
 
     bool imGuiPrepared;
+    bool imGuiCorePrepared;
 
     void ClearMeasurementFlags() {
         measurementPrepared = false;
@@ -94,7 +95,6 @@ namespace core::directx9 {
         if (imGuiPrepared) {
             ImGui_ImplDX9_Shutdown();
             ImGui_ImplWin32_Shutdown();
-            ImGui::DestroyContext();
         }
         helper::SafeRelease(cursorSprite);
         helper::SafeRelease(cursorTexture);
@@ -104,6 +104,8 @@ namespace core::directx9 {
         imGuiConfigured = false;
         imGuiPrepared = false;
         if (forReal) {
+            if (imGuiCorePrepared)
+                ImGui::DestroyContext();
             helper::SafeFreeLib(d3dx9_43);
             helper::SafeFreeLib(d3d9);
         }
@@ -403,7 +405,10 @@ namespace core::directx9 {
         if (!g_hFocusWindow)
             return;
 
-        imguioverlay::Prepare();
+        if (!imGuiCorePrepared) {
+            imguioverlay::Prepare();
+            imGuiCorePrepared = true;
+        }
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX9_Init(pDevice);
     }

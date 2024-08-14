@@ -75,6 +75,7 @@ namespace core::directx11 {
     bool imGuiConfigured;
 
     bool imGuiPrepared;
+    bool imGuiCorePrepared;
 
     static void ClearMeasurementFlags() {
         measurementPrepared = false;
@@ -100,7 +101,6 @@ namespace core::directx11 {
         if (imGuiPrepared) {
             ImGui_ImplDX11_Shutdown();
             ImGui_ImplWin32_Shutdown();
-            ImGui::DestroyContext();
         }
         helper::SafeRelease(pixelShader);
         helper::SafeDelete(spriteBatch);
@@ -114,6 +114,8 @@ namespace core::directx11 {
         imGuiConfigured = false;
         imGuiPrepared = false;
         if (forReal) {
+            if (imGuiCorePrepared)
+                ImGui::DestroyContext();
             helper::SafeFreeLib(d3d11);
         }
     }
@@ -177,7 +179,7 @@ namespace core::directx11 {
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[PresentIdx]), & D3DPresent, &OriPresent },
+            { PVOID(vtable[PresentIdx]), &D3DPresent, &OriPresent },
             { PVOID(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, &OriResizeBuffers },
         });
     }
@@ -369,7 +371,10 @@ namespace core::directx11 {
         if (!device || !context || !g_hFocusWindow)
             return;
 
-        imguioverlay::Prepare();
+        if (!imGuiCorePrepared) {
+            imguioverlay::Prepare();
+            imGuiCorePrepared = true;
+        }
         ImGui_ImplWin32_Init(g_hFocusWindow);
         ImGui_ImplDX11_Init(device, context);
     }

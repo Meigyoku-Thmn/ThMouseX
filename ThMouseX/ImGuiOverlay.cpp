@@ -103,7 +103,7 @@ namespace core::imguioverlay {
                     static auto inputMethod = NAMEOF_ENUM_FLAG(g_currentConfig.InputMethods);
                     ImGui::Text("Input Method(s):\t%s", inputMethod.c_str());
                 }
-                if (ImGui::CollapsingHeader("Global Config")) {
+                if (ImGui::CollapsingHeader("UI/UX Config")) {
                     static auto bombBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_vkCodeForLeftClick);
                     ImGui::Text("Left Click Map:\t\"%s\" 0x%X", ImGui::GetKeyName(bombBtn), gs_vkCodeForLeftClick);
 
