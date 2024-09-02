@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include "macro.h"
 #include "DataTypes.h"
 #include "Variables.h"

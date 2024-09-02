@@ -17,7 +17,6 @@
 
 #define UNUSED [[maybe_unused]]
 
-#define DLLEXPORT __declspec(dllexport)
 #define DLLEXPORT_C extern "C" __declspec(dllexport)
 
 #define EVAL_DISCARD(expr) EVAL_DISCARD_IMPL(__COUNTER__, expr)
@@ -35,22 +34,3 @@ bool MAKE_UNIQUE_VAR(counter2)() { \
 } \
 EVAL_DISCARD(MAKE_UNIQUE_VAR(counter2)()); \
 void MAKE_UNIQUE_VAR(counter1)()
-
-#define BEGIN_FLAG_ENUM(EnumName, EnumType) \
-enum class EnumName: EnumType; \
-inline EnumName operator &(EnumName a, const EnumName b) { \
-    return (EnumName)((EnumType)a & (EnumType)b); \
-} \
-inline EnumName operator &=(EnumName& a, const EnumName b) { \
-    (EnumType&)a &= (EnumType)b; \
-    return b; \
-} \
-inline EnumName operator |(EnumName a, const EnumName b) { \
-    return (EnumName)((EnumType)a | (EnumType)b); \
-} \
-inline EnumName operator |=(EnumName& a, const EnumName b) { \
-    (EnumType&)a |= (EnumType)b; \
-    return b; \
-} \
-enum class EnumName: EnumType {
-#define END_FLAG_ENUM() };

@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <DirectX9/Include/d3d9.h>
 #include <DirectX9/Include/d3dx9core.h>
 #include <vector>

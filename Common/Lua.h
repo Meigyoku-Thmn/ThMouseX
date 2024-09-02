@@ -1,5 +1,5 @@
 #pragma once
-#include "framework.h"
+#include <Windows.h>
 
 namespace common::lua {
     void Initialize();

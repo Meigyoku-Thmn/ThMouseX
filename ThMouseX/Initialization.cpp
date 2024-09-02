@@ -1,6 +1,6 @@
 #include "Initialization.h"
 
-#include "framework.h"
+#include <Windows.h>
 #include <shlwapi.h>
 #include <clocale>
 #include <vector>
@@ -24,6 +24,7 @@
 #include "Direct3D8.h"
 #include "Direct3D9.h"
 #include "Direct3D11.h"
+#include "ComClient.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
@@ -42,6 +43,7 @@ namespace note = common::log;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
+namespace comclient = core::comclient;
 
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
@@ -67,36 +69,36 @@ namespace core {
         if (helper::IsCurrentProcessThMouseX())
             return;
 
-        for (auto ord = gs_gameConfigs.length(); ord > 0; ord--) {
-            auto i = ord - 1;
-            if (_wcsicmp(g_currentProcessName, gs_gameConfigs[i].ProcessName) == 0) {
-                g_currentConfig = gs_gameConfigs[i];
+        if (!comclient::Initialize())
+            return;
 
-                minhook::Initialize();
-                luaapi::Initialize();
-                lua::Initialize();
-                luajit::Initialize();
-                neolua::Initialize();
+        GameConfig gameConfig;
+        if (!comclient::GetGameConfig(g_currentProcessName, gameConfig))
+            return;
 
-                directx11::Initialize();
-                directx9::Initialize();
-                directx8::Initialize();
+        g_currentConfig = gameConfig;
 
-                directinput::Initialize();
-                sendkey::Initialize();
-                keyboardstate::Initialize();
-                messagequeue::Initialize();
+        minhook::Initialize();
+        luaapi::Initialize();
+        lua::Initialize();
+        luajit::Initialize();
+        neolua::Initialize();
 
-                minhook::CreateApiHook(std::vector<minhook::HookApiConfig> {
-                    { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, &OriLoadLibraryExW },
-                });
+        directx11::Initialize();
+        directx9::Initialize();
+        directx8::Initialize();
 
-                minhook::EnableAll();
-                g_hookApplied = true;
+        directinput::Initialize();
+        sendkey::Initialize();
+        keyboardstate::Initialize();
+        messagequeue::Initialize();
 
-                break;
-            }
-        }
+        minhook::CreateApiHook(std::vector<minhook::HookApiConfig> {
+            { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, &OriLoadLibraryExW },
+        });
+
+        minhook::EnableAll();
+        g_hookApplied = true;
     }
 
     thread_local UINT loadLibraryReentrantCount = 0;

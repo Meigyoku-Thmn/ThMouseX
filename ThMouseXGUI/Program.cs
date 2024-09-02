@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using ThMouseXServer;
 
-namespace ThMouseX;
+namespace ThMouseXGUI;
+
+using static ComHelper;
 
 static class Program
 {
@@ -22,26 +25,42 @@ static class Program
     static extern bool ReadGeneralConfigFile();
 
     [STAThread]
-    static void Main()
+    static int Main()
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
         if (!MarkThMouseXProcess())
-            Environment.Exit(1);
+            return 1;
 
         using var mutex = new Mutex(true, AppName, out var mutexIsCreated);
         if (!mutexIsCreated)
         {
             MessageBox.Show($"{AppName} is already running.", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            Environment.Exit(1);
+            return 1;
         }
 
-        if (!ReadGamesFile() || !ReadGeneralConfigFile() || !InstallHooks())
-            Environment.Exit(1);
+        if (!ReadGamesFile() || !ReadGeneralConfigFile())
+            return 1;
+
+        try
+        {
+            CoRegisterClassObject<ComServer>();
+            CoResumeClassObjects();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, AppName + ": Failed to initialize Component Object Models", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return 1;
+        }
+
+        if (!InstallHooks())
+            return 1;
 
         Application.Run(new ThMouseApplicationContext());
 
         RemoveHooks();
+
+        return 0;
     }
 }

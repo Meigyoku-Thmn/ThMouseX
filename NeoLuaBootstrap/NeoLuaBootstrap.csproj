@@ -4,6 +4,7 @@
 		<TargetFramework>net48</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>12</LangVersion>
+		<Platforms>x86</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Lib.Harmony" Version="2.3.3" />

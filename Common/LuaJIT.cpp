@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <string>
 #include <codecvt>
 #include <luajit/lua.hpp>
@@ -57,7 +57,7 @@ namespace common::luajit {
     }
 
     void Initialize() {
-        if (g_currentConfig.ScriptType != ScriptType::LuaJIT)
+        if (g_currentConfig.ScriptType != ScriptType_LuaJIT)
             return;
 
         L = luaL_newstate();
@@ -79,7 +79,7 @@ namespace common::luajit {
             return;
         }
 
-        auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
+        auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.processName + L".lua";
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
 
         if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str()))) {

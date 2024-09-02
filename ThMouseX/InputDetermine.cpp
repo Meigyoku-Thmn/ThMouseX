@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <cmath>
 
 #include "../Common/Variables.h"
@@ -18,14 +18,13 @@ void CalculatePosition(TPointer position, POINT& output) {
 }
 
 static void CalculatePlayerPos(DWORD address) {
-    using enum PointDataType;
-    if (g_currentConfig.PosDataType == Int)
+    if (g_currentConfig.PosDataType == PointDataType_Int)
         CalculatePosition((IntPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == Float)
+    else if (g_currentConfig.PosDataType == PointDataType_Float)
         CalculatePosition((FloatPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == Short)
+    else if (g_currentConfig.PosDataType == PointDataType_Short)
         CalculatePosition((ShortPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == Double)
+    else if (g_currentConfig.PosDataType == PointDataType_Double)
         CalculatePosition((DoublePoint*)address, g_playerPos);
 }
 

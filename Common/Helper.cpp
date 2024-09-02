@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include "macro.h"
 #include <string>
 #include <tuple>
@@ -175,15 +175,16 @@ namespace common::helper {
     }
 
     DWORD CalculateAddress() {
-        using enum ScriptType;
-        if (g_currentConfig.ScriptType == LuaJIT)
+        if (g_currentConfig.ScriptType == ScriptType_LuaJIT)
             return luajit::GetPositionAddress();
-        else if (g_currentConfig.ScriptType == NeoLua)
+        else if (g_currentConfig.ScriptType == ScriptType_NeoLua)
             return neolua::GetPositionAddress();
-        else if (g_currentConfig.ScriptType == Lua)
+        else if (g_currentConfig.ScriptType == ScriptType_Lua)
             return lua::GetPositionAddress();
-        else
-            return memory::ResolveAddress(span{ g_currentConfig.Address.Level, g_currentConfig.Address.Length });
+        else {
+            auto& addressChain = g_currentConfig.AddressChain;
+            return memory::ResolveAddress(span{ &addressChain[addressChain.GetLowerBound()], addressChain.GetCount() });
+        }
     }
 
     bool IsCurrentProcessThMouseX() {

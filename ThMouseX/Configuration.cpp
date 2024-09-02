@@ -1,12 +1,14 @@
-#include "framework.h"
+#include <Windows.h>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
+#include <map>
 #include <format>
 #include <tuple>
 #include <cassert>
 #include <inipp.h>
+#include <atlsafe.h>
 
 #include "../Common/macro.h"
 #include "../Common/Variables.h"
@@ -35,6 +37,7 @@ namespace directinput = core::directinput;
 using namespace std;
 
 using VkCodes = unordered_map<string, BYTE, string_hash, equal_to<>>;
+using GameConfigs = map<wstring, GameConfig, equal_to<>>;
 
 template<CompileTimeString ini_key, typename OutputType>
 static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType& output) {
@@ -113,12 +116,20 @@ tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount,
 tuple<VkCodes, bool> ReadVkCodes();
 #pragma endregion
 
+static GameConfigs gameConfigs;
+
 namespace core::configuration {
     bool MarkThMouseXProcess() {
         auto rs = _putenv(APP_NAME "=" APP_NAME);
         if (rs != 0)
             note::ToFile("[Configuration] MarkThMouseXProcess failed.");
         return true;
+    }
+    GameConfig* GetGameConfig(PWCHAR processName) {
+        wstring processNameLowerCase{ processName };
+        transform(processNameLowerCase.begin(), processNameLowerCase.end(), processNameLowerCase.begin(), towlower);
+        auto gameConfig = gameConfigs.find(processNameLowerCase);
+        return gameConfig == gameConfigs.end() ? nullptr : &gameConfig->second;
     }
     bool ReadGamesFile(const char* gameConfigPath, bool overrding = false);
     bool ReadGamesFile() {
@@ -138,11 +149,11 @@ namespace core::configuration {
                 return true;
         }
         if (!overrding)
-            gs_gameConfigs.fill({});
+            gameConfigs.clear();
 
         string line;
         int lineCount = 0;
-        while (gs_gameConfigs.length() < gs_gameConfigs.capacity() && getline(gamesFile, line)) {
+        while (getline(gamesFile, line)) {
             lineCount++;
             stringstream lineStream(line);
             if (IsCommentLine(lineStream))
@@ -176,16 +187,18 @@ namespace core::configuration {
             if (!ok7)
                 return false;
 
-            auto& gameConfig = gs_gameConfigs.add_new();
+            wstring processNameLowerCase = processName;
+            transform(processNameLowerCase.begin(), processNameLowerCase.end(), processNameLowerCase.begin(), towlower);
+            auto& gameConfig = gameConfigs[processNameLowerCase];
 
-            static_assert(is_same<decltype(&gameConfig.ProcessName[0]), decltype(processName.data())>());
-            memcpy(gameConfig.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
+            gameConfig.processName = new WCHAR[processName.size() + 1];
+            memcpy(gameConfig.processName, processName.c_str(), processName.size() * sizeof(processName[0]));
+            gameConfig.processName[processName.size()] = L'\0';
 
-            static_assert(is_same<decltype(&gameConfig.Address.Level[0]), decltype(addressOffsets.data())>());
             if (addressOffsets.size() > 0) {
-                memcpy(gameConfig.Address.Level, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
-                assert(addressOffsets.size() <= ARRAYSIZE(gameConfig.Address.Level));
-                gameConfig.Address.Length = addressOffsets.size();
+                CComSafeArray<DWORD> addressChain{ addressOffsets.size() };
+                memcpy(addressChain.m_psa->pvData, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
+                gameConfig.Address = addressChain.Detach();
             }
             gameConfig.ScriptType = scriptType;
 
@@ -193,7 +206,6 @@ namespace core::configuration {
 
             gameConfig.BasePixelOffset = offset;
 
-            static_assert(is_same<decltype(gameConfig.BaseHeight), decltype(baseHeight)>());
             gameConfig.BaseHeight = baseHeight;
 
             gameConfig.AspectRatio = aspectRatio;
@@ -265,13 +277,6 @@ tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount, con
     string processName;
     stream >> quoted(processName);
     auto wProcessName = encoding::ConvertToUtf16(processName);
-
-    auto maxSize = ARRAYSIZE(gs_gameConfigs[0].ProcessName) - 1;
-    if (wProcessName.size() > maxSize) {
-        MessageBoxA(nil, format("processName longer than {} characters at line {} in {}.",
-            maxSize, lineCount, gameConfigPath).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
-        return { move(wProcessName), false };
-    }
     return { move(wProcessName), true };
 }
 
@@ -280,21 +285,19 @@ tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, 
     stream >> pointerChainStr;
     vector<DWORD> addressOffsets;
 
-    auto scriptType = ScriptType::None;
+    auto scriptType = ScriptType_None;
 
     if (pointerChainStr.compare("LuaJIT") == 0)
-        scriptType = ScriptType::LuaJIT;
+        scriptType = ScriptType_LuaJIT;
     else if (pointerChainStr.compare("NeoLua") == 0)
-        scriptType = ScriptType::NeoLua;
+        scriptType = ScriptType_NeoLua;
     else if (pointerChainStr.compare("Lua") == 0)
-        scriptType = ScriptType::Lua;
+        scriptType = ScriptType_Lua;
 
-    if (scriptType == ScriptType::None) {
-        auto maxSize = ARRAYSIZE(gs_gameConfigs[0].Address.Level);
-        addressOffsets.reserve(maxSize);
+    if (scriptType == ScriptType_None) {
         size_t leftBoundIdx = 0;
         size_t rightBoundIdx = -1;
-        for (size_t addrLevelIdx = 0; addrLevelIdx < maxSize; addrLevelIdx++) {
+        for (;;) {
             leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
             if (leftBoundIdx == string::npos)
                 break;
@@ -324,19 +327,18 @@ tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, 
 }
 
 tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, const char* gameConfigPath) {
-    using enum PointDataType;
     string dataTypeStr;
     stream >> dataTypeStr;
-    auto dataType = None;
+    auto dataType = PointDataType_None;
 
     if (_stricmp(dataTypeStr.c_str(), "Int") == 0)
-        dataType = Int;
+        dataType = PointDataType_Int;
     else if (_stricmp(dataTypeStr.c_str(), "Float") == 0)
-        dataType = Float;
+        dataType = PointDataType_Float;
     else if (_stricmp(dataTypeStr.c_str(), "Short") == 0)
-        dataType = Short;
+        dataType = PointDataType_Short;
     else if (_stricmp(dataTypeStr.c_str(), "Double") == 0)
-        dataType = Double;
+        dataType = PointDataType_Double;
     else {
         MessageBoxA(nil, format("Invalid dataType at line {} in {}.", lineCount, gameConfigPath).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);
@@ -425,26 +427,25 @@ tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, 
 }
 
 tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, const char* gameConfigPath) {
-    using enum InputMethod;
     string inputMethodStr;
     stream >> inputMethodStr;
 
-    auto inputMethods = None;
+    auto inputMethods = InputMethod_None;
     char* nextToken{};
     auto token = strtok_s(inputMethodStr.data(), "/", &nextToken);
     while (token) {
         if (_stricmp(token, "DirectInput") == 0)
-            inputMethods |= DirectInput;
+            inputMethods |= InputMethod_DirectInput;
         else if (_stricmp(token, "GetKeyboardState") == 0)
-            inputMethods |= GetKeyboardState;
+            inputMethods |= InputMethod_GetKeyboardState;
         else if (_stricmp(token, "SendInput") == 0)
-            inputMethods |= SendInput;
+            inputMethods |= InputMethod_SendInput;
         else if (_stricmp(token, "SendMessage") == 0)
-            inputMethods |= SendMsg;
+            inputMethods |= InputMethod_SendMsg;
         token = strtok_s(nil, "/", &nextToken);
     }
 
-    if (inputMethods == None) {
+    if (inputMethods == InputMethod_None) {
         MessageBoxA(nil, format("Invalid inputMethod at line {} in {}.", lineCount, gameConfigPath).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);
         return { inputMethods, false };

@@ -1,4 +1,4 @@
-﻿namespace ThMouseX
+﻿namespace ThMouseXGUI
 {
     partial class AboutForm
     {

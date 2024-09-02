@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include "macro.h"
 #include <iostream>
 #include <chrono>
@@ -61,6 +61,9 @@ namespace common::log {
         ComPtr<IErrorInfo> errorInfo;
         std::ignore = GetErrorInfo(0, &errorInfo);
         _com_error error(hResult, errorInfo.Get(), true);
+        ComErrToFile(message, error);
+    }
+    void ComErrToFile(const char* message, const _com_error& error) {
         auto description = error.Description();
         if (description.length() > 0) {
 #if _DEBUG
@@ -75,7 +78,7 @@ namespace common::log {
 #endif
         ToFile("%s: %s", message, errorMessage.c_str());
         if (errorMessage.starts_with("IDispatch error") || errorMessage.starts_with("Unknown error")) {
-            errorMessage = errormsg::GuessErrorsFromHResult(hResult);
+            errorMessage = errormsg::GuessErrorsFromHResult(error.Error());
             if (errorMessage != "") {
 #if _DEBUG
                 ToConsole(errorMessage.c_str());

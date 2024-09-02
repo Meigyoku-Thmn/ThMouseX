@@ -1,4 +1,4 @@
-﻿#include "framework.h"
+﻿#include <Windows.h>
 #include "Initialization.h"
 #include "../Common/Variables.h"
 

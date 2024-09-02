@@ -1,0 +1,7 @@
+{
+  "$schema": "https://aka.ms/CsWin32.schema.json",
+  "emitSingleFile": false,
+  "public": true,
+  "useSafeHandles": false,
+  "wideCharOnly": true
+}

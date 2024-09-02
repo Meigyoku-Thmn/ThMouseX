@@ -1,6 +1,6 @@
 #pragma once
 #include "macro.h"
-#include "framework.h"
+#include <Windows.h>
 #include "DataTypes.h"
 
 extern WCHAR    g_currentModuleDirPath[MAX_PATH];
@@ -9,7 +9,7 @@ extern WCHAR    g_currentProcessDirPath[MAX_PATH];
 extern WCHAR    g_currentProcessName[MAX_PATH];
 
 // single game config
-extern GameConfig  g_currentConfig;
+extern GameConfigLocal  g_currentConfig;
 
 // global game state
 extern bool         g_hookApplied;
@@ -38,9 +38,6 @@ extern DoublePoint  g_playerPosRaw;
 extern GameInput    g_gameInput;
 
 #ifndef UTILITY_PROJECT
-// configuration from main exe
-extern GameConfigs  gs_gameConfigs;
-
 extern BYTE     gs_vkCodeForLeftClick;
 extern BYTE     gs_vkCodeForMiddleClick;
 extern BYTE     gs_vkCodeForRightClick;

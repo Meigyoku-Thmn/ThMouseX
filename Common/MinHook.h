@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "macro.h"
-#include "framework.h"
+#include <Windows.h>
 
 namespace common::minhook {
     struct HookConfig {

@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>12</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Platforms>x86</Platforms>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<None Remove=".gitignore" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <AdditionalFiles Include="NativeMethods.json" />
+	  <AdditionalFiles Include="NativeMethods.txt" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="System.Memory" Version="4.5.5" />
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="call &quot;$(DevEnvDir)..\Tools\vsdevcmd.bat&quot; -no_logo&#xD;&#xA;set PostBuildTool=&quot;$(SolutionDir)PostBuildTool\bin\x86\$(Configuration)\net48\PostBuildTool&quot;&#xD;&#xA;set ServerName=ThMouseXServer&#xD;&#xA;set ClientName=ThMouseX&#xD;&#xA;set TypeLibName=ThMouseXServer.dll&#xD;&#xA;set Architecture=*&#xD;&#xA;set ServerPath=&quot;$(OutDir)ThMouseXServer.dll&quot;&#xD;&#xA;set ServerManifestPath=&quot;$(ProjectDir)server.manifest&quot;&#xD;&#xA;set ClientManifestPath=&quot;$(ProjectDir)client.manifest&quot;&#xD;&#xA;set TlbPath=&quot;$(ProjectDir)server.tlb&quot;&#xD;&#xA;%25PostBuildTool%25 GenerateComServerManifest %25ServerName%25 %25TypeLibName%25 %25Architecture%25 %25ServerPath%25 %25ServerManifestPath%25&#xD;&#xA;%25PostBuildTool%25 GenerateComServerManifest %25ClientName%25 %25TypeLibName%25 %25Architecture%25 %25ServerPath%25 %25ClientManifestPath%25&#xD;&#xA;tlbexp /nologo /win32 %25ServerPath%25 /out:%25TlbPath%25&#xD;&#xA;%25PostBuildTool%25 ImportResource %25ServerPath%25 %25TlbPath%25 typelib #1" />
+	</Target>
+
+</Project>

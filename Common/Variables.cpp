@@ -1,5 +1,5 @@
 #include "macro.h"
-#include "framework.h"
+#include <Windows.h>
 
 #include "Variables.h"
 
@@ -9,7 +9,7 @@ WCHAR   g_currentProcessDirPath[MAX_PATH];
 WCHAR   g_currentProcessName[MAX_PATH];
 
 // single game config
-GameConfig      g_currentConfig;
+GameConfigLocal g_currentConfig;
 
 // global game state
 bool        g_hookApplied;
@@ -40,8 +40,6 @@ GameInput   g_gameInput;
 #ifndef UTILITY_PROJECT
 // configuration from main exe
 #pragma data_seg(".SHRCONF")
-GameConfigs gs_gameConfigs{};
-
 BYTE    gs_vkCodeForLeftClick = 0x58; // VK_X
 BYTE    gs_vkCodeForMiddleClick = 0x43; // VK_C
 BYTE    gs_vkCodeForRightClick = 0;

@@ -1,5 +1,5 @@
 #pragma once
-#include "framework.h"
+#include <Windows.h>
 #include "macro.h"
 #include "Variables.h"
 #include "Helper.Encoding.h"
@@ -7,6 +7,7 @@
 #include <string>
 #include <cstdio>
 #include <utility>
+#include <comdef.h>
 
 namespace common::log {
     extern FILE* __logFile;
@@ -38,6 +39,7 @@ namespace common::log {
     }
     void DxErrToFile(const char* message, HRESULT hResult);
     void HResultToFile(const char* message, HRESULT hResult);
+    void ComErrToFile(const char* message, const _com_error& error);
     void LastErrorToFile(const char* message);
     template <typename... Targs>
     void ToConsole(const char* _Format, Targs&&... args) {

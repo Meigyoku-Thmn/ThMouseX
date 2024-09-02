@@ -47,7 +47,7 @@ static HRSRC WINAPI FindResourceWHook(HMODULE hModule, LPCWSTR lpName, LPCWSTR l
     return rs;
 }
 
-void GetDirectInputMappingTableId() {
+static void GetDirectInputMappingTableId() {
     Prepare();
     ComPtr<IDirectInput8A> pDInput8;
     auto rs = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8A, &pDInput8, nil);
