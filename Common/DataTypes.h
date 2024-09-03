@@ -23,7 +23,7 @@ struct GameConfigLocal : GameConfig {
     GameConfigLocal() {}
     GameConfigLocal(const GameConfig& gameConfig) {
         *(GameConfig*)this = gameConfig;
-        AddressChain.Attach(Address);
+        this->AddressChain.Attach(this->Address);
     }
 };
 
@@ -31,15 +31,15 @@ struct GameConfigEx : GameConfig {
     GameConfigEx() {}
     bool CopyFrom(const GameConfig& gameConfig) {
         *(GameConfig*)this = gameConfig;
-        auto hr = SafeArrayCopy(Address, &Address);
-        auto processNameSize = (wcslen(processName) + 1) * sizeof(processName[0]);
+        auto hr = SafeArrayCopy(this->Address, &this->Address);
+        auto processNameSize = (wcslen(this->processName) + 1) * sizeof(this->processName[0]);
         auto allocated = CoTaskMemAlloc(processNameSize);
         if (allocated) {
-            memcpy(allocated, processName, processNameSize);
-            processName = (decltype(processName))allocated;
+            memcpy(allocated, this->processName, processNameSize);
+            this->processName = (decltype(this->processName))allocated;
         }
         if (!allocated || FAILED(hr)) {
-            SafeArrayDestroy(Address);
+            SafeArrayDestroy(this->Address);
             CoTaskMemFree(allocated);
             *(GameConfig*)this = {};
             return false;

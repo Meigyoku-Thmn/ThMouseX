@@ -117,8 +117,8 @@ mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Comma
     <PostBuildEvent>
       <Command>call "$(DevEnvDir)..\Tools\vsdevcmd.bat" -no_logo
 set ClientManifestPath="$(SolutionDir)ThMouseXServer\client.manifest"
-set ComClientPath="$(OutDir)ThMouseX.dll;#1"
-rem mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Command>
+set ComClientPath="$(OutDir)ThMouseX.dll;#2"
+mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
