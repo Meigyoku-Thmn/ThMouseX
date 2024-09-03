@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#import "../ThMouseXServer/server.tlb"
+#include "../Common/ComServer.h"
 using namespace ThMouseXServer;
 
 namespace core::comclient {

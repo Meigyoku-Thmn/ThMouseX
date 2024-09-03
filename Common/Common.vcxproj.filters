@@ -80,6 +80,9 @@
     <ClInclude Include="Helper.Memory.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="ComServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">

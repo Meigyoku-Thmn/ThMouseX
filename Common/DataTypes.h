@@ -9,7 +9,8 @@
 #include <algorithm>
 #include <atlsafe.h>
 
-#import "../ThMouseXServer/server.tlb"
+#include "ComServer.h"
+
 using namespace ThMouseXServer;
 
 static_assert(sizeof(void*) == 4, "Support 32-bit system only!");
@@ -21,8 +22,29 @@ struct GameConfigLocal : GameConfig {
     CComSafeArray<DWORD> AddressChain;
     GameConfigLocal() {}
     GameConfigLocal(const GameConfig& gameConfig) {
-        memcpy(this, &gameConfig, sizeof(gameConfig));
-        AddressChain.Attach(this->Address);
+        *(GameConfig*)this = gameConfig;
+        AddressChain.Attach(Address);
+    }
+};
+
+struct GameConfigEx : GameConfig {
+    GameConfigEx() {}
+    bool CopyFrom(const GameConfig& gameConfig) {
+        *(GameConfig*)this = gameConfig;
+        auto hr = SafeArrayCopy(Address, &Address);
+        auto processNameSize = (wcslen(processName) + 1) * sizeof(processName[0]);
+        auto allocated = CoTaskMemAlloc(processNameSize);
+        if (allocated) {
+            memcpy(allocated, processName, processNameSize);
+            processName = (decltype(processName))allocated;
+        }
+        if (!allocated || FAILED(hr)) {
+            SafeArrayDestroy(Address);
+            CoTaskMemFree(allocated);
+            *(GameConfig*)this = {};
+            return false;
+        }
+        return true;
     }
 };
 

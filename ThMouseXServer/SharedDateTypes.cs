@@ -1,6 +1,22 @@
 ﻿using System.Runtime.InteropServices;
 namespace ThMouseXServer;
 
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+[ComVisible(true)]
+public struct GameConfig
+{
+    [MarshalAs(UnmanagedType.LPWStr)]
+    public string ProcessName;
+    [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_UI4)]
+    public uint[] Address;
+    public ScriptType ScriptType;
+    public PointDataType PosDataType;
+    public FloatPoint BasePixelOffset;
+    public uint BaseHeight;
+    public FloatPoint AspectRatio;
+    public InputMethod InputMethods;
+};
+
 [ComVisible(true)]
 public enum ScriptType : uint
 {
@@ -55,19 +71,3 @@ public enum InputMethod : uint
     SendInput/*   */ = 1 << 2,
     SendMsg/*     */ = 1 << 3
 }
-
-[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-[ComVisible(true)]
-public struct GameConfig
-{
-    [MarshalAs(UnmanagedType.LPWStr)]
-    public string ProcessName;
-    [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_UI4)]
-    public uint[] Address;
-    public ScriptType ScriptType;
-    public PointDataType PosDataType;
-    public FloatPoint BasePixelOffset;
-    public uint BaseHeight;
-    public FloatPoint AspectRatio;
-    public InputMethod InputMethods;
-};

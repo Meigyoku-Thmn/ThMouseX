@@ -67,7 +67,7 @@
       <SDLCheck>false</SDLCheck>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeaderFile />
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
     </ClCompile>
@@ -102,7 +102,7 @@ mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Comma
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeaderFile />
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
     </ClCompile>
@@ -160,7 +160,6 @@ rem mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</C
     <ClInclude Include="imgui_impl_dx8.h" />
     <ClInclude Include="InputDetermine.h" />
     <ClInclude Include="KeyboardState.h" />
-    <ClInclude Include="framework.h" />
     <ClInclude Include="MessageQueue.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SendKey.h" />

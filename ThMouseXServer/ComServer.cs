@@ -13,18 +13,10 @@ public interface IComServer
 [Guid("42F2DB78-D04E-4889-9B27-3F43830A6400"), ComVisible(true)]
 public class ComServer : IComServer
 {
-    [DllImport("ThMouseX.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-    static extern ref GameConfig? GetGameConfig(string processName);
+    [DllImport("ThMouseX.dll",
+        EntryPoint = nameof(GetGameConfig), CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+    static extern bool _GetGameConfig(string processName, out GameConfig gameConfig);
 
     public bool GetGameConfig(string processName, out GameConfig gameConfig)
-    {
-        var rs = GetGameConfig(processName);
-        if (rs == null)
-        {
-            gameConfig = default;
-            return false;
-        }
-        gameConfig = rs.Value;
-        return true;
-    }
+        => _GetGameConfig(processName, out gameConfig);
 }

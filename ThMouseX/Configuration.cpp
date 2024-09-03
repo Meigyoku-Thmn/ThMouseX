@@ -37,7 +37,7 @@ namespace directinput = core::directinput;
 using namespace std;
 
 using VkCodes = unordered_map<string, BYTE, string_hash, equal_to<>>;
-using GameConfigs = map<wstring, GameConfig, equal_to<>>;
+using GameConfigs = map<wstring, GameConfig>;
 
 template<CompileTimeString ini_key, typename OutputType>
 static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType& output) {
@@ -125,11 +125,16 @@ namespace core::configuration {
             note::ToFile("[Configuration] MarkThMouseXProcess failed.");
         return true;
     }
-    GameConfig* GetGameConfig(PWCHAR processName) {
+    bool GetGameConfig(PCWCHAR processName, GameConfigEx* gameConfig) {
         wstring processNameLowerCase{ processName };
         transform(processNameLowerCase.begin(), processNameLowerCase.end(), processNameLowerCase.begin(), towlower);
-        auto gameConfig = gameConfigs.find(processNameLowerCase);
-        return gameConfig == gameConfigs.end() ? nullptr : &gameConfig->second;
+        auto lookup = gameConfigs.find(processNameLowerCase);
+        if (lookup == gameConfigs.end())
+            return false;
+        auto rs = gameConfig->CopyFrom(lookup->second);
+        if (rs == false)
+            note::ToFile("[Configuration] GetGameConfig failed.");
+        return rs;
     }
     bool ReadGamesFile(const char* gameConfigPath, bool overrding = false);
     bool ReadGamesFile() {
