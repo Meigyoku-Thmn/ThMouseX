@@ -1,7 +1,7 @@
 #include "Initialization.h"
 
 #include <Windows.h>
-#include <shlwapi.h>
+#include <Shlwapi.h>
 #include <clocale>
 #include <vector>
 

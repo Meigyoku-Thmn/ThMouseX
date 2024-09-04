@@ -15,6 +15,7 @@ public class ComServer : IComServer
 {
     [DllImport("ThMouseX.dll",
         EntryPoint = nameof(GetGameConfig), CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+    [return: MarshalAs(UnmanagedType.I1)]
     static extern bool _GetGameConfig(string processName, out GameConfig gameConfig);
 
     public bool GetGameConfig(string processName, out GameConfig gameConfig)

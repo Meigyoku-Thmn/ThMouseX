@@ -11,24 +11,22 @@
 
 #include "ComServer.h"
 
-using namespace ThMouseXServer;
-
 static_assert(sizeof(void*) == 4, "Support 32-bit system only!");
 static_assert(sizeof(int) == 4);
 
-DEFINE_ENUM_FLAG_OPERATORS(InputMethod);
+DEFINE_ENUM_FLAG_OPERATORS(ThMouseXServer::InputMethod);
 
-struct GameConfigLocal : GameConfig {
+struct GameConfigLocal : ThMouseXServer::GameConfig {
     CComSafeArray<DWORD> AddressChain;
-    GameConfigLocal() {}
-    GameConfigLocal(const GameConfig& gameConfig) {
+    GameConfigLocal() = default;
+    explicit(false) GameConfigLocal(const GameConfig& gameConfig) {
         *(GameConfig*)this = gameConfig;
         this->AddressChain.Attach(this->Address);
     }
 };
 
-struct GameConfigEx : GameConfig {
-    GameConfigEx() {}
+struct GameConfigEx : ThMouseXServer::GameConfig {
+    GameConfigEx() = default;
     bool CopyFrom(const GameConfig& gameConfig) {
         *(GameConfig*)this = gameConfig;
         auto hr = SafeArrayCopy(this->Address, &this->Address);

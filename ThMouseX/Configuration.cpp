@@ -37,7 +37,7 @@ namespace directinput = core::directinput;
 using namespace std;
 
 using VkCodes = unordered_map<string, BYTE, string_hash, equal_to<>>;
-using GameConfigs = map<wstring, GameConfig>;
+using GameConfigs = map<wstring, GameConfig, less<>>;
 
 template<CompileTimeString ini_key, typename OutputType>
 static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType& output) {
@@ -106,7 +106,7 @@ static bool IniTryGetULong(const inipp::Ini<char>::Section& section, DWORD& outp
 
 #pragma region method declaration
 bool IsCommentLine(stringstream& stream);
-tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount, const char* gameConfigPath);
+tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED const char* gameConfigPath);
 tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, const char* gameConfigPath);
 tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, const char* gameConfigPath);
 tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const char* gameConfigPath);
@@ -278,7 +278,7 @@ bool IsCommentLine(stringstream& stream) {
     return false;
 }
 
-tuple<wstring, bool> ExtractProcessName(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED const char* gameConfigPath) {
     string processName;
     stream >> quoted(processName);
     auto wProcessName = encoding::ConvertToUtf16(processName);

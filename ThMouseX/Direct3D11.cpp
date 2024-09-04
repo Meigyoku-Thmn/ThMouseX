@@ -141,13 +141,13 @@ namespace core::directx11 {
 
         auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11, "D3D11CreateDeviceAndSwapChain");
         if (!_D3D11CreateDeviceAndSwapChain) {
-            note::LastErrorToFile(TAG "Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain.");
+            note::LastErrorToFile(TAG "Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain");
             return;
         }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nil, nil, nil, nil));
         if (!tmpWnd) {
-            note::LastErrorToFile(TAG "Failed to create a temporary window.");
+            note::LastErrorToFile(TAG "Failed to create a temporary window");
             return;
         }
 
@@ -169,7 +169,7 @@ namespace core::directx11 {
         D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
         auto rs = _D3D11CreateDeviceAndSwapChain(nil, D3D_DRIVER_TYPE_HARDWARE, nil, 0, feature_levels, 2, D3D11_SDK_VERSION, &sd, &swap_chain, &_device, nil, nil);
         if (FAILED(rs)) {
-            note::DxErrToFile(TAG "Failed to create device and swapchain of DirectX 11.", rs);
+            note::DxErrToFile(TAG "Failed to create device and swapchain of DirectX 11", rs);
             return;
         }
 

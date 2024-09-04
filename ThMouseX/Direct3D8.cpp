@@ -133,14 +133,14 @@ namespace core::directx8 {
 
         auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8, "Direct3DCreate8");
         if (!_Direct3DCreate8) {
-            note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8.");
+            note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8");
             return;
         }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window",
             WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nil, nil, nil, nil));
         if (!tmpWnd) {
-            note::LastErrorToFile(TAG "Failed to create a temporary window.");
+            note::LastErrorToFile(TAG "Failed to create a temporary window");
             return;
         }
 

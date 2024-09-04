@@ -48,6 +48,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThMouseXServer", "ThMouseXS
 		{CE569C03-02E0-48C0-9DE0-FF347D479E2F} = {CE569C03-02E0-48C0-9DE0-FF347D479E2F}
 	EndProjectSection
 EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "th10", "..\..\SteamLibrary\steamapps\common\th10\th10.exe", "{D79EDF9F-048F-46F2-9DF3-C6DD07F759F7}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = D:\SteamLibrary\steamapps\common\th10\th10.exe
+		RemoteMachine = VNLT072
+		StartingDirectory = D:\SteamLibrary\steamapps\common\th10
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		UseLegacyDebugEngines = No
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+		IORedirection = Auto
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -79,6 +93,8 @@ Global
 		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Debug|x86.Build.0 = Debug|x86
 		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Release|x86.ActiveCfg = Release|x86
 		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Release|x86.Build.0 = Release|x86
+		{D79EDF9F-048F-46F2-9DF3-C6DD07F759F7}.Debug|x86.ActiveCfg = Release|x86
+		{D79EDF9F-048F-46F2-9DF3-C6DD07F759F7}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

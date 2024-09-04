@@ -32,13 +32,13 @@ namespace common::neolua {
 
         auto mscoree = GetModuleHandleW(L"mscoree.dll");
         if (!mscoree) {
-            log::LastErrorToFile(TAG " Failed to load mscoree.dll.");
+            log::LastErrorToFile(TAG " Failed to load mscoree.dll");
             return;
         }
 
         auto _CLRCreateInstance = (decltype(&CLRCreateInstance))GetProcAddress(mscoree, "CLRCreateInstance");
         if (!_CLRCreateInstance) {
-            log::LastErrorToFile(TAG " Failed to import mscoree.dll|CLRCreateInstance.");
+            log::LastErrorToFile(TAG " Failed to import mscoree.dll|CLRCreateInstance");
             return;
         }
 
