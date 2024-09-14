@@ -34,3 +34,6 @@ bool MAKE_UNIQUE_VAR(counter2)() { \
 } \
 EVAL_DISCARD(MAKE_UNIQUE_VAR(counter2)()); \
 void MAKE_UNIQUE_VAR(counter1)()
+
+#define defer(...) defer_impl(__COUNTER__, __VA_ARGS__)
+#define defer_impl(counter, ...) std::shared_ptr<void> MAKE_UNIQUE_VAR(counter)(nullptr, [&](...) __VA_ARGS__);

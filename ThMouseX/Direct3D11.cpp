@@ -355,7 +355,7 @@ namespace core::directx11 {
         }
 
         // draw the cursor
-        auto setCustomShaders = usePixelShader ? []() { context->PSSetShader(pixelShader, nil, 0); } : nil;
+        auto setCustomShaders = usePixelShader ? [] { context->PSSetShader(pixelShader, nil, 0); } : nil;
         auto sortMode = SpriteSortMode_Deferred;
         auto m_states = std::make_unique<CommonStates>(device);
         spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), nil, nil, nil, setCustomShaders, scalingMatrixD3D);

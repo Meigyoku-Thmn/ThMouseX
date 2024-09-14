@@ -339,7 +339,6 @@ namespace common::helper {
             log::LastErrorToFile("CreateEventW failed");
             return;
         }
-        TimerQueueTimerHandle timerHandle;
         auto timeoutCallback = [&]() {
             auto _mainThreadId = mainThreadId.exchange(0);
             if (_mainThreadId == 0)
@@ -349,15 +348,14 @@ namespace common::helper {
                 log::HResultToFile("CoCancelCall failed", hr);
             SetEvent(waitHandle.get());
         };
-        HANDLE _timerHandle{};
-        auto rs = CreateTimerQueueTimer(&_timerHandle, nullptr, [](auto param0, auto param1) {
-            (*(decltype(timeoutCallback)*)param0)();
-        }, &timeoutCallback, timeout, 0, 0);
-        if (rs == FALSE) {
+        auto timeoutCallbackThunk = [](auto callback, auto _) {
+            (*(decltype(timeoutCallback)*)callback)();
+        };
+        auto timerHandle = CreateTimerQueueTimer(nullptr, timeoutCallbackThunk, &timeoutCallback, timeout, 0, 0);
+        if (!timerHandle) {
             log::LastErrorToFile("CreateTimerQueueTimer failed");
             return;
         }
-        timerHandle.reset(_timerHandle);
         auto hr = CoEnableCallCancellation(nullptr);
         if (FAILED(hr)) {
             log::HResultToFile("CoEnableCallCancellation failed", hr);
@@ -368,5 +366,21 @@ namespace common::helper {
         if (_mainThreadId == 0)
             WaitForSingleObject(waitHandle.get(), INFINITE);
         hr = CoDisableCallCancellation(nullptr);
+    }
+
+    TimerQueueTimerHandle CreateTimerQueueTimer(HANDLE TimerQueue, WAITORTIMERCALLBACK Callback, PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags) {
+        HANDLE timerHandle{};
+        auto rs = ::CreateTimerQueueTimer(&timerHandle, TimerQueue, Callback, Parameter, DueTime, Period, Flags);
+        if (!rs)
+            timerHandle = nullptr;
+        return TimerQueueTimerHandle{ timerHandle };
+    }
+
+    ActCtxCookie ActivateActCtx(HANDLE hActCtx) {
+        ULONG_PTR cookie{};
+        auto rs = ::ActivateActCtx(hActCtx, &cookie);
+        if (!rs)
+            cookie = 0;
+        return ActCtxCookie{ cookie };
     }
 }

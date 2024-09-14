@@ -56,4 +56,6 @@ namespace common::helper {
     std::wstring ExpandEnvStr(const wchar_t* str);
     std::wstring ExpandEnvStr(const std::wstring& str);
     void ComMethodTimeout(const std::function<void()>& comAction, DWORD timeout);
+    TimerQueueTimerHandle CreateTimerQueueTimer(HANDLE TimerQueue, WAITORTIMERCALLBACK Callback, PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags);
+    ActCtxCookie ActivateActCtx(HANDLE hActCtx);
 }

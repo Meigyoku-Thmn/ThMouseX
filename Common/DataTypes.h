@@ -135,6 +135,15 @@ struct TimerQueueTimerHandleDeleter {
 };
 using TimerQueueTimerHandle = std::unique_ptr<HANDLE, TimerQueueTimerHandleDeleter>;
 
+struct ActCtxCookieDeleter {
+    using pointer = ULONG_PTR;
+    void operator()(ULONG_PTR cookie) const {
+        if (cookie != 0)
+            DeactivateActCtx(0, cookie);
+    }
+};
+using ActCtxCookie = std::unique_ptr<ULONG_PTR, ActCtxCookieDeleter>;
+
 // https://dev.to/sgf4/strings-as-template-parameters-c20-4joh
 template<std::size_t N>
 struct CompileTimeString {

@@ -41,31 +41,29 @@ namespace core::comclient {
     }
 
     bool GetGameConfig(PWCHAR processName, GameConfig& gameConfig) {
-        return async(launch::async, [&]() {
-            ULONG_PTR cookie{};
-            auto rs = false;
+        return async(launch::async, [&] {
             auto hr = CoInitialize(nullptr);
             if (FAILED(hr)) {
                 note::HResultToFile(TAG "CoInitialize failed", hr);
-                goto END;
+                return false;
             }
-            if (!ActivateActCtx(actCtxHandle, &cookie)) {
+            defer({ CoUninitialize(); });
+            auto cookie = helper::ActivateActCtx(actCtxHandle);
+            if (!cookie) {
                 note::LastErrorToFile(TAG "ActivateActCtx failed");
-                goto END;
+                return false;
             }
             try {
-                helper::ComMethodTimeout([&]() {
+                auto rs = false;
+                helper::ComMethodTimeout([&] {
                     rs = IComServerPtr(__uuidof(ComServer))->GetGameConfig(processName, &gameConfig) == VARIANT_TRUE;
                 }, 1000);
+                return rs;
             }
             catch (_com_error& ex) {
                 note::ComErrToFile(TAG "IServer->GetGameConfig failed", ex);
-                goto END;
+                return false;
             }
-        END:
-            DeactivateActCtx(0, cookie);
-            CoUninitialize();
-            return rs;
         }).get();
     }
 }
