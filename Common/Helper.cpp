@@ -4,10 +4,12 @@
 #include <tuple>
 #include <span>
 #include <format>
+#include <atomic>
 
 #include "Helper.h"
 #include "Helper.Memory.h"
 #include "Helper.Encoding.h"
+#include "Log.h"
 #include "Lua.h"
 #include "LuaJIT.h"
 #include "NeoLua.h"
@@ -328,5 +330,43 @@ namespace common::helper {
 
     wstring ExpandEnvStr(const wstring& str) {
         return ExpandEnvStr(str.c_str());
+    }
+
+    void ComMethodTimeout(const function<void()>& comAction, DWORD timeout) {
+        atomic<DWORD> mainThreadId = GetCurrentThreadId();
+        Handle waitHandle{ CreateEventW(nullptr, TRUE, FALSE, nullptr) };
+        if (waitHandle == nil) {
+            log::LastErrorToFile("CreateEventW failed");
+            return;
+        }
+        TimerQueueTimerHandle timerHandle;
+        auto timeoutCallback = [&]() {
+            auto _mainThreadId = mainThreadId.exchange(0);
+            if (_mainThreadId == 0)
+                return;
+            auto hr = CoCancelCall(_mainThreadId, 0);
+            if (FAILED(hr))
+                log::HResultToFile("CoCancelCall failed", hr);
+            SetEvent(waitHandle.get());
+        };
+        HANDLE _timerHandle{};
+        auto rs = CreateTimerQueueTimer(&_timerHandle, nullptr, [](auto param0, auto param1) {
+            (*(decltype(timeoutCallback)*)param0)();
+        }, &timeoutCallback, timeout, 0, 0);
+        if (rs == FALSE) {
+            log::LastErrorToFile("CreateTimerQueueTimer failed");
+            return;
+        }
+        timerHandle.reset(_timerHandle);
+        auto hr = CoEnableCallCancellation(nullptr);
+        if (FAILED(hr)) {
+            log::HResultToFile("CoEnableCallCancellation failed", hr);
+            return;
+        }
+        comAction();
+        auto _mainThreadId = mainThreadId.exchange(0);
+        if (_mainThreadId == 0)
+            WaitForSingleObject(waitHandle.get(), INFINITE);
+        hr = CoDisableCallCancellation(nullptr);
     }
 }

@@ -55,4 +55,5 @@ namespace common::helper {
     void SafeFreeLib(HMODULE& hLibModule);
     std::wstring ExpandEnvStr(const wchar_t* str);
     std::wstring ExpandEnvStr(const std::wstring& str);
+    void ComMethodTimeout(const std::function<void()>& comAction, DWORD timeout);
 }

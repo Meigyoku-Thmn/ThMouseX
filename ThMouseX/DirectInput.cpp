@@ -59,7 +59,7 @@ namespace core::directinput {
         static mutex mtx;
         HMODULE dinput8{};
         {
-            const lock_guard lock(mtx);
+            const scoped_lock lock(mtx);
             if (initialized)
                 return;
             if ((g_currentConfig.InputMethods & InputMethod_DirectInput) == InputMethod_None)

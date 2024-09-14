@@ -122,7 +122,7 @@ namespace core::directx8 {
         static bool initialized = false;
         static mutex mtx;
         {
-            const lock_guard lock(mtx);
+            const scoped_lock lock(mtx);
             if (initialized)
                 return;
             GetModuleHandleExW(0, (g_systemDirPath + wstring(L"\\d3d8.dll")).c_str(), &d3d8);

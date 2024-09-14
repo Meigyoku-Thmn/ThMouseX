@@ -98,23 +98,42 @@ struct string_hash {
     size_t operator()(std::string const& str) const { return hash_type{}(str); }
 };
 
-struct HMODULE_FREER {
+struct HANDLE_CLOSER {
+    using pointer = HANDLE;
+    void operator()(HANDLE handle) const {
+        if (handle != nil)
+            CloseHandle(handle);
+    }
+};
+using Handle = std::unique_ptr<HANDLE, HANDLE_CLOSER>;
+
+struct HModuleDeleter {
     using pointer = HMODULE;
     void operator()(HMODULE handle) const {
         if (handle != nil)
             FreeLibrary(handle);
     }
 };
-using ModuleHandle = std::unique_ptr<HMODULE, HMODULE_FREER>;
+using ModuleHandle = std::unique_ptr<HMODULE, HModuleDeleter>;
 
-struct HWND_DESTROYER {
+struct HwndDeleter {
     using pointer = HWND;
     void operator()(HWND hwnd) const {
         if (hwnd != nil)
             DestroyWindow(hwnd);
     }
 };
-using WindowHandle = std::unique_ptr<HWND, HWND_DESTROYER>;
+using WindowHandle = std::unique_ptr<HWND, HwndDeleter>;
+
+struct TimerQueueTimerHandleDeleter {
+    using pointer = HANDLE;
+    void operator()(HANDLE handle) const {
+        if (handle != nil) {
+            auto _ = DeleteTimerQueueTimer(nullptr, handle, nullptr) == FALSE;
+        }
+    }
+};
+using TimerQueueTimerHandle = std::unique_ptr<HANDLE, TimerQueueTimerHandleDeleter>;
 
 // https://dev.to/sgf4/strings-as-template-parameters-c20-4joh
 template<std::size_t N>
