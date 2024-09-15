@@ -70,6 +70,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,6 +145,7 @@ mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Comma
     <ClCompile Include="KeyboardState.cpp" />
     <ClCompile Include="MessageQueue.cpp" />
     <ClCompile Include="SendKey.cpp" />
+    <ClCompile Include="Shellcode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComClient.h" />
@@ -163,6 +165,7 @@ mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Comma
     <ClInclude Include="MessageQueue.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SendKey.h" />
+    <ClInclude Include="Shellcode.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

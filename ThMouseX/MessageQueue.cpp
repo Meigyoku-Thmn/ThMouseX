@@ -2,6 +2,7 @@
 #include <vector>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
+#include <tlhelp32.h>
 
 #include "../Common/macro.h"
 #include "../Common/MinHook.h"
@@ -12,12 +13,14 @@
 #include "../Common/Log.h"
 #include "Initialization.h"
 #include "MessageQueue.h"
+#include "Shellcode.h"
 
 namespace minhook = common::minhook;
 namespace neolua = common::neolua;
 namespace helper = common::helper;
 namespace callbackstore = common::callbackstore;
 namespace note = common::log;
+namespace shellcode = core::shellcode;
 
 using namespace std;
 
@@ -46,6 +49,36 @@ struct InputRuleItemMouseBtn2Function {
     bool isOn;
     PostSideEffect nextFrameSideEffect;
 };
+
+BOOL WINAPI _GetFirstProcess(HANDLE snapshot, LPPROCESSENTRY32W entry);
+BOOL WINAPI _GetNextProcess(HANDLE snapshot, LPPROCESSENTRY32W entry);
+decltype(&Process32FirstW) GetNextProcess = _GetFirstProcess;
+BOOL WINAPI _GetFirstProcess(HANDLE snapshot, LPPROCESSENTRY32W entry) {
+    auto rs = Process32FirstW(snapshot, entry);
+    GetNextProcess = _GetNextProcess;
+    return rs;
+}
+BOOL WINAPI _GetNextProcess(HANDLE snapshot, LPPROCESSENTRY32W entry) {
+    auto rs = Process32NextW(snapshot, entry);
+    if (!rs)
+        GetNextProcess = _GetFirstProcess;
+    return rs;
+}
+
+BOOL WINAPI _GetFirstModule(HANDLE snapshot, LPMODULEENTRY32W entry);
+BOOL WINAPI _GetNextModule(HANDLE snapshot, LPMODULEENTRY32W entry);
+decltype(&Module32FirstW) GetNextModule = _GetFirstModule;
+BOOL WINAPI _GetFirstModule(HANDLE snapshot, LPMODULEENTRY32W entry) {
+    auto rs = Module32FirstW(snapshot, entry);
+    GetNextModule = _GetNextModule;
+    return rs;
+}
+BOOL WINAPI _GetNextModule(HANDLE snapshot, LPMODULEENTRY32W entry) {
+    auto rs = Module32NextW(snapshot, entry);
+    if (!rs)
+        GetNextModule = _GetFirstModule;
+    return rs;
+}
 
 namespace core::messagequeue {
     HCURSOR WINAPI _SetCursor(HCURSOR hCursor);
@@ -277,8 +310,58 @@ namespace core::messagequeue {
         UnhookWindowsHookEx(GetMsgProcHandle);
         UnhookWindowsHookEx(CallWndRetProcHandle);
         // force all top-level windows to process a message, therefore force all processes to unload the DLL.
-        DWORD _;
-        SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &_);
+        DWORD __;
+        SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &__);
+        // some processes doesn't have a top-level window or a message loop anymore,
+        // the following find them and inject a thread to force them eject the DLL.
+        // warning: non thread-safe, single-thread only.
+        auto unloadingShellcode = &shellcode::UnloadingShellcode;
+        auto shellcodeSize = shellcode::ShellcodeSectionSize;
+        if (shellcodeSize == 0)
+            return;
+        Handle processSnapshot{ CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) };
+        if (processSnapshot.get() == INVALID_HANDLE_VALUE) {
+            note::LastErrorToFile("CreateToolhelp32Snapshot failed");
+            return;
+        }
+        auto currentProcessId = GetCurrentProcessId();
+        PROCESSENTRY32W processEntry{ .dwSize = sizeof(processEntry) };
+        ShellcodeInput shellcodeInput{};
+        OutputDebugStringW(L"Start scanning:\n");
+        while (GetNextProcess(processSnapshot.get(), &processEntry)) {
+            if (processEntry.th32ProcessID == currentProcessId)
+                continue;
+            Handle hProcess{ OpenProcess(PROCESS_ALL_ACCESS, FALSE, processEntry.th32ProcessID) };
+            if (!hProcess)
+                continue;
+            Handle moduleSnapshot{ CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, processEntry.th32ProcessID) };
+            if (processSnapshot.get() == INVALID_HANDLE_VALUE)
+                continue;
+            MODULEENTRY32W moduleEntry{ .dwSize = sizeof(moduleEntry) };
+            OutputDebugStringW(processEntry.szExeFile);
+            OutputDebugStringW(L"\n");
+            while (GetNextModule(moduleSnapshot.get(), &moduleEntry)) {
+                OutputDebugStringW(L"   ");
+                OutputDebugStringW(moduleEntry.szExePath);
+                OutputDebugStringW(L"\n");
+                if (_wcsicmp(moduleEntry.szExePath, g_currentModulePath) != 0)
+                    continue;
+                auto remoteInput = VirtualAllocEx(hProcess.get(), nil, sizeof(shellcodeInput), MEM_COMMIT, PAGE_READWRITE);
+                defer({ VirtualFreeEx(hProcess.get(), remoteInput, 0, MEM_RELEASE); });
+                if (remoteInput == 0)
+                    continue;
+                if (!WriteProcessMemory(hProcess.get(), remoteInput, &shellcodeInput, sizeof(shellcodeInput), nil))
+                    continue;
+                auto remoteCode = VirtualAllocEx(hProcess.get(), nullptr, shellcodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+                defer({ VirtualFreeEx(hProcess.get(), remoteCode, 0, MEM_RELEASE); });
+                if (remoteCode == 0)
+                    continue;
+                if (!WriteProcessMemory(hProcess.get(), remoteCode, unloadingShellcode, shellcodeSize, nil))
+                    continue;
+                Handle remoteThread{ CreateRemoteThread(hProcess.get(), nullptr, 0, (LPTHREAD_START_ROUTINE)remoteCode, remoteInput, 0, nil) };
+                WaitForSingleObject(remoteThread.get(), 1000);
+            }
+        }
     }
 
     static void PostRenderCallback() {

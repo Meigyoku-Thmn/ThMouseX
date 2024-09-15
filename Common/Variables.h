@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "DataTypes.h"
 
+extern WCHAR    g_currentModulePath[MAX_PATH];
 extern WCHAR    g_currentModuleDirPath[MAX_PATH];
 extern WCHAR    g_systemDirPath[MAX_PATH];
 extern WCHAR    g_currentProcessDirPath[MAX_PATH];

@@ -3,6 +3,7 @@
 
 #include "Variables.h"
 
+WCHAR   g_currentModulePath[MAX_PATH];
 WCHAR   g_currentModuleDirPath[MAX_PATH];
 WCHAR   g_systemDirPath[MAX_PATH];
 WCHAR   g_currentProcessDirPath[MAX_PATH];

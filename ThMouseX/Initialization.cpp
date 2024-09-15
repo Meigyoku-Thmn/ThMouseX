@@ -57,11 +57,12 @@ namespace core {
 
         GetSystemDirectoryW(g_systemDirPath, ARRAYSIZE(g_systemDirPath));
 
-        GetModuleFileNameW(g_coreModule, g_currentModuleDirPath, ARRAYSIZE(g_currentModuleDirPath));
+        GetModuleFileNameW(g_coreModule, g_currentModulePath, ARRAYSIZE(g_currentModulePath));
+        memcpy(g_currentModuleDirPath, g_currentModulePath, sizeof(g_currentModulePath));
         PathRemoveFileSpecW(g_currentModuleDirPath);
 
         GetModuleFileNameW(g_targetModule, g_currentProcessName, ARRAYSIZE(g_currentProcessName));
-        wcscpy(g_currentProcessDirPath, g_currentProcessName);
+        memcpy(g_currentProcessDirPath, g_currentProcessName, sizeof(g_currentProcessName));
         PathRemoveFileSpecW(g_currentProcessDirPath);
         PathStripPathW(g_currentProcessName);
         PathRemoveExtensionW(g_currentProcessName);

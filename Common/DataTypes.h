@@ -100,8 +100,8 @@ struct string_hash {
 
 struct HANDLE_CLOSER {
     using pointer = HANDLE;
-    void operator()(HANDLE handle) const {
-        if (handle != nil)
+    void operator()(pointer handle) const {
+        if (handle != nil && handle != INVALID_HANDLE_VALUE)
             CloseHandle(handle);
     }
 };
@@ -109,16 +109,16 @@ using Handle = std::unique_ptr<HANDLE, HANDLE_CLOSER>;
 
 struct HModuleDeleter {
     using pointer = HMODULE;
-    void operator()(HMODULE handle) const {
-        if (handle != nil)
-            FreeLibrary(handle);
+    void operator()(pointer hModule) const {
+        if (hModule != nil)
+            FreeLibrary(hModule);
     }
 };
 using ModuleHandle = std::unique_ptr<HMODULE, HModuleDeleter>;
 
 struct HwndDeleter {
     using pointer = HWND;
-    void operator()(HWND hwnd) const {
+    void operator()(pointer hwnd) const {
         if (hwnd != nil)
             DestroyWindow(hwnd);
     }
@@ -127,7 +127,7 @@ using WindowHandle = std::unique_ptr<HWND, HwndDeleter>;
 
 struct TimerQueueTimerHandleDeleter {
     using pointer = HANDLE;
-    void operator()(HANDLE handle) const {
+    void operator()(pointer handle) const {
         if (handle != nil) {
             auto _ = DeleteTimerQueueTimer(nullptr, handle, nullptr) == FALSE;
         }
@@ -137,7 +137,7 @@ using TimerQueueTimerHandle = std::unique_ptr<HANDLE, TimerQueueTimerHandleDelet
 
 struct ActCtxCookieDeleter {
     using pointer = ULONG_PTR;
-    void operator()(ULONG_PTR cookie) const {
+    void operator()(pointer cookie) const {
         if (cookie != 0)
             DeactivateActCtx(0, cookie);
     }
@@ -198,3 +198,35 @@ template<std::size_t s1, std::size_t s2>
 consteval auto operator==(const char(&str)[s2], CompileTimeString<s1> fs) {
     return CompileTimeString<s2>(str) == fs;
 }
+
+EXTERN_C IMAGE_DOS_HEADER __ImageBase;
+#define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
+
+typedef struct _UNICODE_STRING {
+    USHORT Length;
+    USHORT MaximumLength;
+    PVOID Buffer;
+} UNICODE_STRING, *PUNICODE_STRING;
+
+typedef struct _ANSI_STRING {
+    USHORT Length;
+    USHORT MaximumLength;
+    PCHAR Buffer;
+} ANSI_STRING, *PANSI_STRING;
+
+VOID NTAPI RtlInitUnicodeString(PUNICODE_STRING DestinationString, PCWSTR SourceString);
+VOID NTAPI RtlInitAnsiString(PANSI_STRING DestinationString, PCSTR SourceString);
+NTSTATUS NTAPI LdrLoadDll(PWCHAR PathToFile, ULONG Flags, PUNICODE_STRING ModuleFileName, HMODULE* ModuleHandle);
+NTSTATUS NTAPI LdrGetProcedureAddress(HMODULE ModuleHandle, PANSI_STRING FunctionName, WORD Oridinal, PVOID *FunctionAddress);
+NTSTATUS NTAPI LdrUnloadDll(HMODULE ModuleHandle);
+
+struct ShellcodeInput {
+    FixedStringMember(WCHAR, user32dll, L"user32.dll");
+    FixedStringMember(CHAR, peekMessageW, "PeekMessageW");
+    HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+    ImportWinAPI(ntdll, RtlInitUnicodeString);
+    ImportWinAPI(ntdll, RtlInitAnsiString);
+    ImportWinAPI(ntdll, LdrLoadDll);
+    ImportWinAPI(ntdll, LdrGetProcedureAddress);
+    ImportWinAPI(ntdll, LdrUnloadDll);
+};
