@@ -14,18 +14,18 @@
 static_assert(sizeof(void*) == 4, "Support 32-bit system only!");
 static_assert(sizeof(int) == 4);
 
-DEFINE_ENUM_FLAG_OPERATORS(ThMouseXServer::InputMethod);
+DEFINE_ENUM_FLAG_OPERATORS(InputMethod);
 
-struct GameConfigLocal : ThMouseXServer::GameConfig {
+struct GameConfigLocal : GameConfig {
     CComSafeArray<DWORD> AddressChain;
-    GameConfigLocal() = default;
-    explicit(false) GameConfigLocal(const GameConfig& gameConfig) {
-        *(GameConfig*)this = gameConfig;
+    CComHeapPtr<WCHAR> ProcessName;
+    void Initialize() {
         this->AddressChain.Attach(this->Address);
+        this->ProcessName.Attach(this->processName);
     }
 };
 
-struct GameConfigEx : ThMouseXServer::GameConfig {
+struct GameConfigEx : GameConfig {
     GameConfigEx() = default;
     bool CopyFrom(const GameConfig& gameConfig) {
         *(GameConfig*)this = gameConfig;
@@ -40,6 +40,41 @@ struct GameConfigEx : ThMouseXServer::GameConfig {
             SafeArrayDestroy(this->Address);
             CoTaskMemFree(allocated);
             *(GameConfig*)this = {};
+            return false;
+        }
+        return true;
+    }
+};
+
+struct CommonConfigLocal : CommonConfig {
+    CComHeapPtr<WCHAR> _TextureFilePath;
+    CComHeapPtr<WCHAR> _ImGuiFontPath;
+    void Initialize() {
+        this->_TextureFilePath.Attach(this->TextureFilePath);
+        this->_ImGuiFontPath.Attach(this->ImGuiFontPath);
+    }
+};
+
+struct CommonConfigEx : CommonConfig {
+    CommonConfigEx() = default;
+    bool CopyFrom(const CommonConfig& commonConfig) {
+        *(CommonConfig*)this = commonConfig;
+        auto textureFilePathSize = (wcslen(this->TextureFilePath) + 1) * sizeof(this->TextureFilePath[0]);
+        auto allocated1 = CoTaskMemAlloc(textureFilePathSize);
+        if (allocated1) {
+            memcpy(allocated1, this->TextureFilePath, textureFilePathSize);
+            this->TextureFilePath = (decltype(this->TextureFilePath))allocated1;
+        }
+        auto imGuiFontPathSize = (wcslen(this->ImGuiFontPath) + 1) * sizeof(this->ImGuiFontPath[0]);
+        auto allocated2 = CoTaskMemAlloc(imGuiFontPathSize);
+        if (allocated2) {
+            memcpy(allocated2, this->ImGuiFontPath, imGuiFontPathSize);
+            this->ImGuiFontPath = (decltype(this->ImGuiFontPath))allocated2;
+        }
+        if (!allocated1 || !allocated2) {
+            CoTaskMemFree(allocated1);
+            CoTaskMemFree(allocated2);
+            *(CommonConfig*)this = {};
             return false;
         }
         return true;
@@ -129,7 +164,10 @@ struct TimerQueueTimerHandleDeleter {
     using pointer = HANDLE;
     void operator()(pointer handle) const {
         if (handle != nil) {
-            auto _ = DeleteTimerQueueTimer(nullptr, handle, nullptr) == FALSE;
+            auto _ = DeleteTimerQueueTimer(nullptr, handle, nullptr);
+            if (_ == FALSE) {
+                // ignore
+            }
         }
     }
 };
@@ -202,22 +240,24 @@ consteval auto operator==(const char(&str)[s2], CompileTimeString<s1> fs) {
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 
-typedef struct _UNICODE_STRING {
+using UNICODE_STRING = struct _UNICODE_STRING {
     USHORT Length;
     USHORT MaximumLength;
     PVOID Buffer;
-} UNICODE_STRING, *PUNICODE_STRING;
+};
+using PUNICODE_STRING = UNICODE_STRING*;
 
-typedef struct _ANSI_STRING {
+using ANSI_STRING = struct _ANSI_STRING {
     USHORT Length;
     USHORT MaximumLength;
     PCHAR Buffer;
-} ANSI_STRING, *PANSI_STRING;
+};
+using PANSI_STRING = ANSI_STRING*;
 
 VOID NTAPI RtlInitUnicodeString(PUNICODE_STRING DestinationString, PCWSTR SourceString);
 VOID NTAPI RtlInitAnsiString(PANSI_STRING DestinationString, PCSTR SourceString);
 NTSTATUS NTAPI LdrLoadDll(PWCHAR PathToFile, ULONG Flags, PUNICODE_STRING ModuleFileName, HMODULE* ModuleHandle);
-NTSTATUS NTAPI LdrGetProcedureAddress(HMODULE ModuleHandle, PANSI_STRING FunctionName, WORD Oridinal, PVOID *FunctionAddress);
+NTSTATUS NTAPI LdrGetProcedureAddress(HMODULE ModuleHandle, PANSI_STRING FunctionName, WORD Oridinal, PVOID* FunctionAddress);
 NTSTATUS NTAPI LdrUnloadDll(HMODULE ModuleHandle);
 
 struct ShellcodeInput {
@@ -230,3 +270,5 @@ struct ShellcodeInput {
     ImportWinAPI(ntdll, LdrGetProcedureAddress);
     ImportWinAPI(ntdll, LdrUnloadDll);
 };
+
+using ThreadFunc = LPTHREAD_START_ROUTINE;

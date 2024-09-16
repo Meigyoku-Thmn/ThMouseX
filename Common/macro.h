@@ -36,10 +36,10 @@ EVAL_DISCARD(MAKE_UNIQUE_VAR(counter2)()); \
 void MAKE_UNIQUE_VAR(counter1)()
 
 #define defer(...) defer_impl(__COUNTER__, __VA_ARGS__)
-#define defer_impl(counter, ...) std::shared_ptr<void> MAKE_UNIQUE_VAR(counter)(nullptr, [&](...) __VA_ARGS__);
+#define defer_impl(counter, ...) std::shared_ptr<void> MAKE_UNIQUE_VAR(counter)(nullptr, [&](...) __VA_ARGS__)
 
 #define FixedStringMember(type, name, value) type name[ARRAYSIZE(value)] = value
-#define ImportWinAPI(hModule, API) decltype(&API) API = (decltype(API))GetProcAddress(hModule, SYM_NAME(API))
+#define ImportWinAPI(hModule, API) decltype(&API) API = hModule ? (decltype(API))GetProcAddress(hModule, SYM_NAME(API)) : nil
 
 #define SHELLCODE_SECTION_NAME ".shlcode"
 #define SHELLCODE  __declspec(safebuffers) __declspec(code_seg(SHELLCODE_SECTION_NAME))

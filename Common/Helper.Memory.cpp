@@ -23,11 +23,11 @@ namespace common::helper::memory {
     }
 
     string GetAddressConfigAsString() {
-        if (g_currentConfig.ScriptType != ScriptType_None)
+        if (g_gameConfig.ScriptType != ScriptType_None)
             return "Using script";
         string rs;
         rs.reserve(128);
-        auto& addressChain = g_currentConfig.AddressChain;
+        auto& addressChain = g_gameConfig.AddressChain;
         auto lowerBound = addressChain.GetLowerBound();
         auto upperBound = addressChain.GetUpperBound();
         for (auto i = lowerBound; i <= upperBound; i++) {

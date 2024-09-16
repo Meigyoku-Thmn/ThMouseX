@@ -40,7 +40,7 @@ namespace core::comclient {
         return true;
     }
 
-    bool GetGameConfig(PWCHAR processName, GameConfig& gameConfig) {
+    bool GetGameConfig(PWCHAR processName, GameConfig& gameConfig, CommonConfig& commonConfig) {
         return async(launch::async, [&] {
             auto hr = CoInitialize(nullptr);
             if (FAILED(hr)) {
@@ -56,7 +56,7 @@ namespace core::comclient {
             try {
                 auto rs = false;
                 helper::ComMethodTimeout([&] {
-                    rs = IComServerPtr(__uuidof(ComServer))->GetGameConfig(processName, &gameConfig) == VARIANT_TRUE;
+                    rs = IComServerPtr(__uuidof(ComServer))->GetGameConfig(processName, &gameConfig, &commonConfig) == VARIANT_TRUE;
                 }, 1000);
                 return rs;
             }

@@ -177,14 +177,14 @@ namespace common::helper {
     }
 
     DWORD CalculateAddress() {
-        if (g_currentConfig.ScriptType == ScriptType_LuaJIT)
+        if (g_gameConfig.ScriptType == ScriptType_LuaJIT)
             return luajit::GetPositionAddress();
-        else if (g_currentConfig.ScriptType == ScriptType_NeoLua)
+        else if (g_gameConfig.ScriptType == ScriptType_NeoLua)
             return neolua::GetPositionAddress();
-        else if (g_currentConfig.ScriptType == ScriptType_Lua)
+        else if (g_gameConfig.ScriptType == ScriptType_Lua)
             return lua::GetPositionAddress();
         else {
-            auto& addressChain = g_currentConfig.AddressChain;
+            auto& addressChain = g_gameConfig.AddressChain;
             return memory::ResolveAddress(span{ &addressChain[addressChain.GetLowerBound()], addressChain.GetCount() });
         }
     }
@@ -339,7 +339,7 @@ namespace common::helper {
             log::LastErrorToFile("CreateEventW failed");
             return;
         }
-        auto timeoutCallback = [&]() {
+        auto timeoutCallback = [&] {
             auto _mainThreadId = mainThreadId.exchange(0);
             if (_mainThreadId == 0)
                 return;
@@ -348,10 +348,10 @@ namespace common::helper {
                 log::HResultToFile("CoCancelCall failed", hr);
             SetEvent(waitHandle.get());
         };
-        auto timeoutCallbackThunk = [](auto callback, auto _) {
+        auto timeoutCallbackThunk = [](auto callback, UNUSED auto _) {
             (*(decltype(timeoutCallback)*)callback)();
         };
-        auto timerHandle = CreateTimerQueueTimer(nullptr, timeoutCallbackThunk, &timeoutCallback, timeout, 0, 0);
+        auto timerHandle = CreateTimerQueueTimer(nullptr, timeoutCallbackThunk, &timeoutCallback, timeout, 0, WT_EXECUTEONLYONCE);
         if (!timerHandle) {
             log::LastErrorToFile("CreateTimerQueueTimer failed");
             return;
@@ -366,6 +366,8 @@ namespace common::helper {
         if (_mainThreadId == 0)
             WaitForSingleObject(waitHandle.get(), INFINITE);
         hr = CoDisableCallCancellation(nullptr);
+        if (FAILED(hr))
+            log::HResultToFile("CoDisableCallCancellation failed", hr);
     }
 
     TimerQueueTimerHandle CreateTimerQueueTimer(HANDLE TimerQueue, WAITORTIMERCALLBACK Callback, PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags) {

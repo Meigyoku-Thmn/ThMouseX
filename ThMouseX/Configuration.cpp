@@ -63,8 +63,8 @@ static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCo
     return true;
 }
 
-template<CompileTimeString ini_key, std::size_t output_len>
-static bool IniTryGetWstrPath(const inipp::Ini<char>::Section& section, WCHAR(&output)[output_len]) {
+template<CompileTimeString ini_key>
+static bool IniTryGetWstrPath(const inipp::Ini<char>::Section& section, PWCHAR& output) {
     string input;
     if (!inipp::get_value(section, ini_key.data, input)) {
         constexpr auto msg = ThMouseXFile ": Missing " + ini_key + " value.";
@@ -78,7 +78,9 @@ static bool IniTryGetWstrPath(const inipp::Ini<char>::Section& section, WCHAR(&o
             return false;
         }
         auto wStr = helper::ExpandEnvStr(encoding::ConvertToUtf16(input.c_str()));
-        GetFullPathNameW(wStr.c_str(), output_len, output, nil);
+        auto nChar = GetFullPathNameW(wStr.c_str(), 0, nil, nil);
+        output = new WCHAR[nChar];
+        GetFullPathNameW(wStr.c_str(), nChar, output, nil);
     }
     return true;
 }
@@ -117,6 +119,7 @@ tuple<VkCodes, bool> ReadVkCodes();
 #pragma endregion
 
 static GameConfigs gameConfigs;
+static CommonConfig commonConfig;
 
 namespace core::configuration {
     bool MarkThMouseXProcess() {
@@ -125,13 +128,13 @@ namespace core::configuration {
             note::ToFile("[Configuration] MarkThMouseXProcess failed.");
         return true;
     }
-    bool GetGameConfig(PCWCHAR processName, GameConfigEx* gameConfig) {
+    bool GetGameConfig(PCWCHAR processName, GameConfigEx* gameConfig, CommonConfigEx* commonConfig) {
         wstring processNameLowerCase{ processName };
         transform(processNameLowerCase.begin(), processNameLowerCase.end(), processNameLowerCase.begin(), towlower);
         auto lookup = gameConfigs.find(processNameLowerCase);
         if (lookup == gameConfigs.end())
             return false;
-        auto rs = gameConfig->CopyFrom(lookup->second);
+        auto rs = gameConfig->CopyFrom(lookup->second) && commonConfig->CopyFrom(::commonConfig);
         if (rs == false)
             note::ToFile("[Configuration] GetGameConfig failed.");
         return rs;
@@ -243,26 +246,26 @@ namespace core::configuration {
         ini.strip_trailing_comments();
         auto const& defaultSection = ini.sections[""];
 
-        if (!IniTryGetButton<"LeftClick">(defaultSection, vkCodes, gs_vkCodeForLeftClick)) return false;
-        if (!IniTryGetButton<"MiddleClick">(defaultSection, vkCodes, gs_vkCodeForMiddleClick)) return false;
-        if (!IniTryGetButton<"RightClick">(defaultSection, vkCodes, gs_vkCodeForRightClick)) return false;
-        if (!IniTryGetButton<"XButton1Click">(defaultSection, vkCodes, gs_vkCodeForXButton1Click)) return false;
-        if (!IniTryGetButton<"XButton2Click">(defaultSection, vkCodes, gs_vkCodeForXButton2Click)) return false;
-        if (!IniTryGetButton<"ScrollUp">(defaultSection, vkCodes, gs_vkCodeForScrollUp)) return false;
-        if (!IniTryGetButton<"ScrollDown">(defaultSection, vkCodes, gs_vkCodeForScrollDown)) return false;
-        if (!IniTryGetButton<"ScrollLeft">(defaultSection, vkCodes, gs_vkCodeForScrollLeft)) return false;
-        if (!IniTryGetButton<"ScrollRight">(defaultSection, vkCodes, gs_vkCodeForScrollRight)) return false;
+        if (!IniTryGetButton<"LeftClick">(defaultSection, vkCodes, commonConfig.VkCodeForLeftClick)) return false;
+        if (!IniTryGetButton<"MiddleClick">(defaultSection, vkCodes, commonConfig.VkCodeForMiddleClick)) return false;
+        if (!IniTryGetButton<"RightClick">(defaultSection, vkCodes, commonConfig.VkCodeForRightClick)) return false;
+        if (!IniTryGetButton<"XButton1Click">(defaultSection, vkCodes, commonConfig.VkCodeForXButton1Click)) return false;
+        if (!IniTryGetButton<"XButton2Click">(defaultSection, vkCodes, commonConfig.VkCodeForXButton2Click)) return false;
+        if (!IniTryGetButton<"ScrollUp">(defaultSection, vkCodes, commonConfig.VkCodeForScrollUp)) return false;
+        if (!IniTryGetButton<"ScrollDown">(defaultSection, vkCodes, commonConfig.VkCodeForScrollDown)) return false;
+        if (!IniTryGetButton<"ScrollLeft">(defaultSection, vkCodes, commonConfig.VkCodeForScrollLeft)) return false;
+        if (!IniTryGetButton<"ScrollRight">(defaultSection, vkCodes, commonConfig.VkCodeForScrollRight)) return false;
 
-        if (!IniTryGetButton<"ToggleMouseControl">(defaultSection, vkCodes, gs_toggleMouseControl)) return false;
-        if (!IniTryGetButton<"ToggleOsCursorButton">(defaultSection, vkCodes, gs_toggleOsCursorButton)) return false;
-        if (!IniTryGetButton<"ToggleImGuiButton">(defaultSection, vkCodes, gs_toggleImGuiButton)) return false;
+        if (!IniTryGetButton<"ToggleMouseControl">(defaultSection, vkCodes, commonConfig.ToggleMouseControl)) return false;
+        if (!IniTryGetButton<"ToggleOsCursorButton">(defaultSection, vkCodes, commonConfig.ToggleOsCursorButton)) return false;
+        if (!IniTryGetButton<"ToggleImGuiButton">(defaultSection, vkCodes, commonConfig.ToggleImGuiButton)) return false;
 
-        if (!IniTryGetWstrPath<"ImGuiFontPath">(defaultSection, gs_imGuiFontPath)) return false;
-        if (!IniTryGetULong<"ImGuiBaseFontSize">(defaultSection, gs_imGuiBaseFontSize)) return false;
-        if (!IniTryGetULong<"ImGuiBaseVerticalResolution">(defaultSection, gs_imGuiBaseVerticalResolution)) return false;
+        if (!IniTryGetWstrPath<"ImGuiFontPath">(defaultSection, commonConfig.ImGuiFontPath)) return false;
+        if (!IniTryGetULong<"ImGuiBaseFontSize">(defaultSection, commonConfig.ImGuiBaseFontSize)) return false;
+        if (!IniTryGetULong<"ImGuiBaseVerticalResolution">(defaultSection, commonConfig.ImGuiBaseVerticalResolution)) return false;
 
-        if (!IniTryGetWstrPath<"CursorTexture">(defaultSection, gs_textureFilePath)) return false;
-        if (!IniTryGetULong<"CursorBaseHeight">(defaultSection, gs_textureBaseHeight)) return false;
+        if (!IniTryGetWstrPath<"CursorTexture">(defaultSection, commonConfig.TextureFilePath)) return false;
+        if (!IniTryGetULong<"CursorBaseHeight">(defaultSection, commonConfig.TextureBaseHeight)) return false;
 
         return true;
     }

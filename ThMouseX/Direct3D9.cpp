@@ -22,6 +22,8 @@
 #include "../Common/Log.h"
 #include "Direct3D9.h"
 
+static CommonConfig& g_c = g_commonConfig;
+
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
@@ -225,7 +227,7 @@ namespace core::directx9 {
         g_hFocusWindow = params.hFocusWindow;
         g_isMinimized = IsIconic(g_hFocusWindow);
 
-        if (gs_textureFilePath[0] && SUCCEEDED(_D3DXCreateTextureFromFileW(device, gs_textureFilePath, &cursorTexture))) {
+        if (g_c.TextureFilePath[0] && SUCCEEDED(_D3DXCreateTextureFromFileW(device, g_c.TextureFilePath, &cursorTexture))) {
             _D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
@@ -293,9 +295,9 @@ namespace core::directx9 {
             note::LastErrorToFile(TAG "PrepareMeasurement: GetClientRect failed (2)");
             return;
         }
-        g_pixelRate = float(g_currentConfig.BaseHeight) / float(clientSize.height());
-        g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
-        g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
+        g_pixelRate = float(g_gameConfig.BaseHeight) / float(clientSize.height());
+        g_pixelOffset.X = g_gameConfig.BasePixelOffset.X / g_pixelRate;
+        g_pixelOffset.Y = g_gameConfig.BasePixelOffset.Y / g_pixelRate;
         imGuiMousePosScaleX = float(clientSize.width()) / float(d3dSize.Width);
         imGuiMousePosScaleY = float(clientSize.height()) / float(d3dSize.Height);
     }
@@ -325,7 +327,7 @@ namespace core::directx9 {
             note::DxErrToFile(TAG "PrepareCursorState: pSurface->GetDesc failed", rs);
             return;
         }
-        auto scale = float(d3dSize.Height) / float(gs_textureBaseHeight);
+        auto scale = float(d3dSize.Height) / float(g_c.TextureBaseHeight);
         cursorScale = D3DXVECTOR2(scale, scale);
 
         RECTSIZE clientSize{};
@@ -431,7 +433,7 @@ namespace core::directx9 {
             return;
         }
 
-        imguioverlay::Configure(float(d3dSize.Height) / float(gs_imGuiBaseVerticalResolution));
+        imguioverlay::Configure(float(d3dSize.Height) / float(g_c.ImGuiBaseVerticalResolution));
     }
 
     static void RenderImGui(IDirect3DDevice9* pDevice) {

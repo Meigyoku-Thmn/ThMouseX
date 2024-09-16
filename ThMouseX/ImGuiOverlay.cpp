@@ -14,6 +14,8 @@ namespace helper = common::helper;
 
 using namespace std;
 
+static CommonConfig& g_c = g_commonConfig;
+
 namespace core::imguioverlay {
     void Prepare() {
         IMGUI_CHECKVERSION();
@@ -25,10 +27,10 @@ namespace core::imguioverlay {
     void Configure(float fontScale) {
         auto& io = ImGui::GetIO();
         io.Fonts->Clear();
-        auto fontSize = round(float(gs_imGuiBaseFontSize) * fontScale);
+        auto fontSize = round(float(g_c.ImGuiBaseFontSize) * fontScale);
         if (fontSize < 13)
             io.Fonts->AddFontDefault();
-        else if (!io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(gs_imGuiFontPath).c_str(), fontSize))
+        else if (!io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(g_c.ImGuiFontPath).c_str(), fontSize))
             io.Fonts->AddFontDefault();
     }
     ImDrawData* Render(unsigned int renderWidth, unsigned int renderHeight, float mouseScaleX, float mouseScaleY) {
@@ -85,45 +87,45 @@ namespace core::imguioverlay {
                     ImGui::Text("Pixel Offset:\t(%g,%g)", g_pixelOffset.X, g_pixelOffset.Y);
                 }
                 if (ImGui::CollapsingHeader("Game Config")) {
-                    static auto procName = encoding::ConvertToUtf8(g_currentConfig.processName);
+                    static auto procName = encoding::ConvertToUtf8(g_gameConfig.processName);
                     ImGui::Text("Process Name:\t%s", procName.c_str());
 
                     static auto procAddr = memory::GetAddressConfigAsString();
                     ImGui::Text("Position Address:\t%s", procAddr.c_str());
 
-                    static auto scriptEngine = NAMEOF_ENUM(g_currentConfig.ScriptType);
+                    static auto scriptEngine = NAMEOF_ENUM(g_gameConfig.ScriptType);
                     ImGui::Text("Script Engine:\t%s", scriptEngine.data());
 
-                    static auto posDataType = NAMEOF_ENUM(g_currentConfig.PosDataType);
+                    static auto posDataType = NAMEOF_ENUM(g_gameConfig.PosDataType);
                     ImGui::Text("Position Data Type:\t%s", posDataType.data());
-                    ImGui::Text("Base Pixel Offset:\t(%g,%g)", g_currentConfig.BasePixelOffset.X, g_currentConfig.BasePixelOffset.Y);
-                    ImGui::Text("Base Height:\t%d", g_currentConfig.BaseHeight);
-                    ImGui::Text("Aspect Ratio:\t(%g,%g)", g_currentConfig.AspectRatio.X, g_currentConfig.AspectRatio.Y);
+                    ImGui::Text("Base Pixel Offset:\t(%g,%g)", g_gameConfig.BasePixelOffset.X, g_gameConfig.BasePixelOffset.Y);
+                    ImGui::Text("Base Height:\t%d", g_gameConfig.BaseHeight);
+                    ImGui::Text("Aspect Ratio:\t(%g,%g)", g_gameConfig.AspectRatio.X, g_gameConfig.AspectRatio.Y);
 
-                    static auto inputMethod = NAMEOF_ENUM_FLAG(g_currentConfig.InputMethods);
+                    static auto inputMethod = NAMEOF_ENUM_FLAG(g_gameConfig.InputMethods);
                     ImGui::Text("Input Method(s):\t%s", inputMethod.c_str());
                 }
                 if (ImGui::CollapsingHeader("UI/UX Config")) {
-                    static auto bombBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_vkCodeForLeftClick);
-                    ImGui::Text("Left Click Map:\t\"%s\" 0x%X", ImGui::GetKeyName(bombBtn), gs_vkCodeForLeftClick);
+                    static auto bombBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(g_c.VkCodeForLeftClick);
+                    ImGui::Text("Left Click Map:\t\"%s\" 0x%X", ImGui::GetKeyName(bombBtn), g_c.VkCodeForLeftClick);
 
-                    static auto extraBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_vkCodeForMiddleClick);
-                    ImGui::Text("Middle Click Map:\t\"%s\" 0x%X", ImGui::GetKeyName(extraBtn), gs_vkCodeForMiddleClick);
+                    static auto extraBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(g_c.VkCodeForMiddleClick);
+                    ImGui::Text("Middle Click Map:\t\"%s\" 0x%X", ImGui::GetKeyName(extraBtn), g_c.VkCodeForMiddleClick);
 
-                    static auto toggleCurBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_toggleOsCursorButton);
-                    ImGui::Text("Toggle Os Cursor Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleCurBtn), gs_toggleOsCursorButton);
+                    static auto toggleCurBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(g_c.ToggleOsCursorButton);
+                    ImGui::Text("Toggle Os Cursor Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleCurBtn), g_c.ToggleOsCursorButton);
 
-                    static auto toggleImGBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(gs_toggleImGuiButton);
-                    ImGui::Text("Toggle ImGUI Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleImGBtn), gs_toggleImGuiButton);
+                    static auto toggleImGBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(g_c.ToggleImGuiButton);
+                    ImGui::Text("Toggle ImGUI Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleImGBtn), g_c.ToggleImGuiButton);
 
-                    static auto texturePath = encoding::ConvertToUtf8(gs_textureFilePath);
+                    static auto texturePath = encoding::ConvertToUtf8(g_c.TextureFilePath);
                     ImGui::Text("Cursor Texture File Path:\t%s", texturePath.c_str());
-                    ImGui::Text("Cursor Texture Base Height:\t%d", gs_textureBaseHeight);
+                    ImGui::Text("Cursor Texture Base Height:\t%d", g_c.TextureBaseHeight);
 
-                    static auto imGuiFontPath = encoding::ConvertToUtf8(gs_imGuiFontPath);
+                    static auto imGuiFontPath = encoding::ConvertToUtf8(g_c.ImGuiFontPath);
                     ImGui::Text("ImGUI Font Path:\t%s", imGuiFontPath.c_str());
-                    ImGui::Text("ImGUI Base Font Size:\t%d", gs_imGuiBaseFontSize);
-                    ImGui::Text("ImGUI Base Vertical Resolution:\t%d", gs_imGuiBaseVerticalResolution);
+                    ImGui::Text("ImGUI Base Font Size:\t%d", g_c.ImGuiBaseFontSize);
+                    ImGui::Text("ImGUI Base Vertical Resolution:\t%d", g_c.ImGuiBaseVerticalResolution);
                 }
             }
             ImGui::End();

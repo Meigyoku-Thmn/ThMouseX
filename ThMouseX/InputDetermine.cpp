@@ -10,7 +10,7 @@ template <typename TPointer>
 void CalculatePosition(TPointer position, POINT& output) {
     RECTSIZE clientSize{};
     GetClientRect(g_hFocusWindow, &clientSize);
-    auto realWidth = float(clientSize.height()) * g_currentConfig.AspectRatio.X / g_currentConfig.AspectRatio.Y;
+    auto realWidth = float(clientSize.height()) * g_gameConfig.AspectRatio.X / g_gameConfig.AspectRatio.Y;
     auto paddingX = (float(clientSize.width()) - realWidth) / 2;
     g_playerPosRaw = { double(position->X), double(position->Y) };
     output.x = lrint(float(position->X) / g_pixelRate + g_pixelOffset.X + paddingX);
@@ -18,13 +18,13 @@ void CalculatePosition(TPointer position, POINT& output) {
 }
 
 static void CalculatePlayerPos(DWORD address) {
-    if (g_currentConfig.PosDataType == PointDataType_Int)
+    if (g_gameConfig.PosDataType == PointDataType_Int)
         CalculatePosition((IntPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == PointDataType_Float)
+    else if (g_gameConfig.PosDataType == PointDataType_Float)
         CalculatePosition((FloatPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == PointDataType_Short)
+    else if (g_gameConfig.PosDataType == PointDataType_Short)
         CalculatePosition((ShortPoint*)address, g_playerPos);
-    else if (g_currentConfig.PosDataType == PointDataType_Double)
+    else if (g_gameConfig.PosDataType == PointDataType_Double)
         CalculatePosition((DoublePoint*)address, g_playerPos);
 }
 

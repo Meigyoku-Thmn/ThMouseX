@@ -2,7 +2,7 @@
 #include <vector>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
-#include <tlhelp32.h>
+#include <TlHelp32.h>
 
 #include "../Common/macro.h"
 #include "../Common/MinHook.h"
@@ -14,6 +14,8 @@
 #include "Initialization.h"
 #include "MessageQueue.h"
 #include "Shellcode.h"
+
+static CommonConfig& g_c = g_commonConfig;
 
 namespace minhook = common::minhook;
 namespace neolua = common::neolua;
@@ -130,7 +132,7 @@ namespace core::messagequeue {
     }
 
     static InputRuleItemVk2SideEffect InputRuleVk2SideEffect[]{
-        { &gs_toggleImGuiButton, 0, [](bool isUp, UNUSED bool __) {
+        { &g_c.ToggleImGuiButton, 0, [](bool isUp, UNUSED bool __) {
             if (isUp) return;
             g_showImGui = !g_showImGui;
             if (g_showImGui) {
@@ -140,12 +142,12 @@ namespace core::messagequeue {
             else
                 HideMousePointer();
         } },
-        { &gs_toggleOsCursorButton, 0, [](bool isUp, UNUSED bool __) {
+        { &g_c.ToggleOsCursorButton, 0, [](bool isUp, UNUSED bool __) {
             if (isUp) return;
             if (!g_showImGui)
                 isCursorShow ? HideMousePointer() : ShowMousePointer();
         } },
-        { &gs_toggleMouseControl, 0, [](bool isUp, bool wantCaptureMouse) {
+        { &g_c.ToggleMouseControl, 0, [](bool isUp, bool wantCaptureMouse) {
             if (!isUp) return;
             g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
         } },
@@ -348,17 +350,17 @@ namespace core::messagequeue {
                     continue;
                 auto remoteInput = VirtualAllocEx(hProcess.get(), nil, sizeof(shellcodeInput), MEM_COMMIT, PAGE_READWRITE);
                 defer({ VirtualFreeEx(hProcess.get(), remoteInput, 0, MEM_RELEASE); });
-                if (remoteInput == 0)
+                if (!remoteInput)
                     continue;
                 if (!WriteProcessMemory(hProcess.get(), remoteInput, &shellcodeInput, sizeof(shellcodeInput), nil))
                     continue;
                 auto remoteCode = VirtualAllocEx(hProcess.get(), nullptr, shellcodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
                 defer({ VirtualFreeEx(hProcess.get(), remoteCode, 0, MEM_RELEASE); });
-                if (remoteCode == 0)
+                if (!remoteCode)
                     continue;
                 if (!WriteProcessMemory(hProcess.get(), remoteCode, unloadingShellcode, shellcodeSize, nil))
                     continue;
-                Handle remoteThread{ CreateRemoteThread(hProcess.get(), nullptr, 0, (LPTHREAD_START_ROUTINE)remoteCode, remoteInput, 0, nil) };
+                Handle remoteThread{ CreateRemoteThread(hProcess.get(), nullptr, 0, (ThreadFunc)remoteCode, remoteInput, 0, nil) };
                 WaitForSingleObject(remoteThread.get(), 1000);
             }
         }
