@@ -1,17 +1,50 @@
 #pragma once
-#include "framework.h"
+#include <Windows.h>
 #include "macro.h"
 #include <functional>
 #include <string_view>
 #include <string>
 #include <memory>
-#include <array>
 #include <type_traits>
 #include <algorithm>
+#include <atlsafe.h>
 
-constexpr auto PROCESS_NAME_MAX_LEN = 64;
-constexpr auto ADDRESS_CHAIN_MAX_LEN = 8;
-constexpr auto GAME_CONFIG_MAX_LEN = 128;
+#include "ComServer.h"
+
+static_assert(sizeof(void*) == 4, "Support 32-bit system only!");
+static_assert(sizeof(int) == 4);
+
+DEFINE_ENUM_FLAG_OPERATORS(ThMouseXServer::InputMethod);
+
+struct GameConfigLocal : ThMouseXServer::GameConfig {
+    CComSafeArray<DWORD> AddressChain;
+    GameConfigLocal() = default;
+    explicit(false) GameConfigLocal(const GameConfig& gameConfig) {
+        *(GameConfig*)this = gameConfig;
+        this->AddressChain.Attach(this->Address);
+    }
+};
+
+struct GameConfigEx : ThMouseXServer::GameConfig {
+    GameConfigEx() = default;
+    bool CopyFrom(const GameConfig& gameConfig) {
+        *(GameConfig*)this = gameConfig;
+        auto hr = SafeArrayCopy(this->Address, &this->Address);
+        auto processNameSize = (wcslen(this->processName) + 1) * sizeof(this->processName[0]);
+        auto allocated = CoTaskMemAlloc(processNameSize);
+        if (allocated) {
+            memcpy(allocated, this->processName, processNameSize);
+            this->processName = (decltype(this->processName))allocated;
+        }
+        if (!allocated || FAILED(hr)) {
+            SafeArrayDestroy(this->Address);
+            CoTaskMemFree(allocated);
+            *(GameConfig*)this = {};
+            return false;
+        }
+        return true;
+    }
+};
 
 struct ErrorMessage {
     HRESULT code;
@@ -36,123 +69,80 @@ struct RECTSIZE : RECT {
     }
 };
 
-enum class PointDataType {
-    None, Int, Float, Short, Double
+enum class GameInput : DWORD {
+    NONE/*          */ = 0,
+
+    CLICK_LEFT/*    */ = 1 << 0,
+    CLICK_MIDDLE/*  */ = 1 << 1,
+    CLICK_RIGHT/*   */ = 1 << 2,
+    CLICK_XBUTTON1/**/ = 1 << 3,
+    CLICK_XBUTTON2/**/ = 1 << 4,
+
+    SCROLL_UP/*     */ = 1 << 5,
+    SCROLL_DOWN/*   */ = 1 << 6,
+    SCROLL_LEFT/*   */ = 1 << 7,
+    SCROLL_RIGHT/*  */ = 1 << 8,
+
+    MOVE_LEFT/*     */ = 1 << 9,
+    MOVE_RIGHT/*    */ = 1 << 10,
+    MOVE_UP/*       */ = 1 << 11,
+    MOVE_DOWN/*     */ = 1 << 12
 };
-
-struct IntPoint {
-    int X;
-    int Y;
-};
-
-struct ShortPoint {
-    short X;
-    short Y;
-};
-
-struct FloatPoint {
-    float X;
-    float Y;
-};
-
-struct DoublePoint {
-    double X;
-    double Y;
-};
-
-struct AddressChain {
-    std::size_t Length;
-    DWORD       Level[ADDRESS_CHAIN_MAX_LEN];
-};
-static_assert(sizeof(void*) == sizeof(AddressChain::Level[0]), "Support 32-bit system only!");
-
-BEGIN_FLAG_ENUM(GameInput, DWORD)
-NONE/*          */ = 0,
-CLICK_LEFT/*    */ = 1 << 0,
-CLICK_MIDDLE/*  */ = 1 << 1,
-CLICK_RIGHT/*   */ = 1 << 2,
-CLICK_XBUTTON1/**/ = 1 << 3,
-CLICK_XBUTTON2/**/ = 1 << 4,
-SCROLL_UP/*     */ = 1 << 5,
-SCROLL_DOWN/*   */ = 1 << 6,
-SCROLL_LEFT/*   */ = 1 << 7,
-SCROLL_RIGHT/*  */ = 1 << 8,
-
-MOVE_LEFT/*   */ = 1 << 9,
-MOVE_RIGHT/*  */ = 1 << 10,
-MOVE_UP/*     */ = 1 << 11,
-MOVE_DOWN/*   */ = 1 << 12
-END_FLAG_ENUM()
-
-BEGIN_FLAG_ENUM(InputMethod, int)
-None/*        */ = 0,
-DirectInput/* */ = 1 << 0,
-GetKeyboardState = 1 << 1,
-SendInput/*   */ = 1 << 2,
-SendMsg/*     */ = 1 << 3,
-END_FLAG_ENUM()
-
-enum class ScriptType {
-    None, LuaJIT, NeoLua, Lua,
-};
-
-struct GameConfig {
-    WCHAR                   ProcessName[PROCESS_NAME_MAX_LEN];
-    AddressChain            Address;
-
-    ScriptType              ScriptType;
-
-    PointDataType           PosDataType;
-    FloatPoint              BasePixelOffset;
-    DWORD                   BaseHeight;
-    FloatPoint              AspectRatio;
-    InputMethod             InputMethods;
-};
-
-template <class ElementType, size_t ArraySize>
-class _GameConfigs : public std::array<ElementType, ArraySize> {
-private:
-    _GameConfigs::size_type _length;
-public:
-    constexpr ElementType& add_new() {
-        return this->at(_length++);
-    }
-    constexpr _GameConfigs::size_type length() const noexcept {
-        return _length;
-    }
-    constexpr _GameConfigs::size_type capacity() const noexcept {
-        return this->max_size();
-    }
-};
-// This class must be instantiated with an initializer, preferably {}.
-using GameConfigs = _GameConfigs<GameConfig, GAME_CONFIG_MAX_LEN>;
-static_assert(std::is_trivial_v<GameConfigs>);
+DEFINE_ENUM_FLAG_OPERATORS(GameInput);
 
 struct string_hash {
     using hash_type = std::hash<std::string_view>;
     using is_transparent = void;
-    size_t operator()(const char* str) const { return hash_type{}(str); }
+    size_t operator()(const PCHAR str) const { return hash_type{}(str); }
     size_t operator()(std::string_view str) const { return hash_type{}(str); }
     size_t operator()(std::string const& str) const { return hash_type{}(str); }
 };
 
-struct HMODULE_FREER {
-    using pointer = HMODULE;
-    void operator()(HMODULE handle) const {
-        if (handle != nil)
-            FreeLibrary(handle);
+struct HANDLE_CLOSER {
+    using pointer = HANDLE;
+    void operator()(pointer handle) const {
+        if (handle != nil && handle != INVALID_HANDLE_VALUE)
+            CloseHandle(handle);
     }
 };
-using ModuleHandle = std::unique_ptr<HMODULE, HMODULE_FREER>;
+using Handle = std::unique_ptr<HANDLE, HANDLE_CLOSER>;
 
-struct HWND_DESTROYER {
+struct HModuleDeleter {
+    using pointer = HMODULE;
+    void operator()(pointer hModule) const {
+        if (hModule != nil)
+            FreeLibrary(hModule);
+    }
+};
+using ModuleHandle = std::unique_ptr<HMODULE, HModuleDeleter>;
+
+struct HwndDeleter {
     using pointer = HWND;
-    void operator()(HWND hwnd) const {
+    void operator()(pointer hwnd) const {
         if (hwnd != nil)
             DestroyWindow(hwnd);
     }
 };
-using WindowHandle = std::unique_ptr<HWND, HWND_DESTROYER>;
+using WindowHandle = std::unique_ptr<HWND, HwndDeleter>;
+
+struct TimerQueueTimerHandleDeleter {
+    using pointer = HANDLE;
+    void operator()(pointer handle) const {
+        if (handle != nil) {
+            auto _ = DeleteTimerQueueTimer(nullptr, handle, nullptr) == FALSE;
+        }
+    }
+};
+using TimerQueueTimerHandle = std::unique_ptr<HANDLE, TimerQueueTimerHandleDeleter>;
+
+struct ActCtxCookieDeleter {
+    using pointer = ULONG_PTR;
+    void operator()(pointer cookie) const {
+        if (cookie != 0)
+            DeactivateActCtx(0, cookie);
+    }
+};
+using ActCtxCookie = std::unique_ptr<ULONG_PTR, ActCtxCookieDeleter>;
 
 // https://dev.to/sgf4/strings-as-template-parameters-c20-4joh
 template<std::size_t N>
@@ -208,3 +198,35 @@ template<std::size_t s1, std::size_t s2>
 consteval auto operator==(const char(&str)[s2], CompileTimeString<s1> fs) {
     return CompileTimeString<s2>(str) == fs;
 }
+
+EXTERN_C IMAGE_DOS_HEADER __ImageBase;
+#define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
+
+typedef struct _UNICODE_STRING {
+    USHORT Length;
+    USHORT MaximumLength;
+    PVOID Buffer;
+} UNICODE_STRING, *PUNICODE_STRING;
+
+typedef struct _ANSI_STRING {
+    USHORT Length;
+    USHORT MaximumLength;
+    PCHAR Buffer;
+} ANSI_STRING, *PANSI_STRING;
+
+VOID NTAPI RtlInitUnicodeString(PUNICODE_STRING DestinationString, PCWSTR SourceString);
+VOID NTAPI RtlInitAnsiString(PANSI_STRING DestinationString, PCSTR SourceString);
+NTSTATUS NTAPI LdrLoadDll(PWCHAR PathToFile, ULONG Flags, PUNICODE_STRING ModuleFileName, HMODULE* ModuleHandle);
+NTSTATUS NTAPI LdrGetProcedureAddress(HMODULE ModuleHandle, PANSI_STRING FunctionName, WORD Oridinal, PVOID *FunctionAddress);
+NTSTATUS NTAPI LdrUnloadDll(HMODULE ModuleHandle);
+
+struct ShellcodeInput {
+    FixedStringMember(WCHAR, user32dll, L"user32.dll");
+    FixedStringMember(CHAR, peekMessageW, "PeekMessageW");
+    HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+    ImportWinAPI(ntdll, RtlInitUnicodeString);
+    ImportWinAPI(ntdll, RtlInitAnsiString);
+    ImportWinAPI(ntdll, LdrLoadDll);
+    ImportWinAPI(ntdll, LdrGetProcedureAddress);
+    ImportWinAPI(ntdll, LdrUnloadDll);
+};

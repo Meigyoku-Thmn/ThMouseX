@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <string>
 #include "macro.h"
 #include <iostream>
@@ -27,18 +27,18 @@ namespace common::neolua {
     }
 
     void Initialize() {
-        if (g_currentConfig.ScriptType != ScriptType::NeoLua)
+        if (g_currentConfig.ScriptType != ScriptType_NeoLua)
             return;
 
         auto mscoree = GetModuleHandleW(L"mscoree.dll");
         if (!mscoree) {
-            log::LastErrorToFile(TAG " Failed to load mscoree.dll.");
+            log::LastErrorToFile(TAG " Failed to load mscoree.dll");
             return;
         }
 
         auto _CLRCreateInstance = (decltype(&CLRCreateInstance))GetProcAddress(mscoree, "CLRCreateInstance");
         if (!_CLRCreateInstance) {
-            log::LastErrorToFile(TAG " Failed to import mscoree.dll|CLRCreateInstance.");
+            log::LastErrorToFile(TAG " Failed to import mscoree.dll|CLRCreateInstance");
             return;
         }
 
@@ -78,7 +78,7 @@ namespace common::neolua {
         }
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/NeoLuaBootstrap.dll";
-        auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
+        auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.processName + L".lua";
         DWORD returnValue;
         result = runtimeHost->ExecuteInDefaultAppDomain(
             bootstrapDllPath.c_str(),

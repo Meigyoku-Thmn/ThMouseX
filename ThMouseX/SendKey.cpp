@@ -1,5 +1,5 @@
 #include "SendKey.h"
-#include "framework.h"
+#include <Windows.h>
 
 #include <span>
 
@@ -39,14 +39,13 @@ static InputRuleStateItem inputRule[]{
 };
 
 static void SendKeyDown(BYTE vkCode) {
-    using enum InputMethod;
-    if ((g_currentConfig.InputMethods & SendMsg) == SendMsg) {
+    if ((g_currentConfig.InputMethods & InputMethod_SendMsg) == InputMethod_SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX) << 16) | 0x00000001;
         if (helper::ShouldBeVkExtended(vkCode))
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYDOWN, helper::NormalizeLeftRightVkCode(vkCode), lParam);
     }
-    else if ((g_currentConfig.InputMethods & SendInput) == SendInput) {
+    else if ((g_currentConfig.InputMethods & InputMethod_SendInput) == InputMethod_SendInput) {
         if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
             return;
         INPUT input{
@@ -62,14 +61,13 @@ static void SendKeyDown(BYTE vkCode) {
 }
 
 static void SendKeyUp(BYTE vkCode) {
-    using enum InputMethod;
-    if ((g_currentConfig.InputMethods & SendMsg) == SendMsg) {
+    if ((g_currentConfig.InputMethods & InputMethod_SendMsg) == InputMethod_SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX) << 16) | 0xC0000001;
         if (helper::ShouldBeVkExtended(vkCode))
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYUP, helper::NormalizeLeftRightVkCode(vkCode), lParam);
     }
-    else if ((g_currentConfig.InputMethods & SendInput) == SendInput) {
+    else if ((g_currentConfig.InputMethods & InputMethod_SendInput) == InputMethod_SendInput) {
         if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
             return;
         INPUT input{
@@ -101,7 +99,6 @@ static void HandleKeyPress(GameInput gameInput, bool& wasPressing, BYTE vkCode) 
 }
 
 static void TestInputAndSendKeys() {
-    using enum GameInput;
     auto gameInput = inputdetermine::DetermineGameInput();
     for (auto& ruleItem : inputRule) {
         auto vkCode = ruleItem.vkCodePtr == nil ? ruleItem.vkCodeStatic : *ruleItem.vkCodePtr;
@@ -120,8 +117,7 @@ static void CleanUp(bool isProcessTerminating) {
 
 namespace core::sendkey {
     void Initialize() {
-        using enum InputMethod;
-        if ((g_currentConfig.InputMethods & (SendInput | SendMsg)) == None)
+        if ((g_currentConfig.InputMethods & (InputMethod_SendInput | InputMethod_SendMsg)) == InputMethod_None)
             return;
         callbackstore::RegisterPostRenderCallback(TestInputAndSendKeys);
         callbackstore::RegisterUninitializeCallback(CleanUp);

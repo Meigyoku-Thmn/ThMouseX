@@ -9,14 +9,6 @@
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{256B0D2C-0296-4D8F-ADE8-79E544649D69}</ProjectGuid>
@@ -38,19 +30,6 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -62,28 +41,16 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -103,6 +70,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -110,24 +78,15 @@
       <ModuleDefinitionFile>$(SolutionDir)Common\Common.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
+      <Command>call "$(DevEnvDir)..\Tools\vsdevcmd.bat" -no_logo
+set ClientManifestPath="$(SolutionDir)ThMouseXServer\client.manifest"
+set ComClientPath="$(OutDir)ThMouseX.dll;#2"
+mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
       <Command>
       </Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>$(SolutionDir)Common\Common.def</ModuleDefinitionFile>
-    </Link>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -157,30 +116,18 @@
       <ModuleDefinitionFile>$(SolutionDir)Common\Common.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
+      <Command>call "$(DevEnvDir)..\Tools\vsdevcmd.bat" -no_logo
+set ClientManifestPath="$(SolutionDir)ThMouseXServer\client.manifest"
+set ComClientPath="$(OutDir)ThMouseX.dll;#2"
+mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
       <Command>
       </Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>$(SolutionDir)Common\Common.def</ModuleDefinitionFile>
-    </Link>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ComClient.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Direct3D11.cpp" />
     <ClCompile Include="Direct3D8.cpp" />
@@ -198,8 +145,10 @@
     <ClCompile Include="KeyboardState.cpp" />
     <ClCompile Include="MessageQueue.cpp" />
     <ClCompile Include="SendKey.cpp" />
+    <ClCompile Include="Shellcode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ComClient.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Direct3D11.h" />
     <ClInclude Include="Direct3D8.h" />
@@ -213,10 +162,10 @@
     <ClInclude Include="imgui_impl_dx8.h" />
     <ClInclude Include="InputDetermine.h" />
     <ClInclude Include="KeyboardState.h" />
-    <ClInclude Include="framework.h" />
     <ClInclude Include="MessageQueue.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SendKey.h" />
+    <ClInclude Include="Shellcode.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.vcxproj">

@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <DirectX9/Include/d3d9.h>
 #include <DirectX9/Include/d3dx9core.h>
 #include <vector>
@@ -126,7 +126,7 @@ namespace core::directx9 {
         static bool initialized = false;
         static mutex mtx;
         {
-            const lock_guard lock(mtx);
+            const scoped_lock lock(mtx);
             if (initialized)
                 return;
             GetModuleHandleExW(0, (g_systemDirPath + wstring(L"\\d3d9.dll")).c_str(), &d3d9);
@@ -137,13 +137,13 @@ namespace core::directx9 {
 
         auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9, "Direct3DCreate9");
         if (!_Direct3DCreate9) {
-            note::LastErrorToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9.");
+            note::LastErrorToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9");
             return;
         }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window", WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nil, nil, nil, nil));
         if (!tmpWnd) {
-            note::LastErrorToFile(TAG "Failed to create a temporary window.");
+            note::LastErrorToFile(TAG "Failed to create a temporary window");
             return;
         }
 
@@ -194,25 +194,25 @@ namespace core::directx9 {
         d3dx9_43 = LoadLibraryW(L"d3dx9_43.dll");
         if (!d3dx9_43) {
             d3dx9_43_failed = true;
-            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to load d3dx9_43.dll.");
+            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to load d3dx9_43.dll");
             return;
         }
         _D3DXCreateSprite = (decltype(&D3DXCreateSprite))GetProcAddress(d3dx9_43, "D3DXCreateSprite");
         if (!_D3DXCreateSprite) {
             d3dx9_43_failed = true;
-            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateSprite.");
+            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateSprite");
             return;
         }
         _D3DXCreateTextureFromFileW = (decltype(&D3DXCreateTextureFromFileW))GetProcAddress(d3dx9_43, "D3DXCreateTextureFromFileW");
         if (!_D3DXCreateTextureFromFileW) {
             d3dx9_43_failed = true;
-            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateTextureFromFileW.");
+            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateTextureFromFileW");
             return;
         }
         _D3DXMatrixTransformation2D = (decltype(&D3DXMatrixTransformation2D))GetProcAddress(d3dx9_43, "D3DXMatrixTransformation2D");
         if (!_D3DXMatrixTransformation2D) {
             d3dx9_43_failed = true;
-            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXMatrixTransformation2D.");
+            note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXMatrixTransformation2D");
             return;
         }
 

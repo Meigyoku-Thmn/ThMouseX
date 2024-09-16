@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <string>
 #include <format>
 #include <span>
@@ -23,12 +23,15 @@ namespace common::helper::memory {
     }
 
     string GetAddressConfigAsString() {
-        if (g_currentConfig.ScriptType != ScriptType::None)
+        if (g_currentConfig.ScriptType != ScriptType_None)
             return "Using script";
         string rs;
         rs.reserve(128);
-        for (size_t i = 0; i < g_currentConfig.Address.Length; i++) {
-            auto offset = g_currentConfig.Address.Level[i];
+        auto& addressChain = g_currentConfig.AddressChain;
+        auto lowerBound = addressChain.GetLowerBound();
+        auto upperBound = addressChain.GetUpperBound();
+        for (auto i = lowerBound; i <= upperBound; i++) {
+            auto offset = addressChain[i];
             rs.append(format("[{:x}]", offset));
         }
         return rs;

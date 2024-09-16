@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace ThMouseX;
+namespace ThMouseXGUI;
 
 public partial class AboutForm : Form
 {

@@ -31,9 +31,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 static void Prepare() {
     GetSystemDirectoryW(g_systemDirPath, ARRAYSIZE(g_systemDirPath));
     GetModuleFileNameW(nil, g_currentProcessName, ARRAYSIZE(g_currentProcessName));
-    wcscpy(g_currentModuleDirPath, g_currentProcessName);
+    memcpy(g_currentModuleDirPath, g_currentProcessName, sizeof(g_currentProcessName));
     PathRemoveFileSpecW(g_currentModuleDirPath);
-    wcscpy(g_currentProcessDirPath, g_currentProcessName);
+    memcpy(g_currentProcessDirPath, g_currentProcessName, sizeof(g_currentProcessName));
     PathRemoveFileSpecW(g_currentProcessDirPath);
     PathStripPathW(g_currentProcessName);
     PathRemoveExtensionW(g_currentProcessName);
@@ -47,7 +47,7 @@ static HRSRC WINAPI FindResourceWHook(HMODULE hModule, LPCWSTR lpName, LPCWSTR l
     return rs;
 }
 
-void GetDirectInputMappingTableId() {
+static void GetDirectInputMappingTableId() {
     Prepare();
     ComPtr<IDirectInput8A> pDInput8;
     auto rs = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8A, &pDInput8, nil);

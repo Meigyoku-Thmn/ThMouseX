@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include "macro.h"
 #include <iostream>
 #include <chrono>
@@ -51,9 +51,6 @@ namespace common::log {
         }
         auto errorDes = DXGetErrorDescriptionA(hResult);
         auto description = errorDes != nil ? string(errorStr) + ": " + errorDes : string(errorStr);
-#if _DEBUG
-        ToConsole("%s: %s", message, description.c_str());
-#endif
         ToFile("%s: %s", message, description.c_str());
     }
 
@@ -61,25 +58,19 @@ namespace common::log {
         ComPtr<IErrorInfo> errorInfo;
         std::ignore = GetErrorInfo(0, &errorInfo);
         _com_error error(hResult, errorInfo.Get(), true);
+        ComErrToFile(message, error);
+    }
+    void ComErrToFile(const char* message, const _com_error& error) {
         auto description = error.Description();
         if (description.length() > 0) {
-#if _DEBUG
-            ToConsole("%s: %s", message, (char*)description);
-#endif
             ToFile("%s: %s", message, (char*)description);
             return;
         }
         auto errorMessage = string(error.ErrorMessage());
-#if _DEBUG
-        ToConsole("%s: %s", message, errorMessage.c_str());
-#endif
         ToFile("%s: %s", message, errorMessage.c_str());
         if (errorMessage.starts_with("IDispatch error") || errorMessage.starts_with("Unknown error")) {
-            errorMessage = errormsg::GuessErrorsFromHResult(hResult);
+            errorMessage = errormsg::GuessErrorsFromHResult(error.Error());
             if (errorMessage != "") {
-#if _DEBUG
-                ToConsole(errorMessage.c_str());
-#endif
                 ToFile(errorMessage.c_str());
             }
         }
@@ -88,9 +79,6 @@ namespace common::log {
     void LastErrorToFile(const char* message) {
         _com_error error(GetLastError());
         auto detail = error.ErrorMessage();
-#if _DEBUG
-        ToConsole("%s: %s", message, detail);
-#endif
         ToFile("%s: %s", message, detail);
     }
 

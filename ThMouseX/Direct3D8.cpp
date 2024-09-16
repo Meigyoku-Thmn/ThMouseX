@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <DirectX8/Include/d3d8.h>
 #include <DirectX8/Include/d3dx8core.h>
 #include <vector>
@@ -122,7 +122,7 @@ namespace core::directx8 {
         static bool initialized = false;
         static mutex mtx;
         {
-            const lock_guard lock(mtx);
+            const scoped_lock lock(mtx);
             if (initialized)
                 return;
             GetModuleHandleExW(0, (g_systemDirPath + wstring(L"\\d3d8.dll")).c_str(), &d3d8);
@@ -133,14 +133,14 @@ namespace core::directx8 {
 
         auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8, "Direct3DCreate8");
         if (!_Direct3DCreate8) {
-            note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8.");
+            note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8");
             return;
         }
 
         WindowHandle tmpWnd(CreateWindowA("BUTTON", "Temp Window",
             WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, nil, nil, nil, nil));
         if (!tmpWnd) {
-            note::LastErrorToFile(TAG "Failed to create a temporary window.");
+            note::LastErrorToFile(TAG "Failed to create a temporary window");
             return;
         }
 

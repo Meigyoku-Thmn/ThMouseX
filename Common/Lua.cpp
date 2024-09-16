@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <string>
 #include <luajit/lua.hpp>
 #include <fstream>
@@ -86,11 +86,11 @@ namespace common::lua {
     string scriptPath;
 
     void Initialize() {
-        if (g_currentConfig.ScriptType != ScriptType::Lua)
+        if (g_currentConfig.ScriptType != ScriptType_Lua)
             return;
 
         {
-            auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.ProcessName + L".lua";
+            auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.processName + L".lua";
             scriptPath = encoding::ConvertToUtf8(wScriptPath);
             ifstream scriptFile(scriptPath.c_str());
             if (!scriptFile) {

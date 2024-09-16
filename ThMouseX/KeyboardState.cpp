@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <vector>
 
 #include "../Common/MinHook.h"
@@ -41,8 +41,7 @@ namespace core::keyboardstate {
     };
 
     void Initialize() {
-        using enum InputMethod;
-        if ((g_currentConfig.InputMethods & GetKeyboardState) == None)
+        if ((g_currentConfig.InputMethods & InputMethod_GetKeyboardState) == InputMethod_None)
             return;
         minhook::CreateApiHook(vector<minhook::HookApiConfig>{
             { L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, &OriGetKeyboardState },

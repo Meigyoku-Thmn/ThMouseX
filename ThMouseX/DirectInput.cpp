@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <dinput.h>
 #include <string>
 #include <vector>
@@ -55,15 +55,14 @@ namespace core::directinput {
     };
 
     void Initialize() {
-        using enum InputMethod;
         static bool initialized = false;
         static mutex mtx;
         HMODULE dinput8{};
         {
-            const lock_guard lock(mtx);
+            const scoped_lock lock(mtx);
             if (initialized)
                 return;
-            if ((g_currentConfig.InputMethods & DirectInput) == None)
+            if ((g_currentConfig.InputMethods & InputMethod_DirectInput) == InputMethod_None)
                 return;
 
             dinput8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\DInput8.dll")).c_str());

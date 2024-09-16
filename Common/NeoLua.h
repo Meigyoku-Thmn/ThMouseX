@@ -1,5 +1,5 @@
 #pragma once
-#include "framework.h"
+#include <Windows.h>
 #include "DataTypes.h"
 
 namespace common::neolua {

@@ -59,7 +59,7 @@ void Lua_RegisterUninitializeCallback(callbackstore::UninitializeCallbackType ca
 
 string LuaJitPrepScript;
 ON_INIT{
-    auto dllModule = GetModuleHandleW(L_(APP_NAME".dll"));
+    auto dllModule = HINST_THISCOMPONENT;
     auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), L"LUASCRIPT");
     if (scriptRes == nil)
         return;

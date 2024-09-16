@@ -1,4 +1,4 @@
-#include "framework.h"
+#include <Windows.h>
 #include <string>
 
 #include "Helper.Encoding.h"
