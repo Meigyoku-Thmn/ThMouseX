@@ -329,7 +329,6 @@ namespace core::messagequeue {
         auto currentProcessId = GetCurrentProcessId();
         PROCESSENTRY32W processEntry{ .dwSize = sizeof(processEntry) };
         ShellcodeInput shellcodeInput{};
-        OutputDebugStringW(L"Start scanning:\n");
         while (GetNextProcess(processSnapshot.get(), &processEntry)) {
             if (processEntry.th32ProcessID == currentProcessId)
                 continue;
@@ -340,12 +339,7 @@ namespace core::messagequeue {
             if (processSnapshot.get() == INVALID_HANDLE_VALUE)
                 continue;
             MODULEENTRY32W moduleEntry{ .dwSize = sizeof(moduleEntry) };
-            OutputDebugStringW(processEntry.szExeFile);
-            OutputDebugStringW(L"\n");
             while (GetNextModule(moduleSnapshot.get(), &moduleEntry)) {
-                OutputDebugStringW(L"   ");
-                OutputDebugStringW(moduleEntry.szExePath);
-                OutputDebugStringW(L"\n");
                 if (_wcsicmp(moduleEntry.szExePath, g_currentModulePath) != 0)
                     continue;
                 auto remoteInput = VirtualAllocEx(hProcess.get(), nil, sizeof(shellcodeInput), MEM_COMMIT, PAGE_READWRITE);
