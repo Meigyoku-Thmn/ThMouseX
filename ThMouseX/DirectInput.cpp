@@ -14,6 +14,8 @@
 #include "InputDetermine.h"
 #include "DirectInput.h"
 
+static CommonConfig& g_c = g_commonConfig;
+
 namespace minhook = common::minhook;
 namespace note = common::log;
 namespace helper = common::helper;
@@ -39,15 +41,15 @@ namespace core::directinput {
     static decltype(&GetDeviceStateDInput8) OriGetDeviceStateDInput8;
 
     static InputRuleItemForDInput inputRule[]{
-        { &gs_vkCodeForLeftClick,       DIK_X,      CLICK_LEFT      },
-        { &gs_vkCodeForMiddleClick,     DIK_C,      CLICK_MIDDLE    },
-        { &gs_vkCodeForRightClick,      0,          CLICK_RIGHT     },
-        { &gs_vkCodeForXButton1Click,   0,          CLICK_XBUTTON1  },
-        { &gs_vkCodeForXButton2Click,   0,          CLICK_XBUTTON2  },
-        { &gs_vkCodeForScrollUp,        0,          SCROLL_UP       },
-        { &gs_vkCodeForScrollDown,      0,          SCROLL_DOWN     },
-        { &gs_vkCodeForScrollLeft,      0,          SCROLL_LEFT     },
-        { &gs_vkCodeForScrollRight,     0,          SCROLL_RIGHT    },
+        { &g_c.VkCodeForLeftClick,      DIK_X,      CLICK_LEFT      },
+        { &g_c.VkCodeForMiddleClick,    DIK_C,      CLICK_MIDDLE    },
+        { &g_c.VkCodeForRightClick,     0,          CLICK_RIGHT     },
+        { &g_c.VkCodeForXButton1Click,  0,          CLICK_XBUTTON1  },
+        { &g_c.VkCodeForXButton2Click,  0,          CLICK_XBUTTON2  },
+        { &g_c.VkCodeForScrollUp,       0,          SCROLL_UP       },
+        { &g_c.VkCodeForScrollDown,     0,          SCROLL_DOWN     },
+        { &g_c.VkCodeForScrollLeft,     0,          SCROLL_LEFT     },
+        { &g_c.VkCodeForScrollRight,    0,          SCROLL_RIGHT    },
         { nil,                          DIK_LEFT,   MOVE_LEFT       },
         { nil,                          DIK_RIGHT,  MOVE_RIGHT      },
         { nil,                          DIK_UP,     MOVE_UP         },
@@ -62,7 +64,7 @@ namespace core::directinput {
             const scoped_lock lock(mtx);
             if (initialized)
                 return;
-            if ((g_currentConfig.InputMethods & InputMethod_DirectInput) == InputMethod_None)
+            if ((g_gameConfig.InputMethods & InputMethod_DirectInput) == InputMethod_None)
                 return;
 
             dinput8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\DInput8.dll")).c_str());

@@ -50,7 +50,7 @@ DWORD Lua_GetPositionAddress() {
 }
 
 PointDataType Lua_GetDataType() {
-    return g_currentConfig.PosDataType;
+    return g_gameConfig.PosDataType;
 }
 
 void Lua_RegisterUninitializeCallback(callbackstore::UninitializeCallbackType callback) {

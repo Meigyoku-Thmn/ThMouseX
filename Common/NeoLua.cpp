@@ -27,7 +27,7 @@ namespace common::neolua {
     }
 
     void Initialize() {
-        if (g_currentConfig.ScriptType != ScriptType_NeoLua)
+        if (g_gameConfig.ScriptType != ScriptType_NeoLua)
             return;
 
         auto mscoree = GetModuleHandleW(L"mscoree.dll");
@@ -78,7 +78,7 @@ namespace common::neolua {
         }
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/NeoLuaBootstrap.dll";
-        auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_currentConfig.processName + L".lua";
+        auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_gameConfig.processName + L".lua";
         DWORD returnValue;
         result = runtimeHost->ExecuteInDefaultAppDomain(
             bootstrapDllPath.c_str(),

@@ -17,6 +17,34 @@ public struct GameConfig
     public InputMethod InputMethods;
 };
 
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+[ComVisible(true)]
+public struct CommonConfig
+{
+    public byte VkCodeForLeftClick;
+    public byte VkCodeForMiddleClick;
+    public byte VkCodeForRightClick;
+    public byte VkCodeForXButton1Click;
+    public byte VkCodeForXButton2Click;
+    public byte VkCodeForScrollUp;
+    public byte VkCodeForScrollDown;
+    public byte VkCodeForScrollLeft;
+    public byte VkCodeForScrollRight;
+
+    public byte ToggleMouseControl;
+    public byte ToggleOsCursorButton;
+    public byte ToggleImGuiButton;
+
+    [MarshalAs(UnmanagedType.LPWStr)]
+    public string TextureFilePath;
+    public uint TextureBaseHeight;
+
+    [MarshalAs(UnmanagedType.LPWStr)]
+    public string ImGuiFontPath;
+    public uint ImGuiBaseFontSize;
+    public uint ImGuiBaseVerticalResolution;
+}
+
 [ComVisible(true)]
 public enum ScriptType : uint
 {
@@ -65,9 +93,9 @@ public struct DoublePoint
 [Flags]
 public enum InputMethod : uint
 {
-    None/*        */ = 0,
-    DirectInput/* */ = 1 << 0,
+    None/*........*/ = 0,
+    DirectInput/*.*/ = 1 << 0,
     GetKeyboardState = 1 << 1,
-    SendInput/*   */ = 1 << 2,
-    SendMsg/*     */ = 1 << 3
+    SendInput/*...*/ = 1 << 2,
+    SendMsg/*.....*/ = 1 << 3
 }

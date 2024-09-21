@@ -72,12 +72,11 @@ namespace core {
 
         if (!comclient::Initialize())
             return;
-
-        GameConfig gameConfig;
-        if (!comclient::GetGameConfig(g_currentProcessName, gameConfig))
+        
+        if (!comclient::GetGameConfig(g_currentProcessName, g_gameConfig, g_commonConfig))
             return;
-
-        g_currentConfig = gameConfig;
+        g_gameConfig.Initialize();
+        g_commonConfig.Initialize();
 
         minhook::Initialize();
         luaapi::Initialize();

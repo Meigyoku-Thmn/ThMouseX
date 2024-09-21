@@ -2,7 +2,7 @@
 #include <vector>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
-#include <tlhelp32.h>
+#include <TlHelp32.h>
 
 #include "../Common/macro.h"
 #include "../Common/MinHook.h"
@@ -14,6 +14,8 @@
 #include "Initialization.h"
 #include "MessageQueue.h"
 #include "Shellcode.h"
+
+static CommonConfig& g_c = g_commonConfig;
 
 namespace minhook = common::minhook;
 namespace neolua = common::neolua;
@@ -130,7 +132,7 @@ namespace core::messagequeue {
     }
 
     static InputRuleItemVk2SideEffect InputRuleVk2SideEffect[]{
-        { &gs_toggleImGuiButton, 0, [](bool isUp, UNUSED bool __) {
+        { &g_c.ToggleImGuiButton, 0, [](bool isUp, UNUSED bool __) {
             if (isUp) return;
             g_showImGui = !g_showImGui;
             if (g_showImGui) {
@@ -140,12 +142,12 @@ namespace core::messagequeue {
             else
                 HideMousePointer();
         } },
-        { &gs_toggleOsCursorButton, 0, [](bool isUp, UNUSED bool __) {
+        { &g_c.ToggleOsCursorButton, 0, [](bool isUp, UNUSED bool __) {
             if (isUp) return;
             if (!g_showImGui)
                 isCursorShow ? HideMousePointer() : ShowMousePointer();
         } },
-        { &gs_toggleMouseControl, 0, [](bool isUp, bool wantCaptureMouse) {
+        { &g_c.ToggleMouseControl, 0, [](bool isUp, bool wantCaptureMouse) {
             if (!isUp) return;
             g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
         } },
@@ -212,6 +214,7 @@ namespace core::messagequeue {
                     auto matchStatus = TestVkCode(e, vkCode);
                     if (matchStatus == Trigger) {
                         ruleItem.sideEffect(false, g_showImGui && ImGui::GetIO().WantCaptureMouse);
+                        ruleItem.sideEffect(true, g_showImGui && ImGui::GetIO().WantCaptureMouse);
                     }
                     else if (matchStatus == Up && ruleItem.isOn == true) {
                         ruleItem.isOn = false;
@@ -247,10 +250,6 @@ namespace core::messagequeue {
     }
 
     static LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
-        if (static auto initialized = false; !initialized) {
-            initialized = true;
-            core::Initialize();
-        }
         if (code == HC_ACTION && g_hookApplied) {
             if (!cursorNormalized) {
                 cursorNormalized = true;
@@ -285,6 +284,14 @@ namespace core::messagequeue {
         return CallNextHookEx(nil, code, wParam, lParam);
     }
 
+    static LRESULT CALLBACK CBTProcW(int code, WPARAM wParam, LPARAM lParam) {
+        if (static auto initialized = false; !initialized && code == HCBT_ACTIVATE) {
+            initialized = true;
+            core::Initialize();
+        }
+        return CallNextHookEx(nil, code, wParam, lParam);
+    }
+
     static bool CheckHookProcHandle(HHOOK handle) {
         if (handle != nil)
             return true;
@@ -294,6 +301,7 @@ namespace core::messagequeue {
 
     HHOOK GetMsgProcHandle;
     HHOOK CallWndRetProcHandle;
+    HHOOK CBTProcHandle;
 
     bool InstallHooks() {
         GetMsgProcHandle = SetWindowsHookExW(WH_GETMESSAGE, GetMsgProcW, g_coreModule, NULL);
@@ -302,6 +310,9 @@ namespace core::messagequeue {
         CallWndRetProcHandle = SetWindowsHookExW(WH_CALLWNDPROCRET, CallWndRetProcW, g_coreModule, NULL);
         if (!CheckHookProcHandle(CallWndRetProcHandle))
             return false;
+        CBTProcHandle = SetWindowsHookExW(WH_CBT, CBTProcW, g_coreModule, NULL);
+        if (!CheckHookProcHandle(CBTProcHandle))
+            return false;
         return true;
     }
 
@@ -309,6 +320,7 @@ namespace core::messagequeue {
         // unregister hooks.
         UnhookWindowsHookEx(GetMsgProcHandle);
         UnhookWindowsHookEx(CallWndRetProcHandle);
+        UnhookWindowsHookEx(CBTProcHandle);
         // force all top-level windows to process a message, therefore force all processes to unload the DLL.
         DWORD __;
         SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &__);
@@ -327,7 +339,6 @@ namespace core::messagequeue {
         auto currentProcessId = GetCurrentProcessId();
         PROCESSENTRY32W processEntry{ .dwSize = sizeof(processEntry) };
         ShellcodeInput shellcodeInput{};
-        OutputDebugStringW(L"Start scanning:\n");
         while (GetNextProcess(processSnapshot.get(), &processEntry)) {
             if (processEntry.th32ProcessID == currentProcessId)
                 continue;
@@ -338,27 +349,22 @@ namespace core::messagequeue {
             if (processSnapshot.get() == INVALID_HANDLE_VALUE)
                 continue;
             MODULEENTRY32W moduleEntry{ .dwSize = sizeof(moduleEntry) };
-            OutputDebugStringW(processEntry.szExeFile);
-            OutputDebugStringW(L"\n");
             while (GetNextModule(moduleSnapshot.get(), &moduleEntry)) {
-                OutputDebugStringW(L"   ");
-                OutputDebugStringW(moduleEntry.szExePath);
-                OutputDebugStringW(L"\n");
                 if (_wcsicmp(moduleEntry.szExePath, g_currentModulePath) != 0)
                     continue;
                 auto remoteInput = VirtualAllocEx(hProcess.get(), nil, sizeof(shellcodeInput), MEM_COMMIT, PAGE_READWRITE);
                 defer({ VirtualFreeEx(hProcess.get(), remoteInput, 0, MEM_RELEASE); });
-                if (remoteInput == 0)
+                if (!remoteInput)
                     continue;
                 if (!WriteProcessMemory(hProcess.get(), remoteInput, &shellcodeInput, sizeof(shellcodeInput), nil))
                     continue;
                 auto remoteCode = VirtualAllocEx(hProcess.get(), nullptr, shellcodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
                 defer({ VirtualFreeEx(hProcess.get(), remoteCode, 0, MEM_RELEASE); });
-                if (remoteCode == 0)
+                if (!remoteCode)
                     continue;
                 if (!WriteProcessMemory(hProcess.get(), remoteCode, unloadingShellcode, shellcodeSize, nil))
                     continue;
-                Handle remoteThread{ CreateRemoteThread(hProcess.get(), nullptr, 0, (LPTHREAD_START_ROUTINE)remoteCode, remoteInput, 0, nil) };
+                Handle remoteThread{ CreateRemoteThread(hProcess.get(), nullptr, 0, (ThreadFunc)remoteCode, remoteInput, 0, nil) };
                 WaitForSingleObject(remoteThread.get(), 1000);
             }
         }

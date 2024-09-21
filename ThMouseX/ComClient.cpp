@@ -40,8 +40,8 @@ namespace core::comclient {
         return true;
     }
 
-    bool GetGameConfig(PWCHAR processName, GameConfig& gameConfig) {
-        return async(launch::async, [&] {
+    bool GetGameConfig(PWCHAR processName, GameConfig& gameConfig, CommonConfig& commonConfig) {
+        packaged_task<bool()> task([&] {
             auto hr = CoInitialize(nullptr);
             if (FAILED(hr)) {
                 note::HResultToFile(TAG "CoInitialize failed", hr);
@@ -56,7 +56,7 @@ namespace core::comclient {
             try {
                 auto rs = false;
                 helper::ComMethodTimeout([&] {
-                    rs = IComServerPtr(__uuidof(ComServer))->GetGameConfig(processName, &gameConfig) == VARIANT_TRUE;
+                    rs = IComServerPtr(__uuidof(ComServer))->GetGameConfig(processName, &gameConfig, &commonConfig) == VARIANT_TRUE;
                 }, 1000);
                 return rs;
             }
@@ -64,6 +64,10 @@ namespace core::comclient {
                 note::ComErrToFile(TAG "IServer->GetGameConfig failed", ex);
                 return false;
             }
-        }).get();
+        });
+        auto result = task.get_future();
+        thread task_td(move(task));
+        task_td.join();
+        return result.get();
     }
 }

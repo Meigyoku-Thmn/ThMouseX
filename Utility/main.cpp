@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <Windows.h>
-#include <shlwapi.h>
+#include <Shlwapi.h>
 #include <dinput.h>
 #include <wrl/client.h>
 
@@ -18,10 +18,8 @@ using namespace Microsoft::WRL;
 
 void GetDirectInputMappingTableId();
 
-HINSTANCE hInstance;
 int resultValue = -1;
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd) {
-    ::hInstance = hInstance;
     auto cmdLine = wstring(lpCmdLine);
     if (cmdLine.starts_with(L"GetDirectInputMappingTableId"))
         GetDirectInputMappingTableId();
@@ -50,7 +48,7 @@ static HRSRC WINAPI FindResourceWHook(HMODULE hModule, LPCWSTR lpName, LPCWSTR l
 static void GetDirectInputMappingTableId() {
     Prepare();
     ComPtr<IDirectInput8A> pDInput8;
-    auto rs = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8A, &pDInput8, nil);
+    auto rs = DirectInput8Create(HINST_THISCOMPONENT, DIRECTINPUT_VERSION, IID_IDirectInput8A, &pDInput8, nil);
     if (FAILED(rs)) {
         note::DxErrToFile("Failed to create an IDirectInput8 instance", rs);
         return;

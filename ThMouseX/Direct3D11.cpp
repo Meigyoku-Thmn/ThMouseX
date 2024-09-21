@@ -28,6 +28,8 @@
 
 #include "AdditiveToneShader.hshader"
 
+static CommonConfig& g_c = g_commonConfig;
+
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
 namespace helper = common::helper;
@@ -228,7 +230,7 @@ namespace core::directx11 {
         g_hFocusWindow = desc.OutputWindow;
         g_isMinimized = IsIconic(g_hFocusWindow);
 
-        if (gs_textureFilePath[0] && SUCCEEDED(CreateWICTextureFromFile(device, gs_textureFilePath, nil, &cursorTexture))) {
+        if (g_c.TextureFilePath[0] && SUCCEEDED(CreateWICTextureFromFile(device, g_c.TextureFilePath, nil, &cursorTexture))) {
             ComPtr<ID3D11Resource> resource;
             cursorTexture->GetResource(&resource);
             ComPtr<ID3D11Texture2D> pTextureInterface;
@@ -278,9 +280,9 @@ namespace core::directx11 {
             note::LastErrorToFile(TAG "PrepareMeasurement: GetClientRect failed");
             return;
         }
-        g_pixelRate = float(g_currentConfig.BaseHeight) / float(clientSize.height());
-        g_pixelOffset.X = g_currentConfig.BasePixelOffset.X / g_pixelRate;
-        g_pixelOffset.Y = g_currentConfig.BasePixelOffset.Y / g_pixelRate;
+        g_pixelRate = float(g_gameConfig.BaseHeight) / float(clientSize.height());
+        g_pixelOffset.X = g_gameConfig.BasePixelOffset.X / g_pixelRate;
+        g_pixelOffset.Y = g_gameConfig.BasePixelOffset.Y / g_pixelRate;
         imGuiMousePosScaleX = float(clientSize.width()) / float(desc.BufferDesc.Width);
         imGuiMousePosScaleY = float(clientSize.height()) / float(desc.BufferDesc.Height);
     }
@@ -303,7 +305,7 @@ namespace core::directx11 {
             return;
         }
 
-        auto scale = float(desc.BufferDesc.Height) / float(gs_textureBaseHeight);
+        auto scale = float(desc.BufferDesc.Height) / float(g_c.TextureBaseHeight);
         cursorScale = XMVECTORF32{ scale, scale };
 
         RECTSIZE clientSize{};
@@ -394,7 +396,7 @@ namespace core::directx11 {
             return;
         }
 
-        imguioverlay::Configure(float(desc.BufferDesc.Height) / float(gs_imGuiBaseVerticalResolution));
+        imguioverlay::Configure(float(desc.BufferDesc.Height) / float(g_c.ImGuiBaseVerticalResolution));
     }
 
     static void RenderImGui(IDXGISwapChain* swapChain) {

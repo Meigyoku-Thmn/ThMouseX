@@ -10,7 +10,8 @@ extern WCHAR    g_currentProcessDirPath[MAX_PATH];
 extern WCHAR    g_currentProcessName[MAX_PATH];
 
 // single game config
-extern GameConfigLocal  g_currentConfig;
+extern GameConfigLocal      g_gameConfig;
+extern CommonConfigLocal    g_commonConfig;
 
 // global game state
 extern bool         g_hookApplied;
@@ -33,29 +34,11 @@ extern bool         g_inputEnabled;
 extern float        g_pixelRate;
 extern FloatPoint   g_pixelOffset;
 extern bool         g_showImGui;
+
+// should be moved to GameConfig or CommonConfig(?)
+extern MovementAlgorithm    g_movementAlgorithm;
+
 // for debugging purpose, not single source of truth
 extern POINT        g_playerPos;
 extern DoublePoint  g_playerPosRaw;
 extern GameInput    g_gameInput;
-
-#ifndef UTILITY_PROJECT
-extern BYTE     gs_vkCodeForLeftClick;
-extern BYTE     gs_vkCodeForMiddleClick;
-extern BYTE     gs_vkCodeForRightClick;
-extern BYTE     gs_vkCodeForXButton1Click;
-extern BYTE     gs_vkCodeForXButton2Click;
-extern BYTE     gs_vkCodeForScrollUp;
-extern BYTE     gs_vkCodeForScrollDown;
-extern BYTE     gs_vkCodeForScrollLeft;
-extern BYTE     gs_vkCodeForScrollRight;
-
-extern BYTE     gs_toggleMouseControl;
-extern BYTE     gs_toggleOsCursorButton;
-extern BYTE     gs_toggleImGuiButton;
-
-extern WCHAR    gs_textureFilePath[MAX_PATH];
-extern DWORD    gs_textureBaseHeight;
-extern WCHAR    gs_imGuiFontPath[MAX_PATH];
-extern DWORD    gs_imGuiBaseFontSize;
-extern DWORD    gs_imGuiBaseVerticalResolution;
-#endif
