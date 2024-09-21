@@ -35,6 +35,9 @@ float       g_pixelRate = 1;
 FloatPoint  g_pixelOffset{ 1, 1 };
 bool        g_showImGui;
 
+// should be moved to GameConfig or CommonConfig(?)
+MovementAlgorithm   g_movementAlgorithm;
+
 // for debugging purpose, not single source of truth
 POINT       g_playerPos;
 DoublePoint g_playerPosRaw;

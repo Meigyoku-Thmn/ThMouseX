@@ -214,6 +214,7 @@ namespace core::messagequeue {
                     auto matchStatus = TestVkCode(e, vkCode);
                     if (matchStatus == Trigger) {
                         ruleItem.sideEffect(false, g_showImGui && ImGui::GetIO().WantCaptureMouse);
+                        ruleItem.sideEffect(true, g_showImGui && ImGui::GetIO().WantCaptureMouse);
                     }
                     else if (matchStatus == Up && ruleItem.isOn == true) {
                         ruleItem.isOn = false;

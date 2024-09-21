@@ -7,14 +7,32 @@
 #include "../Common/Helper.Encoding.h"
 #include "../Common/Helper.Memory.h"
 #include "../Common/Helper.h"
+#include "Configuration.h"
 
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
 namespace helper = common::helper;
+namespace configuration = core::configuration;
 
 using namespace std;
 
 static CommonConfig& g_c = g_commonConfig;
+
+static const char* GetKeyName(BYTE vkCode) {
+    auto imGuiKey = ImGui_ImplWin32_VirtualKeyToImGuiKey(vkCode);
+    auto rs = ImGui::GetKeyName(imGuiKey);
+    if (imGuiKey != ImGuiKey_None)
+        return rs;
+    if (vkCode == SCROLL_UP_EVENT)
+        rs = "SCROLL_UP_EVENT";
+    if (vkCode == SCROLL_DOWN_EVENT)
+        rs = "SCROLL_DOWN_EVENT";
+    if (vkCode == SCROLL_LEFT_EVENT)
+        rs = "SCROLL_LEFT_EVENT";
+    if (vkCode == SCROLL_RIGHT_EVENT)
+        rs = "SCROLL_RIGHT_EVENT";
+    return rs;
+}
 
 namespace core::imguioverlay {
     void Prepare() {
@@ -43,7 +61,6 @@ namespace core::imguioverlay {
 
         static auto useRawInput = false;
         static auto mouseSensitivity = 1.0f;
-        static auto movementAlgorithm = 0;
 
         if (ImGui::Begin("ThMouseX")) {
             ImGui::Checkbox("Use Raw Input", &useRawInput);
@@ -56,15 +73,24 @@ namespace core::imguioverlay {
             ImGui::AlignTextToFramePadding();
             ImGui::Text("Movement Algorithm:");
             ImGui::InvisibleButton("##padding-left", ImVec2(5, 1)); ImGui::SameLine();
-            ImGui::RadioButton("Bresenham's Line", &movementAlgorithm, 0); ImGui::SameLine();
-            ImGui::RadioButton("Simple", &movementAlgorithm, 1);
+            ImGui::RadioButton("Bresenham's Line", (int*)&g_movementAlgorithm, (int)MovementAlgorithm::Bresenham); ImGui::SameLine();
+            ImGui::RadioButton("Simple", (int*)&g_movementAlgorithm, (int)MovementAlgorithm::Simple);
 
-            ImGui::Checkbox("Show Variable Viewer", &showVariableViewer);
+            if (ImGui::Button("Show Variable Viewer")) {
+                showVariableViewer = true;
+            }
         }
         ImGui::End();
 
         if (showVariableViewer) {
             if (ImGui::Begin("ThMouseX's Variable Viewer", &showVariableViewer)) {
+                if (ImGui::CollapsingHeader("Exe Paths")) {
+                    static auto thMousePath = encoding::ConvertToUtf8(g_currentModulePath);
+                    ImGui::Text("ThMouseX:\t%s", thMousePath.c_str());
+
+                    static auto gamePath = encoding::ConvertToUtf8(g_currentProcessName);
+                    ImGui::Text("Game:\t%s", gamePath.c_str());
+                }
                 if (ImGui::CollapsingHeader("Directory Paths")) {
                     static auto thMouseDir = encoding::ConvertToUtf8(g_currentModuleDirPath);
                     ImGui::Text("ThMouseX:\t%s", thMouseDir.c_str());
@@ -106,21 +132,58 @@ namespace core::imguioverlay {
                     ImGui::Text("Input Method(s):\t%s", inputMethod.c_str());
                 }
                 if (ImGui::CollapsingHeader("UI/UX Config")) {
-                    static auto bombBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(g_c.VkCodeForLeftClick);
-                    ImGui::Text("Left Click Map:\t\"%s\" 0x%X", ImGui::GetKeyName(bombBtn), g_c.VkCodeForLeftClick);
+                    static auto leftBtn = GetKeyName(g_c.VkCodeForLeftClick);
+                    ImGui::Text("Left Click Map To:\t\"%s\" 0x%X", leftBtn, g_c.VkCodeForLeftClick);
 
-                    static auto extraBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(g_c.VkCodeForMiddleClick);
-                    ImGui::Text("Middle Click Map:\t\"%s\" 0x%X", ImGui::GetKeyName(extraBtn), g_c.VkCodeForMiddleClick);
+                    static auto middleBtn = GetKeyName(g_c.VkCodeForMiddleClick);
+                    ImGui::Text("Middle Click Map To:\t\"%s\" 0x%X", middleBtn, g_c.VkCodeForMiddleClick);
 
-                    static auto toggleCurBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(g_c.ToggleOsCursorButton);
-                    ImGui::Text("Toggle Os Cursor Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleCurBtn), g_c.ToggleOsCursorButton);
+                    static auto rightBtn = GetKeyName(g_c.VkCodeForRightClick);
+                    ImGui::Text("Right Click Map To:\t\"%s\" 0x%X", rightBtn, g_c.VkCodeForRightClick);
 
-                    static auto toggleImGBtn = ImGui_ImplWin32_VirtualKeyToImGuiKey(g_c.ToggleImGuiButton);
-                    ImGui::Text("Toggle ImGUI Button:\t\"%s\" 0x%X", ImGui::GetKeyName(toggleImGBtn), g_c.ToggleImGuiButton);
+                    ImGui::Separator();
+
+                    static auto x1Btn = GetKeyName(g_c.VkCodeForXButton1Click);
+                    ImGui::Text("Extended Button 1 Map To:\t\"%s\" 0x%X", x1Btn, g_c.VkCodeForXButton1Click);
+
+                    static auto x2Btn = GetKeyName(g_c.VkCodeForXButton2Click);
+                    ImGui::Text("Extended Button 2 Map To:\t\"%s\" 0x%X", x2Btn, g_c.VkCodeForXButton2Click);
+
+                    ImGui::Separator();
+
+                    static auto scrollUpBtn = GetKeyName(g_c.VkCodeForScrollUp);
+                    ImGui::Text("Scroll Up Map To:\t\"%s\" 0x%X", scrollUpBtn, g_c.VkCodeForScrollUp);
+
+                    static auto scrollDownBtn = GetKeyName(g_c.VkCodeForScrollDown);
+                    ImGui::Text("Scroll Down Map To:\t\"%s\" 0x%X", scrollDownBtn, g_c.VkCodeForScrollDown);
+
+                    static auto scrollLeftBtn = GetKeyName(g_c.VkCodeForScrollLeft);
+                    ImGui::Text("Scroll Left Map To:\t\"%s\" 0x%X", scrollLeftBtn, g_c.VkCodeForScrollLeft);
+
+                    static auto scrollRightBtn = GetKeyName(g_c.VkCodeForScrollRight);
+                    ImGui::Text("Scroll Right Map To:\t\"%s\" 0x%X", scrollRightBtn, g_c.VkCodeForScrollRight);
+
+                    ///////////////////////////////////////////////////////////////////
+                    ImGui::Separator();
+
+                    static auto toggleMouseBtn = GetKeyName(g_c.ToggleMouseControl);
+                    ImGui::Text("Toggle Mouse Control Button:\t\"%s\" 0x%X", toggleMouseBtn, g_c.ToggleMouseControl);
+
+                    static auto toggleCurBtn = GetKeyName(g_c.ToggleOsCursorButton);
+                    ImGui::Text("Toggle Os Cursor Button:\t\"%s\" 0x%X", toggleCurBtn, g_c.ToggleOsCursorButton);
+
+                    static auto toggleImGBtn = GetKeyName(g_c.ToggleImGuiButton);
+                    ImGui::Text("Toggle ImGUI Button:\t\"%s\" 0x%X", toggleImGBtn, g_c.ToggleImGuiButton);
+
+                    ///////////////////////////////////////////////////////////////////
+                    ImGui::Separator();
 
                     static auto texturePath = encoding::ConvertToUtf8(g_c.TextureFilePath);
                     ImGui::Text("Cursor Texture File Path:\t%s", texturePath.c_str());
                     ImGui::Text("Cursor Texture Base Height:\t%d", g_c.TextureBaseHeight);
+
+                    ///////////////////////////////////////////////////////////////////
+                    ImGui::Separator();
 
                     static auto imGuiFontPath = encoding::ConvertToUtf8(g_c.ImGuiFontPath);
                     ImGui::Text("ImGUI Font Path:\t%s", imGuiFontPath.c_str());

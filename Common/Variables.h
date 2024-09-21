@@ -35,6 +35,9 @@ extern float        g_pixelRate;
 extern FloatPoint   g_pixelOffset;
 extern bool         g_showImGui;
 
+// should be moved to GameConfig or CommonConfig(?)
+extern MovementAlgorithm    g_movementAlgorithm;
+
 // for debugging purpose, not single source of truth
 extern POINT        g_playerPos;
 extern DoublePoint  g_playerPosRaw;

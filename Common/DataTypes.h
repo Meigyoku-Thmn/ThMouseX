@@ -95,6 +95,10 @@ enum class ModulateStage {
     WhiteInc, WhiteDec, BlackInc, BlackDec,
 };
 
+enum class MovementAlgorithm : int {
+    Bresenham, Simple
+};
+
 struct RECTSIZE : RECT {
     LONG width() const {
         return right - left;

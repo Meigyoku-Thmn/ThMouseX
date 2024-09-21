@@ -395,6 +395,11 @@ void    ImGui_ImplWin32_NewFrame() {
 // Map VK_xxx to ImGuiKey_xxx.
 ImGuiKey ImGui_ImplWin32_VirtualKeyToImGuiKey(WPARAM wParam) {
     switch (wParam) {
+        case VK_LBUTTON: return ImGuiKey_MouseLeft;
+        case VK_RBUTTON: return ImGuiKey_MouseRight;
+        case VK_MBUTTON: return ImGuiKey_MouseMiddle;
+        case VK_XBUTTON1: return ImGuiKey_MouseX1;
+        case VK_XBUTTON2: return ImGuiKey_MouseX2;
         case VK_TAB: return ImGuiKey_Tab;
         case VK_LEFT: return ImGuiKey_LeftArrow;
         case VK_RIGHT: return ImGuiKey_RightArrow;
