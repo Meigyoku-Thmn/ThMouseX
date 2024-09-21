@@ -250,10 +250,6 @@ namespace core::messagequeue {
     }
 
     static LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
-        if (static auto initialized = false; !initialized) {
-            initialized = true;
-            core::Initialize();
-        }
         if (code == HC_ACTION && g_hookApplied) {
             if (!cursorNormalized) {
                 cursorNormalized = true;
@@ -288,6 +284,14 @@ namespace core::messagequeue {
         return CallNextHookEx(nil, code, wParam, lParam);
     }
 
+    static LRESULT CALLBACK CBTProcW(int code, WPARAM wParam, LPARAM lParam) {
+        if (static auto initialized = false; !initialized && code == HCBT_ACTIVATE) {
+            initialized = true;
+            core::Initialize();
+        }
+        return CallNextHookEx(nil, code, wParam, lParam);
+    }
+
     static bool CheckHookProcHandle(HHOOK handle) {
         if (handle != nil)
             return true;
@@ -297,6 +301,7 @@ namespace core::messagequeue {
 
     HHOOK GetMsgProcHandle;
     HHOOK CallWndRetProcHandle;
+    HHOOK CBTProcHandle;
 
     bool InstallHooks() {
         GetMsgProcHandle = SetWindowsHookExW(WH_GETMESSAGE, GetMsgProcW, g_coreModule, NULL);
@@ -305,6 +310,9 @@ namespace core::messagequeue {
         CallWndRetProcHandle = SetWindowsHookExW(WH_CALLWNDPROCRET, CallWndRetProcW, g_coreModule, NULL);
         if (!CheckHookProcHandle(CallWndRetProcHandle))
             return false;
+        CBTProcHandle = SetWindowsHookExW(WH_CBT, CBTProcW, g_coreModule, NULL);
+        if (!CheckHookProcHandle(CBTProcHandle))
+            return false;
         return true;
     }
 
@@ -312,6 +320,7 @@ namespace core::messagequeue {
         // unregister hooks.
         UnhookWindowsHookEx(GetMsgProcHandle);
         UnhookWindowsHookEx(CallWndRetProcHandle);
+        UnhookWindowsHookEx(CBTProcHandle);
         // force all top-level windows to process a message, therefore force all processes to unload the DLL.
         DWORD __;
         SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &__);

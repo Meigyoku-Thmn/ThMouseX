@@ -42,7 +42,7 @@ namespace core::comclient {
 
     bool GetGameConfig(PWCHAR processName, GameConfig& gameConfig, CommonConfig& commonConfig) {
         packaged_task<bool()> task([&] {
-            auto hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+            auto hr = CoInitialize(nullptr);
             if (FAILED(hr)) {
                 note::HResultToFile(TAG "CoInitialize failed", hr);
                 return false;
