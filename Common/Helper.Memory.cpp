@@ -18,18 +18,18 @@ namespace common::helper::memory {
     DWORD ResolveAddress(span<const DWORD> offsets) {
         if (offsets.size() <= 0)
             return NULL;
-        auto memCheck = offsets.size() != lastOffsets.size()
+        auto memInvalidated = offsets.size() != lastOffsets.size()
             || memcmp(offsets.data(), lastOffsets.data(), min(offsets.size(), lastOffsets.size()) * sizeof(offsets[0]));
-        if (!memCheck && !lastIsValid)
+        if (!memInvalidated && !lastIsValid)
             return NULL;
-        if (memCheck) {
+        if (memInvalidated) {
             lastIsValid = true;
             lastOffsets.resize(offsets.size());
             memcpy(lastOffsets.data(), offsets.data(), offsets.size() * sizeof(offsets[0]));
         }
         auto address = offsets[0] + DWORD(g_targetModule);
         for (size_t i = 1; i < offsets.size(); i++) {
-            if (memCheck && IsBadReadMem((PVOID)address, sizeof(address))) {
+            if (memInvalidated && IsBadReadMem((PVOID)address, sizeof(address))) {
                 lastIsValid = false;
                 note::ToFile("Access bad memory region, please check the game's version!");
                 return NULL;
@@ -39,7 +39,7 @@ namespace common::helper::memory {
                 break;
             address += offsets[i];
         }
-        if (memCheck && IsBadReadMem((PVOID)address, sizeof(address))) {
+        if (memInvalidated && IsBadReadMem((PVOID)address, sizeof(address))) {
             lastIsValid = false;
             note::ToFile("Access bad memory region, please check the game's version!");
             return NULL;
