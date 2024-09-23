@@ -24,6 +24,11 @@ namespace common::log {
     wstring __logPath;
     string __processName;
 
+    __StaticData& GetData() {
+        static __StaticData data{};
+        return data;
+    }
+
     tm GetTimeNow() {
         tm rs;
         auto now = time(nil);
@@ -87,7 +92,7 @@ namespace common::log {
         static time_point<steady_clock> oldTime = high_resolution_clock::now();
         static int fps; fps++;
 
-        if (duration_cast<seconds>(high_resolution_clock::now() - oldTime) >= seconds{1}) {
+        if (duration_cast<seconds>(high_resolution_clock::now() - oldTime) >= seconds{ 1 }) {
             oldTime = high_resolution_clock::now();
             ToConsole("FPS: %d", fps);
             fps = 0;

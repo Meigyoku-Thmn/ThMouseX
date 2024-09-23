@@ -13,6 +13,15 @@ namespace common::log {
     extern FILE* __logFile;
     extern std::wstring __logPath;
     extern std::string __processName;
+    struct __StaticData {
+        std::wstring logPath = std::wstring(g_currentModuleDirPath) + L"/log.txt";
+        std::string processName = encoding::ConvertToUtf8(g_currentProcessName);
+        FILE* logFile = _wfsopen(logPath.c_str(), L"a+", _SH_DENYNO);
+        StaticData() {
+            if (logFile != nil)
+                setvbuf(logFile, nil, _IONBF, 0);
+        }
+    };
     tm GetTimeNow();
     void OpenConsole();
     template <typename... Targs>
