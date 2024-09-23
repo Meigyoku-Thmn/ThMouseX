@@ -69,21 +69,19 @@ namespace common::helper::memory {
         if (ptr == nullptr)
             return true;
 
-        auto pStart = (PBYTE)ptr;
+        auto pStart = (const BYTE*)ptr;
         auto pEnd = pStart + size;
 
         DWORD mask = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ
             | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
 
-        PBYTE regionEnd{};
+        const BYTE* regionEnd{};
         do {
             MEMORY_BASIC_INFORMATION memInfo;
-            if (pStart == ptr || pStart == regionEnd) {
-                if (VirtualQuery(pStart, &memInfo, sizeof(memInfo)) == 0)
-                    return true;
-                else
-                    regionEnd = ((PBYTE)memInfo.BaseAddress + memInfo.RegionSize);
-            }
+            if (VirtualQuery(pStart, &memInfo, sizeof(memInfo)) == 0)
+                return true;
+            else
+                regionEnd = ((PBYTE)memInfo.BaseAddress + memInfo.RegionSize);
             if ((memInfo.Protect & mask) == 0 || (memInfo.Protect & (PAGE_GUARD | PAGE_NOACCESS)) != 0)
                 return true;
             if (pEnd <= regionEnd)

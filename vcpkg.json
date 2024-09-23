@@ -5,9 +5,10 @@
     "luajit",
     "minhook",
     "inipp",
-    "nameof"
+    "nameof",
+    "boost-stacktrace"
   ],
-  "builtin-baseline": "861c33057553ee836e7061ffbdabc25ea343145d",
+  "builtin-baseline": "98aa6396292d57e737a6ef999d4225ca488859d5",
   "vcpkg-configuration": {
     "overlay-ports": [
       "./vcpkg_custom_ports"
@@ -20,15 +21,15 @@
     },
     {
       "name": "directxtk",
-      "version": "2023-06-13"
+      "version": "2024-09-04"
     },
     {
       "name": "luajit",
-      "version": "2023-01-04"
+      "version": "2023-01-04#5"
     },
     {
       "name": "minhook",
-      "version": "1.3.3"
+      "version": "1.3.3#4"
     },
     {
       "name": "inipp",
@@ -36,7 +37,11 @@
     },
     {
       "name": "nameof",
-      "version": "0.10.3"
+      "version": "0.10.4"
+    },
+    {
+      "name": "boost-stacktrace",
+      "version": "1.85.0#3"
     }
   ]
 }

@@ -28,13 +28,6 @@ static bool usePullMechanism = false;
 
 static lua_State* L;
 
-#define ImportFuncOrLogErrorThenReturn(lua, luaDllName, funcName) \
-(decltype(&funcName))GetProcAddress(lua, #funcName); \
-if (!_ ## funcName) { \
-    note::ToFile("[Lua] Failed to import %s|" #funcName ".", luaDllName.c_str()); \
-    return; \
-}0
-
 template <CompileTimeString funcName, typename FuncType>
 static bool TryImportFunc(FuncType& func, HMODULE lua, const string& luaDllName) {
     func = (FuncType)GetProcAddress(lua, funcName.data);

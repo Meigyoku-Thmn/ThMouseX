@@ -56,7 +56,8 @@ namespace core::comclient {
             try {
                 auto rs = false;
                 helper::ComMethodTimeout([&] {
-                    rs = IComServerPtr(__uuidof(ComServer))->GetGameConfig(processName, &gameConfig, &commonConfig) == VARIANT_TRUE;
+                    auto comServer = IComServerPtr(__uuidof(ComServer));
+                    rs = comServer->GetGameConfig(processName, &gameConfig, &commonConfig) == VARIANT_TRUE;
                 }, 1000);
                 return rs;
             }
@@ -66,7 +67,7 @@ namespace core::comclient {
             }
         });
         auto result = task.get_future();
-        thread task_td(move(task));
+        jthread task_td(move(task));
         task_td.join();
         return result.get();
     }
