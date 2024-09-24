@@ -27,17 +27,6 @@ namespace common::helper {
         LocalFree(errorMessage);
     }
 
-    string& Replace(string& input, const char* keyword, const char* replacement) {
-        size_t keywordPos = 0;
-        auto keywordLen = strlen(keyword);
-        auto replacementLen = strlen(replacement);
-        while ((keywordPos = input.find(keyword, keywordPos)) != string::npos) {
-            input.replace(keywordPos, keywordLen, replacement);
-            keywordPos += replacementLen;
-        }
-        return input;
-    }
-
     tuple<float, const char*> ConvertToFloat(const string& input) {
         char* endPtr;
         const char* message = nil;

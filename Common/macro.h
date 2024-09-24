@@ -19,10 +19,6 @@
 
 #define DLLEXPORT_C extern "C" __declspec(dllexport)
 
-#define EVAL_DISCARD(expr) EVAL_DISCARD_IMPL(__COUNTER__, expr)
-#define EVAL_DISCARD_IMPL(counter, expr) EVAL_DISCARD_IMPL_EXPAND(counter, expr)
-#define EVAL_DISCARD_IMPL_EXPAND(counter, expr) auto var_discard_##counter = expr
-
 #define MAKE_UNIQUE_VAR(counter) var_discard_##counter
 
 #define defer(...) defer_impl(__COUNTER__, __VA_ARGS__)

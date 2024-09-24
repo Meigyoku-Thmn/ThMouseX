@@ -15,7 +15,10 @@ DLLEXPORT_C DWORD Lua_GetPositionAddress();
 DLLEXPORT_C PointDataType Lua_GetDataType();
 DLLEXPORT_C void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbackType callback);
 
+#define GET_POSITION_ADDRESS "getPositionAddress"
+#define THMOUSEX_MODULE_HANDLE "ThMouseX_ModuleHandle"
+
 namespace common::luaapi {
+    extern std::string LuaJitPrepScript;
     void Initialize();
-    std::string MakePreparationScript();
 }

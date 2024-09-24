@@ -11,7 +11,6 @@
 
 #include <Windows.h>
 #include <string>
-#include <format>
 #include <span>
 
 namespace note = common::log;
@@ -57,9 +56,9 @@ void Lua_RegisterUninitializeCallback(callbackstore::UninitializeCallbackType ca
     callbackstore::RegisterUninitializeCallback(callback, true);
 }
 
-string LuaJitPrepScript;
-
 namespace common::luaapi {
+    string LuaJitPrepScript;
+
     static void Uninitialize(bool isProcessTerminating) {
         Lua_SetPositionAddress(NULL);
     }
@@ -75,12 +74,5 @@ namespace common::luaapi {
         if (scriptHandle == nil)
             return;
         LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
-    }
-
-    string MakePreparationScript() {
-        auto thisDllPath = encoding::ConvertToUtf8(wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME));
-        helper::Replace(thisDllPath, "\\", R"(\\)");
-        auto moduleHandle = uintptr_t(g_coreModule);
-        return vformat(LuaJitPrepScript, make_format_args(thisDllPath, moduleHandle));
     }
 }

@@ -1,8 +1,6 @@
--- This file is not really a valid Lua script, but a Lua script template that is passed to std::vformat
-ThMouseX_DllPath = "{0}"
-ThMouseX_ModuleHandle = {1:#0x}
+-- expected global variables: ThMouseX_ModuleHandle
 
-function InitializeForLuaJIT()    
+function InitializeForLuaJIT()
     local ffi = require("ffi")
 
     ffi.cdef [[
@@ -13,7 +11,7 @@ function InitializeForLuaJIT()
         typedef const char* LPCSTR;
         typedef void (*UninitializeCallbackType)(bool isProcessTerminating);
         
-        LPVOID      GetProcAddress(HMODULE hModule, LPCSTR lpProcName);
+        LPVOID          GetProcAddress(HMODULE hModule, LPCSTR lpProcName);
         typedef DWORD   (*Lua_ReadUInt32)(DWORD address);
         typedef DWORD   (*Lua_ResolveAddress)(DWORD* offsets, size_t length);
         typedef void    (*Lua_OpenConsole)();
@@ -30,20 +28,20 @@ function InitializeForLuaJIT()
     ]]
 
     local hModule = ffi.cast("HMODULE", ThMouseX_ModuleHandle)
-    local config = {{
-        {{'ReadUInt32',                     'Lua_ReadUInt32'}},
-        {{'ResolveAddress',                 'Lua_ResolveAddress'}},
-        {{'OpenConsole',                    'Lua_OpenConsole'}},
-        {{'SetPositionAddress',             'Lua_SetPositionAddress'}},
-        {{'GetDataType',                    'Lua_GetDataType'}},
-        {{'RegisterUninitializeCallback',   'Lua_RegisterUninitializeCallback'}},
-        {{'CreateHook',                     'MH_CreateHook'}},
-        {{'CreateHookApi',                  'Lua_CreateHookApi'}},
-        {{'EnableHook',                     'MH_EnableHook'}},
-        {{'RemoveHook',                     'MH_RemoveHook'}},
-        {{'DisableHook',                    'MH_DisableHook'}},
-        {{'_HookStatusToString',            'MH_StatusToString'}},
-    }}
+    local config = {
+        { 'ReadUInt32',                     'Lua_ReadUInt32'                    },
+        { 'ResolveAddress',                 'Lua_ResolveAddress'                },
+        { 'OpenConsole',                    'Lua_OpenConsole'                   },
+        { 'SetPositionAddress',             'Lua_SetPositionAddress'            },
+        { 'GetDataType',                    'Lua_GetDataType'                   },
+        { 'RegisterUninitializeCallback',   'Lua_RegisterUninitializeCallback'  },
+        { 'CreateHook',                     'MH_CreateHook'                     },
+        { 'CreateHookApi',                  'Lua_CreateHookApi'                 },
+        { 'EnableHook',                     'MH_EnableHook'                     },
+        { 'RemoveHook',                     'MH_RemoveHook'                     },
+        { 'DisableHook',                    'MH_DisableHook'                    },
+        { '_HookStatusToString',            'MH_StatusToString'                 },
+    }
     for i = 1, #config do
         local item = config[i]
         _G[item[1]] = ffi.cast(item[2], ffi.C.GetProcAddress(hModule, item[2]))

@@ -13,7 +13,6 @@ namespace common::helper {
         UINT, WParamPredicate, LParamPredicate
     >;
     void ReportLastError(const char* title);
-    std::string& Replace(std::string& input, const char* keyword, const char* replacement);
     std::tuple<float, const char*> ConvertToFloat(const std::string& input);
     std::tuple<long, const char*> ConvertToLong(const std::string& input, int base);
     std::tuple<unsigned long, const char*> ConvertToULong(const std::string& input, int base);
