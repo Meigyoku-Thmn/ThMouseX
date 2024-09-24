@@ -22,51 +22,18 @@ namespace minhook = common::minhook;
 
 using namespace std;
 
-MH_STATUS Lua_CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal) {
-    return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal);
-}
-
-DWORD Lua_ReadUInt32(DWORD address) {
-    return *PDWORD(address);
-}
-
-DWORD Lua_ResolveAddress(DWORD* offsets, size_t length) {
-    return memory::ResolveAddress(span{ offsets, length });
-}
-
-void Lua_OpenConsole() {
-    note::OpenConsole();
-}
-
 static DWORD positionAddress;
-
-void Lua_SetPositionAddress(DWORD address) {
-    positionAddress = address;
-}
-
-DWORD Lua_GetPositionAddress() {
-    return positionAddress;
-}
-
-PointDataType Lua_GetDataType() {
-    return g_gameConfig.PosDataType;
-}
-
-void Lua_RegisterUninitializeCallback(callbackstore::UninitializeCallbackType callback) {
-    callbackstore::RegisterUninitializeCallback(callback, true);
-}
-
 namespace common::luaapi {
     string LuaJitPrepScript;
 
     static void Uninitialize(bool isProcessTerminating) {
-        Lua_SetPositionAddress(NULL);
+        SetPositionAddress(NULL);
     }
 
     void Initialize() {
         callbackstore::RegisterUninitializeCallback(Uninitialize);
         auto dllModule = HINST_THISCOMPONENT;
-        auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), L"LUASCRIPT");
+        auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT_NAME), L_(LUAJIT_PREP_SCRIPT_TYPE));
         if (scriptRes == nil)
             return;
         auto scriptSize = SizeofResource(dllModule, scriptRes);
@@ -74,5 +41,37 @@ namespace common::luaapi {
         if (scriptHandle == nil)
             return;
         LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
+    }
+
+    DWORD GetPositionAddress() {
+        return positionAddress;
+    }
+
+    void SetPositionAddress(DWORD address) {
+        positionAddress = address;
+    }
+
+    DWORD ReadUInt32(DWORD address) {
+        return *PDWORD(address);
+    }
+
+    DWORD ResolveAddress(DWORD* offsets, size_t length) {
+        return memory::ResolveAddress(span{ offsets, length });
+    }
+
+    void OpenConsole() {
+        note::OpenConsole();
+    }
+
+    PointDataType GetDataType() {
+        return g_gameConfig.PosDataType;
+    }
+
+    void RegisterUninitializeCallback(UninitializeCallbackType callback) {
+        callbackstore::RegisterUninitializeCallback(callback, true);
+    }
+
+    MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal) {
+        return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal);
     }
 }

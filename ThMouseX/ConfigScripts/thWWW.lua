@@ -1,6 +1,5 @@
 -- Script to get player's position in Wonderful Waking World 
 -- This game was made in GameMaker Studio
-InitializeForLuaJIT();
 local ffi = require("ffi")
 
 ffi.cdef [[

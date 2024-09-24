@@ -237,7 +237,7 @@ namespace common::lua {
             return NULL;
 
         if (!usePullMechanism)
-            return Lua_GetPositionAddress();
+            return luaapi::GetPositionAddress();
 
         auto stackSize = _lua_gettop(L);
 

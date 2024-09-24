@@ -99,7 +99,7 @@ namespace common::luajit {
             return NULL;
 
         if (!usePullMechanism)
-            return Lua_GetPositionAddress();
+            return luaapi::GetPositionAddress();
 
         auto oldStackSize = lua_gettop(L);
 

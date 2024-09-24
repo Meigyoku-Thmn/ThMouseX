@@ -6,19 +6,21 @@
 #include <MinHook.h>
 #include <string>
 
-DLLEXPORT_C MH_STATUS Lua_CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
-DLLEXPORT_C DWORD Lua_ReadUInt32(DWORD address);
-DLLEXPORT_C DWORD Lua_ResolveAddress(DWORD* offsets, size_t length);
-DLLEXPORT_C void Lua_OpenConsole();
-DLLEXPORT_C void Lua_SetPositionAddress(DWORD address);
-DLLEXPORT_C DWORD Lua_GetPositionAddress();
-DLLEXPORT_C PointDataType Lua_GetDataType();
-DLLEXPORT_C void Lua_RegisterUninitializeCallback(common::callbackstore::UninitializeCallbackType callback);
 
 #define GET_POSITION_ADDRESS "getPositionAddress"
 #define THMOUSEX_MODULE_HANDLE "ThMouseX_ModuleHandle"
+#define LUAJIT_PREP_SCRIPT_NAME 101
+#define LUAJIT_PREP_SCRIPT_TYPE "LUASCRIPT"
 
 namespace common::luaapi {
     extern std::string LuaJitPrepScript;
     void Initialize();
+    DWORD GetPositionAddress();
+    void SetPositionAddress(DWORD address);
+    DWORD ReadUInt32(DWORD address);
+    DWORD ResolveAddress(DWORD* offsets, size_t length);
+    void OpenConsole();
+    PointDataType GetDataType();
+    void RegisterUninitializeCallback(UninitializeCallbackType callback);
+    MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
 }

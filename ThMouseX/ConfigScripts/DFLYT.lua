@@ -1,8 +1,6 @@
 -- LuaDllName = lua.dll
 -- Script to get player's position in Chaos of Black Loong
 -- This game was made in LuaSTGPlus
-
-InitializeForLuaJIT();
 local ffi = require("ffi")
 local position = ffi.new('double[2]', {0, 0})
 

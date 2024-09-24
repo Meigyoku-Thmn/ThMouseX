@@ -2,8 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by ThMouseX.rc
 //
-#define LUAJIT_PREP_SCRIPT                  101
-
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

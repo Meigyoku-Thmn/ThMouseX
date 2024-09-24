@@ -52,8 +52,6 @@ constexpr auto PresentIdx = 15;
 using namespace std;
 using namespace Microsoft::WRL;
 
-using CallbackType = void (*)(void);
-
 namespace core::directx8 {
     HRESULT WINAPI D3DCreateDevice(IDirect3D8* pD3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice8** ppReturnedDeviceInterface);
     decltype(&D3DCreateDevice) OriCreateDevice;

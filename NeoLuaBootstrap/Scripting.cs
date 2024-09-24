@@ -97,13 +97,15 @@ static class Scripting
         }
     }
 
+    public static void Lua_OpenConsole() => LuaApi.OpenConsole?.Invoke();
+
     const string PreparationScript = @"
-            const _Traverse typeof HarmonyLib.Traverse
-            Traverse = _Traverse
-            const Scripting typpeof NeoLuaBootstrap.Scripting
-            Position = Scripting.Pos
-            OpenConsole = Scripting.Lua_OpenConsole
-        ";
+        const _Traverse typeof HarmonyLib.Traverse
+        Traverse = _Traverse
+        const Scripting typpeof NeoLuaBootstrap.Scripting
+        Position = Scripting.Pos
+        OpenConsole = Scripting.Lua_OpenConsole
+    ";
 
     static public void Initialize(string scriptPath)
     {

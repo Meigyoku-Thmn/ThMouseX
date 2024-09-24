@@ -23,7 +23,7 @@ using namespace Microsoft::WRL;
 
 namespace common::neolua {
     DWORD GetPositionAddress() {
-        return Lua_GetPositionAddress();
+        return luaapi::GetPositionAddress();
     }
 
     void Initialize() {
