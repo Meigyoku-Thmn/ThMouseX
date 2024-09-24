@@ -5,8 +5,7 @@
     "luajit",
     "minhook",
     "inipp",
-    "nameof",
-    "boost-stacktrace"
+    "nameof"
   ],
   "builtin-baseline": "98aa6396292d57e737a6ef999d4225ca488859d5",
   "vcpkg-configuration": {
@@ -38,10 +37,6 @@
     {
       "name": "nameof",
       "version": "0.10.4"
-    },
-    {
-      "name": "boost-stacktrace",
-      "version": "1.85.0#3"
     }
   ]
 }
