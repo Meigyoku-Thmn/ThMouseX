@@ -136,8 +136,5 @@
     <ClCompile Include="Helper.Memory.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="PreparationScript.cpp">
-      <Filter>Source Files\LuaScript</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

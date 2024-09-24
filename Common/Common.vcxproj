@@ -146,7 +146,6 @@
     <ClCompile Include="LuaJIT.cpp" />
     <ClCompile Include="NeoLua.cpp" />
     <ClCompile Include="CallbackStore.cpp" />
-    <ClCompile Include="PreparationScript.cpp" />
     <ClCompile Include="Variables.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
