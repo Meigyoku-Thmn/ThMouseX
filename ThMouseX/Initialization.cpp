@@ -17,6 +17,8 @@
 #include "../Common/LuaJIT.h"
 #include "../Common/Lua.h"
 #include "../Common/NeoLua.h"
+#include "../Common/ErrorMsg.h"
+#include "Shellcode.h"
 #include "KeyboardState.h"
 #include "SendKey.h"
 #include "MessageQueue.h"
@@ -44,6 +46,8 @@ namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
 namespace comclient = core::comclient;
+namespace shellcode = core::shellcode;
+namespace errormsg = common::errormsg;
 
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
@@ -67,8 +71,11 @@ namespace core {
         PathStripPathW(g_currentProcessName);
         PathRemoveExtensionW(g_currentProcessName);
 
-        if (helper::IsCurrentProcessThMouseX())
+        if (helper::IsCurrentProcessThMouseX()) {
+            errormsg::EnsureCorrectness();
+            shellcode::Initialize();
             return;
+        }
 
         if (!comclient::Initialize())
             return;

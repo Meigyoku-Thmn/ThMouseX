@@ -58,17 +58,6 @@ void Lua_RegisterUninitializeCallback(callbackstore::UninitializeCallbackType ca
 }
 
 string LuaJitPrepScript;
-ON_INIT{
-    auto dllModule = HINST_THISCOMPONENT;
-    auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), L"LUASCRIPT");
-    if (scriptRes == nil)
-        return;
-    auto scriptSize = SizeofResource(dllModule, scriptRes);
-    auto scriptHandle = LoadResource(dllModule, scriptRes);
-    if (scriptHandle == nil)
-        return;
-    LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
-};
 
 namespace common::luaapi {
     static void Uninitialize(bool isProcessTerminating) {
@@ -77,6 +66,15 @@ namespace common::luaapi {
 
     void Initialize() {
         callbackstore::RegisterUninitializeCallback(Uninitialize);
+        auto dllModule = HINST_THISCOMPONENT;
+        auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), L"LUASCRIPT");
+        if (scriptRes == nil)
+            return;
+        auto scriptSize = SizeofResource(dllModule, scriptRes);
+        auto scriptHandle = LoadResource(dllModule, scriptRes);
+        if (scriptHandle == nil)
+            return;
+        LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
     }
 
     string MakePreparationScript() {

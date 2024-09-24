@@ -2,6 +2,7 @@
 ; Each line for a game.
 ; Use quotes "" for executable file names that have spaces.
 ; Required encoding is "UTF-8 without BOM"
+; The decimal separator is a point (.)
 
 ; Scripting
 ;  Supported Lua Interpreters:
@@ -10,9 +11,9 @@
 ;   - Lua:
 ;       • Basically hook into the game's Lua runtime, see DFLYT for an example
 ;       • ThMouseX makes the following assumptions about this mode:
-;           - the scripting engine is located in a dll file in the game's directory
-;           - the scripting engine is vanilla LuaJIT
-;           - the scripting engine has the 'ffi' library
+;           - the game's Lua runtime is located in a dll file in the game's directory
+;           - the game's Lua runtime is vanilla LuaJIT
+;           - the game's Lua runtime has the 'ffi' library
 ;           - the game calls the function 'luaL_openlibs' on startup
 
 ; processName   positionRVA         dataType   offset         baseHeight   aspectRatio   inputMethod
@@ -102,14 +103,14 @@ thWWW           LuaJIT              float      (155.5,20.5)   540          16:9 
 ; Chaos of Black Loong (offsetting is done in Lua script)
 DFLYT           Lua                 double     (0,0)          480          4:3           SendInput
 
-; Len'en 1: Evanescent Existence
+; Len'en 1
 Le01            [00AE693C][0]       float      (32,16)        480          4:3           GetKeyboardState
 
-; Len'en 2: Earthen Miraculous Sword
+; Len'en 2
 Le02            [00ADD1A4][0]       float      (32,16)        480          4:3           GetKeyboardState
 
-; Len'en 3: Reactivate Majestical Imperial
+; Len'en 3
 Le03            [00B095EC][0]       float      (32,16)        480          4:3           GetKeyboardState
 
-; Len'en 4: Brilliant Pagoda or Haze Castle
+; Len'en 4
 Le04            [02BB05B4][0]       float      (121,19)       480          4:3           GetKeyboardState

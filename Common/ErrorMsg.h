@@ -5,5 +5,6 @@
 #include "DataTypes.h"
 
 namespace common::errormsg {
+	void EnsureCorrectness();
 	std::string GuessErrorsFromHResult(HRESULT hr);
 }

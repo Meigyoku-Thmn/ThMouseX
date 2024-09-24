@@ -1,8 +1,7 @@
 #include <Windows.h>
 #include <string>
 #include <algorithm>
-#include <vector>
-#include <functional>
+#include <span>
 
 #include "ErrorMsg.h"
 #include "ErrorMsg.Cor.h"
@@ -12,12 +11,17 @@
 using namespace std;
 
 namespace common::errormsg {
-    reference_wrapper<vector<ErrorMessage>> messageGroups[] = {cor::messages, d3d::messages, ddraw::messages};
+    const span<const ErrorMessage> messageGroups[] = { cor::messages, d3d::messages, ddraw::messages };
+    void EnsureCorrectness() {
+        cor::EnsureCorrectness();
+        d3d::EnsureCorrectness();
+        ddraw::EnsureCorrectness();
+    }
     string GuessErrorsFromHResult(HRESULT hr) {
         string errorMessage = "";
         for (auto const& messages : messageGroups) {
-            auto messageItr = ranges::lower_bound(messages.get(), hr, std::less<>(), &ErrorMessage::code);
-            if (messageItr == messages.get().end() || messageItr->code != hr)
+            auto messageItr = ranges::lower_bound(messages, hr, std::less<>(), &ErrorMessage::code);
+            if (messageItr == messages.end() || messageItr->code != hr)
                 continue;
             while (messageItr->code == hr) {
                 errorMessage += string(" (") + messageItr->sourceHeader + ") " + messageItr->symbolicName + ": " + messageItr->description + "\n";
