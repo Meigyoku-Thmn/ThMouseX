@@ -12,6 +12,7 @@
 #include "ComServer.h"
 
 static_assert(sizeof(void*) == 4, "Support 32-bit system only!");
+static_assert(sizeof(HRESULT) == sizeof(UINT));
 static_assert(sizeof(int) == 4);
 
 DEFINE_ENUM_FLAG_OPERATORS(InputMethod);
@@ -88,6 +89,9 @@ struct ErrorMessage {
     LPCSTR sourceHeader;
     ErrorMessage(HRESULT code, LPCSTR symbolicName, LPCSTR description, LPCSTR sourceHeader) :
         code(code), symbolicName(symbolicName), description(description), sourceHeader(sourceHeader) {
+    }
+    ErrorMessage(UINT code, LPCSTR symbolicName, LPCSTR description, LPCSTR sourceHeader) :
+        code((HRESULT)code), symbolicName(symbolicName), description(description), sourceHeader(sourceHeader) {
     }
 };
 

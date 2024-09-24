@@ -13,17 +13,12 @@
 #include "ErrorMsg.h"
 #include "Variables.h"
 
-namespace encoding = common::helper::encoding;
 namespace errormsg = common::errormsg;
 
 using namespace std;
 using namespace Microsoft::WRL;
 
 namespace common::log {
-    FILE* __logFile;
-    wstring __logPath;
-    string __processName;
-
     tm GetTimeNow() {
         tm rs;
         auto now = time(nil);
@@ -60,6 +55,7 @@ namespace common::log {
         _com_error error(hResult, errorInfo.Get(), true);
         ComErrToFile(message, error);
     }
+
     void ComErrToFile(const char* message, const _com_error& error) {
         auto description = error.Description();
         if (description.length() > 0) {
@@ -87,7 +83,7 @@ namespace common::log {
         static time_point<steady_clock> oldTime = high_resolution_clock::now();
         static int fps; fps++;
 
-        if (duration_cast<seconds>(high_resolution_clock::now() - oldTime) >= seconds{1}) {
+        if (duration_cast<seconds>(high_resolution_clock::now() - oldTime) >= seconds{ 1 }) {
             oldTime = high_resolution_clock::now();
             ToConsole("FPS: %d", fps);
             fps = 0;

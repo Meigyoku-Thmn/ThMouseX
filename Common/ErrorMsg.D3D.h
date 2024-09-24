@@ -1,8 +1,9 @@
 #pragma once
 #include <Windows.h>
-#include <vector>
+#include <span>
 #include "DataTypes.h"
 
 namespace common::errormsg::d3d {
-	extern std::vector<ErrorMessage> messages;
+    void EnsureCorrectness();
+    extern const std::span<const ErrorMessage> messages;
 }

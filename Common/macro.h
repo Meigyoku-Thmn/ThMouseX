@@ -25,16 +25,6 @@
 
 #define MAKE_UNIQUE_VAR(counter) var_discard_##counter
 
-#define ON_INIT ON_INIT_IMPL(__COUNTER__, __COUNTER__)
-#define ON_INIT_IMPL(counter1, counter2) \
-void MAKE_UNIQUE_VAR(counter1)(); \
-bool MAKE_UNIQUE_VAR(counter2)() { \
-    MAKE_UNIQUE_VAR(counter1)(); \
-    return true; \
-} \
-EVAL_DISCARD(MAKE_UNIQUE_VAR(counter2)()); \
-void MAKE_UNIQUE_VAR(counter1)()
-
 #define defer(...) defer_impl(__COUNTER__, __VA_ARGS__)
 #define defer_impl(counter, ...) std::shared_ptr<void> MAKE_UNIQUE_VAR(counter)(nullptr, [&](...) __VA_ARGS__)
 
