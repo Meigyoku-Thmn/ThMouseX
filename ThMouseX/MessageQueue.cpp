@@ -8,6 +8,7 @@
 #include "../Common/MinHook.h"
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
+#include "../Common/Helper.Memory.h"
 #include "../Common/NeoLua.h"
 #include "../Common/CallbackStore.h"
 #include "../Common/Log.h"
@@ -20,6 +21,7 @@ static CommonConfig& g_c = g_commonConfig;
 namespace minhook = common::minhook;
 namespace neolua = common::neolua;
 namespace helper = common::helper;
+namespace memory = common::helper::memory;
 namespace callbackstore = common::callbackstore;
 namespace note = common::log;
 namespace shellcode = core::shellcode;
@@ -150,6 +152,9 @@ namespace core::messagequeue {
         { &g_c.ToggleMouseControl, 0, [](bool isUp, bool wantCaptureMouse) {
             if (!isUp) return;
             g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
+            if (g_inputEnabled) {
+                memory::ResetValidationState();
+            }
         } },
     };
 

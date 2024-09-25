@@ -13,8 +13,12 @@ using namespace std;
 namespace note = common::log;
 
 namespace common::helper::memory {
-    thread_local vector<DWORD> lastOffsets;
-    thread_local bool lastIsValid = true;
+    static vector<DWORD> lastOffsets;
+    static bool lastIsValid = true;
+    void ResetValidationState() {
+        lastOffsets.resize(0);
+        lastIsValid = true;
+    }
     DWORD ResolveAddress(span<const DWORD> offsets) {
         if (offsets.size() <= 0)
             return NULL;
@@ -31,7 +35,6 @@ namespace common::helper::memory {
         for (size_t i = 1; i < offsets.size(); i++) {
             if (memInvalidated && IsBadReadMem((PVOID)address, sizeof(address))) {
                 lastIsValid = false;
-                note::ToFile("Access bad memory region, please check the game's version!");
                 return NULL;
             }
             address = *PDWORD(address);
@@ -41,7 +44,6 @@ namespace common::helper::memory {
         }
         if (memInvalidated && IsBadReadMem((PVOID)address, sizeof(address))) {
             lastIsValid = false;
-            note::ToFile("Access bad memory region, please check the game's version!");
             return NULL;
         }
         return address;
