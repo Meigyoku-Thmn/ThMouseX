@@ -33,7 +33,7 @@ local hModule = ffi.cast("HMODULE", ThMouseX_ModuleHandle)
 
 LUAFUNC(DWORD,  ReadUInt32, DWORD address);
 
-LUAFUNC(DWORD,  ResolveAddress, DWORD* offsets, size_t length);
+LUAFUNC(DWORD,  ResolveAddress, DWORD* offsets, size_t length, bool doNotValidateLastAddress);
 
 LUAFUNC(void,   OpenConsole);
 

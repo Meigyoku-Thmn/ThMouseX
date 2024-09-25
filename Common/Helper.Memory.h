@@ -6,7 +6,7 @@
 
 namespace common::helper::memory {
     void ResetValidationState();
-    DWORD ResolveAddress(std::span<const DWORD> offsets);
+    DWORD ResolveAddress(std::span<const DWORD> offsets, bool doNotValidateLastAddress);
     std::string GetAddressConfigAsString();
     bool IsBadReadMem(const void* ptr, size_t size);
 }

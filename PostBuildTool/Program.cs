@@ -1,5 +1,4 @@
-﻿#pragma warning disable S1075
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Reflection;

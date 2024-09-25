@@ -52,8 +52,8 @@ namespace common::luaapi {
         return *PDWORD(address);
     }
 
-    DWORD ResolveAddress(DWORD* offsets, size_t length) {
-        return memory::ResolveAddress(span{ offsets, length });
+    DWORD ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
+        return memory::ResolveAddress(span{ offsets, length }, doNotValidateLastAddress);
     }
 
     void OpenConsole() {
@@ -79,8 +79,8 @@ DWORD Lua_ReadUInt32(DWORD address) {
     return luaapi::ReadUInt32(address);
 }
 
-DWORD Lua_ResolveAddress(DWORD* offsets, size_t length) {
-    return luaapi::ResolveAddress(offsets, length);
+DWORD Lua_ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
+    return luaapi::ResolveAddress(offsets, length, doNotValidateLastAddress);
 }
 
 void Lua_OpenConsole() {

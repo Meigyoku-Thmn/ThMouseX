@@ -174,7 +174,7 @@ namespace common::helper {
             return lua::GetPositionAddress();
         else {
             auto& addressChain = g_gameConfig.AddressChain;
-            return memory::ResolveAddress(span{ &addressChain[addressChain.GetLowerBound()], addressChain.GetCount() });
+            return memory::ResolveAddress(span{ &addressChain[addressChain.GetLowerBound()], addressChain.GetCount() }, false);
         }
     }
 

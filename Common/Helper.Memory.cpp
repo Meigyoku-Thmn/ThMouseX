@@ -19,7 +19,7 @@ namespace common::helper::memory {
         lastOffsets.resize(0);
         lastIsValid = true;
     }
-    DWORD ResolveAddress(span<const DWORD> offsets) {
+    DWORD ResolveAddress(span<const DWORD> offsets, bool doNotValidateLastAddress) {
         if (offsets.size() <= 0)
             return NULL;
         auto memInvalidated = offsets.size() != lastOffsets.size()
@@ -42,7 +42,7 @@ namespace common::helper::memory {
                 break;
             address += offsets[i];
         }
-        if (memInvalidated && IsBadReadMem((PVOID)address, sizeof(address))) {
+        if (!doNotValidateLastAddress && memInvalidated && IsBadReadMem((PVOID)address, sizeof(address))) {
             lastIsValid = false;
             return NULL;
         }
