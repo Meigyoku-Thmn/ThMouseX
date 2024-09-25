@@ -6,11 +6,10 @@
 #include <MinHook.h>
 #include <string>
 
+#include "../ThMouseX/resource.h"
 
 #define GET_POSITION_ADDRESS "getPositionAddress"
 #define THMOUSEX_MODULE_HANDLE "ThMouseX_ModuleHandle"
-#define LUAJIT_PREP_SCRIPT_NAME 101
-#define LUAJIT_PREP_SCRIPT_TYPE "LUASCRIPT"
 
 namespace common::luaapi {
     extern std::string LuaJitPrepScript;

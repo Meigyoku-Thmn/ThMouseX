@@ -2,6 +2,7 @@
 using Neo.IronLua;
 using Sigil;
 using Sigil.NonGeneric;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -84,16 +85,27 @@ static class Scripting
     {
         try
         {
-            HarmonyInst.UnpatchAll(HarmonyId);
-            PrefixStore.Clear();
-            PostfixStore.Clear();
-            DelegateStore.Clear();
-            L?.Dispose();
-            L = null;
+            try
+            {
+                HarmonyInst.UnpatchAll(HarmonyId);
+                PrefixStore.Clear();
+                PostfixStore.Clear();
+                DelegateStore.Clear();
+                L?.Dispose();
+                L = null;
+            }
+            catch (Exception e)
+            {
+                Logging.ToFile("[NeoLua] {0}", e);
+            }
         }
         catch (Exception e)
         {
-            Logging.ToFile("[NeoLua] {0}", e);
+            Debugger.Log(0, null, e.ToString());
+        }
+        finally
+        {
+            Logging.Close();
         }
     }
 

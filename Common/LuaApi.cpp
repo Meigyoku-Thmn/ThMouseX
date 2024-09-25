@@ -6,11 +6,10 @@
 #include "Variables.h"
 #include "CallbackStore.h"
 #include <MinHook.h>
-#include "PreparationScript.h"
-
 #include <Windows.h>
 #include <string>
 #include <span>
+#include "PreparationScript.h"
 
 namespace note = common::log;
 namespace helper = common::helper;
@@ -31,7 +30,7 @@ namespace common::luaapi {
     void Initialize() {
         callbackstore::RegisterUninitializeCallback(Uninitialize);
         auto dllModule = HINST_THISCOMPONENT;
-        auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT_NAME), L_(LUAJIT_PREP_SCRIPT_TYPE));
+        auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), LS_(LUAJIT_PREP_SCRIPT_TYPE));
         if (scriptRes == nil)
             return;
         auto scriptSize = SizeofResource(dllModule, scriptRes);

@@ -137,4 +137,9 @@
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PreparationScript.lua">
+      <Filter>Header Files\LuaScript</Filter>
+    </None>
+  </ItemGroup>
 </Project>

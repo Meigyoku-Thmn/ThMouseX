@@ -6,6 +6,10 @@
 #define L_(str) L_IMPL(str)
 #define L_IMPL(str) L##str
 
+#define LS_(sym) LS_IMPL(sym)
+#define LS_IMPL(str) LS_IMPL2(#str)
+#define LS_IMPL2(str) L##str
+
 #define nil nullptr
 
 #define SYM_NAME(name) #name

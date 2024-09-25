@@ -26,4 +26,9 @@ static class Logging
         File.Write("[{0} {1:dd/MM/yyyy HH:mm:ss}] ", Process.GetCurrentProcess().ProcessName, DateTime.Now);
         File.WriteLine(format, args);
     }
+    public static void Close()
+    {
+        File.Close();
+        _file = null;
+    }
 }
