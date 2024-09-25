@@ -152,9 +152,6 @@ namespace core::messagequeue {
         { &g_c.ToggleMouseControl, 0, [](bool isUp, bool wantCaptureMouse) {
             if (!isUp) return;
             g_inputEnabled = wantCaptureMouse ? false : !g_inputEnabled;
-            if (g_inputEnabled) {
-                memory::ResetValidationState();
-            }
         } },
     };
 
