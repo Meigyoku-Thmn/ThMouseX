@@ -83,6 +83,9 @@
     <ClInclude Include="ComServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PreparationScript.h">
+      <Filter>Header Files\LuaScript</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -135,11 +138,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Common.def">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="PreparationScript.lua">
-      <Filter>Source Files\LuaScript</Filter>
+      <Filter>Header Files\LuaScript</Filter>
     </None>
   </ItemGroup>
 </Project>

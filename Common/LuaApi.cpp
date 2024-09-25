@@ -5,69 +5,32 @@
 #include "Log.h"
 #include "Variables.h"
 #include "CallbackStore.h"
-#include "MinHook.h"
 #include <MinHook.h>
-#include "../ThMouseX/resource.h"
-
 #include <Windows.h>
 #include <string>
-#include <format>
 #include <span>
+#include "PreparationScript.h"
 
 namespace note = common::log;
 namespace helper = common::helper;
 namespace memory = common::helper::memory;
 namespace encoding = common::helper::encoding;
 namespace callbackstore = common::callbackstore;
-namespace minhook = common::minhook;
 
 using namespace std;
 
-MH_STATUS Lua_CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal) {
-    return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal);
-}
-
-DWORD Lua_ReadUInt32(DWORD address) {
-    return *PDWORD(address);
-}
-
-DWORD Lua_ResolveAddress(DWORD* offsets, size_t length) {
-    return memory::ResolveAddress(span{ offsets, length });
-}
-
-void Lua_OpenConsole() {
-    note::OpenConsole();
-}
-
 static DWORD positionAddress;
-
-void Lua_SetPositionAddress(DWORD address) {
-    positionAddress = address;
-}
-
-DWORD Lua_GetPositionAddress() {
-    return positionAddress;
-}
-
-PointDataType Lua_GetDataType() {
-    return g_gameConfig.PosDataType;
-}
-
-void Lua_RegisterUninitializeCallback(callbackstore::UninitializeCallbackType callback) {
-    callbackstore::RegisterUninitializeCallback(callback, true);
-}
-
-string LuaJitPrepScript;
-
 namespace common::luaapi {
+    string LuaJitPrepScript;
+
     static void Uninitialize(bool isProcessTerminating) {
-        Lua_SetPositionAddress(NULL);
+        SetPositionAddress(NULL);
     }
 
     void Initialize() {
         callbackstore::RegisterUninitializeCallback(Uninitialize);
         auto dllModule = HINST_THISCOMPONENT;
-        auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), L"LUASCRIPT");
+        auto scriptRes = FindResourceW(dllModule, MAKEINTRESOURCEW(LUAJIT_PREP_SCRIPT), LS_(LUAJIT_PREP_SCRIPT_TYPE));
         if (scriptRes == nil)
             return;
         auto scriptSize = SizeofResource(dllModule, scriptRes);
@@ -77,10 +40,85 @@ namespace common::luaapi {
         LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
     }
 
-    string MakePreparationScript() {
-        auto thisDllPath = encoding::ConvertToUtf8(wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME));
-        helper::Replace(thisDllPath, "\\", R"(\\)");
-        auto moduleHandle = uintptr_t(g_coreModule);
-        return vformat(LuaJitPrepScript, make_format_args(thisDllPath, moduleHandle));
+    DWORD GetPositionAddress() {
+        return positionAddress;
     }
+
+    void SetPositionAddress(DWORD address) {
+        positionAddress = address;
+    }
+
+    DWORD ReadUInt32(DWORD address) {
+        return *PDWORD(address);
+    }
+
+    DWORD ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
+        return memory::ResolveAddress(span{ offsets, length }, doNotValidateLastAddress);
+    }
+
+    void OpenConsole() {
+        note::OpenConsole();
+    }
+
+    PointDataType GetDataType() {
+        return g_gameConfig.PosDataType;
+    }
+
+    void RegisterUninitializeCallback(UninitializeCallbackType callback) {
+        callbackstore::RegisterUninitializeCallback(callback, true);
+    }
+
+    MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal) {
+        return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal);
+    }
+}
+
+namespace luaapi = common::luaapi;
+
+DWORD Lua_ReadUInt32(DWORD address) {
+    return luaapi::ReadUInt32(address);
+}
+
+DWORD Lua_ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
+    return luaapi::ResolveAddress(offsets, length, doNotValidateLastAddress);
+}
+
+void Lua_OpenConsole() {
+    luaapi::OpenConsole();
+}
+
+void Lua_SetPositionAddress(DWORD address) {
+    luaapi::SetPositionAddress(address);
+}
+
+int Lua_GetDataType() {
+    return luaapi::GetDataType();
+}
+
+void Lua_RegisterUninitializeCallback(UninitializeCallbackType callback) {
+    luaapi::RegisterUninitializeCallback(callback);
+}
+
+int Lua_CreateHook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal) {
+    return MH_CreateHook(pTarget, pDetour, ppOriginal);
+}
+
+int Lua_CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal) {
+    return luaapi::CreateHookApi(pszModule, pszProcName, pDetour, ppOriginal);
+}
+
+int Lua_EnableHook(LPVOID pTarget) {
+    return MH_EnableHook(pTarget);
+}
+
+int Lua_RemoveHook(LPVOID pTarget) {
+    return MH_RemoveHook(pTarget);
+}
+
+int Lua_DisableHook(LPVOID pTarget) {
+    return MH_DisableHook(pTarget);
+}
+
+LPCSTR Lua_StatusToString(int status) {
+    return MH_StatusToString((MH_STATUS)status);
 }

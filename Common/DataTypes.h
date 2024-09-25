@@ -21,8 +21,10 @@ struct GameConfigLocal : GameConfig {
     CComSafeArray<DWORD> AddressChain;
     CComHeapPtr<WCHAR> ProcessName;
     void Initialize() {
-        this->AddressChain.Attach(this->Address);
-        this->ProcessName.Attach(this->processName);
+        if (this->Address)
+            this->AddressChain.Attach(this->Address);
+        if (this->processName)
+            this->ProcessName.Attach(this->processName);
     }
 };
 
@@ -51,8 +53,10 @@ struct CommonConfigLocal : CommonConfig {
     CComHeapPtr<WCHAR> _TextureFilePath;
     CComHeapPtr<WCHAR> _ImGuiFontPath;
     void Initialize() {
-        this->_TextureFilePath.Attach(this->TextureFilePath);
-        this->_ImGuiFontPath.Attach(this->ImGuiFontPath);
+        if (this->TextureFilePath)
+            this->_TextureFilePath.Attach(this->TextureFilePath);
+        if (this->ImGuiFontPath)
+            this->_ImGuiFontPath.Attach(this->ImGuiFontPath);
     }
 };
 
@@ -280,3 +284,6 @@ struct ShellcodeInput {
 };
 
 using ThreadFunc = LPTHREAD_START_ROUTINE;
+
+typedef void(__cdecl *UninitializeCallbackType)(bool isProcessTerminating);
+typedef void(__cdecl *CallbackType)();

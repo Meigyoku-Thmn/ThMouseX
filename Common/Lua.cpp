@@ -24,8 +24,6 @@ using namespace std;
 static bool scriptingDisabled = false;
 static bool usePullMechanism = false;
 
-#define GET_POSITION_ADDRESS "getPositionAddress"
-
 static lua_State* L;
 
 template <CompileTimeString funcName, typename FuncType>
@@ -63,6 +61,8 @@ namespace common::lua {
     decltype(&lua_pushvalue) _lua_pushvalue;
     decltype(&lua_type) _lua_type;
     decltype(&lua_getfield) _lua_getfield;
+    decltype(&lua_setfield) _lua_setfield;
+    decltype(&lua_pushinteger) _lua_pushinteger;
 
     static bool Validate(lua_State* L, int r) {
         if (r != 0) {
@@ -149,6 +149,8 @@ namespace common::lua {
         if (!TryImportFunc<SYM_NAME(lua_pushvalue)>(_lua_pushvalue, lua, luaDllName)) return;
         if (!TryImportFunc<SYM_NAME(lua_type)>(_lua_type, lua, luaDllName)) return;
         if (!TryImportFunc<SYM_NAME(lua_getfield)>(_lua_getfield, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_setfield)>(_lua_setfield, lua, luaDllName)) return;
+        if (!TryImportFunc<SYM_NAME(lua_pushinteger)>(_lua_pushinteger, lua, luaDllName)) return;
 
         minhook::CreateHook(vector<minhook::HookConfig>{
             { _luaL_callmeta, & luaL_callmeta_hook, &ori_luaL_callmeta },
@@ -193,8 +195,10 @@ namespace common::lua {
 
         auto oldStackSize = _lua_gettop(L);
 
+        _lua_pushinteger(L, uintptr_t(g_coreModule));
+        _lua_setfield(L, LUA_GLOBALSINDEX, THMOUSEX_MODULE_HANDLE);
         auto rs = 0;
-        if ((rs = _luaL_loadstring(L, luaapi::MakePreparationScript().c_str())) == 0)
+        if ((rs = _luaL_loadstring(L, luaapi::LuaJitPrepScript.c_str())) == 0)
             rs = ori_lua_pcall(L, 0, LUA_MULTRET, 0);
         if (!Validate(L, rs)) {
             _lua_settop(L, oldStackSize);
@@ -233,7 +237,7 @@ namespace common::lua {
             return NULL;
 
         if (!usePullMechanism)
-            return Lua_GetPositionAddress();
+            return luaapi::GetPositionAddress();
 
         auto stackSize = _lua_gettop(L);
 

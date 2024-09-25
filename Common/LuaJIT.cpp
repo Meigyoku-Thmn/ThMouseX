@@ -26,8 +26,6 @@ using namespace std;
 static bool scriptingDisabled = false;
 static bool usePullMechanism = false;
 
-#define GET_POSITION_ADDRESS "getPositionAddress"
-
 static lua_State* L;
 
 static bool CheckAndDisableIfError(lua_State* _L, int r) {
@@ -73,7 +71,9 @@ namespace common::luajit {
 
         auto oldStackSize = lua_gettop(L);
 
-        if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::MakePreparationScript().c_str()))) {
+        lua_pushinteger(L, uintptr_t(g_coreModule));
+        lua_setglobal(L, THMOUSEX_MODULE_HANDLE);
+        if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::LuaJitPrepScript.c_str()))) {
             note::ToFile("[LuaJIT] The above error occurred in Preparation Script.");
             lua_settop(L, oldStackSize);
             return;
@@ -99,7 +99,7 @@ namespace common::luajit {
             return NULL;
 
         if (!usePullMechanism)
-            return Lua_GetPositionAddress();
+            return luaapi::GetPositionAddress();
 
         auto oldStackSize = lua_gettop(L);
 

@@ -1,6 +1,5 @@
 -- Script to search player's position in Danmaka: Red Forbidden Fruit
 -- This game was made in GameMaker Studio
-InitializeForLuaJIT()
 local ffi = require("ffi")
 
 local PLAYER_ELDY = 278
@@ -11,7 +10,7 @@ local objectIds = {PLAYER_ELDY, PLAYER_DIANA, PLAYER_ANGEL, HITMARK}
 objectIds[0] = #objectIds
 
 local baseOffset = 0x023D561C
-local objectPoolCountAddress = ResolveAddress(ffi.new('uint32_t[1]', {baseOffset + 2 * 4}), 1)
+local objectPoolCountAddress = ResolveAddress(ffi.new('uint32_t[1]', {baseOffset + 2 * 4}), 1, false)
 
 local positionOffset = 0xB4
 local objectIdOffset = 0x7C
@@ -26,13 +25,13 @@ local function testAndGetAddress(objectIdx)
         posAddressChain[1] = objectIdx * 4
         objectIdAddressChain[1] = objectIdx * 4
     end
-    local objectId = ResolveAddress(objectIdAddressChain, 4)
+    local objectId = ResolveAddress(objectIdAddressChain, 4, true)
     if (objectId == 0) then
         return 0
     end
     for i = 1, objectIds[0] do
         if (objectId == objectIds[i]) then
-            return ResolveAddress(posAddressChain, 3)
+            return ResolveAddress(posAddressChain, 3, false)
         end
     end
     return 0

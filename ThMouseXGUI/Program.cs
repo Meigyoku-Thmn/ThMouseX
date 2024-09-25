@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using ThMouseXServer;
 
@@ -33,34 +34,41 @@ static class Program
         if (!MarkThMouseXProcess())
             return 1;
 
-        using var mutex = new Mutex(true, AppName, out var mutexIsCreated);
-        if (!mutexIsCreated)
+        var restartFlag = false;
+        using (var mutex = new Mutex(true, AppName, out var mutexIsCreated))
         {
-            MessageBox.Show($"{AppName} is already running.", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            return 1;
+            if (!mutexIsCreated)
+            {
+                MessageBox.Show($"{AppName} is already running.", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return 1;
+            }
+
+            if (!ReadGamesFile() || !ReadGeneralConfigFile())
+                return 1;
+
+            try
+            {
+                CoRegisterClassObject<ComServer>();
+                CoResumeClassObjects();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, AppName + ": Failed to initialize Component Object Models", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return 1;
+            }
+
+            if (!InstallHooks())
+                return 1;
+
+            var applicationContext = new ThMouseApplicationContext();
+            Application.Run(applicationContext);
+            restartFlag = applicationContext.RestartFlag;
+            RemoveHooks();
         }
-
-        if (!ReadGamesFile() || !ReadGeneralConfigFile())
-            return 1;
-
-        try
+        if (restartFlag)
         {
-            CoRegisterClassObject<ComServer>();
-            CoResumeClassObjects();
+            Process.Start(Application.ExecutablePath);
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, AppName + ": Failed to initialize Component Object Models", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return 1;
-        }
-
-        if (!InstallHooks())
-            return 1;
-
-        Application.Run(new ThMouseApplicationContext());
-
-        RemoveHooks();
-
         return 0;
     }
 }

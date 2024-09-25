@@ -1,6 +1,5 @@
 -- Script to get player's position in Wonderful Waking World 
 -- This game was made in GameMaker Studio
-InitializeForLuaJIT();
 local ffi = require("ffi")
 
 ffi.cdef [[
@@ -8,7 +7,7 @@ ffi.cdef [[
 ]]
 
 local Obj_Player_Id = 232
-local getObjectFromId = ffi.cast("getObjectFromId", ResolveAddress(ffi.new('uint32_t[1]', {0x34A30}), 1))
+local getObjectFromId = ffi.cast("getObjectFromId", ResolveAddress(ffi.new('uint32_t[1]', {0x34A30}), 1, false))
 
 -- native code will call into this function for each frame
 function getPositionAddress()

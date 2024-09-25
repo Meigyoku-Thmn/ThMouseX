@@ -6,6 +6,10 @@
 #define L_(str) L_IMPL(str)
 #define L_IMPL(str) L##str
 
+#define LS_(sym) LS_IMPL(sym)
+#define LS_IMPL(str) LS_IMPL2(#str)
+#define LS_IMPL2(str) L##str
+
 #define nil nullptr
 
 #define SYM_NAME(name) #name
@@ -18,10 +22,6 @@
 #define UNUSED [[maybe_unused]]
 
 #define DLLEXPORT_C extern "C" __declspec(dllexport)
-
-#define EVAL_DISCARD(expr) EVAL_DISCARD_IMPL(__COUNTER__, expr)
-#define EVAL_DISCARD_IMPL(counter, expr) EVAL_DISCARD_IMPL_EXPAND(counter, expr)
-#define EVAL_DISCARD_IMPL_EXPAND(counter, expr) auto var_discard_##counter = expr
 
 #define MAKE_UNIQUE_VAR(counter) var_discard_##counter
 

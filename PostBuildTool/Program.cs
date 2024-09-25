@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.IO.Compression;
+using System.Net.Http;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
@@ -23,6 +26,9 @@ static class Program
                     break;
                 case nameof(GenerateComServerManifest):
                     GenerateComServerManifest(directiveArgs);
+                    break;
+                case nameof(FormatLuaScript):
+                    FormatLuaScript(directiveArgs);
                     break;
                 default:
                     throw new InvalidOperationException($"Unknown directive '{directive}'.");
@@ -101,5 +107,35 @@ static class Program
         fixed (void* pData = data)
             UpdateResource(handle, resourceType, resourceId, 0, pData, (uint)data.Length).ThrowIfError();
         EndUpdateResource(handle, false).ThrowIfError();
+    }
+
+    const string StyluaUrl = "https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-windows-x86_64.zip";
+    static void FormatLuaScript(string[] args)
+    {
+        if (!Environment.Is64BitOperatingSystem)
+        {
+            Console.WriteLine("This cmdline relies on StyLua which doesn't have a 32-bit executable file, skip Lua script formatting.");
+            return;
+        }
+        var targetPath = args.ElementAtOrDefault(0);
+        var styluaDirPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        var styluaPath = Path.Combine(styluaDirPath, "stylua.exe");
+        if (!File.Exists(styluaPath))
+        {
+            Console.WriteLine($"stylua.exe is not available, download from {StyluaUrl}");
+            var tmpPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            using var tmpStream = new FileStream(tmpPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Delete);
+            File.Delete(tmpPath);
+            using var httpClient = new HttpClient();
+            using var internetStream = httpClient.GetStreamAsync(StyluaUrl).Result;
+            internetStream.CopyTo(tmpStream);
+            tmpStream.Seek(0, SeekOrigin.Begin);
+            using var tmpZipStream = new ZipArchive(tmpStream);
+            tmpZipStream.ExtractToDirectory(styluaDirPath);
+        }
+        Console.WriteLine($"Format lua script: {targetPath}");
+        Process.Start(new ProcessStartInfo(styluaPath, $"--column-width 999 --indent-type Spaces \"{targetPath}\"") {
+            UseShellExecute = false,
+        }).WaitForExit();
     }
 }

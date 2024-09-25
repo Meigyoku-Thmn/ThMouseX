@@ -54,7 +54,6 @@ static constexpr XMVECTORF32 ToneColor(UCHAR i) {
 constexpr auto ResizeBuffersIdx = 13;
 constexpr auto PresentIdx = 8;
 
-using CallbackType = void (*)(void);
 using ID3D11DevicePtr = ID3D11Device*;
 using ID3D11DeviceContextPtr = ID3D11DeviceContext*;
 using ID3D11RenderTargetViewPtr = ID3D11RenderTargetView*;
