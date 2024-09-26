@@ -79,10 +79,12 @@
       </ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(DevEnvDir)..\Tools\vsdevcmd.bat" -no_logo
-set ClientManifestPath="$(SolutionDir)ThMouseXServer\client.manifest"
-set ComClientPath="$(OutDir)ThMouseX.dll;#2"
-mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Command>
+      <Command>set DevEnvDir=$(DevEnvDir)
+set SolutionDir=$(SolutionDir)
+set Configuration=$(Configuration)
+set ProjectDir=$(ProjectDir)
+set OutDir=$(OutDir)
+PostBuildScript.bat</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -118,10 +120,12 @@ mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Comma
       </ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(DevEnvDir)..\Tools\vsdevcmd.bat" -no_logo
-set ClientManifestPath="$(SolutionDir)ThMouseXServer\client.manifest"
-set ComClientPath="$(OutDir)ThMouseX.dll;#2"
-mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Command>
+      <Command>set DevEnvDir=$(DevEnvDir)
+set SolutionDir=$(SolutionDir)
+set Configuration=$(Configuration)
+set ProjectDir=$(ProjectDir)
+set OutDir=$(OutDir)
+PostBuildScript.bat</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -235,6 +239,9 @@ mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Comma
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ThMouseX.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostBuildScript.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
