@@ -141,5 +141,6 @@
     <None Include="PreparationScript.lua">
       <Filter>Header Files\LuaScript</Filter>
     </None>
+    <None Include="PostBuildScript.bat" />
   </ItemGroup>
 </Project>

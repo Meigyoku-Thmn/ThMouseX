@@ -81,13 +81,12 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>call "$(DevEnvDir)..\Tools\vsdevcmd.bat" -no_logo
-set PostBuildTool="$(SolutionDir)PostBuildTool\bin\x86\$(Configuration)\net48\PostBuildTool"
-cl PreparationScript.h /P /EP /u /nologo
-    if %errorlevel% neq 0 exit /b %errorlevel%
-copy PreparationScript.i PreparationScript.lua /Y
-    if %errorlevel% neq 0 exit /b %errorlevel%
-%PostBuildTool% FormatLuaScript PreparationScript.lua</Command>
+      <Command>set DevEnvDir=$(DevEnvDir)
+set SolutionDir=$(SolutionDir)
+set Configuration=$(Configuration)
+set ProjectDir=$(ProjectDir)
+set OutDir=$(OutDir)
+PostBuildScript.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,13 +117,12 @@ copy PreparationScript.i PreparationScript.lua /Y
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>call "$(DevEnvDir)..\Tools\vsdevcmd.bat" -no_logo
-set PostBuildTool="$(SolutionDir)PostBuildTool\bin\x86\$(Configuration)\net48\PostBuildTool"
-cl PreparationScript.h /P /EP /u /nologo
-    if %errorlevel% neq 0 exit /b %errorlevel%
-copy PreparationScript.i PreparationScript.lua /Y
-    if %errorlevel% neq 0 exit /b %errorlevel%
-%PostBuildTool% FormatLuaScript PreparationScript.lua</Command>
+      <Command>set DevEnvDir=$(DevEnvDir)
+set SolutionDir=$(SolutionDir)
+set Configuration=$(Configuration)
+set ProjectDir=$(ProjectDir)
+set OutDir=$(OutDir)
+PostBuildScript.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,6 +165,7 @@ copy PreparationScript.i PreparationScript.lua /Y
     <ClCompile Include="Variables.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="PostBuildScript.bat" />
     <None Include="PreparationScript.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
