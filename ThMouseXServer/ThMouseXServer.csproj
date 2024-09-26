@@ -22,21 +22,11 @@
         </PackageReference>
         <PackageReference Include="System.Memory" Version="4.5.5" />
     </ItemGroup>
+    
+    <Import Project="$(SolutionDir)PostBuild.targets" />
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <PropertyGroup>
-            <PostBuildScript>
-                <![CDATA[
-                    set DevEnvDir=$(DevEnvDir)
-                    set SolutionDir=$(SolutionDir)
-                    set Configuration=$(Configuration)
-                    set ProjectDir=$(ProjectDir)
-                    set OutDir=$(OutDir)
-                    PostBuildScript.bat
-                ]]>
-            </PostBuildScript>
-        </PropertyGroup>
-        <Exec Command="$(PostBuildScript)" />
+        <Exec Command="PostBuildScript.bat" />
     </Target>
 
 </Project>

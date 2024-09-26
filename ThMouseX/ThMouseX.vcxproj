@@ -57,7 +57,8 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
-  </PropertyGroup>
+  </PropertyGroup>  
+  <Import Project="$(SolutionDir)PostBuild.targets" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -79,12 +80,7 @@
       </ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>set DevEnvDir=$(DevEnvDir)
-set SolutionDir=$(SolutionDir)
-set Configuration=$(Configuration)
-set ProjectDir=$(ProjectDir)
-set OutDir=$(OutDir)
-PostBuildScript.bat</Command>
+      <Command>PostBuildScript.bat</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -120,12 +116,7 @@ PostBuildScript.bat</Command>
       </ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>set DevEnvDir=$(DevEnvDir)
-set SolutionDir=$(SolutionDir)
-set Configuration=$(Configuration)
-set ProjectDir=$(ProjectDir)
-set OutDir=$(OutDir)
-PostBuildScript.bat</Command>
+      <Command>PostBuildScript.bat</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>

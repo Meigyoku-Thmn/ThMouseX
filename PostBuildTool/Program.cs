@@ -117,7 +117,8 @@ static class Program
             Console.WriteLine("This cmdline relies on StyLua which doesn't have a 32-bit executable file, skip Lua script formatting.");
             return;
         }
-        var targetPath = args.ElementAtOrDefault(0);
+        var inputPath = args.ElementAtOrDefault(0);
+        var outputPath = args.ElementAtOrDefault(1);
         var styluaDirPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         var styluaPath = Path.Combine(styluaDirPath, "stylua.exe");
         if (!File.Exists(styluaPath))
@@ -133,9 +134,20 @@ static class Program
             using var tmpZipStream = new ZipArchive(tmpStream);
             tmpZipStream.ExtractToDirectory(styluaDirPath);
         }
-        Console.WriteLine($"Format lua script: {targetPath}");
-        Process.Start(new ProcessStartInfo(styluaPath, $"--column-width 999 --indent-type Spaces \"{targetPath}\"") {
+        Console.WriteLine($"Format lua script: {outputPath}");
+        Process.Start(new ProcessStartInfo(styluaPath, $"--column-width 999 --indent-type Spaces \"{inputPath}\"") {
             UseShellExecute = false,
         }).WaitForExit();
+        if (File.Exists(outputPath))
+        {
+            var newContent = File.ReadAllText(inputPath);
+            var oldContent = File.ReadAllText(outputPath);
+            if (newContent == oldContent)
+            {
+                Console.WriteLine($"{outputPath} has no change, keep modified date.");
+                return;
+            }
+        }
+        File.Copy(inputPath, outputPath, true);
     }
 }
