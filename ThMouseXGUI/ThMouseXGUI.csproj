@@ -1,32 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net48</TargetFramework>
-		<UseWindowsForms>true</UseWindowsForms>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<LangVersion>12</LangVersion>
-		<ApplicationIcon>ThMouseX.ico</ApplicationIcon>
-		<Prefer32Bit>true</Prefer32Bit>
-		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<Version>3.0.0</Version>
-		<Platforms>x86</Platforms>
-	</PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net48</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>12</LangVersion>
+        <ApplicationIcon>ThMouseX.ico</ApplicationIcon>
+        <Prefer32Bit>true</Prefer32Bit>
+        <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+        <Version>3.0.0</Version>
+        <Platforms>x86</Platforms>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<None Remove=".gitignore" />
-	</ItemGroup>
+    <ItemGroup>
+        <None Remove=".gitignore" />
+        <Content Include="ThMouseX.ico" />
+        <ProjectReference Include="..\ThMouseXServer\ThMouseXServer.csproj" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<Content Include="ThMouseX.ico" />
-	</ItemGroup>
+    <Import Project="$(SolutionDir)PostBuild.targets" />
 
-	<ItemGroup>
-	  <ProjectReference Include="..\ThMouseXServer\ThMouseXServer.csproj" />
-	</ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="call &quot;$(DevEnvDir)..\Tools\vsdevcmd.bat&quot; -no_logo&#xD;&#xA;xcopy &quot;$(SolutionDir)$(Configuration)\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /y /s /d&#xD;&#xA;   if %25errorlevel%25 neq 0 exit /b %25errorlevel%25&#xD;&#xA;xcopy &quot;$(SolutionDir)NeoLuaBootstrap\bin\x86\$(Configuration)\net48\*&quot; &quot;$(ProjectDir)$(OutDir)&quot; /y /s /d&#xD;&#xA;   if %25errorlevel%25 neq 0 exit /b %25errorlevel%25&#xD;&#xA;set ServerManifestPath=&quot;$(SolutionDir)ThMouseXServer\server.manifest&quot;&#xD;&#xA;set ComServerPath=&quot;$(ProjectDir)$(OutDir)ThMouseXGUI.exe;#1&quot;&#xD;&#xA;mt -nologo -manifest %25ServerManifestPath%25 -outputresource:%25ComServerPath%25" />
-	</Target>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="PostBuildScript.bat" />
+    </Target>
 
 </Project>

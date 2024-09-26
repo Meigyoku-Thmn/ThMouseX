@@ -1,0 +1,28 @@
+<Project>
+    <UsingTask
+        TaskName="SetEnvironmentVariable"
+        TaskFactory="RoslynCodeTaskFactory"
+        AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+        <ParameterGroup>
+            <Name ParameterType="System.String" Required="true" />
+            <Value ParameterType="System.String" Required="true" />
+        </ParameterGroup>
+        <Task>
+            <Using Namespace="System" />
+            <Code Type="Fragment" Language="cs">
+                <![CDATA[
+                    Environment.SetEnvironmentVariable(Name, Value);
+                ]]>
+            </Code>
+        </Task>
+    </UsingTask>
+
+    <Target Name="PostBuildPreparation" BeforeTargets="PostBuildEvent">
+        <SetEnvironmentVariable Name="DevEnvDir" Value="$(DevEnvDir)" />
+        <SetEnvironmentVariable Name="SolutionDir" Value="$(SolutionDir)" />
+        <SetEnvironmentVariable Name="Configuration" Value="$(Configuration)" />
+        <SetEnvironmentVariable Name="ProjectDir" Value="$(ProjectDir)" />
+        <SetEnvironmentVariable Name="OutDir" Value="$(OutDir)" />
+    </Target>
+
+</Project>

@@ -57,7 +57,8 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
-  </PropertyGroup>
+  </PropertyGroup>  
+  <Import Project="$(SolutionDir)PostBuild.targets" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -79,10 +80,7 @@
       </ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(DevEnvDir)..\Tools\vsdevcmd.bat" -no_logo
-set ClientManifestPath="$(SolutionDir)ThMouseXServer\client.manifest"
-set ComClientPath="$(OutDir)ThMouseX.dll;#2"
-mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Command>
+      <Command>PostBuildScript.bat</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -118,10 +116,7 @@ mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Comma
       </ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(DevEnvDir)..\Tools\vsdevcmd.bat" -no_logo
-set ClientManifestPath="$(SolutionDir)ThMouseXServer\client.manifest"
-set ComClientPath="$(OutDir)ThMouseX.dll;#2"
-mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Command>
+      <Command>PostBuildScript.bat</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -235,6 +230,9 @@ mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%</Comma
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ThMouseX.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PostBuildScript.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
