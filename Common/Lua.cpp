@@ -153,35 +153,43 @@ namespace common::lua {
         if (!TryImportFunc<SYM_NAME(lua_pushinteger)>(_lua_pushinteger, lua, luaDllName)) return;
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { _luaL_callmeta, & luaL_callmeta_hook, &ori_luaL_callmeta },
-            { _lua_call, &lua_call_hook, &ori_lua_call },
-            { _lua_cpcall, &lua_cpcall_hook, &ori_lua_cpcall },
-            { _lua_pcall, &lua_pcall_hook, &ori_lua_pcall },
+            { _luaL_callmeta, &luaL_callmeta_hook, &ori_luaL_callmeta, APP_NAME "_callmeta" },
+            { _lua_call, &lua_call_hook, &ori_lua_call, APP_NAME "_call" },
+            { _lua_cpcall, &lua_cpcall_hook, &ori_lua_cpcall, APP_NAME "_cpcall" },
+            { _lua_pcall, &lua_pcall_hook, &ori_lua_pcall, APP_NAME "_pcall" },
         });
     }
 
     int luaL_callmeta_hook(lua_State* L, int obj, const char* e) {
         auto rs = ori_luaL_callmeta(L, obj, e);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _luaL_callmeta, nil, &ori_luaL_callmeta } });
+        minhook::DisableHooks(vector<minhook::HookConfig> {
+            { _luaL_callmeta, nil, &ori_luaL_callmeta, APP_NAME "_callmeta" }
+        });
         return rs;
     }
     void lua_call_hook(lua_State* L, int nargs, int nresults) {
         ori_lua_call(L, nargs, nresults);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_call, nil, &ori_lua_call } });
+        minhook::DisableHooks(vector<minhook::HookConfig> {
+            { _lua_call, nil, &ori_lua_call, APP_NAME "_call" }
+        });
         return;
     }
     int lua_cpcall_hook(lua_State* L, lua_CFunction func, void* ud) {
         auto rs = ori_lua_cpcall(L, func, ud);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_cpcall, nil, &ori_lua_cpcall } });
+        minhook::DisableHooks(vector<minhook::HookConfig> {
+            { _lua_cpcall, nil, &ori_lua_cpcall, APP_NAME "_cpcall" }
+        });
         return rs;
     }
     int lua_pcall_hook(lua_State* L, int nargs, int nresults, int errfunc) {
         auto rs = ori_lua_pcall(L, nargs, nresults, errfunc);
         AttachScript(L);
-        minhook::RemoveHooks(vector<minhook::HookConfig> { { _lua_pcall, nil, &ori_lua_pcall } });
+        minhook::DisableHooks(vector<minhook::HookConfig> {
+            { _lua_pcall, nil, &ori_lua_pcall, APP_NAME "_pcall" }
+        });
         return rs;
     }
 

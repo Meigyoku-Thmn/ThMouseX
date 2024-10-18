@@ -49,6 +49,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThMouseXServer", "ThMouseXS
 		{CE569C03-02E0-48C0-9DE0-FF347D479E2F} = {CE569C03-02E0-48C0-9DE0-FF347D479E2F}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "minhook", "minhook", "{586DA747-0EB4-4011-B4D4-08746257FF20}"
+	ProjectSection(SolutionItems) = preProject
+		vcpkg_custom_ports\minhook\portfile.cmake = vcpkg_custom_ports\minhook\portfile.cmake
+		vcpkg_custom_ports\minhook\vcpkg.json = vcpkg_custom_ports\minhook\vcpkg.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -90,6 +96,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0BC970E8-88F7-409A-A19C-864968D63227} = {B337E9DD-BB1B-4851-B933-05C75CB5D9AC}
 		{044C7786-B635-46BD-874B-EF75F6B0DE2B} = {0BC970E8-88F7-409A-A19C-864968D63227}
+		{586DA747-0EB4-4011-B4D4-08746257FF20} = {0BC970E8-88F7-409A-A19C-864968D63227}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B04EB577-D4A9-409A-8E97-AC2E350FEE6B}

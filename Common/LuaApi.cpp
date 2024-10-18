@@ -68,8 +68,8 @@ namespace common::luaapi {
         callbackstore::RegisterUninitializeCallback(callback, true);
     }
 
-    MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal) {
-        return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal);
+    MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal, LPCSTR discriminator) {
+        return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal, discriminator);
     }
 }
 
@@ -99,24 +99,20 @@ void Lua_RegisterUninitializeCallback(UninitializeCallbackType callback) {
     luaapi::RegisterUninitializeCallback(callback);
 }
 
-int Lua_CreateHook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal) {
-    return MH_CreateHook(pTarget, pDetour, ppOriginal);
+int Lua_CreateHook(LPVOID pTarget, LPVOID pDetour, LPVOID* ppOriginal, LPCSTR discriminator) {
+    return MH_CreateHook(pTarget, pDetour, ppOriginal, discriminator);
 }
 
-int Lua_CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal) {
-    return luaapi::CreateHookApi(pszModule, pszProcName, pDetour, ppOriginal);
+int Lua_CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal, LPCSTR discriminator) {
+    return luaapi::CreateHookApi(pszModule, pszProcName, pDetour, ppOriginal, discriminator);
 }
 
-int Lua_EnableHook(LPVOID pTarget) {
-    return MH_EnableHook(pTarget);
+int Lua_EnableHook(LPVOID pTarget, LPCSTR discriminator) {
+    return MH_EnableHook(pTarget, discriminator);
 }
 
-int Lua_RemoveHook(LPVOID pTarget) {
-    return MH_RemoveHook(pTarget);
-}
-
-int Lua_DisableHook(LPVOID pTarget) {
-    return MH_DisableHook(pTarget);
+int Lua_DisableHook(LPVOID pTarget, LPCSTR discriminator) {
+    return MH_DisableHook(pTarget, discriminator);
 }
 
 LPCSTR Lua_StatusToString(int status) {

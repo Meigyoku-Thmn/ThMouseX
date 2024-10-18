@@ -43,15 +43,13 @@ LUAFUNC(int,    GetDataType);
 
 LUAFUNC(void,   RegisterUninitializeCallback, UninitializeCallbackType callback);
 
-LUAFUNC(int,    CreateHook, LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal);
+LUAFUNC(int,    CreateHook, LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal, LPCSTR discriminator);
 
-LUAFUNC(int,    CreateHookApi, LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
+LUAFUNC(int,    CreateHookApi, LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal, LPCSTR discriminator);
 
-LUAFUNC(int,    EnableHook, LPVOID pTarget);
+LUAFUNC(int,    EnableHook, LPVOID pTarget, LPCSTR discriminator);
 
-LUAFUNC(int,    RemoveHook, LPVOID pTarget);
-
-LUAFUNC(int,    DisableHook, LPVOID pTarget);
+LUAFUNC(int,    DisableHook, LPVOID pTarget, LPCSTR discriminator);
 
 LUAFUNC(LPCSTR, StatusToString, int status);
 

@@ -8,6 +8,7 @@ namespace common::minhook {
         LPVOID  pTarget;
         LPVOID  pDetour;
         LPVOID  ppOriginal;
+        PCCH    discriminator;
     };
 
     struct HookApiConfig {
@@ -15,6 +16,7 @@ namespace common::minhook {
         LPCSTR  procName;
         LPVOID  pDetour;
         LPVOID  ppOriginal;
+        PCCH    discriminator;
     };
 
     bool Initialize();
@@ -22,7 +24,8 @@ namespace common::minhook {
     bool CreateApiHook(const std::vector<HookApiConfig>& hookConfigs);
     bool EnableHooks(const std::vector<HookApiConfig>& hookConfigs);
     bool EnableHooks(const std::vector<HookConfig>& hookConfigs);
-    bool RemoveHooks(const std::vector<HookApiConfig>& hookConfigs);
-    bool RemoveHooks(const std::vector<HookConfig>& hookConfigs);
     bool EnableAll();
+    bool DisableHooks(const std::vector<HookApiConfig>& hookConfigs);
+    bool DisableHooks(const std::vector<HookConfig>& hookConfigs);
+    bool DisableAll();
 }

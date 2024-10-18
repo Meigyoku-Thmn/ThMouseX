@@ -21,5 +21,5 @@ namespace common::luaapi {
     void OpenConsole();
     PointDataType GetDataType();
     void RegisterUninitializeCallback(UninitializeCallbackType callback);
-    MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal);
+    MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal, LPCSTR discriminator);
 }
