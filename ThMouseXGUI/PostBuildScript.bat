@@ -1,4 +1,3 @@
-call "%DevEnvDir%..\Tools\vsdevcmd.bat" -no_logo
 rem Copy all the C++ output files into this
 xcopy "%SolutionDir%%Configuration%\*" "%ProjectDir%%OutDir%" /y /s /d
     if %errorlevel% neq 0 exit /b %errorlevel%

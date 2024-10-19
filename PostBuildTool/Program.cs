@@ -119,7 +119,9 @@ static class Program
         }
         var inputPath = args.ElementAtOrDefault(0);
         var outputPath = args.ElementAtOrDefault(1);
-        var styluaDirPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        var styluaDirPath = Environment.GetEnvironmentVariable("PostBuildTool_InternalDir");
+        if (string.IsNullOrEmpty(styluaDirPath))
+            styluaDirPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         var styluaPath = Path.Combine(styluaDirPath, "stylua.exe");
         if (!File.Exists(styluaPath))
         {

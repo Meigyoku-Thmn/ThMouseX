@@ -19,10 +19,5 @@
         <ProjectReference Include="..\ThMouseXServer\ThMouseXServer.csproj" />
     </ItemGroup>
 
-    <Import Project="$(SolutionDir)PostBuild.targets" />
-
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="PostBuildScript.bat" />
-    </Target>
-
+    <Import Project="$(SolutionDir)Common.targets" />
 </Project>
