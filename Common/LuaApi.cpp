@@ -3,6 +3,7 @@
 #include "Helper.Memory.h"
 #include "Helper.Encoding.h"
 #include "Log.h"
+#include "macro.h"
 #include "Variables.h"
 #include "CallbackStore.h"
 #include <MinHook.h>
@@ -37,7 +38,22 @@ namespace common::luaapi {
         auto scriptHandle = LoadResource(dllModule, scriptRes);
         if (scriptHandle == nil)
             return;
-        LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
+        LuaJitPrepScript += "\n"
+            SYM_NAME(MH_UNKNOWN)" = " /*                   */ + to_string(MH_UNKNOWN) + "\n"
+            SYM_NAME(MH_OK)" = " /*                        */ + to_string(MH_OK) + "\n"
+            SYM_NAME(MH_ERROR_ALREADY_INITIALIZED)" = " /* */ + to_string(MH_ERROR_ALREADY_INITIALIZED) + "\n"
+            SYM_NAME(MH_ERROR_NOT_INITIALIZED)" = " /*     */ + to_string(MH_ERROR_NOT_INITIALIZED) + "\n"
+            SYM_NAME(MH_ERROR_ALREADY_CREATED)" = " /*     */ + to_string(MH_ERROR_ALREADY_CREATED) + "\n"
+            SYM_NAME(MH_ERROR_NOT_CREATED)" = " /*         */ + to_string(MH_ERROR_NOT_CREATED) + "\n"
+            SYM_NAME(MH_ERROR_ENABLED)" = " /*             */ + to_string(MH_ERROR_ENABLED) + "\n"
+            SYM_NAME(MH_ERROR_DISABLED)" = " /*            */ + to_string(MH_ERROR_DISABLED) + "\n"
+            SYM_NAME(MH_ERROR_NOT_EXECUTABLE)" = " /*      */ + to_string(MH_ERROR_NOT_EXECUTABLE) + "\n"
+            SYM_NAME(MH_ERROR_UNSUPPORTED_FUNCTION)" = " /**/ + to_string(MH_ERROR_UNSUPPORTED_FUNCTION) + "\n"
+            SYM_NAME(MH_ERROR_MEMORY_ALLOC)" = " /*        */ + to_string(MH_ERROR_MEMORY_ALLOC) + "\n"
+            SYM_NAME(MH_ERROR_MEMORY_PROTECT)" = " /*      */ + to_string(MH_ERROR_MEMORY_PROTECT) + "\n"
+            SYM_NAME(MH_ERROR_MODULE_NOT_FOUND)" = " /*    */ + to_string(MH_ERROR_MODULE_NOT_FOUND) + "\n"
+            SYM_NAME(MH_ERROR_FUNCTION_NOT_FOUND)" = " /*  */ + to_string(MH_ERROR_FUNCTION_NOT_FOUND) + "\n"
+            ;
     }
 
     DWORD GetPositionAddress() {
