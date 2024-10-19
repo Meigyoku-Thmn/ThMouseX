@@ -11,4 +11,5 @@
 		<PackageReference Include="NeoLua" Version="1.3.14" />
 		<PackageReference Include="Sigil" Version="5.0.0" />
 	</ItemGroup>
+  	<Import Project="$(SolutionDir)Common.targets" />
 </Project>

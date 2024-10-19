@@ -17,12 +17,23 @@
         </Task>
     </UsingTask>
 
-    <Target Name="PostBuildPreparation" BeforeTargets="PostBuildEvent">
+    <Target Name="PostBuildPreparation" BeforeTargets="PostBuildEvent;Clean">
+        <SetEnvironmentVariable Name="ProjectName" Value="$(ProjectName)" />
         <SetEnvironmentVariable Name="DevEnvDir" Value="$(DevEnvDir)" />
         <SetEnvironmentVariable Name="SolutionDir" Value="$(SolutionDir)" />
         <SetEnvironmentVariable Name="Configuration" Value="$(Configuration)" />
         <SetEnvironmentVariable Name="ProjectDir" Value="$(ProjectDir)" />
         <SetEnvironmentVariable Name="OutDir" Value="$(OutDir)" />
+        <SetEnvironmentVariable Name="PostBuildTool" Value="$(SolutionDir)PostBuildTool\bin\x86\$(Configuration)\net48\PostBuildTool" />
+        <SetEnvironmentVariable Name="PostBuildTool_InternalDir" Value="$(SolutionDir)PostBuildTool\obj" />
+    </Target>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="$(SolutionDir)PostBuild.bat" />
+    </Target>
+    
+    <Target Name="RemoveOutDir" AfterTargets="Clean">
+        <Exec Command="$(SolutionDir)CleanUp.bat" />
     </Target>
 
 </Project>

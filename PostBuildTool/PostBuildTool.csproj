@@ -22,4 +22,6 @@
       <Reference Include="System.Net.Http" />
     </ItemGroup>
 
+    <Import Project="$(SolutionDir)Common.targets" />
+
 </Project>

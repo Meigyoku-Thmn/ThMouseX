@@ -23,10 +23,6 @@
         <PackageReference Include="System.Memory" Version="4.5.5" />
     </ItemGroup>
     
-    <Import Project="$(SolutionDir)PostBuild.targets" />
-
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="PostBuildScript.bat" />
-    </Target>
+    <Import Project="$(SolutionDir)Common.targets" />
 
 </Project>
