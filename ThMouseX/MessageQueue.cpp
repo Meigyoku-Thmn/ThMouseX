@@ -390,8 +390,8 @@ namespace core::messagequeue {
         // Hide the mouse cursor when D3D is running, but only after cursor normalization
         callbackstore::RegisterPostRenderCallback(PostRenderCallback);
         minhook::CreateApiHook(vector<minhook::HookApiConfig>{
-            { L"USER32.DLL", "SetCursor", & _SetCursor, & OriSetCursor },
-            { L"USER32.DLL", "ShowCursor", &_ShowCursor, &OriShowCursor },
+            { L"USER32.DLL", "SetCursor", & _SetCursor, &OriSetCursor, APP_NAME "_SetCursor" },
+            { L"USER32.DLL", "ShowCursor", &_ShowCursor, &OriShowCursor, APP_NAME "_ShowCursor"},
         });
     }
 }

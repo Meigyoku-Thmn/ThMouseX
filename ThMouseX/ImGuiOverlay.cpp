@@ -7,6 +7,7 @@
 #include "../Common/Helper.Encoding.h"
 #include "../Common/Helper.Memory.h"
 #include "../Common/Helper.h"
+#include "../Common/macro.h"
 #include "Configuration.h"
 
 namespace encoding = common::helper::encoding;
@@ -24,13 +25,13 @@ static const char* GetKeyName(BYTE vkCode) {
     if (imGuiKey != ImGuiKey_None)
         return rs;
     if (vkCode == SCROLL_UP_EVENT)
-        rs = "SCROLL_UP_EVENT";
-    if (vkCode == SCROLL_DOWN_EVENT)
-        rs = "SCROLL_DOWN_EVENT";
-    if (vkCode == SCROLL_LEFT_EVENT)
-        rs = "SCROLL_LEFT_EVENT";
-    if (vkCode == SCROLL_RIGHT_EVENT)
-        rs = "SCROLL_RIGHT_EVENT";
+        rs = SYM_NAME(SCROLL_UP_EVENT);
+    else if (vkCode == SCROLL_DOWN_EVENT)
+        rs = SYM_NAME(SCROLL_DOWN_EVENT);
+    else if (vkCode == SCROLL_LEFT_EVENT)
+        rs = SYM_NAME(SCROLL_LEFT_EVENT);
+    else if (vkCode == SCROLL_RIGHT_EVENT)
+        rs = SYM_NAME(SCROLL_RIGHT_EVENT);
     return rs;
 }
 

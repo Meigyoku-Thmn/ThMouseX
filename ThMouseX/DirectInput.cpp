@@ -121,7 +121,7 @@ namespace core::directinput {
         auto vtable = *(DWORD**)pDevice8.Get();
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[GetDeviceStateIdx]), & GetDeviceStateDInput8, & OriGetDeviceStateDInput8 },
+            { PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8, APP_NAME "_GetDeviceStateDInput8" },
         });
     }
 

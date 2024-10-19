@@ -46,7 +46,7 @@ namespace core::keyboardstate {
         if ((g_gameConfig.InputMethods & InputMethod_GetKeyboardState) == InputMethod_None)
             return;
         minhook::CreateApiHook(vector<minhook::HookApiConfig>{
-            { L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, &OriGetKeyboardState },
+            { L"USER32.DLL", "GetKeyboardState", &_GetKeyboardState, &OriGetKeyboardState, APP_NAME "_GetKeyboardState" },
         });
     }
 

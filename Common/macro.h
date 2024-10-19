@@ -2,6 +2,7 @@
 #include <winerror.h>
 
 #define APP_NAME "ThMouseX"
+#define HOOK_ENGINE_STATE_NAME "ThMouseX_MinHook_State"
 
 #define L_(str) L_IMPL(str)
 #define L_IMPL(str) L##str

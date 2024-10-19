@@ -101,7 +101,7 @@ namespace core {
         messagequeue::Initialize();
 
         minhook::CreateApiHook(std::vector<minhook::HookApiConfig> {
-            { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, &OriLoadLibraryExW },
+            { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, &OriLoadLibraryExW, APP_NAME "_LoadLibraryExW" },
         });
 
         minhook::EnableAll();
