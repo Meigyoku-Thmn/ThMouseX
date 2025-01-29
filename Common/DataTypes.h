@@ -6,6 +6,7 @@
 #include <memory>
 #include <array>
 #include <type_traits>
+#include <string>
 
 constexpr auto PROCESS_NAME_MAX_LEN = 64;
 constexpr auto ADDRESS_CHAIN_MAX_LEN = 8;
