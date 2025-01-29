@@ -96,6 +96,8 @@ Remember to **compile for 32-bit, toolset v143, .NET Framework 4.8**, and make s
 * ThMouseX.txt
 * VirtualKeyCodes.txt
 
+The above files should be populated in `ThMouseXGUI\bin` directory.
+
 ### Another way to compile without installing anything on your computer (recommended way)
 - Fork the THMouseX repository to your Github account<br>
 ![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/4b941f22-594d-46c6-be83-818db918e2d4)
