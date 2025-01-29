@@ -31,9 +31,5 @@
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <Exec Command="$(SolutionDir)PostBuild.bat" />
     </Target>
-    
-    <Target Name="RemoveOutDir" AfterTargets="Clean">
-        <Exec Command="$(SolutionDir)CleanUp.bat" />
-    </Target>
 
 </Project>
