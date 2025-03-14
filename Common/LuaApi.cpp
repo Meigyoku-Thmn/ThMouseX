@@ -9,6 +9,7 @@
 #include <MinHook.h>
 #include <Windows.h>
 #include <string>
+#include <format>
 #include <span>
 #include "PreparationScript.h"
 
@@ -38,21 +39,24 @@ namespace common::luaapi {
         auto scriptHandle = LoadResource(dllModule, scriptRes);
         if (scriptHandle == nil)
             return;
-        LuaJitPrepScript += "\n"
-            SYM_NAME(MH_UNKNOWN)" = " /*                   */ + to_string(MH_UNKNOWN) + "\n"
-            SYM_NAME(MH_OK)" = " /*                        */ + to_string(MH_OK) + "\n"
-            SYM_NAME(MH_ERROR_ALREADY_INITIALIZED)" = " /* */ + to_string(MH_ERROR_ALREADY_INITIALIZED) + "\n"
-            SYM_NAME(MH_ERROR_NOT_INITIALIZED)" = " /*     */ + to_string(MH_ERROR_NOT_INITIALIZED) + "\n"
-            SYM_NAME(MH_ERROR_ALREADY_CREATED)" = " /*     */ + to_string(MH_ERROR_ALREADY_CREATED) + "\n"
-            SYM_NAME(MH_ERROR_NOT_CREATED)" = " /*         */ + to_string(MH_ERROR_NOT_CREATED) + "\n"
-            SYM_NAME(MH_ERROR_ENABLED)" = " /*             */ + to_string(MH_ERROR_ENABLED) + "\n"
-            SYM_NAME(MH_ERROR_DISABLED)" = " /*            */ + to_string(MH_ERROR_DISABLED) + "\n"
-            SYM_NAME(MH_ERROR_NOT_EXECUTABLE)" = " /*      */ + to_string(MH_ERROR_NOT_EXECUTABLE) + "\n"
-            SYM_NAME(MH_ERROR_UNSUPPORTED_FUNCTION)" = " /**/ + to_string(MH_ERROR_UNSUPPORTED_FUNCTION) + "\n"
-            SYM_NAME(MH_ERROR_MEMORY_ALLOC)" = " /*        */ + to_string(MH_ERROR_MEMORY_ALLOC) + "\n"
-            SYM_NAME(MH_ERROR_MEMORY_PROTECT)" = " /*      */ + to_string(MH_ERROR_MEMORY_PROTECT) + "\n"
-            SYM_NAME(MH_ERROR_MODULE_NOT_FOUND)" = " /*    */ + to_string(MH_ERROR_MODULE_NOT_FOUND) + "\n"
-            SYM_NAME(MH_ERROR_FUNCTION_NOT_FOUND)" = " /*  */ + to_string(MH_ERROR_FUNCTION_NOT_FOUND) + "\n"
+        LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
+        LuaJitPrepScript
+            .append("\n")
+            .append(format(SYM_NAME(MH_UNKNOWN)" = {}\n",                   /* */ to_string(MH_UNKNOWN)))
+            .append(format(SYM_NAME(MH_UNKNOWN)" = {}\n",                   /* */ to_string(MH_UNKNOWN)))
+            .append(format(SYM_NAME(MH_OK)" = {}\n",                        /* */ to_string(MH_OK)))
+            .append(format(SYM_NAME(MH_ERROR_ALREADY_INITIALIZED)" = {}\n", /* */ to_string(MH_ERROR_ALREADY_INITIALIZED)))
+            .append(format(SYM_NAME(MH_ERROR_NOT_INITIALIZED)" = {}\n",     /* */ to_string(MH_ERROR_NOT_INITIALIZED)))
+            .append(format(SYM_NAME(MH_ERROR_ALREADY_CREATED)" = {}\n",     /* */ to_string(MH_ERROR_ALREADY_CREATED)))
+            .append(format(SYM_NAME(MH_ERROR_NOT_CREATED)" = {}\n",         /* */ to_string(MH_ERROR_NOT_CREATED)))
+            .append(format(SYM_NAME(MH_ERROR_ENABLED)" = {}\n",             /* */ to_string(MH_ERROR_ENABLED)))
+            .append(format(SYM_NAME(MH_ERROR_DISABLED)" = {}\n",            /* */ to_string(MH_ERROR_DISABLED)))
+            .append(format(SYM_NAME(MH_ERROR_NOT_EXECUTABLE)" = {}\n",      /* */ to_string(MH_ERROR_NOT_EXECUTABLE)))
+            .append(format(SYM_NAME(MH_ERROR_UNSUPPORTED_FUNCTION)" = {}\n",/* */ to_string(MH_ERROR_UNSUPPORTED_FUNCTION)))
+            .append(format(SYM_NAME(MH_ERROR_MEMORY_ALLOC)" = {}\n",        /* */ to_string(MH_ERROR_MEMORY_ALLOC)))
+            .append(format(SYM_NAME(MH_ERROR_MEMORY_PROTECT)" = {}\n",      /* */ to_string(MH_ERROR_MEMORY_PROTECT)))
+            .append(format(SYM_NAME(MH_ERROR_MODULE_NOT_FOUND)" = {}\n",    /* */ to_string(MH_ERROR_MODULE_NOT_FOUND)))
+            .append(format(SYM_NAME(MH_ERROR_FUNCTION_NOT_FOUND)" = {}\n",  /* */ to_string(MH_ERROR_FUNCTION_NOT_FOUND)))
             ;
     }
 
