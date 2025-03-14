@@ -2,7 +2,6 @@
 #include <string>
 #include <codecvt>
 #include <luajit/lua.hpp>
-#include <format>
 
 #include "macro.h"
 #include "CallbackStore.h"
