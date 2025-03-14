@@ -53,7 +53,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market           (v1.00a)
 * Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost     (v1.10c)
 
-It also have preconfiguration of some other games:
+It also have preconfiguration of some other games (try the development branch if it doesn't work):
 * [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
 * [東方幕華祭 〜 Fantastic Danmaku Festival](https://store.steampowered.com/app/882710/_TouHou_Makuka_Sai__Fantastic_Danmaku_Festival/)
 * [東方幕華祭 春雪篇 〜 Fantastic Danmaku Festival Part II](https://store.steampowered.com/app/1031480/TouHou_Makuka_Sai__Fantastic_Danmaku_Festival_Part_II/)
