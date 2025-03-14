@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿#pragma warning disable S2743
+using System.Runtime.InteropServices;
 
 namespace ThMouseXServer;
 

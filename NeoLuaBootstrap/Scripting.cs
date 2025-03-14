@@ -1,9 +1,6 @@
 ﻿using HarmonyLib;
 using Neo.IronLua;
-using Sigil;
-using Sigil.NonGeneric;
 using System.Diagnostics;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -27,15 +24,6 @@ static class Scripting
     };
     static readonly GCHandle PosHandle = GCHandle.Alloc(Pos, GCHandleType.Pinned);
 
-    static void LoadDelegate(this Emit emitter, Delegate dele)
-    {
-        DelegateStore.Add(dele);
-        emitter.LoadField(DelegateStoreField);
-        emitter.LoadConstant(DelegateStore.Count - 1);
-        emitter.Call(getItemMethod);
-        emitter.CastClass(DelegateStore[DelegateStore.Count - 1].GetType());
-    }
-
     static DynamicMethod MakeLuaFuncionWrapper(Delegate luaFunc)
     {
         if (luaFunc == null)
@@ -45,26 +33,24 @@ static class Scripting
             .Where((e, i) => i != 0 || e.ParameterType != typeof(Closure)).ToArray();
         var paramTypes = paramInfos.Select(e => e.ParameterType).ToArray();
         var retType = methodInfo.ReturnType;
-#if DEBUG
-        var emitter = Emit.NewDynamicMethod(retType, paramTypes, methodInfo.Name, doVerify: true);
-#else
-        var emitter = Emit.NewDynamicMethod(retType, paramTypes, methodInfo.Name, doVerify: false);
-#endif
-        emitter.LoadDelegate(luaFunc);
-        for (ushort i = 0; i < paramTypes.Length; i++)
-            emitter.LoadArgument(i);
-        emitter.Call(luaFunc.GetType().GetMethod(nameof(Action.Invoke)));
-        emitter.Return();
 
-        var emitterAccessor = Traverse.Create(emitter);
-        var module = emitterAccessor.Field("Module").GetValue() as Module;
-        var dynaMethod = new DynamicMethod(methodInfo.Name, retType, paramTypes, module, skipVisibility: true);
-        for (var i = 0; i < paramInfos.Length; i++)
+        var dynaMethod = new DynamicMethod(methodInfo.Name, retType, paramTypes, typeof(Scripting), skipVisibility: true);
+        var il = dynaMethod.GetILGenerator();
+
+        DelegateStore.Add(luaFunc);
+        il.Emit(OpCodes.Ldnull);
+        il.Emit(OpCodes.Ldfld, DelegateStoreField);
+        il.Emit(OpCodes.Ldc_I4, DelegateStore.Count - 1);
+        il.Emit(OpCodes.Call, getItemMethod);
+        il.Emit(OpCodes.Castclass, luaFunc.GetType());
+        for (ushort i = 0; i < paramInfos.Length; i++)
+        {
             dynaMethod.DefineParameter(i + 1, paramInfos[i].Attributes, paramInfos[i].Name);
-        emitterAccessor.Field("InnerEmit").Property("DynMethod").SetValue(dynaMethod);
+            il.Emit(OpCodes.Ldarg, i);
+        }
+        il.Emit(OpCodes.Call, luaFunc.GetType().GetMethod(nameof(Action.Invoke)));
+        il.Emit(OpCodes.Ret);
 
-        var outDelegateType = Expression.GetDelegateType([.. paramTypes, retType]);
-        emitter.CreateDelegate(outDelegateType, OptimizationOptions.All);
 
         return dynaMethod;
     }
