@@ -5,6 +5,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>12</LangVersion>
 		<Platforms>x86</Platforms>
+        <OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Lib.Harmony" Version="2.3.5" />
