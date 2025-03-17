@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>12</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <Platforms>x86</Platforms>
+        <Platforms>x86;x64</Platforms>
     </PropertyGroup>
 
     <ItemGroup>

@@ -26,6 +26,7 @@
     </UsingTask>
 
     <Target Name="PostBuildPreparation" BeforeTargets="PostBuildEvent;Clean">
+        <SetEnvironmentVariable Name="PlatformTarget" Value="$(PlatformTarget)" />
         <SetEnvironmentVariable Name="ProjectName" Value="$(ProjectName)" />
         <SetEnvironmentVariable Name="DevEnvDir" Value="$(DevEnvDir)" />
         <SetEnvironmentVariable Name="SolutionDir" Value="$(SolutionDir)" />
