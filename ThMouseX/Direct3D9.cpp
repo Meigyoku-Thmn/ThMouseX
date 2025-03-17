@@ -7,6 +7,7 @@
 #include <wrl/client.h>
 #include <comdef.h>
 #include <mutex>
+#include <cstdint>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx9.h"
@@ -170,8 +171,8 @@ namespace core::directx9 {
             return;
         }
 
-        auto vtable = *(DWORD**)pD3D.Get();
-        auto vtable2 = *(DWORD**)pDevice.Get();
+        auto vtable = *(uintptr_t**)pD3D.Get();
+        auto vtable2 = *(uintptr_t**)pDevice.Get();
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);

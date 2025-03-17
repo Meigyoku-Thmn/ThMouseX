@@ -17,7 +17,7 @@ namespace common::luaapi {
     void Initialize();
     uintptr_t GetPositionAddress();
     void SetPositionAddress(uintptr_t address);
-    DWORD ReadUInt32(DWORD address);
+    DWORD ReadUInt32(uintptr_t address);
     uintptr_t ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress);
     void OpenConsole();
     PointDataType GetDataType();

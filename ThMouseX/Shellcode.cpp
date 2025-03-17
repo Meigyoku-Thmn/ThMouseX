@@ -1,17 +1,19 @@
 #include "Shellcode.h"
 #include "../Common/Helper.h"
 
+#include <cstdint>
+
 namespace helper = common::helper;
 
 namespace core::shellcode {
     SIZE_T ShellcodeSectionSize;
     void Initialize() {
-        auto& nt_header = *(PIMAGE_NT_HEADERS)((DWORD)&__ImageBase + __ImageBase.e_lfanew);
+        auto& nt_header = *(PIMAGE_NT_HEADERS)((uintptr_t)&__ImageBase + __ImageBase.e_lfanew);
         auto sectionHeaders = (PIMAGE_SECTION_HEADER)(
-            (DWORD)&nt_header +
+            (uintptr_t)&nt_header +
             sizeof(nt_header.Signature) +
-            (DWORD)(sizeof(nt_header.FileHeader)) +
-            (DWORD)nt_header.FileHeader.SizeOfOptionalHeader
+            sizeof(nt_header.FileHeader) +
+            nt_header.FileHeader.SizeOfOptionalHeader
             );
         for (size_t i = 0; i < nt_header.FileHeader.NumberOfSections; i++) {
             auto& sectionHeader = sectionHeaders[i];

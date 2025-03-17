@@ -32,7 +32,7 @@ local hModule = ffi.cast("HMODULE", ThMouseX_ModuleHandle)
     FuncName = ffi.cast(SYM_NAME(Lua_##FuncName), ffi.C.GetProcAddress(hModule, SYM_NAME(Lua_##FuncName)))
 #endif
 
-LUAFUNC(DWORD,      ReadUInt32, DWORD address);
+LUAFUNC(DWORD,      ReadUInt32, uintptr_t address);
 
 LUAFUNC(uintptr_t,  ResolveAddress, DWORD* offsets, size_t length, bool doNotValidateLastAddress);
 

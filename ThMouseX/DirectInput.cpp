@@ -4,6 +4,7 @@
 #include <vector>
 #include <wrl/client.h>
 #include <mutex>
+#include <cstdint>
 
 #include "../Common/macro.h"
 #include "../Common/DataTypes.h"
@@ -118,7 +119,7 @@ namespace core::directinput {
             return;
         }
 
-        auto vtable = *(DWORD**)pDevice8.Get();
+        auto vtable = *(uintptr_t**)pDevice8.Get();
 
         minhook::CreateHook(vector<minhook::HookConfig>{
             { PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8, APP_NAME "_GetDeviceStateDInput8" },

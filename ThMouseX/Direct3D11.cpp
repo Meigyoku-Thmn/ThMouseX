@@ -10,6 +10,7 @@
 #include <wrl/client.h>
 #include <comdef.h>
 #include <mutex>
+#include <cstdint>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
@@ -173,7 +174,7 @@ namespace core::directx11 {
             return;
         }
 
-        auto vtable = *(DWORD**)swap_chain.Get();
+        auto vtable = *(uintptr_t**)swap_chain.Get();
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);

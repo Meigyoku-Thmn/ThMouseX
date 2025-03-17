@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <cmath>
+#include <cstdint>
 
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
@@ -17,7 +18,7 @@ void CalculatePosition(TPointer position, POINT& output) {
     output.y = lrint(float(position->Y) / g_pixelRate + g_pixelOffset.Y);
 }
 
-static void CalculatePlayerPos(DWORD address) {
+static void CalculatePlayerPos(uintptr_t address) {
     if (g_gameConfig.PosDataType == PointDataType_Int)
         CalculatePosition((IntPoint*)address, g_playerPos);
     else if (g_gameConfig.PosDataType == PointDataType_Float)
@@ -60,7 +61,7 @@ namespace core::inputdetermine {
         g_gameInput = NONE;
         g_playerPos = {};
         g_playerPosRaw = {};
-        DWORD address{};
+        uintptr_t address{};
 
         if (!g_inputEnabled)
             return NONE;

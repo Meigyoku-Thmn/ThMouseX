@@ -69,7 +69,7 @@ namespace common::luaapi {
         positionAddress = address;
     }
 
-    DWORD ReadUInt32(DWORD address) {
+    DWORD ReadUInt32(uintptr_t address) {
         return *PDWORD(address);
     }
 
@@ -96,7 +96,7 @@ namespace common::luaapi {
 
 namespace luaapi = common::luaapi;
 
-DWORD Lua_ReadUInt32(DWORD address) {
+DWORD Lua_ReadUInt32(uintptr_t address) {
     return luaapi::ReadUInt32(address);
 }
 
