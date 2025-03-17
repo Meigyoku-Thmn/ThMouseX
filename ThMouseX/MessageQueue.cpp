@@ -324,7 +324,7 @@ namespace core::messagequeue {
         UnhookWindowsHookEx(CallWndRetProcHandle);
         UnhookWindowsHookEx(CBTProcHandle);
         // force all top-level windows to process a message, therefore force all processes to unload the DLL.
-        DWORD __;
+        DWORD_PTR __;
         SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &__);
         // some processes doesn't have a top-level window or a message loop anymore,
         // the following find them and inject a thread to force them eject the DLL.

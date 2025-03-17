@@ -13,6 +13,7 @@ rem Make a manifest file for the client
 "%PostBuildTool%" GenerateComServerManifest %ClientName% %TypeLibName% %Architecture% %ServerPath% %ClientManifestPath%
 if %errorlevel% neq 0 exit /b %errorlevel%
 rem Generate a TypeLib file
+del %TlbPath% > nul 2> nul
 if %PlatformTarget% equ x86 (
 	tlbexp /nologo /win32 %ServerPath% /out:%TlbPath%
 ) else if %PlatformTarget% equ x64 (

@@ -204,7 +204,7 @@ namespace core::configuration {
             gameConfig.processName[processName.size()] = L'\0';
 
             if (addressOffsets.size() > 0) {
-                CComSafeArray<DWORD> addressChain{ addressOffsets.size() };
+                CComSafeArray<DWORD> addressChain{ (ULONG)addressOffsets.size() };
                 memcpy(addressChain.m_psa->pvData, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
                 gameConfig.Address = addressChain.Detach();
             }
