@@ -1,7 +1,8 @@
 #pragma once
+#include <cstdint>
 #include <Windows.h>
 
 namespace common::luajit {
     void Initialize();
-    DWORD GetPositionAddress();
+    uintptr_t GetPositionAddress();
 }

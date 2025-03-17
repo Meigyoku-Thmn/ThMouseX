@@ -5,6 +5,7 @@
 #include <span>
 #include <format>
 #include <atomic>
+#include <cstdint>
 
 #include "Helper.h"
 #include "Helper.Memory.h"
@@ -165,7 +166,7 @@ namespace common::helper {
             && hwndRect.bottom == monitorInfo.rcMonitor.bottom;
     }
 
-    DWORD CalculateAddress() {
+    uintptr_t CalculateAddress() {
         if (g_gameConfig.ScriptType == ScriptType_LuaJIT)
             return luajit::GetPositionAddress();
         else if (g_gameConfig.ScriptType == ScriptType_NeoLua)

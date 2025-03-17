@@ -11,6 +11,7 @@
 #include <string>
 #include <format>
 #include <span>
+#include <cstdint>
 #include "PreparationScript.h"
 
 namespace note = common::log;
@@ -21,7 +22,7 @@ namespace callbackstore = common::callbackstore;
 
 using namespace std;
 
-static DWORD positionAddress;
+static uintptr_t positionAddress;
 namespace common::luaapi {
     string LuaJitPrepScript;
 
@@ -60,11 +61,11 @@ namespace common::luaapi {
             ;
     }
 
-    DWORD GetPositionAddress() {
+    uintptr_t GetPositionAddress() {
         return positionAddress;
     }
 
-    void SetPositionAddress(DWORD address) {
+    void SetPositionAddress(uintptr_t address) {
         positionAddress = address;
     }
 
@@ -72,7 +73,7 @@ namespace common::luaapi {
         return *PDWORD(address);
     }
 
-    DWORD ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
+    uintptr_t ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
         return memory::ResolveAddress(span{ offsets, length }, doNotValidateLastAddress);
     }
 
@@ -99,7 +100,7 @@ DWORD Lua_ReadUInt32(DWORD address) {
     return luaapi::ReadUInt32(address);
 }
 
-DWORD Lua_ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
+uintptr_t Lua_ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
     return luaapi::ResolveAddress(offsets, length, doNotValidateLastAddress);
 }
 
@@ -107,7 +108,7 @@ void Lua_OpenConsole() {
     luaapi::OpenConsole();
 }
 
-void Lua_SetPositionAddress(DWORD address) {
+void Lua_SetPositionAddress(uintptr_t address) {
     luaapi::SetPositionAddress(address);
 }
 

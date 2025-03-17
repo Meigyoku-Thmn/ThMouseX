@@ -3,6 +3,7 @@
 #include <format>
 #include <span>
 #include <vector>
+#include <cstdint>
 
 #include "Helper.Memory.h"
 #include "Log.h"
@@ -15,7 +16,7 @@ namespace note = common::log;
 namespace common::helper::memory {
     static vector<DWORD> lastOffsets;
     static bool lastIsValid = true;
-    DWORD ResolveAddress(span<const DWORD> offsets, bool doNotValidateLastAddress) {
+    uintptr_t ResolveAddress(span<const DWORD> offsets, bool doNotValidateLastAddress) {
         if (offsets.size() <= 0)
             return NULL;
         auto memInvalidated = offsets.size() != lastOffsets.size()
@@ -27,14 +28,14 @@ namespace common::helper::memory {
             lastOffsets.resize(offsets.size());
             memcpy(lastOffsets.data(), offsets.data(), offsets.size() * sizeof(offsets[0]));
         }
-        auto address = offsets[0] + DWORD(g_targetModule);
+        auto address = offsets[0] + uintptr_t(g_targetModule);
         for (size_t i = 1; i < offsets.size(); i++) {
             if (memInvalidated && IsBadReadMem((PVOID)address, sizeof(address))) {
                 lastIsValid = false;
                 note::ToFile("Access bad memory region, please check the game's version!");
                 return NULL;
             }
-            address = *PDWORD(address);
+            address = *PUINT_PTR(address);
             if (!address)
                 return NULL;
             address += offsets[i];

@@ -3,6 +3,7 @@
 #include "macro.h"
 #include <tuple>
 #include <string>
+#include <cstdint>
 #include "DataTypes.h"
 
 namespace common::helper {
@@ -22,7 +23,7 @@ namespace common::helper {
     void FixWindowCoordinate(bool isExclusiveMode, UINT d3dWidth, UINT d3dHeight, UINT clientWidth, UINT clientHeight);
     // use for directx8
     bool TestFullscreenHeuristically();
-    DWORD CalculateAddress();
+    uintptr_t CalculateAddress();
     bool IsCurrentProcessThMouseX();
     std::tuple<DWORD, std::string> CallProcess(const std::wstring& processPath, const std::wstring& cmdLine);
     bool ShouldBeVkExtended(BYTE key);

@@ -5,6 +5,7 @@
 #include <wrl/client.h>
 #include <metahost.h>
 #include <comdef.h>
+#include <cstdint>
 
 #include "DataTypes.h"
 #include "NeoLua.h"
@@ -22,7 +23,7 @@ using namespace Microsoft::WRL;
 #define TAG "[NeoLua] "
 
 namespace common::neolua {
-    DWORD GetPositionAddress() {
+    uintptr_t GetPositionAddress() {
         return luaapi::GetPositionAddress();
     }
 

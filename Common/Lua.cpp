@@ -3,6 +3,7 @@
 #include <luajit/lua.hpp>
 #include <fstream>
 #include <sstream>
+#include <cstdint>
 
 #include "Lua.h"
 #include "LuaApi.h"
@@ -240,7 +241,7 @@ namespace common::lua {
         _lua_settop(L, oldStackSize);
     }
 
-    DWORD GetPositionAddress() {
+    uintptr_t GetPositionAddress() {
         if (scriptingDisabled)
             return NULL;
 
@@ -262,7 +263,7 @@ namespace common::lua {
             return NULL;
         }
 
-        auto result = DWORD(_lua_tointeger(L, -1));
+        auto result = uintptr_t(_lua_tointeger(L, -1));
         _lua_settop(L, stackSize);
         return result;
     }

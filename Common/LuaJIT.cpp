@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <string>
 #include <codecvt>
+#include <cstdint>
 #include <luajit/lua.hpp>
 
 #include "macro.h"
@@ -93,7 +94,7 @@ namespace common::luajit {
             lua_settop(L, oldStackSize);
     }
 
-    DWORD GetPositionAddress() {
+    uintptr_t GetPositionAddress() {
         if (scriptingDisabled)
             return NULL;
 
@@ -116,7 +117,7 @@ namespace common::luajit {
             return NULL;
         }
 
-        auto result = DWORD(lua_tointeger(L, -1));
+        auto result = uintptr_t(lua_tointeger(L, -1));
         lua_settop(L, oldStackSize);
         return result;
     }
