@@ -86,7 +86,7 @@ namespace common::minhook {
         return true;
     }
 
-    bool DisableHooks(const std::vector<HookApiConfig>& hookConfigs) {
+    bool DisableHooks(const vector<HookApiConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto hModule = GetModuleHandleW(config.moduleName);
             if (!hModule)
@@ -101,7 +101,7 @@ namespace common::minhook {
         return true;
     }
 
-    bool DisableHooks(const std::vector<HookConfig>& hookConfigs) {
+    bool DisableHooks(const vector<HookConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto rs = MH_DisableHook(config.pTarget, config.discriminator);
             if (rs != MH_OK)

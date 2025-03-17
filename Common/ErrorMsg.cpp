@@ -20,7 +20,7 @@ namespace common::errormsg {
     string GuessErrorsFromHResult(HRESULT hr) {
         string errorMessage = "";
         for (auto const& messages : messageGroups) {
-            auto messageItr = ranges::lower_bound(messages, hr, std::less<>(), &ErrorMessage::code);
+            auto messageItr = ranges::lower_bound(messages, hr, less<>(), &ErrorMessage::code);
             if (messageItr == messages.end() || messageItr->code != hr)
                 continue;
             while (messageItr->code == hr) {

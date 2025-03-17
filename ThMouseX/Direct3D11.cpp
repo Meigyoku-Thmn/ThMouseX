@@ -20,7 +20,6 @@
 #include "../Common/MinHook.h"
 #include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
-#include "../Common/DataTypes.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
 #include "../Common/Log.h"
@@ -358,7 +357,7 @@ namespace core::directx11 {
         // draw the cursor
         auto setCustomShaders = usePixelShader ? [] { context->PSSetShader(pixelShader, nil, 0); } : nil;
         auto sortMode = SpriteSortMode_Deferred;
-        auto m_states = std::make_unique<CommonStates>(device);
+        auto m_states = make_unique<CommonStates>(device);
         spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), nil, nil, nil, setCustomShaders, scalingMatrixD3D);
         auto color = g_inputEnabled ? ToneColor(tone) : RGBA(255, 200, 200, 128);
         spriteBatch->Draw(cursorTexture, cursorPositionD3D, nil, color, 0, cursorPivot, 1, SpriteEffects_None);

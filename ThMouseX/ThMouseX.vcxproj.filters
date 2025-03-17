@@ -41,9 +41,6 @@
     <ClCompile Include="MessageQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CompilerConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Configuration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -92,6 +89,7 @@
     <ClCompile Include="Shellcode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CompilerConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MessageQueue.h">

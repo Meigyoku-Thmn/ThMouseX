@@ -100,9 +100,6 @@
     <ClCompile Include="CallbackStore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CompilerConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Lua.cpp">
       <Filter>Source Files\LuaScript</Filter>
     </ClCompile>
@@ -136,6 +133,7 @@
     <ClCompile Include="Helper.Memory.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
+    <ClCompile Include="CompilerConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PreparationScript.lua">

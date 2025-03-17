@@ -49,9 +49,11 @@ namespace comclient = core::comclient;
 namespace shellcode = core::shellcode;
 namespace errormsg = common::errormsg;
 
+using namespace std;
+
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
-    decltype(&_LoadLibraryExW) OriLoadLibraryExW;
+    static decltype(&_LoadLibraryExW) OriLoadLibraryExW;
 
     void Initialize() {
         setlocale(LC_ALL, ".UTF8");
@@ -100,7 +102,7 @@ namespace core {
         keyboardstate::Initialize();
         messagequeue::Initialize();
 
-        minhook::CreateApiHook(std::vector<minhook::HookApiConfig> {
+        minhook::CreateApiHook(vector<minhook::HookApiConfig> {
             { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, &OriLoadLibraryExW, APP_NAME "_LoadLibraryExW" },
         });
 
@@ -108,7 +110,7 @@ namespace core {
         g_hookApplied = true;
     }
 
-    thread_local UINT loadLibraryReentrantCount = 0;
+    static thread_local UINT loadLibraryReentrantCount = 0;
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto allowInitialization = loadLibraryReentrantCount == 0;
         loadLibraryReentrantCount++;

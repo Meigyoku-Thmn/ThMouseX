@@ -51,7 +51,7 @@ namespace common::log {
 
     void HResultToFile(const char* message, HRESULT hResult) {
         ComPtr<IErrorInfo> errorInfo;
-        std::ignore = GetErrorInfo(0, &errorInfo);
+        ignore = GetErrorInfo(0, &errorInfo);
         _com_error error(hResult, errorInfo.Get(), true);
         ComErrToFile(message, error);
     }

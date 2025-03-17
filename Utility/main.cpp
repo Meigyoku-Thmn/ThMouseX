@@ -18,7 +18,7 @@ using namespace Microsoft::WRL;
 
 void GetDirectInputMappingTableId();
 
-int resultValue = -1;
+static int resultValue = -1;
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nShowCmd) {
     auto cmdLine = wstring(lpCmdLine);
     if (cmdLine.starts_with(L"GetDirectInputMappingTableId"))
@@ -37,7 +37,7 @@ static void Prepare() {
     PathRemoveExtensionW(g_currentProcessName);
 }
 
-decltype(&FindResourceW) FindResourceWOri;
+static decltype(&FindResourceW) FindResourceWOri;
 static HRSRC WINAPI FindResourceWHook(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType) {
     auto rs = FindResourceWOri(hModule, lpName, lpType);
     if (lpType == RT_RCDATA)
@@ -55,7 +55,7 @@ static void GetDirectInputMappingTableId() {
     }
     if (!minhook::Initialize())
         return;
-    if (!minhook::CreateApiHook(std::vector<minhook::HookApiConfig> {
+    if (!minhook::CreateApiHook(vector<minhook::HookApiConfig> {
         { L"Kernel32.dll", "FindResourceW", &FindResourceWHook, &FindResourceWOri },
     })) return;
     if (!minhook::EnableAll())
