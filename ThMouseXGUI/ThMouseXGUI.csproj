@@ -11,9 +11,6 @@
         <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
         <Version>3.0.0</Version>
         <Platforms>x86</Platforms>
-        <OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     </PropertyGroup>
 
     <ItemGroup>

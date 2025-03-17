@@ -1,4 +1,12 @@
 <Project>
+
+    <PropertyGroup>
+        <OutDir>$(SolutionDir)$(Configuration)\$(PlatformTarget)\</OutDir>
+        <OutputPath>$(SolutionDir)$(Configuration)\$(PlatformTarget)\</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    </PropertyGroup>
+
     <UsingTask
         TaskName="SetEnvironmentVariable"
         TaskFactory="RoslynCodeTaskFactory"
@@ -24,7 +32,7 @@
         <SetEnvironmentVariable Name="Configuration" Value="$(Configuration)" />
         <SetEnvironmentVariable Name="ProjectDir" Value="$(ProjectDir)" />
         <SetEnvironmentVariable Name="OutDir" Value="$(OutDir)" />
-        <SetEnvironmentVariable Name="PostBuildTool" Value="$(SolutionDir)$(Configuration)\PostBuildTool" />
+        <SetEnvironmentVariable Name="PostBuildTool" Value="$(OutDir)PostBuildTool" />
         <SetEnvironmentVariable Name="PostBuildTool_InternalDir" Value="$(SolutionDir)PostBuildTool\obj" />
     </Target>
 
