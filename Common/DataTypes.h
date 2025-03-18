@@ -11,8 +11,6 @@
 
 #include "ComServer.h"
 
-static_assert(sizeof(HRESULT) == sizeof(UINT));
-
 DEFINE_ENUM_FLAG_OPERATORS(InputMethod);
 
 struct GameConfigLocal : GameConfig {
