@@ -29,7 +29,7 @@ static lua_State* L;
 
 template <CompileTimeString funcName, typename FuncType>
 static bool TryImportFunc(FuncType& func, HMODULE lua, const string& luaDllName) {
-    func = (FuncType)GetProcAddress(lua, funcName.data);
+    func = rcast<FuncType>(GetProcAddress(lua, funcName.data));
     if (!func) {
         auto msg = "[Lua] Failed to import %s|" + funcName + ".";
         note::ToFile(msg.data, luaDllName.c_str());
@@ -154,7 +154,7 @@ namespace common::lua {
         if (!TryImportFunc<SYM_NAME(lua_pushinteger)>(_lua_pushinteger, lua, luaDllName)) return;
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { _luaL_callmeta, &luaL_callmeta_hook, &ori_luaL_callmeta, APP_NAME "_callmeta" },
+            { _luaL_callmeta, & luaL_callmeta_hook, & ori_luaL_callmeta, APP_NAME "_callmeta" },
             { _lua_call, &lua_call_hook, &ori_lua_call, APP_NAME "_call" },
             { _lua_cpcall, &lua_cpcall_hook, &ori_lua_cpcall, APP_NAME "_cpcall" },
             { _lua_pcall, &lua_pcall_hook, &ori_lua_pcall, APP_NAME "_pcall" },
@@ -165,7 +165,7 @@ namespace common::lua {
         auto rs = ori_luaL_callmeta(L, obj, e);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {
-            { _luaL_callmeta, nil, &ori_luaL_callmeta, APP_NAME "_callmeta" }
+            { _luaL_callmeta, nil, & ori_luaL_callmeta, APP_NAME "_callmeta" }
         });
         return rs;
     }
@@ -173,7 +173,7 @@ namespace common::lua {
         ori_lua_call(L, nargs, nresults);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {
-            { _lua_call, nil, &ori_lua_call, APP_NAME "_call" }
+            { _lua_call, nil, & ori_lua_call, APP_NAME "_call" }
         });
         return;
     }
@@ -181,7 +181,7 @@ namespace common::lua {
         auto rs = ori_lua_cpcall(L, func, ud);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {
-            { _lua_cpcall, nil, &ori_lua_cpcall, APP_NAME "_cpcall" }
+            { _lua_cpcall, nil, & ori_lua_cpcall, APP_NAME "_cpcall" }
         });
         return rs;
     }
@@ -189,7 +189,7 @@ namespace common::lua {
         auto rs = ori_lua_pcall(L, nargs, nresults, errfunc);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {
-            { _lua_pcall, nil, &ori_lua_pcall, APP_NAME "_pcall" }
+            { _lua_pcall, nil, & ori_lua_pcall, APP_NAME "_pcall" }
         });
         return rs;
     }
@@ -204,7 +204,7 @@ namespace common::lua {
 
         auto oldStackSize = _lua_gettop(L);
 
-        _lua_pushinteger(L, uintptr_t(g_coreModule));
+        _lua_pushinteger(L, rcast<uintptr_t>(g_coreModule));
         _lua_setfield(L, LUA_GLOBALSINDEX, THMOUSEX_MODULE_HANDLE);
         auto rs = 0;
         if ((rs = _luaL_loadstring(L, luaapi::LuaJitPrepScript.c_str())) == 0)
@@ -222,11 +222,12 @@ namespace common::lua {
             return;
         }
         fseek(scriptIn, 0, SEEK_END);
-        auto scriptSize = ftell(scriptIn);
-        auto scriptContent = vector<char>(scriptSize + 1);
+        auto scriptSize = scast<size_t>(ftell(scriptIn)) + 1;
+        auto scriptContent = vector<char>(scriptSize);
         rewind(scriptIn);
-        fread(scriptContent.data(), sizeof(scriptContent[0]), scriptSize + 1, scriptIn);
-        scriptContent[scriptSize] = '\0';
+        fread(scriptContent.data(), sizeof(scriptContent[0]), scriptSize, scriptIn);
+        if (scriptSize > 0)
+            scriptContent[scriptSize - 1] = '\0';
         fclose(scriptIn);
         if ((rs = _luaL_loadstring(L, scriptContent.data())) == 0)
             rs = ori_lua_pcall(L, 0, LUA_MULTRET, 0);
@@ -262,8 +263,8 @@ namespace common::lua {
             _lua_settop(L, stackSize);
             return NULL;
         }
-
-        auto result = uintptr_t(_lua_tointeger(L, -1));
+        
+        auto result = scast<uintptr_t>(_lua_tointeger(L, -1));
         _lua_settop(L, stackSize);
         return result;
     }

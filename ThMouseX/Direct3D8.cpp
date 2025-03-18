@@ -132,7 +132,7 @@ namespace core::directx8 {
             initialized = true;
         }
 
-        auto _Direct3DCreate8 = (decltype(&Direct3DCreate8))GetProcAddress(d3d8, "Direct3DCreate8");
+        auto _Direct3DCreate8 = rcast<decltype(&Direct3DCreate8)>(GetProcAddress(d3d8, "Direct3DCreate8"));
         if (!_Direct3DCreate8) {
             note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8");
             return;
@@ -168,16 +168,16 @@ namespace core::directx8 {
             return;
         }
 
-        auto vtable = *(uintptr_t**)pD3D.Get();
-        auto vtable2 = *(uintptr_t**)pDevice.Get();
+        auto vtable = *rcast<uintptr_t**>(pD3D.Get());
+        auto vtable2 = *rcast<uintptr_t**>(pDevice.Get());
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[CreateDeviceIdx]), &D3DCreateDevice, &OriCreateDevice, APP_NAME "_D3DCreateDevice" },
-            { PVOID(vtable2[ResetIdx]), &D3DReset, &OriReset, APP_NAME "_D3DReset" },
-            { PVOID(vtable2[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
+            { rcast<PVOID>(vtable[CreateDeviceIdx]), &D3DCreateDevice, &OriCreateDevice, APP_NAME "_D3DCreateDevice" },
+            { rcast<PVOID>(vtable2[ResetIdx]), &D3DReset, &OriReset, APP_NAME "_D3DReset" },
+            { rcast<PVOID>(vtable2[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
         });
     }
 
@@ -199,7 +199,7 @@ namespace core::directx8 {
             D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = { float(cursorSize.Height - 1) / 2.f, float(cursorSize.Width - 1) / 2.f };
+            cursorPivot = { scast<float>(cursorSize.Height - 1) / 2.f, scast<float>(cursorSize.Width - 1) / 2.f };
         }
     }
 
@@ -245,17 +245,17 @@ namespace core::directx8 {
         // There is no way to get back D3DPRESENT_PARAMETERS in DirectX8
         // So, use a heuristic method to detect fullscreen mode
         helper::FixWindowCoordinate(helper::TestFullscreenHeuristically(),
-            d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
+            d3dSize.Width, d3dSize.Height, scast<UINT>(clientSize.width()), scast<UINT>(clientSize.height()));
 
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
             note::LastErrorToFile(TAG "PrepareMeasurement: GetClientRect failed (2)");
             return;
         }
-        g_pixelRate = float(g_gameConfig.BaseHeight) / float(clientSize.height());
+        g_pixelRate = scast<float>(g_gameConfig.BaseHeight) / scast<float>(clientSize.height());
         g_pixelOffset.X = g_gameConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_gameConfig.BasePixelOffset.Y / g_pixelRate;
-        imGuiMousePosScaleX = float(clientSize.width()) / float(d3dSize.Width);
-        imGuiMousePosScaleY = float(clientSize.height()) / float(d3dSize.Height);
+        imGuiMousePosScaleX = scast<float>(clientSize.width()) / scast<float>(d3dSize.Width);
+        imGuiMousePosScaleY = scast<float>(clientSize.height()) / scast<float>(d3dSize.Height);
     }
 
     /*
@@ -283,7 +283,7 @@ namespace core::directx8 {
             note::DxErrToFile(TAG "PrepareCursorState: pSurface->GetDesc failed", rs);
             return;
         }
-        auto scale = float(d3dSize.Height) / float(g_c.TextureBaseHeight);
+        auto scale = scast<float>(d3dSize.Height) / scast<float>(g_c.TextureBaseHeight);
         cursorScale = D3DXVECTOR2(scale, scale);
 
         RECTSIZE clientSize{};
@@ -291,7 +291,7 @@ namespace core::directx8 {
             note::LastErrorToFile(TAG "PrepareCursorState: GetClientRect failed");
             return;
         }
-        d3dScale = float(clientSize.width()) / float(d3dSize.Width);
+        d3dScale = scast<float>(clientSize.width()) / scast<float>(d3dSize.Width);
     }
 
     static void RenderCursor(IDirect3DDevice8* pDevice) {
@@ -319,7 +319,7 @@ namespace core::directx8 {
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         auto pointerPosition = helper::GetPointerPosition();
-        D3DXVECTOR2 cursorPositionD3D(float(pointerPosition.x), float(pointerPosition.y));
+        D3DXVECTOR2 cursorPositionD3D(scast<float>(pointerPosition.x), scast<float>(pointerPosition.y));
         if (d3dScale != 0.f && d3dScale != 1.f)
             cursorPositionD3D /= d3dScale;
 
@@ -391,7 +391,7 @@ namespace core::directx8 {
             return;
         }
 
-        imguioverlay::Configure(float(d3dSize.Height) / float(g_c.ImGuiBaseVerticalResolution));
+        imguioverlay::Configure(scast<float>(d3dSize.Height) / scast<float>(g_c.ImGuiBaseVerticalResolution));
     }
 
     static void RenderImGui(IDirect3DDevice8* pDevice) {

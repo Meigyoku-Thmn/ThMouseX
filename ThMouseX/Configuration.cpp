@@ -122,7 +122,7 @@ namespace core::configuration {
     }
     bool GetGameConfig(PCWCHAR processName, GameConfigEx* gameConfig, CommonConfigEx* commonConfig) {
         wstring processNameLowerCase{ processName };
-        transform(processNameLowerCase.begin(), processNameLowerCase.end(), processNameLowerCase.begin(), towlower);
+        ranges::transform(processNameLowerCase, processNameLowerCase.begin(), towlower);
         auto lookup = gameConfigs.find(processNameLowerCase);
         if (lookup == gameConfigs.end())
             return false;
@@ -188,7 +188,7 @@ namespace core::configuration {
                 return false;
 
             wstring processNameLowerCase = processName;
-            transform(processNameLowerCase.begin(), processNameLowerCase.end(), processNameLowerCase.begin(), towlower);
+            ranges::transform(processNameLowerCase, processNameLowerCase.begin(), towlower);
             auto& gameConfig = gameConfigs[processNameLowerCase];
 
             gameConfig.processName = new WCHAR[processName.size() + 1];
@@ -196,7 +196,7 @@ namespace core::configuration {
             gameConfig.processName[processName.size()] = L'\0';
 
             if (addressOffsets.size() > 0) {
-                CComSafeArray<DWORD> addressChain{ (ULONG)addressOffsets.size() };
+                CComSafeArray<DWORD> addressChain{ scast<ULONG>(addressOffsets.size()) };
                 memcpy(addressChain.m_psa->pvData, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
                 gameConfig.Address = addressChain.Detach();
             }
@@ -482,7 +482,7 @@ tuple<VkCodes, bool> ReadVkCodes() {
                 convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
             return { move(vkCodes), false };
         }
-        vkCodes[key] = (BYTE)value;
+        vkCodes[key] = scast<BYTE>(value);
     }
 
     return { move(vkCodes), true };

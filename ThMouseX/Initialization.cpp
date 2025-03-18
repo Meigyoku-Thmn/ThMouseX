@@ -76,7 +76,7 @@ namespace core {
         PathRemoveExtensionW(g_currentProcessName);
 
         if (helper::IsCurrentProcessThMouseX()) {
-            errormsg::EnsureCorrectness();
+            errormsg::Initialize();
             shellcode::Initialize();
             return;
         }

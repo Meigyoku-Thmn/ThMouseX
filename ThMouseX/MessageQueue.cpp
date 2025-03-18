@@ -167,7 +167,7 @@ namespace core::messagequeue {
         { SCROLL_RIGHT_EVENT,   &g_scrolledRight    },
     };
 
-    static MatchStatus TestVkCode(PMSG e, BYTE vkCode) {
+    static MatchStatus TestVkCode(const MSG* e, BYTE vkCode) {
         using enum MatchStatus;
         auto [messageUp, wParamUp, lParamUp, messageDown, wParamDown, lParamDown] = helper::ConvertVkCodeToMessage(vkCode);
         if (messageUp == WM_NULL &&
@@ -193,7 +193,7 @@ namespace core::messagequeue {
         return None;
     }
 
-    static bool IsMouseAndKeyboardInput(PMSG e) {
+    static bool IsMouseAndKeyboardInput(const MSG* e) {
         auto msg = e->message;
         return msg == WM_KEYUP || msg == WM_KEYDOWN ||
             msg == WM_LBUTTONUP || msg == WM_LBUTTONDOWN ||
@@ -204,7 +204,7 @@ namespace core::messagequeue {
     }
 
     static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        auto e = PMSG(lParam);
+        auto e = rcast<PMSG>(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
             using enum MatchStatus;
             if (g_showImGui) {
@@ -257,7 +257,7 @@ namespace core::messagequeue {
                 cursorNormalized = true;
                 NormalizeCursor();
             }
-            auto e = (PCWPRETSTRUCT)lParam;
+            auto e = rcast<PCWPRETSTRUCT>(lParam);
             if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
@@ -360,13 +360,13 @@ namespace core::messagequeue {
                     continue;
                 if (!WriteProcessMemory(hProcess.get(), remoteInput, &shellcodeInput, sizeof(shellcodeInput), nil))
                     continue;
-                auto remoteCode = VirtualAllocEx(hProcess.get(), nullptr, shellcodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+                auto remoteCode = VirtualAllocEx(hProcess.get(), nil, shellcodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
                 defer({ VirtualFreeEx(hProcess.get(), remoteCode, 0, MEM_RELEASE); });
                 if (!remoteCode)
                     continue;
                 if (!WriteProcessMemory(hProcess.get(), remoteCode, unloadingShellcode, shellcodeSize, nil))
                     continue;
-                Handle remoteThread{ CreateRemoteThread(hProcess.get(), nullptr, 0, (ThreadFunc)remoteCode, remoteInput, 0, nil) };
+                Handle remoteThread{ CreateRemoteThread(hProcess.get(), nil, 0, scast<ThreadFunc>(remoteCode), remoteInput, 0, nil) };
                 WaitForSingleObject(remoteThread.get(), 1000);
             }
         }

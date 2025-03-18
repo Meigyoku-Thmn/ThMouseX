@@ -40,7 +40,7 @@ namespace common::luaapi {
         auto scriptHandle = LoadResource(dllModule, scriptRes);
         if (scriptHandle == nil)
             return;
-        LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
+        LuaJitPrepScript = string(scast<const char*>(LockResource(scriptHandle)), scriptSize);
         LuaJitPrepScript
             .append("\n")
             .append(format(SYM_NAME(MH_UNKNOWN)" = {}\n",                   /* */ to_string(MH_UNKNOWN)))
@@ -70,7 +70,7 @@ namespace common::luaapi {
     }
 
     DWORD ReadUInt32(uintptr_t address) {
-        return *PDWORD(address);
+        return *rcast<PDWORD>(address);
     }
 
     uintptr_t ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {

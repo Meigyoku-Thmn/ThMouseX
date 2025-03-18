@@ -71,7 +71,7 @@ namespace common::luajit {
 
         auto oldStackSize = lua_gettop(L);
 
-        lua_pushinteger(L, uintptr_t(g_coreModule));
+        lua_pushinteger(L, rcast<uintptr_t>(g_coreModule));
         lua_setglobal(L, THMOUSEX_MODULE_HANDLE);
         if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::LuaJitPrepScript.c_str()))) {
             note::ToFile("[LuaJIT] The above error occurred in Preparation Script.");
@@ -117,7 +117,7 @@ namespace common::luajit {
             return NULL;
         }
 
-        auto result = uintptr_t(lua_tointeger(L, -1));
+        auto result = scast<uintptr_t>(lua_tointeger(L, -1));
         lua_settop(L, oldStackSize);
         return result;
     }

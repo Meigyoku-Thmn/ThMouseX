@@ -46,7 +46,7 @@ namespace core::imguioverlay {
     void Configure(float fontScale) {
         auto& io = ImGui::GetIO();
         io.Fonts->Clear();
-        auto fontSize = round(float(g_c.ImGuiBaseFontSize) * fontScale);
+        auto fontSize = round(scast<float>(g_c.ImGuiBaseFontSize) * fontScale);
         if (fontSize < 13)
             io.Fonts->AddFontDefault();
         else if (!io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(g_c.ImGuiFontPath).c_str(), fontSize))
@@ -54,7 +54,7 @@ namespace core::imguioverlay {
     }
     ImDrawData* Render(unsigned int renderWidth, unsigned int renderHeight, float mouseScaleX, float mouseScaleY) {
         auto& io = ImGui::GetIO();
-        io.DisplaySize = ImVec2(float(renderWidth), float(renderHeight));
+        io.DisplaySize = ImVec2(scast<float>(renderWidth), scast<float>(renderHeight));
         ImGui_ImplWin32_SetMousePosScale(mouseScaleX, mouseScaleY);
         ImGui::NewFrame();
 
@@ -74,8 +74,8 @@ namespace core::imguioverlay {
             ImGui::AlignTextToFramePadding();
             ImGui::Text("Movement Algorithm:");
             ImGui::InvisibleButton("##padding-left", ImVec2(5, 1)); ImGui::SameLine();
-            ImGui::RadioButton("Bresenham's Line", (int*)&g_movementAlgorithm, (int)MovementAlgorithm::Bresenham); ImGui::SameLine();
-            ImGui::RadioButton("Simple", (int*)&g_movementAlgorithm, (int)MovementAlgorithm::Simple);
+            ImGui::RadioButton("Bresenham's Line", rcast<int*>(&g_movementAlgorithm), scast<int>(MovementAlgorithm::Bresenham)); ImGui::SameLine();
+            ImGui::RadioButton("Simple", rcast<int*>(&g_movementAlgorithm), scast<int>(MovementAlgorithm::Simple));
 
             if (ImGui::Button("Show Variable Viewer")) {
                 showVariableViewer = true;

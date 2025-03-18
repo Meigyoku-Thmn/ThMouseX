@@ -40,9 +40,9 @@ namespace core::comclient {
         return true;
     }
 
-    bool GetGameConfig(PWCHAR processName, GameConfig& gameConfig, CommonConfig& commonConfig) {
+    bool GetGameConfig(const WCHAR* processName, GameConfig& gameConfig, CommonConfig& commonConfig) {
         packaged_task<bool()> task([&] {
-            auto hr = CoInitialize(nullptr);
+            auto hr = CoInitialize(nil);
             if (hr != S_OK && hr != S_FALSE) {
                 note::HResultToFile(TAG "CoInitialize failed", hr);
                 return false;

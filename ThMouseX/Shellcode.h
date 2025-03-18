@@ -5,5 +5,5 @@
 namespace core::shellcode {
     extern SIZE_T ShellcodeSectionSize;
     void Initialize();
-    SHELLCODE DWORD WINAPI UnloadingShellcode(ShellcodeInput* inp);
+    SHELLCODE DWORD WINAPI UnloadingShellcode(const ShellcodeInput* inp);
 }

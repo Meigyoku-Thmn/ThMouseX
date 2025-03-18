@@ -4,5 +4,5 @@
 
 namespace core::comclient {
     bool Initialize();
-    bool GetGameConfig(PWCHAR processName, GameConfig& gameConfig, CommonConfig& commonConfig);
+    bool GetGameConfig(const WCHAR* processName, GameConfig& gameConfig, CommonConfig& commonConfig);
 }

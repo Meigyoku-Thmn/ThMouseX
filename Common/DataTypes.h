@@ -25,9 +25,8 @@ struct GameConfigLocal : GameConfig {
 };
 
 struct GameConfigEx : GameConfig {
-    GameConfigEx() = default;
     bool CopyFrom(const GameConfig& gameConfig) {
-        *(GameConfig*)this = gameConfig;
+        *scast<GameConfig*>(this) = gameConfig;
         auto hr = SafeArrayCopy(this->Address, &this->Address);
         auto processNameSize = (wcslen(this->processName) + 1) * sizeof(this->processName[0]);
         auto allocated = CoTaskMemAlloc(processNameSize);
@@ -38,7 +37,7 @@ struct GameConfigEx : GameConfig {
         if (!allocated || FAILED(hr)) {
             SafeArrayDestroy(this->Address);
             CoTaskMemFree(allocated);
-            *(GameConfig*)this = {};
+            *scast<GameConfig*>(this) = {};
             return false;
         }
         return true;
@@ -57,9 +56,8 @@ struct CommonConfigLocal : CommonConfig {
 };
 
 struct CommonConfigEx : CommonConfig {
-    CommonConfigEx() = default;
     bool CopyFrom(const CommonConfig& commonConfig) {
-        *(CommonConfig*)this = commonConfig;
+        *scast<CommonConfig*>(this) = commonConfig;
         auto textureFilePathSize = (wcslen(this->TextureFilePath) + 1) * sizeof(this->TextureFilePath[0]);
         auto allocated1 = CoTaskMemAlloc(textureFilePathSize);
         if (allocated1) {
@@ -75,7 +73,7 @@ struct CommonConfigEx : CommonConfig {
         if (!allocated1 || !allocated2) {
             CoTaskMemFree(allocated1);
             CoTaskMemFree(allocated2);
-            *(CommonConfig*)this = {};
+            *scast<CommonConfig*>(this) = {};
             return false;
         }
         return true;
@@ -136,7 +134,7 @@ DEFINE_ENUM_FLAG_OPERATORS(GameInput);
 struct string_hash {
     using hash_type = std::hash<std::string_view>;
     using is_transparent = void;
-    size_t operator()(const PCHAR str) const { return hash_type{}(str); }
+    size_t operator()(const char* str) const { return hash_type{}(str); }
     size_t operator()(std::string_view str) const { return hash_type{}(str); }
     size_t operator()(std::string const& str) const { return hash_type{}(str); }
 };
@@ -172,7 +170,7 @@ struct TimerQueueTimerHandleDeleter {
     using pointer = HANDLE;
     void operator()(pointer handle) const {
         if (handle != nil) {
-            auto _ = DeleteTimerQueueTimer(nullptr, handle, nullptr);
+            auto _ = DeleteTimerQueueTimer(nil, handle, nil);
             if (_ == FALSE) {
                 // ignore
             }
@@ -281,5 +279,5 @@ struct ShellcodeInput {
 
 using ThreadFunc = LPTHREAD_START_ROUTINE;
 
-typedef void(__cdecl *UninitializeCallbackType)(bool isProcessTerminating);
-typedef void(__cdecl *CallbackType)();
+typedef void(__cdecl* UninitializeCallbackType)(bool isProcessTerminating);
+typedef void(__cdecl* CallbackType)();

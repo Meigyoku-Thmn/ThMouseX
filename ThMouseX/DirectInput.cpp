@@ -80,18 +80,18 @@ namespace core::directinput {
                         note::LastErrorToFile(message.c_str());
                     break;
                 }
-                auto resHandle = FindResourceW(dinput8, MAKEINTRESOURCEW(exitCode), (LPWSTR)RT_RCDATA);
+                auto resHandle = FindResourceW(dinput8, MAKEINTRESOURCEW(exitCode), rcast<LPWSTR>(RT_RCDATA));
                 if (resHandle == nil) {
                     note::LastErrorToFile(TAG "Failed to get the mapping table from DInput8.dll");
                     break;
                 }
-                auto mappingTable = (BYTE*)LoadResource(dinput8, resHandle);
+                auto mappingTable = scast<BYTE*>(LoadResource(dinput8, resHandle));
                 if (mappingTable == nil) {
                     note::LastErrorToFile(TAG "Failed to get the mapping table from DInput8.dll");
                     break;
                 }
                 for (auto& ruleItem : inputRule) {
-                    auto vkCodeSrc = ruleItem.vkCodeSrcPtr == nil ? (BYTE)0 : *ruleItem.vkCodeSrcPtr;
+                    auto vkCodeSrc = ruleItem.vkCodeSrcPtr == nil ? BYTE(0) : *ruleItem.vkCodeSrcPtr;
                     ruleItem.dikCodeDest = helper::MapVk2Dik(vkCodeSrc, mappingTable, ruleItem.dikCodeDest);
                 }
             } while (false);
@@ -99,7 +99,7 @@ namespace core::directinput {
             initialized = true;
         }
 
-        auto _DirectInput8Create = (decltype(&DirectInput8Create))GetProcAddress(dinput8, "DirectInput8Create");
+        auto _DirectInput8Create = rcast<decltype(&DirectInput8Create)>(GetProcAddress(dinput8, "DirectInput8Create"));
         if (!_DirectInput8Create) {
             note::LastErrorToFile(TAG "Failed to import DInput8.dll|DirectInput8Create");
             return;
@@ -119,10 +119,10 @@ namespace core::directinput {
             return;
         }
 
-        auto vtable = *(uintptr_t**)pDevice8.Get();
+        auto vtable = *rcast<uintptr_t**>(pDevice8.Get());
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8, APP_NAME "_GetDeviceStateDInput8" },
+            { rcast<PVOID>(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8, APP_NAME "_GetDeviceStateDInput8" },
         });
     }
 
@@ -130,7 +130,7 @@ namespace core::directinput {
         using enum GameInput;
         auto hr = OriGetDeviceStateDInput8(pDevice, cbData, lpvData);
         if (SUCCEEDED(hr) && cbData == sizeof(BYTE) * 256) {
-            auto keys = PBYTE(lpvData);
+            auto keys = scast<PBYTE>(lpvData);
             auto gameInput = inputdetermine::DetermineGameInput();
             for (const auto& ruleItem : inputRule) {
                 if ((gameInput & ruleItem.input) == ruleItem.input)

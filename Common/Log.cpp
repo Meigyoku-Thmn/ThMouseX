@@ -31,9 +31,9 @@ namespace common::log {
             return;
 #pragma warning(push)
 #pragma warning(disable: 6031)
-        freopen("conin$", "r", stdin);
-        freopen("conout$", "w", stdout);
-        freopen("conout$", "w", stderr);
+        ignore = freopen("conin$", "r", stdin);
+        ignore = freopen("conout$", "w", stdout);
+        ignore = freopen("conout$", "w", stderr);
 #pragma warning(pop)
         printf("Debugging Window:\n\n");
     }
@@ -59,7 +59,7 @@ namespace common::log {
     void ComErrToFile(const char* message, const _com_error& error) {
         auto description = error.Description();
         if (description.length() > 0) {
-            ToFile("%s: %s", message, (char*)description);
+            ToFile("%s: %s", message, scast<char*>(description));
             return;
         }
         auto errorMessage = string(error.ErrorMessage());

@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include <span>
+#include <vector>
 
 #include "ErrorMsg.h"
 #include "ErrorMsg.Cor.h"
@@ -11,11 +12,12 @@
 using namespace std;
 
 namespace common::errormsg {
-    const span<const ErrorMessage> messageGroups[] = { cor::messages, d3d::messages, ddraw::messages };
-    void EnsureCorrectness() {
+    vector<span<const ErrorMessage>> messageGroups;
+    void Initialize() {
         cor::EnsureCorrectness();
         d3d::EnsureCorrectness();
         ddraw::EnsureCorrectness();
+        messageGroups = { cor::messages, d3d::messages, ddraw::messages };
     }
     string GuessErrorsFromHResult(HRESULT hr) {
         string errorMessage = "";

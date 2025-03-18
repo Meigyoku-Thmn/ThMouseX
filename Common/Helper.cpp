@@ -140,11 +140,11 @@ namespace common::helper {
         }
         else if (d3dWidth > clientWidth || d3dHeight > clientHeight) {
             // fix for Touhou 18
-            RECTSIZE size{ 0, 0, LONG(d3dWidth), LONG(d3dHeight) };
+            RECTSIZE size{ 0, 0, scast<LONG>(d3dWidth), scast<LONG>(d3dHeight) };
             auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
             auto hasMenu = GetMenu(g_hFocusWindow) != nil ? TRUE : FALSE;
             auto exStyle = GetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE);
-            AdjustWindowRectEx(&size, (DWORD)style, hasMenu, (DWORD)exStyle);
+            AdjustWindowRectEx(&size, scast<DWORD>(style), hasMenu, scast<DWORD>(exStyle));
             auto updateFlags = SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOREPOSITION;
             SetWindowPos(g_hFocusWindow, nil, 0, 0, size.width(), size.height(), updateFlags);
         }
@@ -180,7 +180,7 @@ namespace common::helper {
     }
 
     bool IsCurrentProcessThMouseX() {
-        auto envVal = getenv(APP_NAME);
+        const char* envVal = getenv(APP_NAME);
         if (envVal == nil)
             return false;
         return strcmp(envVal, APP_NAME) == 0;
@@ -218,10 +218,10 @@ namespace common::helper {
             key == VK_CANCEL;
     }
 
-    BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable, BYTE defaultDikCode) {
+    BYTE MapVk2Dik(BYTE vkCode, const BYTE* mappingTable, BYTE defaultDikCode) {
         if (vkCode == 0)
             return defaultDikCode;
-        auto scancode = (BYTE)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX);
+        auto scancode = scast<BYTE>(MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX));
         if (vkCode == VK_PAUSE)
             scancode = 0x45;
         else if (vkCode == VK_NUMLOCK && scancode == 0x45 || ShouldBeVkExtended(vkCode))
@@ -270,22 +270,22 @@ namespace common::helper {
         if (vkCode == SCROLL_UP_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) > 0; }, nil
+                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return scast<INT16>(_wParam >> 16) > 0; }, nil
             );
         if (vkCode == SCROLL_DOWN_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) < 0; }, nil
+                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return scast<INT16>(_wParam >> 16) < 0; }, nil
             );
         if (vkCode == SCROLL_LEFT_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) < 0; }, nil
+                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return scast<INT16>(_wParam >> 16) < 0; }, nil
             );
         if (vkCode == SCROLL_RIGHT_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) > 0; }, nil
+                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return scast<INT16>(_wParam >> 16) > 0; }, nil
             );
         return VkCodeMessage(
             WM_KEYUP, [](auto _wParam, auto _vkCode) { return _wParam == _vkCode; }, nil,
@@ -324,7 +324,7 @@ namespace common::helper {
 
     void ComMethodTimeout(const function<void()>& comAction, DWORD timeout) {
         atomic<DWORD> mainThreadId = GetCurrentThreadId();
-        Handle waitHandle{ CreateEventW(nullptr, TRUE, FALSE, nullptr) };
+        Handle waitHandle{ CreateEventW(nil, TRUE, FALSE, nil) };
         if (waitHandle == nil) {
             log::LastErrorToFile("CreateEventW failed");
             return;
@@ -339,14 +339,14 @@ namespace common::helper {
             SetEvent(waitHandle.get());
         };
         auto timeoutCallbackThunk = [](auto callback, UNUSED auto _) {
-            (*(decltype(timeoutCallback)*)callback)();
+            (*scast<decltype(timeoutCallback)*>(callback))();
         };
-        auto timerHandle = CreateTimerQueueTimer(nullptr, timeoutCallbackThunk, &timeoutCallback, timeout, 0, WT_EXECUTEONLYONCE);
+        auto timerHandle = CreateTimerQueueTimer(nil, timeoutCallbackThunk, &timeoutCallback, timeout, 0, WT_EXECUTEONLYONCE);
         if (!timerHandle) {
             log::LastErrorToFile("CreateTimerQueueTimer failed");
             return;
         }
-        auto hr = CoEnableCallCancellation(nullptr);
+        auto hr = CoEnableCallCancellation(nil);
         if (FAILED(hr)) {
             log::HResultToFile("CoEnableCallCancellation failed", hr);
             return;
@@ -355,7 +355,7 @@ namespace common::helper {
         auto _mainThreadId = mainThreadId.exchange(0);
         if (_mainThreadId == 0)
             WaitForSingleObject(waitHandle.get(), INFINITE);
-        hr = CoDisableCallCancellation(nullptr);
+        hr = CoDisableCallCancellation(nil);
         if (FAILED(hr))
             log::HResultToFile("CoDisableCallCancellation failed", hr);
     }
@@ -364,7 +364,7 @@ namespace common::helper {
         HANDLE timerHandle{};
         auto rs = ::CreateTimerQueueTimer(&timerHandle, TimerQueue, Callback, Parameter, DueTime, Period, Flags);
         if (!rs)
-            timerHandle = nullptr;
+            timerHandle = nil;
         return TimerQueueTimerHandle{ timerHandle };
     }
 

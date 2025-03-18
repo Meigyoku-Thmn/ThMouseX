@@ -54,8 +54,8 @@ static void SendKeyDown(BYTE vkCode) {
             .type = INPUT_KEYBOARD,
             .ki = {
                 .wVk = helper::NormalizeLeftRightVkCode(vkCode),
-                .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX),
-                .dwFlags = DWORD(helper::ShouldBeVkExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0),/*
+                .wScan = scast<WORD>(MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX)),
+                .dwFlags = scast<DWORD>(helper::ShouldBeVkExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0),/*
           */},
         };
         ::SendInput(1, &input, sizeof(INPUT));
@@ -76,8 +76,8 @@ static void SendKeyUp(BYTE vkCode) {
             .type = INPUT_KEYBOARD,
             .ki = {
                 .wVk = helper::NormalizeLeftRightVkCode(vkCode),
-                .wScan = (WORD)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX),
-                .dwFlags = DWORD(KEYEVENTF_KEYUP | (helper::ShouldBeVkExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0)),/*
+                .wScan = scast<WORD>(MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX)),
+                .dwFlags = scast<DWORD>(KEYEVENTF_KEYUP | (helper::ShouldBeVkExtended(vkCode) ? KEYEVENTF_EXTENDEDKEY : 0)),/*
           */},
         };
         ::SendInput(1, &input, sizeof(INPUT));

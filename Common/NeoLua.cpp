@@ -37,7 +37,7 @@ namespace common::neolua {
             return;
         }
 
-        auto _CLRCreateInstance = (decltype(&CLRCreateInstance))GetProcAddress(mscoree, "CLRCreateInstance");
+        auto _CLRCreateInstance = rcast<decltype(&CLRCreateInstance)>(GetProcAddress(mscoree, "CLRCreateInstance"));
         if (!_CLRCreateInstance) {
             log::LastErrorToFile(TAG " Failed to import mscoree.dll|CLRCreateInstance");
             return;
@@ -61,7 +61,7 @@ namespace common::neolua {
         }
         ComPtr<ICLRRuntimeInfo> runtimeInfo;
         ULONG count = 0;
-        result = enumerator->Next(1, (IUnknown**)&runtimeInfo, &count);
+        result = enumerator->Next(1, scast<IUnknown**>(&runtimeInfo), &count);
         if (FAILED(result)) {
             note::HResultToFile(TAG "Cannot enumerate on IEnum", result);
             return;

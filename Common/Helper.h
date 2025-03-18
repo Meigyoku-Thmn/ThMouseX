@@ -27,7 +27,7 @@ namespace common::helper {
     bool IsCurrentProcessThMouseX();
     std::tuple<DWORD, std::string> CallProcess(const std::wstring& processPath, const std::wstring& cmdLine);
     bool ShouldBeVkExtended(BYTE key);
-    BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable, BYTE defaultDikCode = 0);
+    BYTE MapVk2Dik(BYTE vkCode, const BYTE* mappingTable, BYTE defaultDikCode = 0);
     BYTE NormalizeLeftRightVkCode(BYTE vkCode);
     VkCodeMessage ConvertVkCodeToMessage(BYTE vkCode);
     HRESULT Win32FromHResult(HRESULT hr);
