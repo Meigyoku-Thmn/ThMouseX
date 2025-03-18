@@ -15,19 +15,11 @@
 #include "../Common/Log.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
-#include "Direct3D8.h"
-#include "Direct3D9.h"
-#include "Direct3D11.h"
-#include "DirectInput.h"
 #include "Configuration.h"
 
 namespace note = common::log;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
-namespace directx8 = core::directx8;
-namespace directx9 = core::directx9;
-namespace directx11 = core::directx11;
-namespace directinput = core::directinput;
 
 #define GameFile "Games.txt"
 #define GameFile2 "Games2.txt"

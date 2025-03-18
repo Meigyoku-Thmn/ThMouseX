@@ -36,7 +36,9 @@ namespace neolua = common::neolua;
 namespace lua = common::lua;
 namespace messagequeue = core::messagequeue;
 namespace sendkey = core::sendkey;
+#ifndef _WIN64
 namespace directx8 = core::directx8;
+#endif
 namespace directx9 = core::directx9;
 namespace directx11 = core::directx11;
 namespace directinput = core::directinput;
@@ -95,7 +97,9 @@ namespace core {
 
         directx11::Initialize();
         directx9::Initialize();
+#ifndef _WIN64
         directx8::Initialize();
+#endif
 
         directinput::Initialize();
         sendkey::Initialize();
@@ -119,7 +123,9 @@ namespace core {
         if (allowInitialization) {
             directx11::Initialize();
             directx9::Initialize();
+#ifndef _WIN64
             directx8::Initialize();
+#endif
             directinput::Initialize();
             minhook::EnableAll();
         }

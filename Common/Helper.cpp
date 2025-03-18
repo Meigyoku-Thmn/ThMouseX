@@ -144,7 +144,7 @@ namespace common::helper {
             auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
             auto hasMenu = GetMenu(g_hFocusWindow) != nil ? TRUE : FALSE;
             auto exStyle = GetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE);
-            AdjustWindowRectEx(&size, style, hasMenu, exStyle);
+            AdjustWindowRectEx(&size, (DWORD)style, hasMenu, (DWORD)exStyle);
             auto updateFlags = SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOREPOSITION;
             SetWindowPos(g_hFocusWindow, nil, 0, 0, size.width(), size.height(), updateFlags);
         }

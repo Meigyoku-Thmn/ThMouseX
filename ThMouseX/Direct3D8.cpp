@@ -1,3 +1,4 @@
+#ifndef _WIN64
 #include <Windows.h>
 #include <DirectX8/Include/d3d8.h>
 #include <DirectX8/Include/d3dx8core.h>
@@ -428,3 +429,4 @@ namespace core::directx8 {
         return OriPresent(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
     }
 }
+#endif
