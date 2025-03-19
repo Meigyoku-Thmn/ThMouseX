@@ -70,10 +70,11 @@ It also have preconfiguration of some other games:
 
 You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt.
 
-Try to build the development branch if it doesn't work, see FAQ below.
+You can try the [<code>development</code>](https://github.com/Meigyoku-Thmn/ThMouseX/tree/development) branch if something doesn't work, see the [Compilation](#compilation) section below.
 
-FAQ
+Compilation
 ---
+There are 2 branches: the <code>master</code> branch, and the <code>development</code> branch. The <code>development</code> branch is for experimental features.
 ### How to compile on your computer (not recommended for non-tech savvy)
 <details>
     <summary>Click to show</summary>
@@ -113,7 +114,7 @@ FAQ
     <table><tr><td></td></tr><tr><td>
         <ol>
             <li>
-                <p>Fork the THMouseX repository to your Github account</p>
+                <p>Fork the ThMouseX repository to your Github account</p>
                 <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/4b941f22-594d-46c6-be83-818db918e2d4">
             </li>
             <li>
@@ -140,6 +141,8 @@ FAQ
     </td></tr></table>
 </details>
 
+Instructions
+-----------------------
 ### How to use ThMouseX?
 1. Run ThMouseX.exe, or ThMouseXGUI.exe
 2. Run your game, or you can run your game first and then run ThMouseX.exe.
