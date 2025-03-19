@@ -53,7 +53,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market           (v1.00a)
 * Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost     (v1.10c)
 
-It also have preconfiguration of some other games:
+It also have preconfiguration of some other games (try the development branch if it doesn't work, see FAQ below): 
 * [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
 * [東方幕華祭 〜 Fantastic Danmaku Festival](https://store.steampowered.com/app/882710/_TouHou_Makuka_Sai__Fantastic_Danmaku_Festival/)
 * [東方幕華祭 春雪篇 〜 Fantastic Danmaku Festival Part II](https://store.steampowered.com/app/1031480/TouHou_Makuka_Sai__Fantastic_Danmaku_Festival_Part_II/)
@@ -85,18 +85,32 @@ Remember to **compile for 32-bit, toolset v143, .NET Framework 4.8**, and make s
 * ConfigScripts
 * 0Harmony.dll
 * Common.dll
-* Cursor.png
 * DX8Hook.dll
-* Games.txt
 * Neo.Lua.dll
 * NeoLuaBootstrap.dll
 * Sigil.dll
 * ThMCore.dll
 * THMouseX.exe
-* ThMouseX.txt
+* Cursor.png
+* ThMouseX.ini
 * VirtualKeyCodes.txt
+* Games.txt
 
 The above files should be populated in `ThMouseXGUI\bin` directory.
+
+If you build the development branch, make sure these files and folder are in the same folder:
+* ConfigScripts
+* 0Harmony.dll
+* Neo.Lua.dll
+* NeoLuaBootstrap.dll
+* THMouseX.dll
+* THMouseXGUI.exe
+* Cursor.png
+* ThMouseX.ini
+* VirtualKeyCodes.txt
+* Games.txt
+
+The above files should be populated in `Release\x86` directory.
 
 ### Another way to compile without installing anything on your computer (recommended way)
 - Fork the THMouseX repository to your Github account<br>
