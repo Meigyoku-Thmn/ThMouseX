@@ -53,7 +53,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market           (v1.00a)
 * Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost     (v1.10c)
 
-It also have preconfiguration of some other games (try the development branch if it doesn't work, see FAQ below):
+It also have preconfiguration of some other games:
 * [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
 * [東方幕華祭 〜 Fantastic Danmaku Festival](https://store.steampowered.com/app/882710/_TouHou_Makuka_Sai__Fantastic_Danmaku_Festival/)
 * [東方幕華祭 春雪篇 〜 Fantastic Danmaku Festival Part II](https://store.steampowered.com/app/1031480/TouHou_Makuka_Sai__Fantastic_Danmaku_Festival_Part_II/)
@@ -70,10 +70,15 @@ It also have preconfiguration of some other games (try the development branch if
 
 You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt.
 
+Try to build the development branch if it doesn't work, see FAQ below.
+
 FAQ
 ---
 ### How to compile on your computer (not recommended for non-tech savvy)
-This project can be compiled via Visual Studio (I use Visual Studio 2022), or just Visual Studio Build Tools:
+<details>
+    <summary>Click to show</summary>
+    
+<br>This project can be compiled via Visual Studio (I use Visual Studio 2022), or just Visual Studio Build Tools:
 * [Visual Studio](https://visualstudio.microsoft.com/), select "Desktop development with C++" during installation.
 * [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools), select "Visual C++ build tools" during installation.
 
@@ -96,20 +101,43 @@ Remember to **compile for 32-bit, toolset v143, .NET Framework 4.8**, and make s
 
 The above files should be populated in `Release\x86` directory.
 
+</details>
+
 ### Another way to compile without installing anything on your computer (recommended way)
-- Fork the THMouseX repository to your Github account<br>
-![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/4b941f22-594d-46c6-be83-818db918e2d4)
-- Go to the "Actions" tab<br>
-![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/34ed8954-c711-4df4-843e-f730d8483394)
-- Click "Deployment" on the left sidebar<br>
-![chrome_1lYLXTdT9o](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/81c9cd3b-ef98-4092-a172-b48f379dd2c8)
-- Run the workflow<br>
-![chrome_AxRRzs1MUn](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/cdf4206b-4fa5-4e70-a0ac-a7e325d30ef9)
-- Wait for it, then download the produced zipped artifact (shown up in the page with url form `https://github.com/<username>/ThMouseX/actions/runs/<flowid>`)<br>
-![chrome_jdw1pXLJl2](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/0bcf952d-4acf-4db7-ba83-8e7d106b0301)
+<details>
+    <summary>Click to show</summary>
+    <table><tr><td></td></tr><tr><td>
+        <ol>
+            <li>
+                <p>Fork the THMouseX repository to your Github account</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/4b941f22-594d-46c6-be83-818db918e2d4">
+            </li>
+            <li>
+                <p>Go to the "Actions" tab</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/34ed8954-c711-4df4-843e-f730d8483394">
+            </li>
+            <li>
+                <p>Click "Deployment" on the left sidebar</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/81c9cd3b-ef98-4092-a172-b48f379dd2c8">
+            </li>
+            <li>
+                <p>If you want to build the development branch</p>
+                <img src="https://github.com/user-attachments/assets/034ca81f-469a-44b9-91d0-d9e79b72484d">
+            </li>
+            <li>
+                <p>Run the workflow</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/cdf4206b-4fa5-4e70-a0ac-a7e325d30ef9">
+            </li>
+            <li>
+                <p>Wait for it, then download the produced zipped artifact<br>(shown up in the page with url form <code>https://github.com/<username>/ThMouseX/actions/runs/<flowid></code>)</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/0bcf952d-4acf-4db7-ba83-8e7d106b0301">
+            </li>
+        </ol>
+    </td></tr></table>
+</details>
 
 ### How to use ThMouseX?
-1. Run ThMouseX.exe.
+1. Run ThMouseX.exe, or ThMouseXGUI.exe
 2. Run your game, or you can run your game first and then run ThMouseX.exe.
 3. If the game is supported, a cursor will show upon entering the game.
 
