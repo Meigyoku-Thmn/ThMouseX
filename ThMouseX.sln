@@ -58,6 +58,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "minhook", "minhook", "{586D
 		vcpkg_custom_ports\minhook\vcpkg.json = vcpkg_custom_ports\minhook\vcpkg.json
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github-workflows", "github-workflows", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build.yml = .github\workflows\build.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -130,6 +135,7 @@ Global
 		{0BC970E8-88F7-409A-A19C-864968D63227} = {B337E9DD-BB1B-4851-B933-05C75CB5D9AC}
 		{044C7786-B635-46BD-874B-EF75F6B0DE2B} = {0BC970E8-88F7-409A-A19C-864968D63227}
 		{586DA747-0EB4-4011-B4D4-08746257FF20} = {0BC970E8-88F7-409A-A19C-864968D63227}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {B337E9DD-BB1B-4851-B933-05C75CB5D9AC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B04EB577-D4A9-409A-8E97-AC2E350FEE6B}
