@@ -77,30 +77,34 @@ FAQ
 ### How to compile on your computer (not recommended for non-tech savvy)
 <details>
     <summary>Click to show</summary>
-    
-<br>This project can be compiled via Visual Studio (I use Visual Studio 2022), or just Visual Studio Build Tools:
-* [Visual Studio](https://visualstudio.microsoft.com/), select "Desktop development with C++" during installation.
-* [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools), select "Visual C++ build tools" during installation.
-
-Also you need [.NET Framework 4.8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet-framework).
-
-You also need to setup [vcpkg](https://vcpkg.io/en/getting-started.html) and put vcpkg folder path into the PATH of environment variables.
-
-Remember to **compile for 32-bit, toolset v143, .NET Framework 4.8**, and make sure these files and folder are in the same folder:
-* ThMouseXGUI.exe
-* ThMouseX.dll
-* NeoLuaBootstrap.dll
-* Neo.Lua.dll
-* 0Harmony.dll
-* Sigil.dll (not in development branch)
-* Games.txt
-* ThMouseX.ini
-* VirtualKeyCodes.txt
-* Cursor.png
-* ConfigScripts
-
-The above files should be populated in `Release\x86` directory.
-
+    <table><tr><td></td></tr><tr><td>
+        <p>This project can be compiled via Visual Studio (I use Visual Studio 2022), or just Visual Studio Build Tools:</p>
+        <ul>
+            <li>
+                <a href="https://visualstudio.microsoft.com">Visual Studio</a>, select "Desktop development with C++" during installation.
+            </li>
+            <li>
+                <a href="https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools">Visual Studio Build Tools</a>, select "Visual C++ build tools" during installation.
+            </li>
+        </ul>        
+        <p>Also you need <a href="https://dotnet.microsoft.com/en-us/download/dotnet-framework">.NET Framework 4.8 SDK</a>.</p>
+        <p>You also need to setup <a href="https://vcpkg.io/en/getting-started.html">vcpkg</a> and put vcpkg folder path into the PATH of environment variables, use the command <code>vcpkg integrate install</code> to integrate it with Visual Studio.</p>      
+        <p>Remember to <strong>compile for 32-bit, toolset v143, .NET Framework 4.8</strong>, and make sure these files and folder are in the same folder:</p>
+        <ul>
+            <li>ThMouseXGUI.exe</li>
+            <li>ThMouseX.dll</li>
+            <li>NeoLuaBootstrap.dll</li>
+            <li>Neo.Lua.dll</li>
+            <li>0Harmony.dll</li>
+            <li>Sigil.dll (not in development branch)</li>
+            <li>Games.txt</li>
+            <li>ThMouseX.ini</li>
+            <li>VirtualKeyCodes.txt</li>
+            <li>Cursor.png</li>
+            <li>ConfigScripts (folder)</li>
+        </ul>
+        <p>The above files should be populated in <code>Release\x86</code> directory.</p>
+    </td></tr></table>
 </details>
 
 ### Another way to compile without installing anything on your computer (recommended way)
