@@ -24,9 +24,9 @@ Differences of the fork
 
 Drawbacks
 --------
-* Only works with 32-bit games, if there is a good 64-bit bullet hell game I will consider adding 64-bit support.
+* Only works with 32-bit games, 64-bit games will be supported soon.
 * Doesn't work well with Steam Overlay, although this is minimal.
-* Doesn't work well with other mods that inject their own overlay (for example, [thprac](https://github.com/touhouworldcup/thprac)), they can still work but the overlays will override each other.
+* Doesn't work well with other mods that inject their own overlay (for example, [thprac](https://github.com/touhouworldcup/thprac)), they can still work but the overlays may override each other.
 * Configuration is difficult.
 
 Preconfigured games
