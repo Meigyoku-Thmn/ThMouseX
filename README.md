@@ -93,7 +93,9 @@ There are 2 branches: the <code>master</code> branch, and the <code>development<
         <p>Remember to <strong>compile for 32-bit, toolset v143, .NET Framework 4.8</strong>, and make sure these files and folder are in the same folder:</p>
         <ul>
             <li>ThMouseXGUI.exe</li>
+            <li>ThMouseXGUI.64.exe</li>
             <li>ThMouseX.dll</li>
+            <li>ThMouseX.64.dll</li>
             <li>ThMouseX.DotNet.dll</li>
             <li>Neo.Lua.dll</li>
             <li>0Harmony.dll</li>

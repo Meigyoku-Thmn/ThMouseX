@@ -27,7 +27,7 @@
 
     <Target Name="PostBuildPreparation" BeforeTargets="PostBuildEvent;Clean">
         <SetEnvironmentVariable Name="PlatformTarget" Value="$(PlatformTarget)" />
-        <SetEnvironmentVariable Name="ProjectName" Value="$(ProjectName)" />
+        <SetEnvironmentVariable Name="TargetName" Value="$(TargetName)" />
         <SetEnvironmentVariable Name="DevEnvDir" Value="$(DevEnvDir)" />
         <SetEnvironmentVariable Name="SolutionDir" Value="$(SolutionDir)" />
         <SetEnvironmentVariable Name="Configuration" Value="$(Configuration)" />

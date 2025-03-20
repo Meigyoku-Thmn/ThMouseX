@@ -1,4 +1,4 @@
 set ClientManifestPath="%SolutionDir%ThMouseXServer\client.manifest"
-set ComClientPath="%OutDir%ThMouseX.dll;#2"
+set ComClientPath="%OutDir%%TargetName%.dll;#2"
 rem Embed the manifest file
 mt -nologo -manifest %ClientManifestPath% -outputresource:%ComClientPath%

@@ -1,6 +1,6 @@
 set ServerManifestPath="%SolutionDir%ThMouseXServer\server.manifest"
-set ComServerPath="%OutDir%ThMouseXGUI.exe;#1"
-set TargetPath="%OutDir%ThMouseXGUI.exe"
+set ComServerPath="%OutDir%%TargetName%.exe;#1"
+set TargetPath="%OutDir%%TargetName%.exe"
 set TlbPath="%SolutionDir%ThMouseXServer\server.tlb"
 rem Embed the Typelib file into the Server dll file
 "%PostBuildTool%" ImportResource %TargetPath% %TlbPath% typelib #1

@@ -9,6 +9,14 @@
         <Platforms>x86;x64</Platforms>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Platform)'=='x86'">
+      <DefineConstants>$(DefineConstants);WIN32</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Platform)'=='x64'">
+      <DefineConstants>$(DefineConstants);WIN64</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Remove=".gitignore" />
         <None Remove="server.tlb" />

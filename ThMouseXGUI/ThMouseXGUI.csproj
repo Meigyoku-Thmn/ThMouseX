@@ -13,6 +13,15 @@
         <Platforms>x86;x64</Platforms>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Platform)'=='x86'">
+        <DefineConstants>$(DefineConstants);WIN32</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Platform)'=='x64'">
+        <DefineConstants>$(DefineConstants);WIN64</DefineConstants>
+        <AssemblyName>$(MSBuildProjectName).64</AssemblyName>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Remove=".gitignore" />
         <Content Include="ThMouseX.ico" />

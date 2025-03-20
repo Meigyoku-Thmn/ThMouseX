@@ -78,6 +78,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
+    <TargetName>$(ProjectName).64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -88,6 +89,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath);$(SolutionDir)\ThirdPartyLibraries</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\ThirdPartyLibraries</LibraryPath>
+    <TargetName>$(ProjectName).64</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
