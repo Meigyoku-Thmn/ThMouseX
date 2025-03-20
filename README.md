@@ -94,7 +94,7 @@ There are 2 branches: the <code>master</code> branch, and the <code>development<
         <ul>
             <li>ThMouseXGUI.exe</li>
             <li>ThMouseX.dll</li>
-            <li>NeoLuaBootstrap.dll</li>
+            <li>ThMouseX.DotNet.dll</li>
             <li>Neo.Lua.dll</li>
             <li>0Harmony.dll</li>
             <li>Games.txt</li>

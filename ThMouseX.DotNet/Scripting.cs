@@ -6,7 +6,7 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace NeoLuaBootstrap;
+namespace ThMouseX.DotNet;
 
 static class Scripting
 {
@@ -100,7 +100,7 @@ static class Scripting
     const string PreparationScript = @"
         const _Traverse typeof HarmonyLib.Traverse
         Traverse = _Traverse
-        const Scripting typpeof NeoLuaBootstrap.Scripting
+        const Scripting typpeof ThMouseX.DotNet.Scripting
         Position = Scripting.Pos
         OpenConsole = Scripting.Lua_OpenConsole
     ";

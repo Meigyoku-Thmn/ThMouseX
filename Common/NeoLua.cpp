@@ -78,18 +78,18 @@ namespace common::neolua {
             return;
         }
 
-        auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/NeoLuaBootstrap.dll";
+        auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/ThMouseX.DotNet.dll";
         auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_gameConfig.processName + L".lua";
         DWORD returnValue;
         result = runtimeHost->ExecuteInDefaultAppDomain(
             bootstrapDllPath.c_str(),
-            L"NeoLuaBootstrap.Handlers",
+            L"ThMouseX.DotNet.Handlers",
             L"Initialize",
             scriptPath.c_str(),
             &returnValue
         );
         if (FAILED(result)) {
-            note::HResultToFile(TAG "Failed to invoke NeoLuaBootstrap.Handlers.Initialize", result);
+            note::HResultToFile(TAG "Failed to invoke ThMouseX.DotNet.Handlers.Initialize", result);
             return;
         }
     }

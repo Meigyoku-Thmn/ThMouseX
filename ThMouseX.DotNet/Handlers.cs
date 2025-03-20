@@ -1,4 +1,4 @@
-﻿namespace NeoLuaBootstrap;
+﻿namespace ThMouseX.DotNet;
 
 public static class Handlers
 {

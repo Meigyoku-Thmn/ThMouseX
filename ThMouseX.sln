@@ -15,7 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcx
 		{85C40D1A-6337-41D8-BE38-B10DD73FB09E} = {85C40D1A-6337-41D8-BE38-B10DD73FB09E}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoLuaBootstrap", "NeoLuaBootstrap\NeoLuaBootstrap.csproj", "{081B19A5-F06F-45DB-8E83-391DD407DDA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThMouseX.DotNet", "ThMouseX.DotNet\ThMouseX.DotNet.csproj", "{081B19A5-F06F-45DB-8E83-391DD407DDA4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThMouseXGUI", "ThMouseXGUI\ThMouseXGUI.csproj", "{D91DA069-F70E-4961-A49C-AB7CE1923FFD}"
 	ProjectSection(ProjectDependencies) = postProject

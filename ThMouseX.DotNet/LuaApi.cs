@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace NeoLuaBootstrap;
+namespace ThMouseX.DotNet;
 
 internal static class LuaApi
 {
