@@ -28,11 +28,13 @@ jobs:
     - name: Delete unnecessary files
       run: |
         cd Release/x86
-        del *.exp -Force ; $null
-        del *.lib -Force ; $null
-        del *.pdb -Force ; $null
-        del *.exe.config -Force ; $null
-        del de -Recurse -Force ; $null
+        del *.exp                   -Force ; $null
+        del *.lib                   -Force ; $null
+        del *.pdb                   -Force ; $null
+        del *.exe.config            -Force ; $null
+        del PostBuildTool.exe       -Force ; $null
+        del ThMouseXServer.dll      -Force ; $null
+        del de -Recurse             -Force ; $null
         cd ../..
         
     - name: List top files

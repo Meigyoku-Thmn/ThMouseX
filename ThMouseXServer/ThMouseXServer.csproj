@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <None Remove=".gitignore" />
+        <None Remove="server.tlb" />
         <AdditionalFiles Include="NativeMethods.json" />
         <AdditionalFiles Include="NativeMethods.txt" />
     </ItemGroup>

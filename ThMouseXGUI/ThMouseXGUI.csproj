@@ -16,6 +16,11 @@
     <ItemGroup>
         <None Remove=".gitignore" />
         <Content Include="ThMouseX.ico" />
+        <PackageReference Include="Fody" Version="6.9.2">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="ILMerge.Fody" Version="1.24.0" PrivateAssets="All" />
         <ProjectReference Include="..\ThMouseXServer\ThMouseXServer.csproj" />
     </ItemGroup>
 

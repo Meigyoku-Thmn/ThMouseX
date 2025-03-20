@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using ThMouseXServer;
 
+[assembly: Guid("2AD4FA86-3961-4F4B-AC10-8AC5716E526A"), ComVisible(false)]
+
 namespace ThMouseXGUI;
 
 using static ComHelper;
@@ -30,6 +32,15 @@ static class Program
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
+
+        var thisAssembly = Assembly.GetExecutingAssembly();
+        var expectedName = thisAssembly.GetName().Name;
+        var actualName = Path.GetFileNameWithoutExtension(thisAssembly.Location);
+        if (expectedName != actualName)
+        {
+            MessageBox.Show($"The file name of this executable file must be '{expectedName}.exe'!", AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return 1;
+        }
 
         if (!MarkThMouseXProcess())
             return 1;
