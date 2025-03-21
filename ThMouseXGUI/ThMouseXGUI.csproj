@@ -7,10 +7,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>12</LangVersion>
         <ApplicationIcon>ThMouseX.ico</ApplicationIcon>
-        <Prefer32Bit>true</Prefer32Bit>
         <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
         <Version>3.0.0</Version>
         <Platforms>x86;x64</Platforms>
+        <DebugType>full</DebugType>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Platform)'=='x86'">
@@ -21,7 +21,7 @@
         <DefineConstants>$(DefineConstants);WIN64</DefineConstants>
         <AssemblyName>$(MSBuildProjectName).64</AssemblyName>
     </PropertyGroup>
-
+    
     <ItemGroup>
         <None Remove=".gitignore" />
         <Content Include="ThMouseX.ico" />
@@ -30,6 +30,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="ILMerge.Fody" Version="1.24.0" PrivateAssets="All" />
+        <ProjectReference Include="..\ThMouseX.DotNet\ThMouseX.DotNet.csproj" />
         <ProjectReference Include="..\ThMouseXServer\ThMouseXServer.csproj" />
     </ItemGroup>
 

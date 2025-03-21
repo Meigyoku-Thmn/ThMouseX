@@ -16,7 +16,11 @@ using static ComHelper;
 static class Program
 {
     public const string AppName = "ThMouseX";
+#if (WIN32)
     public const string DllName = AppName + ".dll";
+#else
+    public const string DllName = AppName + ".64.dll";
+#endif
     public static readonly string RootDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     public static readonly string LogPath = Path.Combine(RootDir, "log.txt");
 

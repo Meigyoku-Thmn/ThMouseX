@@ -1,14 +1,10 @@
 ﻿#pragma warning disable S4200
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace ThMouseX.DotNet;
 
 internal static class LuaApi
 {
-    static readonly string ThMouseX_Path = Path.Combine(
-        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Constants.AppName + ".dll");
-
     [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
     public static extern IntPtr GetModuleHandle([MarshalAs(UnmanagedType.LPWStr)] string lpModuleName);
     [DllImport("kernel32", CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
@@ -39,15 +35,18 @@ internal static class LuaApi
 
     static public void Initialize()
     {
-        var ThMouseX_Module = GetModuleHandle(ThMouseX_Path);
-        RegisterUninitializeCallback = ThMouseX_Module.GetFunction("Lua_RegisterUninitializeCallback")
+        var envValue = Environment.GetEnvironmentVariable("ThMouseX_ModuleHandle");
+        var ThMouseX_ModuleHandle = Environment.Is64BitProcess
+            ? new IntPtr((long)ulong.Parse(envValue))
+            : new IntPtr((int)uint.Parse(envValue));
+        RegisterUninitializeCallback = ThMouseX_ModuleHandle.GetFunction("Lua_RegisterUninitializeCallback")
             .GetDelegate<RegisterUninitializeCallbackDelegate>();
-        SetPositionAddress = ThMouseX_Module.GetFunction("Lua_SetPositionAddress")
-           .GetDelegate<SetPositionAddressDelegate>();
-        GetDataType = ThMouseX_Module.GetFunction("Lua_GetDataType")
-           .GetDelegate<GetDataTypeDelegate>();
-        OpenConsole = ThMouseX_Module.GetFunction("Lua_OpenConsole")
-           .GetDelegate<OpenConsoleDelegate>();
+        SetPositionAddress = ThMouseX_ModuleHandle.GetFunction("Lua_SetPositionAddress")
+            .GetDelegate<SetPositionAddressDelegate>();
+        GetDataType = ThMouseX_ModuleHandle.GetFunction("Lua_GetDataType")
+            .GetDelegate<GetDataTypeDelegate>();
+        OpenConsole = ThMouseX_ModuleHandle.GetFunction("Lua_OpenConsole")
+            .GetDelegate<OpenConsoleDelegate>();
     }
 
     static public void Uninitialize(bool isProcessTerminating)

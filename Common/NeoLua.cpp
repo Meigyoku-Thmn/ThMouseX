@@ -77,6 +77,10 @@ namespace common::neolua {
             note::HResultToFile(TAG "Cannot get ICLRRuntimeHost instance", result);
             return;
         }
+        if (_putenv(string("ThMouseX_ModuleHandle=").append(to_string((uintptr_t)g_coreModule)).c_str()) != 0) {
+            note::ToFile(TAG "Cannot set ThMouseX_ModuleHandle env.");
+            return;
+        }
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/ThMouseX.DotNet.dll";
         auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_gameConfig.processName + L".lua";

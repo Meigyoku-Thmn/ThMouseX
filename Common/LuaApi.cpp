@@ -40,8 +40,7 @@ namespace common::luaapi {
         auto scriptHandle = LoadResource(dllModule, scriptRes);
         if (scriptHandle == nil)
             return;
-        LuaJitPrepScript = string(scast<const char*>(LockResource(scriptHandle)), scriptSize);
-        LuaJitPrepScript
+        LuaJitPrepScript = string(scast<const char*>(LockResource(scriptHandle)), scriptSize)
             .append("\n")
             .append(format(SYM_NAME(MH_UNKNOWN)" = {}\n",                   /* */ to_string(MH_UNKNOWN)))
             .append(format(SYM_NAME(MH_UNKNOWN)" = {}\n",                   /* */ to_string(MH_UNKNOWN)))

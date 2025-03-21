@@ -165,7 +165,7 @@ Additional Instructions
 ### Cursor sprite
 The crosshair/cursor sprite may be changed:
 1. Find your preferred crosshair in .png format and place it into the same folder as ThMouseX.exe.
-2. Open up ThMouseX.txt.
+2. Open up ThMouseX.ini.
 3. Change the file name after "CursorTexture = " to the preferred crosshair file's name. (Don't forget the file extension name ".png".)
 
 ### Add your favorite games

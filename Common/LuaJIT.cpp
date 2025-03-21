@@ -38,17 +38,6 @@ static bool CheckAndDisableIfError(lua_State* _L, int r) {
 }
 
 namespace common::luajit {
-    HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
-    decltype(&_LoadLibraryExA) OriLoadLibraryExA;
-
-    HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
-        auto thisDllPath = wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME);
-        if (encoding::ConvertToUtf8(thisDllPath).compare(lpLibFileName) == 0)
-            return g_coreModule;
-        else
-            return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
-    }
-
     static void Uninitialize(bool isProcessTerminating) {
         if (L != nil)
             lua_close(L);
