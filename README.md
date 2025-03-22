@@ -25,7 +25,7 @@ Differences of the fork
 Drawbacks
 --------
 * Only works with 32-bit games, 64-bit games will be supported soon.
-* Doesn't work well with Steam Overlay, although this is minimal.
+* Doesn't work well with Steam Overlay. This should be minimalized from ver 3.
 * Doesn't work well with other mods that inject their own overlay (for example, [thprac](https://github.com/touhouworldcup/thprac)), they can still work but the overlays may override each other.
 * Configuration is difficult.
 
@@ -145,9 +145,8 @@ There are 2 branches: the <code>master</code> branch, and the <code>development<
 Instructions
 -----------------------
 ### How to use ThMouseX?
-1. Run ThMouseX.exe, or ThMouseXGUI.exe
-2. Run your game, or you can run your game first and then run ThMouseX.exe.
-3. If the game is supported, a cursor will show upon entering the game.
+1. Run ThMouseXGUI.exe then run your game, or you can run your game first and then run ThMouseXGUI.exe.
+2. If the game is supported, a cursor will show upon entering the game.
 
 ### How to control?
 * The character will move towards where the cursor points. Please note that it will NOT move immidiately with the cursor, because ThMouseX doesn't modifier any game's behavior.
