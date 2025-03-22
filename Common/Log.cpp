@@ -28,14 +28,13 @@ namespace common::log {
     }
 
     void OpenConsole() {
-        if (AllocConsole() == FALSE)
+        if (!AttachConsole(ATTACH_PARENT_PROCESS) && !AllocConsole())
             return;
-#pragma warning(push)
-#pragma warning(disable: 6031)
-        ignore = freopen("conin$", "r", stdin);
-        ignore = freopen("conout$", "w", stdout);
-        ignore = freopen("conout$", "w", stderr);
-#pragma warning(pop)
+        if (!!GetConsoleCP()) {
+            ignore = freopen("conin$", "r", stdin);
+            ignore = freopen("conout$", "w", stdout);
+            ignore = freopen("conout$", "w", stderr);
+        }
         printf("Debugging Window:\n\n");
     }
 
