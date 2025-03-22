@@ -203,6 +203,19 @@ namespace core::messagequeue {
             msg == WM_MOUSEWHEEL || msg == WM_MOUSEHWHEEL;
     }
 
+    static auto initialized = false;
+    static void TriggerInitialization(bool calledFromSetCursor, HWND currentHwnd) {
+        if (initialized)
+            return;
+        if (calledFromSetCursor) {
+            auto foregroundHwnd = GetForegroundWindow();
+            if (foregroundHwnd != currentHwnd)
+                return;
+        }
+        initialized = true;
+        core::Initialize();
+    }
+
     static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
         auto e = rcast<PMSG>(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
@@ -252,12 +265,14 @@ namespace core::messagequeue {
     }
 
     static LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
+        auto e = rcast<PCWPRETSTRUCT>(lParam);
+        if (code == HC_ACTION && e->message == WM_SETCURSOR)
+            TriggerInitialization(true, e->hwnd);
         if (code == HC_ACTION && g_hookApplied) {
             if (!cursorNormalized) {
                 cursorNormalized = true;
                 NormalizeCursor();
             }
-            auto e = rcast<PCWPRETSTRUCT>(lParam);
             if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
@@ -286,12 +301,9 @@ namespace core::messagequeue {
         return CallNextHookEx(nil, code, wParam, lParam);
     }
 
-    static auto initialized = false;
     static LRESULT CALLBACK CBTProcW(int code, WPARAM wParam, LPARAM lParam) {
-        if (!initialized && code == HCBT_ACTIVATE) {
-            initialized = true;
-            core::Initialize();
-        }
+        if (code == HCBT_ACTIVATE)
+            TriggerInitialization(false, nil);
         return CallNextHookEx(nil, code, wParam, lParam);
     }
 
