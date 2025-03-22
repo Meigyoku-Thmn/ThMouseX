@@ -57,9 +57,9 @@ namespace core::directinput {
         { nil,                          DIK_DOWN,   MOVE_DOWN       },
     };
 
+    static bool initialized = false;
+    static mutex mtx;
     void Initialize() {
-        static bool initialized = false;
-        static mutex mtx;
         HMODULE dinput8{};
         {
             const scoped_lock lock(mtx);
@@ -85,7 +85,7 @@ namespace core::directinput {
                     note::LastErrorToFile(TAG "Failed to get the mapping table from DInput8.dll");
                     break;
                 }
-                auto mappingTable = scast<BYTE*>(LoadResource(dinput8, resHandle));
+                auto mappingTable = scast<const BYTE*>(LoadResource(dinput8, resHandle));
                 if (mappingTable == nil) {
                     note::LastErrorToFile(TAG "Failed to get the mapping table from DInput8.dll");
                     break;

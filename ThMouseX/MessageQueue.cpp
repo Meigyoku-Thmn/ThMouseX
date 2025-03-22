@@ -34,7 +34,7 @@ struct InputRuleItemVk2SideEffect;
 struct InputRuleItemMouseBtn2Function;
 
 using SideEffect = void (*)(bool isUp, bool wantCaptureMouse);
-using PostSideEffect = void (*)(InputRuleItemMouseBtn2Function& ruleItem);
+using PostSideEffect = void (*)(const InputRuleItemMouseBtn2Function& ruleItem);
 
 enum class MatchStatus {
     None, Up, Down, Trigger
@@ -85,7 +85,7 @@ BOOL WINAPI _GetNextModule(HANDLE snapshot, LPMODULEENTRY32W entry) {
 }
 
 namespace core::messagequeue {
-    HCURSOR WINAPI _SetCursor(HCURSOR hCursor);
+    HCURSOR WINAPI _SetCursor(HCURSOR cursor);
     decltype(&_SetCursor) OriSetCursor;
     int WINAPI _ShowCursor(BOOL bShow);
     decltype(&_ShowCursor) OriShowCursor;
@@ -232,7 +232,7 @@ namespace core::messagequeue {
                 for (auto& ruleItem : InputRuleMouseBtn2ClickState) {
                     auto matchStatus = TestVkCode(e, ruleItem.vkCode);
                     if (matchStatus == Trigger) {
-                        ruleItem.nextFrameSideEffect = [](auto& _ruleItem) { *_ruleItem.clickStatePtr = false; };
+                        ruleItem.nextFrameSideEffect = [](const auto& _ruleItem) { *_ruleItem.clickStatePtr = false; };
                         *ruleItem.clickStatePtr = true;
                     }
                     else if (matchStatus == Up && ruleItem.isOn == true) {
@@ -261,7 +261,7 @@ namespace core::messagequeue {
             if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
-            else if (e->message == WM_SETCURSOR && !g_showImGui) {
+            else if (e->message == WM_SETCURSOR) {
                 if (LOWORD(e->lParam) == HTCLIENT) {
                     if (isCursorShow)
                         ShowMousePointer();
@@ -286,8 +286,9 @@ namespace core::messagequeue {
         return CallNextHookEx(nil, code, wParam, lParam);
     }
 
+    static auto initialized = false;
     static LRESULT CALLBACK CBTProcW(int code, WPARAM wParam, LPARAM lParam) {
-        if (static auto initialized = false; !initialized && code == HCBT_ACTIVATE) {
+        if (!initialized && code == HCBT_ACTIVATE) {
             initialized = true;
             core::Initialize();
         }
@@ -372,6 +373,7 @@ namespace core::messagequeue {
         }
     }
 
+    static bool callbackDone = false;
     static void PostRenderCallback() {
         for (auto& ruleItem : InputRuleMouseBtn2ClickState) {
             if (ruleItem.nextFrameSideEffect) {
@@ -379,7 +381,6 @@ namespace core::messagequeue {
                 ruleItem.nextFrameSideEffect = nil;
             }
         }
-        static bool callbackDone = false;
         if (cursorNormalized && !callbackDone) {
             callbackDone = true;
             HideMousePointer();

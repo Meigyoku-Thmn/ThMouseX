@@ -194,8 +194,8 @@ namespace common::lua {
         return rs;
     }
 
+    static bool scriptAttached = false;
     void AttachScript(lua_State* L) {
-        static bool scriptAttached = false;
         if (scriptAttached)
             return;
         scriptAttached = true;

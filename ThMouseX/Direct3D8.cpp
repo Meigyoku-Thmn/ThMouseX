@@ -119,9 +119,9 @@ namespace core::directx8 {
         CleanUp(true);
     }
 
+    static bool initialized = false;
+    static mutex mtx;
     void Initialize() {
-        static bool initialized = false;
-        static mutex mtx;
         {
             const scoped_lock lock(mtx);
             if (initialized)
@@ -294,8 +294,9 @@ namespace core::directx8 {
         d3dScale = scast<float>(clientSize.width()) / scast<float>(d3dSize.Width);
     }
 
+    static UCHAR tone = 0;
+    static auto toneStage = ModulateStage::WhiteInc;
     static void RenderCursor(IDirect3DDevice8* pDevice) {
-        using enum ModulateStage;
         if (!cursorTexture)
             return;
 
@@ -330,8 +331,7 @@ namespace core::directx8 {
         cursorSprite->Begin();
         // draw the cursor and scale cursor sprite to match the current render resolution
         if (g_inputEnabled) {
-            static UCHAR tone = 0;
-            static auto toneStage = WhiteInc;
+            using enum ModulateStage;
             helper::CalculateNextTone(tone, toneStage);
             if (toneStage == WhiteInc || toneStage == WhiteDec) {
                 // default behaviour: texture color * diffuse color

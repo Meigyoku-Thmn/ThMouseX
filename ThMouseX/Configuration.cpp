@@ -295,10 +295,9 @@ tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, 
         scriptType = ScriptType_Lua;
 
     if (scriptType == ScriptType_None) {
-        size_t leftBoundIdx = 0;
         size_t rightBoundIdx = -1;
         for (;;) {
-            leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
+            auto leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
             if (leftBoundIdx == string::npos)
                 break;
             rightBoundIdx = pointerChainStr.find(']', leftBoundIdx + 1);

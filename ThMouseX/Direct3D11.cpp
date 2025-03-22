@@ -127,9 +127,9 @@ namespace core::directx11 {
         CleanUp(true);
     }
 
+    static bool initialized = false;
+    static mutex mtx;
     void Initialize() {
-        static bool initialized = false;
-        static mutex mtx;
         {
             const scoped_lock lock(mtx);
             if (initialized)
@@ -315,8 +315,9 @@ namespace core::directx11 {
         d3dScale = scast<float>(clientSize.width()) / scast<float>(desc.BufferDesc.Width);
     }
 
+    static UCHAR tone = 0;
+    static auto toneStage = ModulateStage::WhiteInc;
     static void RenderCursor(IDXGISwapChain* swapChain) {
-        using enum ModulateStage;
         if (!cursorTexture || !spriteBatch || !renderTargetView || !device || !context)
             return;
 
@@ -344,10 +345,9 @@ namespace core::directx11 {
 
         context->OMSetRenderTargets(1, &renderTargetView, nil);
 
-        static UCHAR tone = 0;
-        static auto toneStage = WhiteInc;
         auto usePixelShader = false;
         if (g_inputEnabled) {
+            using enum ModulateStage;
             helper::CalculateNextTone(tone, toneStage);
             if (toneStage == WhiteInc || toneStage == WhiteDec)
                 // default behaviour: texture color * diffuse color

@@ -123,9 +123,9 @@ namespace core::directx9 {
         CleanUp(true);
     }
 
+    static bool initialized = false;
+    static mutex mtx;
     void Initialize() {
-        static bool initialized = false;
-        static mutex mtx;
         {
             const scoped_lock lock(mtx);
             if (initialized)
@@ -337,8 +337,9 @@ namespace core::directx9 {
         d3dScale = scast<float>(clientSize.width()) / scast<float>(d3dSize.Width);
     }
 
+    static UCHAR tone = 0;
+    static auto toneStage = ModulateStage::WhiteInc;
     static void RenderCursor(IDirect3DDevice9* pDevice) {
-        using enum ModulateStage;
         if (!cursorTexture || !_D3DXMatrixTransformation2D)
             return;
 
@@ -374,8 +375,7 @@ namespace core::directx9 {
         cursorSprite->SetTransform(&scalingMatrixD3D);
         // draw the cursor
         if (g_inputEnabled) {
-            static UCHAR tone = 0;
-            static auto toneStage = WhiteInc;
+            using enum ModulateStage;
             helper::CalculateNextTone(tone, toneStage);
             if (toneStage == WhiteInc || toneStage == WhiteDec) {
                 // default behaviour: texture color * diffuse color

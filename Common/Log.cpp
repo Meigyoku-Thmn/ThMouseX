@@ -16,6 +16,7 @@
 namespace errormsg = common::errormsg;
 
 using namespace std;
+using namespace chrono;
 using namespace Microsoft::WRL;
 
 namespace common::log {
@@ -78,11 +79,10 @@ namespace common::log {
         ToFile("%s: %s", message, detail);
     }
 
+    static time_point<steady_clock> oldTime = high_resolution_clock::now();
+    static int fps = 0;
     void FpsToConsole() {
-        using namespace chrono;
-        static time_point<steady_clock> oldTime = high_resolution_clock::now();
-        static int fps; fps++;
-
+        fps++;
         if (duration_cast<seconds>(high_resolution_clock::now() - oldTime) >= seconds{ 1 }) {
             oldTime = high_resolution_clock::now();
             ToConsole("FPS: %d", fps);
