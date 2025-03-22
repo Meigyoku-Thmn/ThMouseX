@@ -6,6 +6,16 @@
 		<LangVersion>12</LangVersion>
 		<Platforms>x86;x64</Platforms>
 	</PropertyGroup>
+
+    <PropertyGroup Condition="'$(Platform)'=='x86'">
+        <DefineConstants>$(DefineConstants);WIN32</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Platform)'=='x64'">
+        <DefineConstants>$(DefineConstants);WIN64</DefineConstants>
+        <AssemblyName>$(MSBuildProjectName).64</AssemblyName>
+    </PropertyGroup>
+    
 	<ItemGroup>
 		<PackageReference Include="Lib.Harmony" Version="2.3.5" />
 		<PackageReference Include="NeoLua" Version="1.3.14" />
