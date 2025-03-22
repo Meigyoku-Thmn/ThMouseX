@@ -32,10 +32,10 @@ namespace core::shellcode {
         inp->LdrLoadDll(nil, 0, &user32dll, &user32);
         ANSI_STRING peekMessageW{};
         inp->RtlInitAnsiString(&peekMessageW, inp->peekMessageW);
-        decltype(&PeekMessageW) PeekMessageW{};
-        inp->LdrGetProcedureAddress(user32, &peekMessageW, 0, bcast<PVOID*>(&PeekMessageW));
+        PVOID peekMessageWFunc{};
+        inp->LdrGetProcedureAddress(user32, &peekMessageW, 0, &peekMessageWFunc);
         MSG msg;
-        PeekMessageW(&msg, nil, WM_USER, WM_USER, PM_NOREMOVE);
+        bcast<decltype(&PeekMessageW)>(peekMessageWFunc)(&msg, nil, WM_USER, WM_USER, PM_NOREMOVE);
         inp->LdrUnloadDll(user32);
         return 0;
     }
