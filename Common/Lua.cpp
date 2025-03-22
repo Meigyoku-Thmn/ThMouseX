@@ -29,7 +29,7 @@ static lua_State* L;
 
 template <CompileTimeString funcName, typename FuncType>
 static bool TryImportFunc(FuncType& func, HMODULE lua, const string& luaDllName) {
-    func = rcast<FuncType>(GetProcAddress(lua, funcName.data));
+    func = bcast<FuncType>(GetProcAddress(lua, funcName.data));
     if (!func) {
         auto msg = "[Lua] Failed to import %s|" + funcName + ".";
         note::ToFile(msg.data, luaDllName.c_str());
@@ -204,7 +204,7 @@ namespace common::lua {
 
         auto oldStackSize = _lua_gettop(L);
 
-        _lua_pushinteger(L, rcast<uintptr_t>(g_coreModule));
+        _lua_pushinteger(L, bcast<uintptr_t>(g_coreModule));
         _lua_setfield(L, LUA_GLOBALSINDEX, THMOUSEX_MODULE_HANDLE);
         auto rs = 0;
         if ((rs = _luaL_loadstring(L, luaapi::LuaJitPrepScript.c_str())) == 0)

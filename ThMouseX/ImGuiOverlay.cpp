@@ -74,8 +74,8 @@ namespace core::imguioverlay {
             ImGui::AlignTextToFramePadding();
             ImGui::Text("Movement Algorithm:");
             ImGui::InvisibleButton("##padding-left", ImVec2(5, 1)); ImGui::SameLine();
-            ImGui::RadioButton("Bresenham's Line", rcast<int*>(&g_movementAlgorithm), scast<int>(MovementAlgorithm::Bresenham)); ImGui::SameLine();
-            ImGui::RadioButton("Simple", rcast<int*>(&g_movementAlgorithm), scast<int>(MovementAlgorithm::Simple));
+            ImGui::RadioButton("Bresenham's Line", bcast<int*>(&g_movementAlgorithm), scast<int>(MovementAlgorithm::Bresenham)); ImGui::SameLine();
+            ImGui::RadioButton("Simple", bcast<int*>(&g_movementAlgorithm), scast<int>(MovementAlgorithm::Simple));
 
             if (ImGui::Button("Show Variable Viewer")) {
                 showVariableViewer = true;

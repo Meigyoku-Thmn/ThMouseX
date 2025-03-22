@@ -8,9 +8,9 @@ namespace helper = common::helper;
 namespace core::shellcode {
     SIZE_T ShellcodeSectionSize;
     void Initialize() {
-        auto& nt_header = *rcast<PIMAGE_NT_HEADERS>(rcast<uintptr_t>(&__ImageBase) + __ImageBase.e_lfanew);
-        auto sectionHeaders = rcast<PIMAGE_SECTION_HEADER>(
-            rcast<uintptr_t>(&nt_header) +
+        auto& nt_header = *bcast<PIMAGE_NT_HEADERS>(bcast<uintptr_t>(&__ImageBase) + __ImageBase.e_lfanew);
+        auto sectionHeaders = bcast<PIMAGE_SECTION_HEADER>(
+            bcast<uintptr_t>(&nt_header) +
             sizeof(nt_header.Signature) +
             sizeof(nt_header.FileHeader) +
             nt_header.FileHeader.SizeOfOptionalHeader
@@ -33,7 +33,7 @@ namespace core::shellcode {
         ANSI_STRING peekMessageW{};
         inp->RtlInitAnsiString(&peekMessageW, inp->peekMessageW);
         decltype(&PeekMessageW) PeekMessageW{};
-        inp->LdrGetProcedureAddress(user32, &peekMessageW, 0, rcast<PVOID*>(&PeekMessageW));
+        inp->LdrGetProcedureAddress(user32, &peekMessageW, 0, bcast<PVOID*>(&PeekMessageW));
         MSG msg;
         PeekMessageW(&msg, nil, WM_USER, WM_USER, PM_NOREMOVE);
         inp->LdrUnloadDll(user32);

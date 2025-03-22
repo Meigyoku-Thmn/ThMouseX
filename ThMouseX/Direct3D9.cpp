@@ -136,7 +136,7 @@ namespace core::directx9 {
             initialized = true;
         }
 
-        auto _Direct3DCreate9 = rcast<decltype(&Direct3DCreate9)>(GetProcAddress(d3d9, "Direct3DCreate9"));
+        auto _Direct3DCreate9 = bcast<decltype(&Direct3DCreate9)>(GetProcAddress(d3d9, "Direct3DCreate9"));
         if (!_Direct3DCreate9) {
             note::LastErrorToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9");
             return;
@@ -171,16 +171,16 @@ namespace core::directx9 {
             return;
         }
 
-        auto vtable = *rcast<uintptr_t**>(pD3D.Get());
-        auto vtable2 = *rcast<uintptr_t**>(pDevice.Get());
+        auto vtable = *bcast<uintptr_t**>(pD3D.Get());
+        auto vtable2 = *bcast<uintptr_t**>(pDevice.Get());
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { rcast<PVOID>(vtable[CreateDeviceIdx]), &D3DCreateDevice, &OriCreateDevice, APP_NAME "_D3DCreateDevice" },
-            { rcast<PVOID>(vtable2[ResetIdx]), &D3DReset, &OriReset, APP_NAME "_D3DReset" },
-            { rcast<PVOID>(vtable2[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
+            { bcast<PVOID>(vtable[CreateDeviceIdx]), &D3DCreateDevice, &OriCreateDevice, APP_NAME "_D3DCreateDevice" },
+            { bcast<PVOID>(vtable2[ResetIdx]), &D3DReset, &OriReset, APP_NAME "_D3DReset" },
+            { bcast<PVOID>(vtable2[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
         });
     }
 
@@ -198,19 +198,19 @@ namespace core::directx9 {
             note::LastErrorToFile(TAG "PrepareFirstStep: Failed to load d3dx9_43.dll");
             return;
         }
-        _D3DXCreateSprite = rcast<decltype(&D3DXCreateSprite)>(GetProcAddress(d3dx9_43, "D3DXCreateSprite"));
+        _D3DXCreateSprite = bcast<decltype(&D3DXCreateSprite)>(GetProcAddress(d3dx9_43, "D3DXCreateSprite"));
         if (!_D3DXCreateSprite) {
             d3dx9_43_failed = true;
             note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateSprite");
             return;
         }
-        _D3DXCreateTextureFromFileW = rcast<decltype(&D3DXCreateTextureFromFileW)>(GetProcAddress(d3dx9_43, "D3DXCreateTextureFromFileW"));
+        _D3DXCreateTextureFromFileW = bcast<decltype(&D3DXCreateTextureFromFileW)>(GetProcAddress(d3dx9_43, "D3DXCreateTextureFromFileW"));
         if (!_D3DXCreateTextureFromFileW) {
             d3dx9_43_failed = true;
             note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateTextureFromFileW");
             return;
         }
-        _D3DXMatrixTransformation2D = rcast<decltype(&D3DXMatrixTransformation2D)>(GetProcAddress(d3dx9_43, "D3DXMatrixTransformation2D"));
+        _D3DXMatrixTransformation2D = bcast<decltype(&D3DXMatrixTransformation2D)>(GetProcAddress(d3dx9_43, "D3DXMatrixTransformation2D"));
         if (!_D3DXMatrixTransformation2D) {
             d3dx9_43_failed = true;
             note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXMatrixTransformation2D");

@@ -60,7 +60,7 @@ namespace common::luajit {
 
         auto oldStackSize = lua_gettop(L);
 
-        lua_pushinteger(L, rcast<uintptr_t>(g_coreModule));
+        lua_pushinteger(L, bcast<uintptr_t>(g_coreModule));
         lua_setglobal(L, THMOUSEX_MODULE_HANDLE);
         if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::LuaJitPrepScript.c_str()))) {
             note::ToFile("[LuaJIT] The above error occurred in Preparation Script.");

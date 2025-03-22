@@ -80,7 +80,7 @@ namespace core::directinput {
                         note::LastErrorToFile(message.c_str());
                     break;
                 }
-                auto resHandle = FindResourceW(dinput8, MAKEINTRESOURCEW(exitCode), rcast<LPWSTR>(RT_RCDATA));
+                auto resHandle = FindResourceW(dinput8, MAKEINTRESOURCEW(exitCode), bcast<LPWSTR>(RT_RCDATA));
                 if (resHandle == nil) {
                     note::LastErrorToFile(TAG "Failed to get the mapping table from DInput8.dll");
                     break;
@@ -99,7 +99,7 @@ namespace core::directinput {
             initialized = true;
         }
 
-        auto _DirectInput8Create = rcast<decltype(&DirectInput8Create)>(GetProcAddress(dinput8, "DirectInput8Create"));
+        auto _DirectInput8Create = bcast<decltype(&DirectInput8Create)>(GetProcAddress(dinput8, "DirectInput8Create"));
         if (!_DirectInput8Create) {
             note::LastErrorToFile(TAG "Failed to import DInput8.dll|DirectInput8Create");
             return;
@@ -119,10 +119,10 @@ namespace core::directinput {
             return;
         }
 
-        auto vtable = *rcast<uintptr_t**>(pDevice8.Get());
+        auto vtable = *bcast<uintptr_t**>(pDevice8.Get());
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { rcast<PVOID>(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8, APP_NAME "_GetDeviceStateDInput8" },
+            { bcast<PVOID>(vtable[GetDeviceStateIdx]), &GetDeviceStateDInput8, &OriGetDeviceStateDInput8, APP_NAME "_GetDeviceStateDInput8" },
         });
     }
 

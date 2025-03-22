@@ -140,7 +140,7 @@ namespace core::directx11 {
             initialized = true;
         }
 
-        auto _D3D11CreateDeviceAndSwapChain = rcast<decltype(&D3D11CreateDeviceAndSwapChain)>(GetProcAddress(d3d11, "D3D11CreateDeviceAndSwapChain"));
+        auto _D3D11CreateDeviceAndSwapChain = bcast<decltype(&D3D11CreateDeviceAndSwapChain)>(GetProcAddress(d3d11, "D3D11CreateDeviceAndSwapChain"));
         if (!_D3D11CreateDeviceAndSwapChain) {
             note::LastErrorToFile(TAG "Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain");
             return;
@@ -174,14 +174,14 @@ namespace core::directx11 {
             return;
         }
 
-        auto vtable = *rcast<uintptr_t**>(swap_chain.Get());
+        auto vtable = *bcast<uintptr_t**>(swap_chain.Get());
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { rcast<PVOID>(vtable[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
-            { rcast<PVOID>(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, &OriResizeBuffers, APP_NAME "_D3DResizeBuffers" },
+            { bcast<PVOID>(vtable[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
+            { bcast<PVOID>(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, &OriResizeBuffers, APP_NAME "_D3DResizeBuffers" },
         });
     }
 

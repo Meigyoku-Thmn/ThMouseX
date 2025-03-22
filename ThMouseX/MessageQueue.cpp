@@ -217,7 +217,7 @@ namespace core::messagequeue {
     }
 
     static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        auto e = rcast<PMSG>(lParam);
+        auto e = bcast<PMSG>(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
             using enum MatchStatus;
             if (g_showImGui) {
@@ -265,7 +265,7 @@ namespace core::messagequeue {
     }
 
     static LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
-        auto e = rcast<PCWPRETSTRUCT>(lParam);
+        auto e = bcast<PCWPRETSTRUCT>(lParam);
         if (code == HC_ACTION && e->message == WM_SETCURSOR)
             TriggerInitialization(true, e->hwnd);
         if (code == HC_ACTION && g_hookApplied) {

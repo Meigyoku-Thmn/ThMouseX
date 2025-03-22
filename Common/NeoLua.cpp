@@ -37,7 +37,7 @@ namespace common::neolua {
             return;
         }
 
-        auto _CLRCreateInstance = rcast<decltype(&CLRCreateInstance)>(GetProcAddress(mscoree, "CLRCreateInstance"));
+        auto _CLRCreateInstance = bcast<decltype(&CLRCreateInstance)>(GetProcAddress(mscoree, "CLRCreateInstance"));
         if (!_CLRCreateInstance) {
             log::LastErrorToFile(TAG " Failed to import mscoree.dll|CLRCreateInstance");
             return;

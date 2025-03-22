@@ -132,7 +132,7 @@ namespace core::directx8 {
             initialized = true;
         }
 
-        auto _Direct3DCreate8 = rcast<decltype(&Direct3DCreate8)>(GetProcAddress(d3d8, "Direct3DCreate8"));
+        auto _Direct3DCreate8 = bcast<decltype(&Direct3DCreate8)>(GetProcAddress(d3d8, "Direct3DCreate8"));
         if (!_Direct3DCreate8) {
             note::LastErrorToFile(TAG "Failed to import d3d8.dll|Direct3DCreate8");
             return;
@@ -168,16 +168,16 @@ namespace core::directx8 {
             return;
         }
 
-        auto vtable = *rcast<uintptr_t**>(pD3D.Get());
-        auto vtable2 = *rcast<uintptr_t**>(pDevice.Get());
+        auto vtable = *bcast<uintptr_t**>(pD3D.Get());
+        auto vtable2 = *bcast<uintptr_t**>(pDevice.Get());
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { rcast<PVOID>(vtable[CreateDeviceIdx]), &D3DCreateDevice, &OriCreateDevice, APP_NAME "_D3DCreateDevice" },
-            { rcast<PVOID>(vtable2[ResetIdx]), &D3DReset, &OriReset, APP_NAME "_D3DReset" },
-            { rcast<PVOID>(vtable2[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
+            { bcast<PVOID>(vtable[CreateDeviceIdx]), &D3DCreateDevice, &OriCreateDevice, APP_NAME "_D3DCreateDevice" },
+            { bcast<PVOID>(vtable2[ResetIdx]), &D3DReset, &OriReset, APP_NAME "_D3DReset" },
+            { bcast<PVOID>(vtable2[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
         });
     }
 

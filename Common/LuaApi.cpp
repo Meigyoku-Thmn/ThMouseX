@@ -69,7 +69,7 @@ namespace common::luaapi {
     }
 
     DWORD ReadUInt32(uintptr_t address) {
-        return *rcast<PDWORD>(address);
+        return *bcast<PDWORD>(address);
     }
 
     uintptr_t ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {

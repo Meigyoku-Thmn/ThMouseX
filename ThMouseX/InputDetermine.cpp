@@ -20,13 +20,13 @@ void CalculatePosition(TPointer position, POINT& output) {
 
 static void CalculatePlayerPos(uintptr_t address) {
     if (g_gameConfig.PosDataType == PointDataType_Int)
-        CalculatePosition(rcast<IntPoint*>(address), g_playerPos);
+        CalculatePosition(bcast<IntPoint*>(address), g_playerPos);
     else if (g_gameConfig.PosDataType == PointDataType_Float)
-        CalculatePosition(rcast<FloatPoint*>(address), g_playerPos);
+        CalculatePosition(bcast<FloatPoint*>(address), g_playerPos);
     else if (g_gameConfig.PosDataType == PointDataType_Short)
-        CalculatePosition(rcast<ShortPoint*>(address), g_playerPos);
+        CalculatePosition(bcast<ShortPoint*>(address), g_playerPos);
     else if (g_gameConfig.PosDataType == PointDataType_Double)
-        CalculatePosition(rcast<DoublePoint*>(address), g_playerPos);
+        CalculatePosition(bcast<DoublePoint*>(address), g_playerPos);
 }
 
 namespace helper = common::helper;

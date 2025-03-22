@@ -1,5 +1,6 @@
 #pragma once
 #include <winerror.h>
+#include <bit>
 
 #define APP_NAME "ThMouseX"
 #define HOOK_ENGINE_STATE_NAME "ThMouseX_MinHook_State"
@@ -16,6 +17,7 @@
 #define rcast reinterpret_cast
 #define scast static_cast
 #define dcast dynamic_cast
+#define bcast std::bit_cast
 
 #define SYM_NAME(name) #name
 
@@ -34,7 +36,7 @@
 #define defer_impl(counter, ...) std::shared_ptr<void> MAKE_UNIQUE_VAR(counter)(nil, [&](...) __VA_ARGS__)
 
 #define FixedStringMember(type, name, value) type name[ARRAYSIZE(value)] = value
-#define ImportWinAPI(hModule, API) decltype(&API) API = hModule ? rcast<decltype(API)>(GetProcAddress(hModule, SYM_NAME(API))) : nil
+#define ImportWinAPI(hModule, API) decltype(&API) API = hModule ? bcast<decltype(API)>(GetProcAddress(hModule, SYM_NAME(API))) : nil
 
 #define SHELLCODE_SECTION_NAME ".shlcode"
 #define SHELLCODE  __declspec(safebuffers) __declspec(code_seg(SHELLCODE_SECTION_NAME))

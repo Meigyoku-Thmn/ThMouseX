@@ -28,19 +28,19 @@ namespace common::helper::memory {
             lastOffsets.resize(offsets.size());
             memcpy(lastOffsets.data(), offsets.data(), offsets.size() * sizeof(offsets[0]));
         }
-        auto address = offsets[0] + rcast<uintptr_t>(g_targetModule);
+        auto address = offsets[0] + bcast<uintptr_t>(g_targetModule);
         for (size_t i = 1; i < offsets.size(); i++) {
-            if (memInvalidated && IsBadReadMem(rcast<PVOID>(address), sizeof(address))) {
+            if (memInvalidated && IsBadReadMem(bcast<PVOID>(address), sizeof(address))) {
                 lastIsValid = false;
                 note::ToFile("Access bad memory region, please check the game's version!");
                 return NULL;
             }
-            address = *rcast<PUINT_PTR>(address);
+            address = *bcast<PUINT_PTR>(address);
             if (!address)
                 return NULL;
             address += offsets[i];
         }
-        if (!doNotValidateLastAddress && memInvalidated && IsBadReadMem(rcast<PVOID>(address), sizeof(address))) {
+        if (!doNotValidateLastAddress && memInvalidated && IsBadReadMem(bcast<PVOID>(address), sizeof(address))) {
             lastIsValid = false;
             note::ToFile("Access bad memory region, please check the game's version!");
             return NULL;
