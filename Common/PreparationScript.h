@@ -14,8 +14,8 @@ ffi.cdef [[
     typedef LPVOID HMODULE;
     typedef const wchar_t* LPCWSTR;
     typedef const char* LPCSTR;
-    typedef void(__cdecl *UninitializeCallbackType)(bool isProcessTerminating);
-    typedef void(__cdecl *CallbackType)();
+    typedef void(*UninitializeCallbackType)(bool isProcessTerminating);
+    typedef void(*CallbackType)();
     LPVOID GetProcAddress(HMODULE hModule, LPCSTR lpProcName);
 ]]
 local hModule = ffi.cast("HMODULE", ThMouseX_ModuleHandle)

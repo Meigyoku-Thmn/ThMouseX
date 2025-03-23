@@ -279,5 +279,5 @@ struct ShellcodeInput {
 
 using ThreadFunc = LPTHREAD_START_ROUTINE;
 
-using UninitializeCallbackType = void(__cdecl*)(bool isProcessTerminating);
-using CallbackType = void(__cdecl*)();
+using UninitializeCallbackType = void(*)(bool isProcessTerminating);
+using CallbackType = void(*)();
