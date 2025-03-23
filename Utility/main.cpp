@@ -41,7 +41,7 @@ static decltype(&FindResourceW) FindResourceWOri;
 static HRSRC WINAPI FindResourceWHook(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType) {
     auto rs = FindResourceWOri(hModule, lpName, lpType);
     if (lpType == RT_RCDATA)
-        resultValue = bcast<int>(lpName);
+        resultValue = scast<int>(bcast<uintptr_t>(lpName));
     return rs;
 }
 
