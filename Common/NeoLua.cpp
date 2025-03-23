@@ -6,16 +6,20 @@
 #include <metahost.h>
 #include <comdef.h>
 #include <cstdint>
+#include <format>
 
 #include "DataTypes.h"
 #include "NeoLua.h"
+#include "LuaApi.h"
 #include "Log.h"
 #include "Variables.h"
-#include "LuaApi.h"
 #include "Helper.h"
+#include "Helper.Encoding.h"
 
 namespace note = common::log;
 namespace helper = common::helper;
+namespace luaapi = common::luaapi;
+namespace encoding = common::helper::encoding;
 
 using namespace std;
 using namespace Microsoft::WRL;
@@ -27,10 +31,27 @@ namespace common::neolua {
         return luaapi::GetPositionAddress();
     }
 
+    static void DotNetFramework();
+    static void UnityMono();
+
+    wstring wScriptPath;
+
     void Initialize() {
         if (g_gameConfig.ScriptType != ScriptType_NeoLua)
             return;
 
+        wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.processName);
+        auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
+        auto runtime = luaapi::ReadAttributeFromLuaScript(scriptPath, "Runtime");
+        if (runtime == ".NET Framework")
+            DotNetFramework();
+        else if (runtime == "Unity Mono")
+            UnityMono();
+        else
+            note::ToFile(TAG " Unknown specified runtime '%s' in %s.", runtime.c_str(), scriptPath.c_str());
+    }
+
+    static void DotNetFramework() {
         auto mscoree = GetModuleHandleW(L"mscoree.dll");
         if (!mscoree) {
             log::LastErrorToFile(TAG " Failed to load mscoree.dll");
@@ -77,24 +98,27 @@ namespace common::neolua {
             note::HResultToFile(TAG "Cannot get ICLRRuntimeHost instance", result);
             return;
         }
-        if (_putenv(string("ThMouseX_ModuleHandle=").append(to_string((uintptr_t)g_coreModule)).c_str()) != 0) {
+        if (_putenv(format("ThMouseX_ModuleHandle={}", (uintptr_t)g_coreModule).c_str()) != 0) {
             note::ToFile(TAG "Cannot set ThMouseX_ModuleHandle env.");
             return;
         }
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/ThMouseX.DotNet.dll";
-        auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_gameConfig.processName + L".lua";
         DWORD returnValue;
         result = runtimeHost->ExecuteInDefaultAppDomain(
             bootstrapDllPath.c_str(),
             L"ThMouseX.DotNet.Handlers",
             L"Initialize",
-            scriptPath.c_str(),
+            wScriptPath.c_str(),
             &returnValue
         );
         if (FAILED(result)) {
             note::HResultToFile(TAG "Failed to invoke ThMouseX.DotNet.Handlers.Initialize", result);
             return;
         }
+    }
+
+    void UnityMono() {
+
     }
 }

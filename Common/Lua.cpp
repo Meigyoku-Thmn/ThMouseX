@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdint>
+#include <format>
 
 #include "Lua.h"
 #include "LuaApi.h"
@@ -83,52 +84,15 @@ namespace common::lua {
         if (g_gameConfig.ScriptType != ScriptType_Lua)
             return;
 
-        {
-            auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_gameConfig.processName + L".lua";
-            scriptPath = encoding::ConvertToUtf8(wScriptPath);
-            ifstream scriptFile(scriptPath.c_str());
-            if (!scriptFile) {
-                note::ToFile("[Lua] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
-                scriptingDisabled = true;
-                return;
-            }
-            string firstLine;
-            if (!getline(scriptFile, firstLine)) {
-                note::ToFile("[Lua] Cannot read the first line of %s: %s.", scriptPath.c_str(), strerror(errno));
-                scriptingDisabled = true;
-                return;
-            }
-            stringstream lineStream(firstLine);
-            string token;
-            lineStream >> token;
-            if (token != "--") {
-                note::ToFile("[Lua] The first line of '%s' is not a Lua comment.", scriptPath.c_str());
-                scriptingDisabled = true;
-                return;
-            }
-            lineStream >> token;
-            if (token != "LuaDllName") {
-                note::ToFile("[Lua] The first Lua comment of '%s' doesn't have the key LuaDllName.", scriptPath.c_str());
-                scriptingDisabled = true;
-                return;
-            }
-            lineStream >> token;
-            if (token != "=") {
-                note::ToFile("[Lua] Expected '=' after LuaDllName in '%s'.", scriptPath.c_str());
-                scriptingDisabled = true;
-                return;
-            }
-            token = "";
-            lineStream >> token;
-            if (token == "") {
-                note::ToFile("[Lua] LuaDllName value must be specified in '%s'.", scriptPath.c_str());
-                scriptingDisabled = true;
-                return;
-            }
-            luaDllName = token;
+        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.processName);
+        scriptPath = encoding::ConvertToUtf8(wScriptPath);
+        luaDllName = luaapi::ReadAttributeFromLuaScript(scriptPath, "LuaDllName");
+        if (luaDllName.empty()) {
+            scriptingDisabled = true;
+            return;
         }
 
-        auto luaPath = g_currentProcessDirPath + wstring(L"\\") + encoding::ConvertToUtf16(luaDllName);
+        auto luaPath = format(L"{}\\{}", g_currentProcessDirPath, encoding::ConvertToUtf16(luaDllName));
         auto lua = GetModuleHandleW(luaPath.c_str());
         if (!lua) {
             note::ToFile("[Lua] Failed to load %s from the game's directory.", luaDllName.c_str());

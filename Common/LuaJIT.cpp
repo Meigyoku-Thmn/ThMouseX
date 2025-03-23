@@ -2,6 +2,7 @@
 #include <string>
 #include <codecvt>
 #include <cstdint>
+#include <format>
 #include <luajit/lua.hpp>
 
 #include "macro.h"
@@ -68,7 +69,7 @@ namespace common::luajit {
             return;
         }
 
-        auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_gameConfig.processName + L".lua";
+        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.processName);
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
 
         if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str()))) {

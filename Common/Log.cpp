@@ -45,7 +45,9 @@ namespace common::log {
             return;
         }
         auto errorDes = DXGetErrorDescriptionA(hResult);
-        auto description = errorDes != nil ? string(errorStr) + ": " + errorDes : string(errorStr);
+        auto description = errorDes != nil
+            ? string(errorStr) + ": " + errorDes
+            : string(errorStr);
         ToFile("%s: %s", message, description.c_str());
     }
 

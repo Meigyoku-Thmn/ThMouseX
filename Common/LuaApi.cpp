@@ -12,6 +12,8 @@
 #include <format>
 #include <span>
 #include <cstdint>
+#include <fstream>
+#include <sstream>
 #include "PreparationScript.h"
 
 namespace note = common::log;
@@ -90,6 +92,45 @@ namespace common::luaapi {
 
     MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal, LPCSTR discriminator) {
         return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal, discriminator);
+    }
+
+    string ReadAttributeFromLuaScript(const string& scriptPath, const char* attributeName) {
+        if (attributeName == nil || attributeName[0] == '\0')
+            return "";
+        ifstream scriptFile(scriptPath.c_str());
+        if (!scriptFile) {
+            note::ToFile("[LuaApi] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
+            return "";
+        }
+        string firstLine;
+        if (!getline(scriptFile, firstLine)) {
+            note::ToFile("[LuaApi] Cannot read the first line of %s: %s.", scriptPath.c_str(), strerror(errno));
+            return "";
+        }
+        stringstream lineStream(firstLine);
+        string token;
+        lineStream >> token;
+        if (token != "--") {
+            note::ToFile("[LuaApi] The first line of '%s' is not a Lua comment.", scriptPath.c_str());
+            return "";
+        }
+        lineStream >> token;
+        if (token != attributeName) {
+            note::ToFile("[LuaApi] The first Lua comment of '%s' doesn't have the key %s.", scriptPath.c_str(), attributeName);
+            return "";
+        }
+        lineStream >> token;
+        if (token != "=") {
+            note::ToFile("[LuaApi] Expected '=' after %s in '%s'.", attributeName, scriptPath.c_str());
+            return "";
+        }
+        token = "";
+        lineStream >> token;
+        if (token == "") {
+            note::ToFile("[LuaApi] %s value must be specified in '%s'.", attributeName, scriptPath.c_str());
+            return "";
+        }
+        return token;
     }
 }
 
