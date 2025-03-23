@@ -266,10 +266,6 @@ using LdrLoadDll = NTSTATUS(NTAPI*)(PWCHAR PathToFile, ULONG Flags, PUNICODE_STR
 using LdrGetProcedureAddress = NTSTATUS(NTAPI*)(HMODULE ModuleHandle, PANSI_STRING FunctionName, WORD Oridinal, PVOID* FunctionAddress);
 using LdrUnloadDll = NTSTATUS(NTAPI*)(HMODULE ModuleHandle);
 
-struct ABC {
-    RtlInitUnicodeString _RtlInitUnicodeString;
-};
-
 struct ShellcodeInput {
     FixedStringMember(WCHAR, user32dll, L"user32.dll");
     FixedStringMember(CHAR, peekMessageW, "PeekMessageW");
