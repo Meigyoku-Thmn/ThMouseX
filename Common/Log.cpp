@@ -38,7 +38,7 @@ namespace common::log {
         printf("Debugging Window:\n\n");
     }
 
-    void DxErrToFile(const char* message, HRESULT hResult) {
+    void DxErrToFile(PCSTR message, HRESULT hResult) {
         auto errorStr = DXGetErrorStringA(hResult);
         if (errorStr == nil) {
             HResultToFile(message, hResult);
@@ -51,14 +51,14 @@ namespace common::log {
         ToFile("%s: %s", message, description.c_str());
     }
 
-    void HResultToFile(const char* message, HRESULT hResult) {
+    void HResultToFile(PCSTR message, HRESULT hResult) {
         ComPtr<IErrorInfo> errorInfo;
         ignore = GetErrorInfo(0, &errorInfo);
         _com_error error(hResult, errorInfo.Get(), true);
         ComErrToFile(message, error);
     }
 
-    void ComErrToFile(const char* message, const _com_error& error) {
+    void ComErrToFile(PCSTR message, const _com_error& error) {
         auto description = error.Description();
         if (description.length() > 0) {
             ToFile("%s: %s", message, scast<char*>(description));
@@ -74,7 +74,7 @@ namespace common::log {
         }
     }
 
-    void LastErrorToFile(const char* message) {
+    void LastErrorToFile(PCSTR message) {
         _com_error error(GetLastError());
         auto detail = error.ErrorMessage();
         ToFile("%s: %s", message, detail);

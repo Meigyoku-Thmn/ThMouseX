@@ -69,6 +69,8 @@ static class Scripting
     static readonly Harmony HarmonyInst = new(HarmonyId);
     static public void Uninitialize(bool isProcessTerminating = false)
     {
+        if (isProcessTerminating)
+            return;
         try
         {
             try

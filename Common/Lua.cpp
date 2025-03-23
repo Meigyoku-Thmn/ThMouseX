@@ -40,7 +40,7 @@ static bool TryImportFunc(FuncType& func, HMODULE lua, const string& luaDllName)
 }
 
 namespace common::lua {
-    int luaL_callmeta_hook(lua_State* L, int obj, const char* e);
+    int luaL_callmeta_hook(lua_State* L, int obj, PCSTR e);
     decltype(&luaL_callmeta_hook) ori_luaL_callmeta;
     void lua_call_hook(lua_State* L, int nargs, int nresults);
     decltype(&lua_call_hook) ori_lua_call;
@@ -125,7 +125,7 @@ namespace common::lua {
         });
     }
 
-    int luaL_callmeta_hook(lua_State* L, int obj, const char* e) {
+    int luaL_callmeta_hook(lua_State* L, int obj, PCSTR e) {
         auto rs = ori_luaL_callmeta(L, obj, e);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {

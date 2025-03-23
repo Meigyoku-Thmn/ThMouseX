@@ -103,6 +103,9 @@ thWWW           LuaJIT              float      (155.5,20.5)   540          16:9 
 ; Chaos of Black Loong (offsetting is done in Lua script)
 DFLYT           Lua                 double     (0,0)          480          4:3           SendInput
 
+; Abyss Soul Lotus
+THasl           NeoLua              double     (0,0)          480          4:3           GetKeyboardState
+
 ; Len'en 1
 Le01            [00AE693C][0]       float      (32,16)        480          4:3           GetKeyboardState
 

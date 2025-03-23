@@ -100,13 +100,13 @@ static bool IniTryGetULong(const inipp::Ini<char>::Section& section, DWORD& outp
 
 #pragma region method declaration
 bool IsCommentLine(stringstream& stream);
-tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED const char* gameConfigPath);
-tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, const char* gameConfigPath);
+tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED PCSTR gameConfigPath);
+tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, PCSTR gameConfigPath);
 tuple<VkCodes, bool> ReadVkCodes();
 #pragma endregion
 
@@ -131,14 +131,14 @@ namespace core::configuration {
             note::ToFile("[Configuration] GetGameConfig failed.");
         return rs;
     }
-    bool ReadGamesFile(const char* gameConfigPath, bool overrding = false);
+    bool ReadGamesFile(PCSTR gameConfigPath, bool overrding = false);
     bool ReadGamesFile() {
         auto rs = ReadGamesFile(GameFile);
         if (rs)
             rs = ReadGamesFile(GameFile2, true);
         return rs;
     }
-    bool ReadGamesFile(const char* gameConfigPath, bool overrding) {
+    bool ReadGamesFile(PCSTR gameConfigPath, bool overrding) {
         ifstream gamesFile(gameConfigPath);
         if (!gamesFile) {
             if (!overrding) {
@@ -273,14 +273,14 @@ bool IsCommentLine(stringstream& stream) {
     return false;
 }
 
-tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED const char* gameConfigPath) {
+tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED PCSTR gameConfigPath) {
     string processName;
     stream >> quoted(processName);
     auto wProcessName = encoding::ConvertToUtf16(processName);
     return { move(wProcessName), true };
 }
 
-tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
     string pointerChainStr;
     stream >> pointerChainStr;
     vector<DWORD> addressOffsets;
@@ -325,7 +325,7 @@ tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, 
     return { move(addressOffsets), scriptType, true };
 }
 
-tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
     string dataTypeStr;
     stream >> dataTypeStr;
     auto dataType = PointDataType_None;
@@ -347,7 +347,7 @@ tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, 
     return { move(dataType), true };
 }
 
-tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
     string posOffsetStr;
     stream >> posOffsetStr;
 
@@ -382,7 +382,7 @@ tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const
     return { FloatPoint{offsetX, offsetY}, true };
 }
 
-tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
     DWORD baseHeight;
     stream >> dec >> baseHeight;
 
@@ -395,7 +395,7 @@ tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, const 
     return { baseHeight, true };
 }
 
-tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
     string aspectRatioStr;
     stream >> aspectRatioStr;
 
@@ -425,7 +425,7 @@ tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, 
     return { FloatPoint{ratioX, ratioY}, true };
 }
 
-tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
     string inputMethodStr;
     stream >> inputMethodStr;
 

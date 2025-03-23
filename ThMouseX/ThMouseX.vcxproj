@@ -267,6 +267,9 @@
     <CopyFileToFolders Include="ConfigScripts/thWWW.lua">
       <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="ConfigScripts\THasl.lua">
+      <DestinationFolders>$(OutDir)ConfigScripts</DestinationFolders>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="AdditiveToneShader.hlsl">

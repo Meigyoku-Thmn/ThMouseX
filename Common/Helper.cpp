@@ -19,7 +19,7 @@
 using namespace std;
 
 namespace common::helper {
-    void ReportLastError(const char* title) {
+    void ReportLastError(PCSTR title) {
         auto flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         auto dwErr = GetLastError();
         PSTR errorMessage{};
@@ -28,9 +28,9 @@ namespace common::helper {
         LocalFree(errorMessage);
     }
 
-    tuple<float, const char*> ConvertToFloat(const string& input) {
+    tuple<float, PCSTR> ConvertToFloat(const string& input) {
         char* endPtr;
-        const char* message = nil;
+        PCSTR message = nil;
         auto result = strtof(input.c_str(), &endPtr);
         if (errno == ERANGE)
             message = "out of range (type float)";
@@ -39,9 +39,9 @@ namespace common::helper {
         return tuple(result, message);
     }
 
-    tuple<long, const char*> ConvertToLong(const string& input, int base) {
+    tuple<long, PCSTR> ConvertToLong(const string& input, int base) {
         char* endPtr;
-        const char* message = nil;
+        PCSTR message = nil;
         auto result = strtol(input.c_str(), &endPtr, base);
         if (errno == ERANGE)
             message = "out of range (type long)";
@@ -50,9 +50,9 @@ namespace common::helper {
         return tuple(result, message);
     }
 
-    tuple<unsigned long, const char*> ConvertToULong(const string& input, int base) {
+    tuple<unsigned long, PCSTR> ConvertToULong(const string& input, int base) {
         char* endPtr;
-        const char* message = nil;
+        PCSTR message = nil;
         auto result = strtoul(input.c_str(), &endPtr, base);
         if (errno == ERANGE)
             message = "out of range (type unsigned long)";
@@ -180,7 +180,7 @@ namespace common::helper {
     }
 
     bool IsCurrentProcessThMouseX() {
-        const char* envVal = getenv(APP_NAME);
+        PCSTR envVal = getenv(APP_NAME);
         if (envVal == nil)
             return false;
         return strcmp(envVal, APP_NAME) == 0;

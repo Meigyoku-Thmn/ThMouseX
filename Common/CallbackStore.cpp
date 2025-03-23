@@ -8,16 +8,16 @@
 using namespace std;
 
 namespace common::callbackstore {
-    struct UninitializeCallbackItem {
-        UninitializeCallbackType callback;
-        bool isFromManagedCode;
-    };
-    vector<UninitializeCallbackItem> uninitializeCallbacks;
+    vector<UninitializeCallbackType> uninitializeCallbacks;
+    vector<UninitializeCallbackType> uninitializeManagedCallbacks;
     vector<CallbackType> postRenderCallbacks;
     vector<CallbackType> clearMeasurementFlagsCallbacks;
 
     void RegisterUninitializeCallback(UninitializeCallbackType callback, bool isFromManagedCode) {
-        uninitializeCallbacks.emplace_back(callback, isFromManagedCode);
+        if (isFromManagedCode)
+            uninitializeManagedCallbacks.push_back(callback);
+        else
+            uninitializeCallbacks.push_back(callback);
     }
     void RegisterPostRenderCallback(CallbackType callback) {
         postRenderCallbacks.push_back(callback);
@@ -27,14 +27,13 @@ namespace common::callbackstore {
     }
 
     void TriggerUninitializeCallbacks(bool isProcessTerminating) {
-        for (auto const& item : uninitializeCallbacks) {
-            if (isProcessTerminating && item.isFromManagedCode)
-                continue;
-            item.callback(isProcessTerminating);
-        }
+        for (auto const& callback : uninitializeManagedCallbacks)
+            callback(isProcessTerminating);
+        for (auto const& callback : uninitializeCallbacks)
+            callback(isProcessTerminating);
     }
     void TriggerPostRenderCallbacks() {
-        for (auto& callback : postRenderCallbacks)
+        for (auto const& callback : postRenderCallbacks)
             callback();
     }
     void TriggerClearMeasurementFlagsCallbacks() {

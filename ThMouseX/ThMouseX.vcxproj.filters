@@ -165,6 +165,9 @@
     <CopyFileToFolders Include="ConfigScripts/thWWW.lua">
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="ConfigScripts\THasl.lua">
+      <Filter>ConfigScripts</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="AdditiveToneShader.hlsl">

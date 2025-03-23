@@ -29,6 +29,8 @@ namespace common::luaapi {
     string LuaJitPrepScript;
 
     static void Uninitialize(bool isProcessTerminating) {
+        if (isProcessTerminating)
+            return;
         SetPositionAddress(NULL);
     }
 
@@ -42,7 +44,7 @@ namespace common::luaapi {
         auto scriptHandle = LoadResource(dllModule, scriptRes);
         if (scriptHandle == nil)
             return;
-        LuaJitPrepScript = string(scast<const char*>(LockResource(scriptHandle)), scriptSize)
+        LuaJitPrepScript = string(scast<PCSTR>(LockResource(scriptHandle)), scriptSize)
             .append("\n")
             .append(format(SYM_NAME(MH_UNKNOWN)" = {}\n",                   /* */ to_string(MH_UNKNOWN)))
             .append(format(SYM_NAME(MH_UNKNOWN)" = {}\n",                   /* */ to_string(MH_UNKNOWN)))
@@ -94,7 +96,7 @@ namespace common::luaapi {
         return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal, discriminator);
     }
 
-    string ReadAttributeFromLuaScript(const string& scriptPath, const char* attributeName) {
+    string ReadAttributeFromLuaScript(const string& scriptPath, PCSTR attributeName) {
         if (attributeName == nil || attributeName[0] == '\0')
             return "";
         ifstream scriptFile(scriptPath.c_str());

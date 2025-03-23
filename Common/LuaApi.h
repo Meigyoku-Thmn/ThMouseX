@@ -23,5 +23,5 @@ namespace common::luaapi {
     PointDataType GetDataType();
     void RegisterUninitializeCallback(UninitializeCallbackType callback);
     MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal, LPCSTR discriminator);
-    std::string ReadAttributeFromLuaScript(const std::string& scriptPath, const char* attributeName);
+    std::string ReadAttributeFromLuaScript(const std::string& scriptPath, PCSTR attributeName);
 }

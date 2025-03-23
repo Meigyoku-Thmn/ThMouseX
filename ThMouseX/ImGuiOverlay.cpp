@@ -19,7 +19,7 @@ using namespace std;
 
 static CommonConfig& g_c = g_commonConfig;
 
-static const char* GetKeyName(BYTE vkCode) {
+static PCSTR GetKeyName(BYTE vkCode) {
     auto imGuiKey = ImGui_ImplWin32_VirtualKeyToImGuiKey(vkCode);
     auto rs = ImGui::GetKeyName(imGuiKey);
     if (imGuiKey != ImGuiKey_None)

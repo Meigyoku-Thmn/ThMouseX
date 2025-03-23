@@ -7,16 +7,16 @@
 #include "DataTypes.h"
 
 namespace common::helper {
-    using WParamPredicate = bool (*)(WPARAM wParam, BYTE vkCode);
-    using LParamPredicate = bool (*)(LPARAM lParam, BYTE vkCode);
+    using WParamPredicate = bool(*)(WPARAM wParam, BYTE vkCode);
+    using LParamPredicate = bool(*)(LPARAM lParam, BYTE vkCode);
     using VkCodeMessage = std::tuple<
         UINT, WParamPredicate, LParamPredicate,
         UINT, WParamPredicate, LParamPredicate
     >;
-    void ReportLastError(const char* title);
-    std::tuple<float, const char*> ConvertToFloat(const std::string& input);
-    std::tuple<long, const char*> ConvertToLong(const std::string& input, int base);
-    std::tuple<unsigned long, const char*> ConvertToULong(const std::string& input, int base);
+    void ReportLastError(PCSTR title);
+    std::tuple<float, PCSTR> ConvertToFloat(const std::string& input);
+    std::tuple<long, PCSTR> ConvertToLong(const std::string& input, int base);
+    std::tuple<unsigned long, PCSTR> ConvertToULong(const std::string& input, int base);
     void CalculateNextTone(UCHAR& tone, ModulateStage& toneStage);
     POINT GetPointerPosition();
     void RemoveWindowBorder(UINT width, UINT height);

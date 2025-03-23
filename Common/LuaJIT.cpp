@@ -40,7 +40,7 @@ static bool CheckAndDisableIfError(lua_State* _L, int r) {
 
 namespace common::luajit {
     static void Uninitialize(bool isProcessTerminating) {
-        if (L != nil)
+        if (!isProcessTerminating && L != nil)
             lua_close(L);
     }
 

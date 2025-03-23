@@ -36,7 +36,7 @@
 #define defer_impl(counter, ...) std::shared_ptr<void> MAKE_UNIQUE_VAR(counter)(nil, [&](...) __VA_ARGS__)
 
 #define FixedStringMember(type, name, value) type name[ARRAYSIZE(value)] = value
-#define ImportWinAPI(hModule, API) decltype(&API) API = hModule ? bcast<decltype(API)>(GetProcAddress(hModule, SYM_NAME(API))) : nil
+#define ImportAPI(hModule, API) API _##API = hModule ? bcast<API>(GetProcAddress(hModule, SYM_NAME(API))) : nil
 
 #define SHELLCODE_SECTION_NAME ".shlcode"
 #define SHELLCODE  __declspec(safebuffers) __declspec(code_seg(SHELLCODE_SECTION_NAME))

@@ -134,7 +134,7 @@ DEFINE_ENUM_FLAG_OPERATORS(GameInput);
 struct string_hash {
     using hash_type = std::hash<std::string_view>;
     using is_transparent = void;
-    size_t operator()(const char* str) const { return hash_type{}(str); }
+    size_t operator()(PCSTR str) const { return hash_type{}(str); }
     size_t operator()(std::string_view str) const { return hash_type{}(str); }
     size_t operator()(std::string const& str) const { return hash_type{}(str); }
 };
@@ -260,24 +260,28 @@ using ANSI_STRING = struct _ANSI_STRING {
 };
 using PANSI_STRING = ANSI_STRING*;
 
-VOID NTAPI RtlInitUnicodeString(PUNICODE_STRING DestinationString, PCWSTR SourceString);
-VOID NTAPI RtlInitAnsiString(PANSI_STRING DestinationString, PCSTR SourceString);
-NTSTATUS NTAPI LdrLoadDll(PWCHAR PathToFile, ULONG Flags, PUNICODE_STRING ModuleFileName, HMODULE* ModuleHandle);
-NTSTATUS NTAPI LdrGetProcedureAddress(HMODULE ModuleHandle, PANSI_STRING FunctionName, WORD Oridinal, PVOID* FunctionAddress);
-NTSTATUS NTAPI LdrUnloadDll(HMODULE ModuleHandle);
+using RtlInitUnicodeString = VOID(NTAPI*)(PUNICODE_STRING DestinationString, PCWSTR SourceString);
+using RtlInitAnsiString = VOID(NTAPI*)(PANSI_STRING DestinationString, PCSTR SourceString);
+using LdrLoadDll = NTSTATUS(NTAPI*)(PWCHAR PathToFile, ULONG Flags, PUNICODE_STRING ModuleFileName, HMODULE* ModuleHandle);
+using LdrGetProcedureAddress = NTSTATUS(NTAPI*)(HMODULE ModuleHandle, PANSI_STRING FunctionName, WORD Oridinal, PVOID* FunctionAddress);
+using LdrUnloadDll = NTSTATUS(NTAPI*)(HMODULE ModuleHandle);
+
+struct ABC {
+    RtlInitUnicodeString _RtlInitUnicodeString;
+};
 
 struct ShellcodeInput {
     FixedStringMember(WCHAR, user32dll, L"user32.dll");
     FixedStringMember(CHAR, peekMessageW, "PeekMessageW");
     HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
-    ImportWinAPI(ntdll, RtlInitUnicodeString);
-    ImportWinAPI(ntdll, RtlInitAnsiString);
-    ImportWinAPI(ntdll, LdrLoadDll);
-    ImportWinAPI(ntdll, LdrGetProcedureAddress);
-    ImportWinAPI(ntdll, LdrUnloadDll);
+    ImportAPI(ntdll, RtlInitUnicodeString);
+    ImportAPI(ntdll, RtlInitAnsiString);
+    ImportAPI(ntdll, LdrLoadDll);
+    ImportAPI(ntdll, LdrGetProcedureAddress);
+    ImportAPI(ntdll, LdrUnloadDll);
 };
 
 using ThreadFunc = LPTHREAD_START_ROUTINE;
 
-typedef void(__cdecl* UninitializeCallbackType)(bool isProcessTerminating);
-typedef void(__cdecl* CallbackType)();
+using UninitializeCallbackType = void(__cdecl*)(bool isProcessTerminating);
+using CallbackType = void(__cdecl*)();

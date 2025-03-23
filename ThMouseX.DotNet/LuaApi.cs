@@ -51,6 +51,8 @@ internal static class LuaApi
 
     static public void Uninitialize(bool isProcessTerminating)
     {
+        if (isProcessTerminating)
+            return;
         RegisterUninitializeCallback = null;
         SetPositionAddress = null;
         GetDataType = null;

@@ -2,13 +2,13 @@
 
 public static class Handlers
 {
-    static public int Initialize(string scriptPath)
+    static public int Initialize(string _)
     {
         try
         {
             LuaApi.Initialize();
             Scripting.Uninitialize();
-            Scripting.Initialize(scriptPath);
+            Scripting.Initialize(Environment.GetEnvironmentVariable("ThMouseX_ScriptPath"));
             LuaApi.RegisterUninitializeCallback(uninitializeDelegate);
             return 0;
         }
