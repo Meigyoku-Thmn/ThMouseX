@@ -132,7 +132,8 @@ namespace common::neolua {
     using mono_class_get_method_from_name = PVOID(*)(PVOID klass, PCSTR name, int param_count);
     using mono_runtime_invoke = PVOID(*)(PVOID method, PVOID obj, PVOID* params, PVOID* exc);
     using mono_object_to_string = PVOID(*)(PVOID obj, PVOID* exc);
-    using mono_string_chars = PCWSTR(*)(PVOID s);
+    using mono_string_to_utf8 = PSTR(*)(PVOID s);
+    using mono_free = void(*)(PVOID ptr);
 
     static void UnityMono(const wstring& bootstrapDllPath) {
 #pragma region Preparation
@@ -186,9 +187,14 @@ namespace common::neolua {
             log::LastErrorToFile(TAG " Failed to import mono_object_to_string");
             return;
         }
-        ImportAPI(mono, mono_string_chars);
-        if (!_mono_string_chars) {
-            log::LastErrorToFile(TAG " Failed to import mono_string_chars");
+        ImportAPI(mono, mono_string_to_utf8);
+        if (!_mono_string_to_utf8) {
+            log::LastErrorToFile(TAG " Failed to import mono_string_to_utf8");
+            return;
+        }
+        ImportAPI(mono, mono_free);
+        if (!_mono_free) {
+            log::LastErrorToFile(TAG " Failed to import mono_free");
             return;
         }
 
@@ -227,8 +233,9 @@ namespace common::neolua {
         _mono_runtime_invoke(method, nullptr, nullptr, &mono_exception);
         if (mono_exception) {
             auto mono_err_string = _mono_object_to_string(mono_exception, nil);
-            auto err_str = _mono_string_chars(mono_err_string);
+            auto err_str = _mono_string_to_utf8(mono_err_string);
             note::ToFile(TAG "Failed to invoke ThMouseX.DotNet.Handlers.Initialize: %s", err_str);
+            _mono_free(err_str);
             return;
         }
     }
