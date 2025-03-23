@@ -54,36 +54,6 @@ struct InputRuleItemMouseBtn2Function {
     PostSideEffect nextFrameSideEffect;
 };
 
-BOOL WINAPI _GetFirstProcess(HANDLE snapshot, LPPROCESSENTRY32W entry);
-BOOL WINAPI _GetNextProcess(HANDLE snapshot, LPPROCESSENTRY32W entry);
-decltype(&Process32FirstW) GetNextProcess = _GetFirstProcess;
-BOOL WINAPI _GetFirstProcess(HANDLE snapshot, LPPROCESSENTRY32W entry) {
-    auto rs = Process32FirstW(snapshot, entry);
-    GetNextProcess = _GetNextProcess;
-    return rs;
-}
-BOOL WINAPI _GetNextProcess(HANDLE snapshot, LPPROCESSENTRY32W entry) {
-    auto rs = Process32NextW(snapshot, entry);
-    if (!rs)
-        GetNextProcess = _GetFirstProcess;
-    return rs;
-}
-
-BOOL WINAPI _GetFirstModule(HANDLE snapshot, LPMODULEENTRY32W entry);
-BOOL WINAPI _GetNextModule(HANDLE snapshot, LPMODULEENTRY32W entry);
-decltype(&Module32FirstW) GetNextModule = _GetFirstModule;
-BOOL WINAPI _GetFirstModule(HANDLE snapshot, LPMODULEENTRY32W entry) {
-    auto rs = Module32FirstW(snapshot, entry);
-    GetNextModule = _GetNextModule;
-    return rs;
-}
-BOOL WINAPI _GetNextModule(HANDLE snapshot, LPMODULEENTRY32W entry) {
-    auto rs = Module32NextW(snapshot, entry);
-    if (!rs)
-        GetNextModule = _GetFirstModule;
-    return rs;
-}
-
 namespace core::messagequeue {
     HCURSOR WINAPI _SetCursor(HCURSOR cursor);
     decltype(&_SetCursor) OriSetCursor;
@@ -354,7 +324,10 @@ namespace core::messagequeue {
         auto currentProcessId = GetCurrentProcessId();
         PROCESSENTRY32W processEntry{ .dwSize = sizeof(processEntry) };
         ShellcodeInput shellcodeInput{};
+
+        decltype(&Process32FirstW) GetNextProcess = Process32FirstW;
         while (GetNextProcess(processSnapshot.get(), &processEntry)) {
+            GetNextProcess = Process32NextW;
             if (processEntry.th32ProcessID == currentProcessId)
                 continue;
             Handle hProcess{ OpenProcess(PROCESS_ALL_ACCESS, FALSE, processEntry.th32ProcessID) };
@@ -364,7 +337,9 @@ namespace core::messagequeue {
             if (processSnapshot.get() == INVALID_HANDLE_VALUE)
                 continue;
             MODULEENTRY32W moduleEntry{ .dwSize = sizeof(moduleEntry) };
+            decltype(&Module32FirstW) GetNextModule = Module32FirstW;
             while (GetNextModule(moduleSnapshot.get(), &moduleEntry)) {
+                GetNextModule = Module32NextW;
                 if (_wcsicmp(moduleEntry.szExePath, g_currentModulePath) != 0)
                     continue;
                 auto remoteInput = VirtualAllocEx(hProcess.get(), nil, sizeof(shellcodeInput), MEM_COMMIT, PAGE_READWRITE);
