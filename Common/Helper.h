@@ -58,4 +58,7 @@ namespace common::helper {
     void ComMethodTimeout(const std::function<void()>& comAction, DWORD timeout);
     TimerQueueTimerHandle CreateTimerQueueTimer(HANDLE TimerQueue, WAITORTIMERCALLBACK Callback, PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags);
     ActCtxCookie ActivateActCtx(HANDLE hActCtx);
+    void LeftTrimInplace(std::string& s);
+    void RightTrimInplace(std::string& s);
+    void TrimInplace(std::string& s);
 }

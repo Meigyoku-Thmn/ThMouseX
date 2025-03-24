@@ -127,7 +127,8 @@ namespace common::luaapi {
             return "";
         }
         token = "";
-        lineStream >> token;
+        getline(lineStream, token);
+        helper::TrimInplace(token);
         if (token == "") {
             note::ToFile("[LuaApi] %s value must be specified in '%s'.", attributeName, scriptPath.c_str());
             return "";

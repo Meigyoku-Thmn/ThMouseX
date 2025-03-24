@@ -337,10 +337,10 @@ namespace common::helper {
             if (FAILED(hr))
                 log::HResultToFile("CoCancelCall failed", hr);
             SetEvent(waitHandle.get());
-        };
+            };
         auto timeoutCallbackThunk = [](auto callback, UNUSED auto _) {
             (*scast<decltype(timeoutCallback)*>(callback))();
-        };
+            };
         auto timerHandle = CreateTimerQueueTimer(nil, timeoutCallbackThunk, &timeoutCallback, timeout, 0, WT_EXECUTEONLYONCE);
         if (!timerHandle) {
             log::LastErrorToFile("CreateTimerQueueTimer failed");
@@ -374,5 +374,25 @@ namespace common::helper {
         if (!rs)
             cookie = 0;
         return ActCtxCookie{ cookie };
+    }
+
+    // trim from start (in place)
+    void LeftTrimInplace(string& s) {
+        s.erase(s.begin(), find_if(s.begin(), s.end(), [](const UCHAR ch) {
+            return !isspace(ch);
+        }));
+    }
+
+    // trim from end (in place)
+    void RightTrimInplace(string& s) {
+        s.erase(find_if(s.rbegin(), s.rend(), [](const UCHAR ch) {
+            return !isspace(ch);
+        }).base(), s.end());
+    }
+
+    // trim from both ends (in place)
+    void TrimInplace(string& s) {
+        RightTrimInplace(s);
+        LeftTrimInplace(s);
     }
 }
