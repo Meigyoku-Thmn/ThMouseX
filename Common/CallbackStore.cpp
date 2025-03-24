@@ -27,8 +27,9 @@ namespace common::callbackstore {
     }
 
     void TriggerUninitializeCallbacks(bool isProcessTerminating) {
-        for (auto const& callback : uninitializeManagedCallbacks)
-            callback(isProcessTerminating);
+        if (!isProcessTerminating)
+            for (auto const& callback : uninitializeManagedCallbacks)
+                callback(isProcessTerminating);
         for (auto const& callback : uninitializeCallbacks)
             callback(isProcessTerminating);
     }
