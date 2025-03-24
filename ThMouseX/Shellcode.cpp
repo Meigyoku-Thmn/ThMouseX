@@ -23,19 +23,20 @@ namespace core::shellcode {
             break;
         }
     }
-    // this only works with /JMC (Just My Code) disabled
+    // This only works with /JMC (Just My Code) disabled.
+    // Do not call any functions beside those in ShellcodeInput, constexpr function or function template will not be inlined in debug.
 #pragma runtime_checks("", off)
     SHELLCODE DWORD WINAPI UnloadingShellcode(const ShellcodeInput* inp) {
         UNICODE_STRING user32dll{};
         inp->_RtlInitUnicodeString(&user32dll, inp->user32dll);
-        HMODULE user32{};
+        HMODULE user32{}; 
         inp->_LdrLoadDll(nil, 0, &user32dll, &user32);
         ANSI_STRING peekMessageW{};
         inp->_RtlInitAnsiString(&peekMessageW, inp->peekMessageW);
         PVOID peekMessageWFunc{};
         inp->_LdrGetProcedureAddress(user32, &peekMessageW, 0, &peekMessageWFunc);
         MSG msg;
-        bcast<decltype(&PeekMessageW)>(peekMessageWFunc)(&msg, nil, WM_USER, WM_USER, PM_NOREMOVE);
+        rcast<decltype(&PeekMessageW)>(peekMessageWFunc)(&msg, nil, WM_USER, WM_USER, PM_NOREMOVE);
         inp->_LdrUnloadDll(user32);
         return 0;
     }

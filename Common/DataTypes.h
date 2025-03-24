@@ -260,11 +260,11 @@ using ANSI_STRING = struct _ANSI_STRING {
 };
 using PANSI_STRING = ANSI_STRING*;
 
-using RtlInitUnicodeString = VOID(NTAPI*)(PUNICODE_STRING DestinationString, PCWSTR SourceString);
-using RtlInitAnsiString = VOID(NTAPI*)(PANSI_STRING DestinationString, PCSTR SourceString);
-using LdrLoadDll = NTSTATUS(NTAPI*)(PWCHAR PathToFile, ULONG Flags, PUNICODE_STRING ModuleFileName, HMODULE* ModuleHandle);
-using LdrGetProcedureAddress = NTSTATUS(NTAPI*)(HMODULE ModuleHandle, PANSI_STRING FunctionName, WORD Oridinal, PVOID* FunctionAddress);
-using LdrUnloadDll = NTSTATUS(NTAPI*)(HMODULE ModuleHandle);
+using RtlInitUnicodeString = VOID(NTAPI*)(_Out_ PUNICODE_STRING DestinationString, _In_opt_ PCWSTR SourceString);
+using RtlInitAnsiString = VOID(NTAPI*)(_Out_ PANSI_STRING DestinationString, _In_opt_ PCSTR SourceString);
+using LdrLoadDll = NTSTATUS(NTAPI*)(_In_opt_ PWCHAR PathToFile, _In_ ULONG Flags, _In_ PUNICODE_STRING ModuleFileName, _Out_ HMODULE* ModuleHandle);
+using LdrGetProcedureAddress = NTSTATUS(NTAPI*)(_In_ HMODULE ModuleHandle, _In_ PANSI_STRING FunctionName, _In_ WORD Oridinal, _Out_ PVOID* FunctionAddress);
+using LdrUnloadDll = NTSTATUS(NTAPI*)(_In_ HMODULE ModuleHandle);
 
 struct ShellcodeInput {
     FixedStringMember(WCHAR, user32dll, L"user32.dll");
