@@ -20,16 +20,16 @@ namespace core::shellcode {
             auto& sectionHeader = sectionHeaders[i];
             if (strncmp(rcast<PCHAR>(sectionHeader.Name), SHELLCODE_SECTION_NAME, ARRAYSIZE(sectionHeader.Name)) != 0)
                 continue;
-            ShellcodeFunctionPtr = bcast<PVOID>(scast<uintptr_t>(sectionHeader.VirtualAddress));
+            ShellcodeFunctionPtr = bcast<PVOID>(bcast<uintptr_t>(&__ImageBase) + sectionHeader.VirtualAddress);
             ShellcodeSectionSize = sectionHeader.Misc.VirtualSize;
             break;
         }
     }
-
 }
 
-// This only works with /JMC (Just My Code) disabled.
-// Do not call any functions beside those in ShellcodeInput, constexpr function or function template will not be inlined in debug.
+// This only works with /JMC (Just My Code) disabled and runtime security off.
+// Do not call any functions beside the functions in ShellcodeInput.
+// constexpr functions or function templates will not be inlined in debug mode.
 #pragma runtime_checks("", off)
 #ifdef _WIN64
 #pragma comment(linker, "/include:UnloadingShellcode")

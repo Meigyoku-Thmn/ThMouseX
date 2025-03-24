@@ -18,7 +18,6 @@
 #include "../Common/Lua.h"
 #include "../Common/NeoLua.h"
 #include "../Common/ErrorMsg.h"
-#include "Shellcode.h"
 #include "KeyboardState.h"
 #include "SendKey.h"
 #include "MessageQueue.h"
@@ -48,7 +47,6 @@ namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
 namespace comclient = core::comclient;
-namespace shellcode = core::shellcode;
 namespace errormsg = common::errormsg;
 
 using namespace std;
@@ -75,17 +73,16 @@ namespace core {
         PathStripPathW(g_currentProcessName);
         PathRemoveExtensionW(g_currentProcessName);
 
-        if (helper::IsCurrentProcessThMouseX()) {
-            errormsg::Initialize();
-            shellcode::Initialize();
+        if (helper::IsCurrentProcessThMouseX())
             return;
-        }
 
         if (!comclient::Initialize())
             return;
         
         if (!comclient::GetGameConfig(g_currentProcessName, g_gameConfig, g_commonConfig))
             return;
+
+        errormsg::Initialize();
         g_gameConfig.Initialize();
         g_commonConfig.Initialize();
 

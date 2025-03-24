@@ -309,9 +309,9 @@ namespace core::messagequeue {
         // force all top-level windows to process a message, therefore force all processes to unload the DLL.
         DWORD_PTR __;
         SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &__);
-        // some processes doesn't have a top-level window or a message loop anymore,
-        // the following find them and inject a thread to force them eject the DLL.
-        // warning: non thread-safe, single-thread only.
+        // some processes at this point might not have a top-level window or a message loop anymore,
+        // the following code find them and inject a thread to force them eject the DLL.
+        shellcode::Initialize();
         auto unloadingShellcode = shellcode::ShellcodeFunctionPtr;
         auto shellcodeSize = shellcode::ShellcodeSectionSize;
         if (shellcodeSize == 0)
