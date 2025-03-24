@@ -312,7 +312,7 @@ namespace core::messagequeue {
         // some processes doesn't have a top-level window or a message loop anymore,
         // the following find them and inject a thread to force them eject the DLL.
         // warning: non thread-safe, single-thread only.
-        auto unloadingShellcode = &shellcode::UnloadingShellcode;
+        auto unloadingShellcode = shellcode::ShellcodeFunctionPtr;
         auto shellcodeSize = shellcode::ShellcodeSectionSize;
         if (shellcodeSize == 0)
             return;

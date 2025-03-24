@@ -6,6 +6,7 @@
 namespace helper = common::helper;
 
 namespace core::shellcode {
+    PVOID ShellcodeFunctionPtr;
     SIZE_T ShellcodeSectionSize;
     void Initialize() {
         auto& nt_header = *bcast<PIMAGE_NT_HEADERS>(bcast<uintptr_t>(&__ImageBase) + __ImageBase.e_lfanew);
@@ -14,31 +15,39 @@ namespace core::shellcode {
             sizeof(nt_header.Signature) +
             sizeof(nt_header.FileHeader) +
             nt_header.FileHeader.SizeOfOptionalHeader
-            );
+        );
         for (size_t i = 0; i < nt_header.FileHeader.NumberOfSections; i++) {
             auto& sectionHeader = sectionHeaders[i];
             if (strncmp(rcast<PCHAR>(sectionHeader.Name), SHELLCODE_SECTION_NAME, ARRAYSIZE(sectionHeader.Name)) != 0)
                 continue;
+            ShellcodeFunctionPtr = bcast<PVOID>(scast<uintptr_t>(sectionHeader.VirtualAddress));
             ShellcodeSectionSize = sectionHeader.Misc.VirtualSize;
             break;
         }
     }
-    // This only works with /JMC (Just My Code) disabled.
-    // Do not call any functions beside those in ShellcodeInput, constexpr function or function template will not be inlined in debug.
-#pragma runtime_checks("", off)
-    SHELLCODE DWORD WINAPI UnloadingShellcode(const ShellcodeInput* inp) {
-        UNICODE_STRING user32dll{};
-        inp->_RtlInitUnicodeString(&user32dll, inp->user32dll);
-        HMODULE user32{}; 
-        inp->_LdrLoadDll(nil, 0, &user32dll, &user32);
-        ANSI_STRING peekMessageW{};
-        inp->_RtlInitAnsiString(&peekMessageW, inp->peekMessageW);
-        PVOID peekMessageWFunc{};
-        inp->_LdrGetProcedureAddress(user32, &peekMessageW, 0, &peekMessageWFunc);
-        MSG msg;
-        rcast<decltype(&PeekMessageW)>(peekMessageWFunc)(&msg, nil, WM_USER, WM_USER, PM_NOREMOVE);
-        inp->_LdrUnloadDll(user32);
-        return 0;
-    }
-#pragma runtime_checks("", restore)
+
 }
+
+// This only works with /JMC (Just My Code) disabled.
+// Do not call any functions beside those in ShellcodeInput, constexpr function or function template will not be inlined in debug.
+#pragma runtime_checks("", off)
+#ifdef _WIN64
+#pragma comment(linker, "/include:UnloadingShellcode")
+#else
+#pragma comment(linker, "/include:_UnloadingShellcode@4")
+#endif
+EXTERN_C SHELLCODE DWORD WINAPI UnloadingShellcode(const ShellcodeInput* inp) {
+    UNICODE_STRING user32dll{};
+    inp->_RtlInitUnicodeString(&user32dll, inp->user32dll);
+    HMODULE user32{};
+    inp->_LdrLoadDll(nil, 0, &user32dll, &user32);
+    ANSI_STRING peekMessageW{};
+    inp->_RtlInitAnsiString(&peekMessageW, inp->peekMessageW);
+    PVOID peekMessageWFunc{};
+    inp->_LdrGetProcedureAddress(user32, &peekMessageW, 0, &peekMessageWFunc);
+    MSG msg;
+    rcast<decltype(&PeekMessageW)>(peekMessageWFunc)(&msg, nil, WM_USER, WM_USER, PM_NOREMOVE);
+    inp->_LdrUnloadDll(user32);
+    return 0;
+}
+#pragma runtime_checks("", restore)
