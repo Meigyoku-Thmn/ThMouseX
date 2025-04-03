@@ -57,20 +57,20 @@ namespace common::neolua {
         else if (runtime == "Unity Mono")
             UnityMono(bootstrapDllPath);
         else
-            note::ToFile(TAG " Unknown specified runtime '%s' in %s.", runtime.c_str(), scriptPath.c_str());
+            note::ToFile(TAG "Unknown specified runtime '%s' in %s.", runtime.c_str(), scriptPath.c_str());
     }
 
     static void DotNetFramework(const wstring& bootstrapDllPath) {
 #pragma region Preparation
         auto mscoree = GetModuleHandleW(L"mscoree.dll");
         if (!mscoree) {
-            log::LastErrorToFile(TAG " Failed to load mscoree.dll");
+            log::LastErrorToFile(TAG "Failed to load mscoree.dll");
             return;
         }
 
         auto _CLRCreateInstance = bcast<decltype(&CLRCreateInstance)>(GetProcAddress(mscoree, "CLRCreateInstance"));
         if (!_CLRCreateInstance) {
-            log::LastErrorToFile(TAG " Failed to import mscoree.dll|CLRCreateInstance");
+            log::LastErrorToFile(TAG "Failed to import mscoree.dll|CLRCreateInstance");
             return;
         }
 
@@ -143,7 +143,7 @@ namespace common::neolua {
         if (!mono)
             mono = GetModuleHandleW(L"mono-2.0-sgen.dll");
         if (!mono) {
-            log::LastErrorToFile(TAG " Failed to load the mono runtime");
+            log::LastErrorToFile(TAG "Failed to load the mono runtime");
             return;
         }
 

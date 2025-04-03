@@ -42,7 +42,7 @@
     if (!_##API) { \
         (logger)(prefix " Failed to import " #API); \
         return; \
-    }
+    }0
 
 #define SHELLCODE_SECTION_NAME ".shlcode"
 #define SHELLCODE  __declspec(safebuffers) __declspec(code_seg(SHELLCODE_SECTION_NAME))
