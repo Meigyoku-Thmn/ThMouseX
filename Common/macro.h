@@ -37,6 +37,12 @@
 
 #define FixedStringMember(type, name, value) type name[ARRAYSIZE(value)] = value
 #define ImportAPI(hModule, API) API _##API = hModule ? bcast<API>(GetProcAddress(hModule, SYM_NAME(API))) : nil
+#define TryImportAPI(hModule, API, logger, prefix) \
+    ImportAPI(hModule, API); \
+    if (!_##API) { \
+        (logger)(prefix " Failed to import " #API); \
+        return; \
+    }
 
 #define SHELLCODE_SECTION_NAME ".shlcode"
 #define SHELLCODE  __declspec(safebuffers) __declspec(code_seg(SHELLCODE_SECTION_NAME))

@@ -147,56 +147,16 @@ namespace common::neolua {
             return;
         }
 
-        ImportAPI(mono, mono_get_root_domain);
-        if (!_mono_get_root_domain) {
-            log::LastErrorToFile(TAG " Failed to import mono_get_root_domain");
-            return;
-        }
-        ImportAPI(mono, mono_thread_attach);
-        if (!_mono_thread_attach) {
-            log::LastErrorToFile(TAG " Failed to import mono_thread_attach");
-            return;
-        }
-        ImportAPI(mono, mono_domain_assembly_open);
-        if (!_mono_domain_assembly_open) {
-            log::LastErrorToFile(TAG " Failed to import mono_domain_assembly_open");
-            return;
-        }
-        ImportAPI(mono, mono_assembly_get_image);
-        if (!_mono_assembly_get_image) {
-            log::LastErrorToFile(TAG " Failed to import mono_assembly_get_image");
-            return;
-        }
-        ImportAPI(mono, mono_class_from_name);
-        if (!_mono_class_from_name) {
-            log::LastErrorToFile(TAG " Failed to import mono_class_from_name");
-            return;
-        }
-        ImportAPI(mono, mono_class_get_method_from_name);
-        if (!_mono_class_get_method_from_name) {
-            log::LastErrorToFile(TAG " Failed to import mono_class_get_method_from_name");
-            return;
-        }
-        ImportAPI(mono, mono_runtime_invoke);
-        if (!_mono_runtime_invoke) {
-            log::LastErrorToFile(TAG " Failed to import mono_runtime_invoke");
-            return;
-        }
-        ImportAPI(mono, mono_object_to_string);
-        if (!_mono_object_to_string) {
-            log::LastErrorToFile(TAG " Failed to import mono_object_to_string");
-            return;
-        }
-        ImportAPI(mono, mono_string_to_utf8);
-        if (!_mono_string_to_utf8) {
-            log::LastErrorToFile(TAG " Failed to import mono_string_to_utf8");
-            return;
-        }
-        ImportAPI(mono, mono_free);
-        if (!_mono_free) {
-            log::LastErrorToFile(TAG " Failed to import mono_free");
-            return;
-        }
+        TryImportAPI(mono, mono_get_root_domain, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_thread_attach, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_domain_assembly_open, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_assembly_get_image, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_class_from_name, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_class_get_method_from_name, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_runtime_invoke, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_object_to_string, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_string_to_utf8, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_free, log::LastErrorToFile, TAG);
 
         auto rootDomain = _mono_get_root_domain();
         if (!rootDomain) {
