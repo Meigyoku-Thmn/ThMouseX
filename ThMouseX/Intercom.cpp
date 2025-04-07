@@ -83,7 +83,6 @@ namespace core::intercom {
         ValidateResult(result);
         ValidateServerResult(serverResult);
 #pragma endregion
-        return false;
 
 #pragma region Get ImGuiFontPath
         copyDataCallback = [&](const COPYDATASTRUCT* received) {
