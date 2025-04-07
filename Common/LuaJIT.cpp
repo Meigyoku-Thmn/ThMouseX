@@ -70,7 +70,7 @@ namespace common::luajit {
             return;
         }
 
-        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.processName);
+        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.ProcessName);
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
 
         if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str()))) {

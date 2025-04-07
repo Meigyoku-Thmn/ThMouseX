@@ -72,9 +72,8 @@ struct CommonConfig {
     ULONG ImGuiBaseVerticalResolution;
 };
 
-
 struct GameConfig {
-    LPWSTR processName;
+    LPWSTR ProcessName;
     DWORD NumOfOffsets;
     PDWORD Offsets;
     ScriptType ScriptType;

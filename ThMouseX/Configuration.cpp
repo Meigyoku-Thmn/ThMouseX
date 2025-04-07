@@ -29,7 +29,11 @@ using namespace std;
 
 using VkCodes = unordered_map<string, BYTE, string_hash, equal_to<>>;
 using GameConfigs = map<wstring, GameConfig, less<>>;
-using MemBlockLengths = map<LPCVOID, size_t>;
+using MemBlockSizes = map<LPCVOID, size_t>;
+
+static GameConfigs gameConfigs;
+static CommonConfig commonConfig;
+static MemBlockSizes memBlockSizes;
 
 template<CompileTimeString ini_key, typename OutputType>
 static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType& output) {
@@ -73,6 +77,7 @@ static bool IniTryGetWstrPath(const inipp::Ini<char>::Section& section, PWCHAR& 
         auto nChar = GetFullPathNameW(wStr.c_str(), 0, nil, nil);
         output = new WCHAR[nChar];
         GetFullPathNameW(wStr.c_str(), nChar, output, nil);
+        memBlockSizes[output] = nChar * sizeof(output[0]);
     }
     return true;
 }
@@ -110,15 +115,29 @@ tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount,
 tuple<VkCodes, bool> ReadVkCodes();
 #pragma endregion
 
-static GameConfigs gameConfigs;
-static CommonConfig commonConfig;
-static MemBlockLengths memBlockLengths;
-
 namespace core::configuration {
     bool MarkThMouseXProcess() {
         auto rs = _putenv(APP_NAME "=" APP_NAME);
         if (rs != 0)
             note::ToFile("[Configuration] MarkThMouseXProcess failed.");
+        return true;
+    }
+
+    UINT_PTR GetMemBlockSize(LPCVOID address) {
+        auto iter = memBlockSizes.find(address);
+        if (iter == memBlockSizes.end())
+            return 0;
+        return iter->second;
+    }
+
+    bool GetGameConfig(LPCWSTR processName, CommonConfig** commonConfig, DWORD* commonConfigSize, GameConfig** gameConfig, DWORD* gameConfigSize) {
+        auto iter = gameConfigs.find(processName);
+        if (iter == gameConfigs.end())
+            return false;
+        *gameConfig = &iter->second;
+        *gameConfigSize = sizeof(GameConfig);
+        *commonConfig = &::commonConfig;
+        *commonConfigSize = sizeof(CommonConfig);
         return true;
     }
 
@@ -182,13 +201,15 @@ namespace core::configuration {
             ranges::transform(processNameLowerCase, processNameLowerCase.begin(), towlower);
             auto& gameConfig = gameConfigs[processNameLowerCase];
 
-            gameConfig.processName = new WCHAR[processName.size() + 1];
-            memcpy(gameConfig.processName, processName.c_str(), processName.size() * sizeof(processName[0]));
-            gameConfig.processName[processName.size()] = L'\0';
+            gameConfig.ProcessName = new WCHAR[processName.size() + 1];
+            memcpy(gameConfig.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
+            gameConfig.ProcessName[processName.size()] = L'\0';
+            memBlockSizes[gameConfig.ProcessName] = (processName.size() + 1) * sizeof(processName[0]);
 
             if (addressOffsets.size() > 0) {
                 gameConfig.Offsets = new DWORD[addressOffsets.size()];
                 memcpy(gameConfig.Offsets, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
+                memBlockSizes[gameConfig.Offsets] = addressOffsets.size() * sizeof(gameConfig.Offsets[0]);
             }
             gameConfig.ScriptType = scriptType;
 

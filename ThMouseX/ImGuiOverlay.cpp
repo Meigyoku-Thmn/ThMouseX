@@ -114,7 +114,7 @@ namespace core::imguioverlay {
                     ImGui::Text("Pixel Offset:\t(%g,%g)", g_pixelOffset.X, g_pixelOffset.Y);
                 }
                 if (ImGui::CollapsingHeader("Game Config")) {
-                    static auto procName = encoding::ConvertToUtf8(g_gameConfig.processName);
+                    static auto procName = encoding::ConvertToUtf8(g_gameConfig.ProcessName);
                     ImGui::Text("Process Name:\t%s", procName.c_str());
 
                     static auto procAddr = memory::GetAddressConfigAsString();

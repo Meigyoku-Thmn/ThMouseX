@@ -85,7 +85,7 @@ namespace common::lua {
         if (g_gameConfig.ScriptType != Lua)
             return;
 
-        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.processName);
+        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.ProcessName);
         scriptPath = encoding::ConvertToUtf8(wScriptPath);
         luaDllName = luaapi::ReadAttributeFromLuaScript(scriptPath, "LuaDllName");
         if (luaDllName.empty()) {

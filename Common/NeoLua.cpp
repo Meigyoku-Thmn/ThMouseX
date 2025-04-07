@@ -40,7 +40,7 @@ namespace common::neolua {
             return;
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/ThMouseX.DotNet.dll";
-        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.processName);
+        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.ProcessName);
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
         auto runtime = luaapi::ReadAttributeFromLuaScript(scriptPath, "Runtime");
 

@@ -25,6 +25,7 @@
 #include "Direct3D8.h"
 #include "Direct3D9.h"
 #include "Direct3D11.h"
+#include "Intercom.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
@@ -41,6 +42,7 @@ namespace directx9 = core::directx9;
 namespace directx11 = core::directx11;
 namespace directinput = core::directinput;
 namespace keyboardstate = core::keyboardstate;
+namespace intercom = core::intercom;
 namespace note = common::log;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
@@ -74,6 +76,9 @@ namespace core {
         if (helper::IsCurrentProcessThMouseX())
             return;
 
+        if (!intercom::QueryGameConfig(g_currentProcessName, g_commonConfig, g_gameConfig))
+            return;
+
         errormsg::Initialize();
         minhook::Initialize();
         luaapi::Initialize();
@@ -93,7 +98,7 @@ namespace core {
         messagequeue::Initialize();
 
         minhook::CreateApiHook(vector<minhook::HookApiConfig> {
-            { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, &OriLoadLibraryExW, APP_NAME "_LoadLibraryExW" },
+            { L"KERNELBASE.dll", "LoadLibraryExW", & _LoadLibraryExW, & OriLoadLibraryExW, APP_NAME "_LoadLibraryExW" },
         });
 
         minhook::EnableAll();
