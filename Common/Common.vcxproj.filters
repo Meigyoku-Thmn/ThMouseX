@@ -80,9 +80,6 @@
     <ClInclude Include="Helper.Memory.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
-    <ClInclude Include="ComServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PreparationScript.h">
       <Filter>Header Files\LuaScript</Filter>
     </ClInclude>

@@ -26,6 +26,7 @@
     </UsingTask>
 
     <Target Name="PostBuildPreparation" BeforeTargets="PostBuildEvent">
+        <SetEnvironmentVariable Name="StyluaUrl" Value="https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-windows-x86_64.zip" />
         <SetEnvironmentVariable Name="PlatformTarget" Value="$(PlatformTarget)" />
         <SetEnvironmentVariable Name="TargetName" Value="$(TargetName)" />
         <SetEnvironmentVariable Name="DevEnvDir" Value="$(DevEnvDir)" />

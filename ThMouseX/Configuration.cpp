@@ -8,7 +8,6 @@
 #include <tuple>
 #include <cassert>
 #include <inipp.h>
-#include <atlsafe.h>
 
 #include "../Common/macro.h"
 #include "../Common/Variables.h"
@@ -30,6 +29,7 @@ using namespace std;
 
 using VkCodes = unordered_map<string, BYTE, string_hash, equal_to<>>;
 using GameConfigs = map<wstring, GameConfig, less<>>;
+using MemBlockLengths = map<LPCVOID, size_t>;
 
 template<CompileTimeString ini_key, typename OutputType>
 static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType& output) {
@@ -112,6 +112,7 @@ tuple<VkCodes, bool> ReadVkCodes();
 
 static GameConfigs gameConfigs;
 static CommonConfig commonConfig;
+static MemBlockLengths memBlockLengths;
 
 namespace core::configuration {
     bool MarkThMouseXProcess() {
@@ -120,17 +121,7 @@ namespace core::configuration {
             note::ToFile("[Configuration] MarkThMouseXProcess failed.");
         return true;
     }
-    bool GetGameConfig(PCWCHAR processName, GameConfigEx* gameConfig, CommonConfigEx* commonConfig) {
-        wstring processNameLowerCase{ processName };
-        ranges::transform(processNameLowerCase, processNameLowerCase.begin(), towlower);
-        auto lookup = gameConfigs.find(processNameLowerCase);
-        if (lookup == gameConfigs.end())
-            return false;
-        auto rs = gameConfig->CopyFrom(lookup->second) && commonConfig->CopyFrom(::commonConfig);
-        if (rs == false)
-            note::ToFile("[Configuration] GetGameConfig failed.");
-        return rs;
-    }
+
     bool ReadGamesFile(PCSTR gameConfigPath, bool overrding = false);
     bool ReadGamesFile() {
         auto rs = ReadGamesFile(GameFile);
@@ -196,9 +187,8 @@ namespace core::configuration {
             gameConfig.processName[processName.size()] = L'\0';
 
             if (addressOffsets.size() > 0) {
-                CComSafeArray<DWORD> addressChain{ scast<ULONG>(addressOffsets.size()) };
-                memcpy(addressChain.m_psa->pvData, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
-                gameConfig.Address = addressChain.Detach();
+                gameConfig.Offsets = new DWORD[addressOffsets.size()];
+                memcpy(gameConfig.Offsets, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
             }
             gameConfig.ScriptType = scriptType;
 
@@ -281,20 +271,21 @@ tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCou
 }
 
 tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
+    using enum ScriptType;
     string pointerChainStr;
     stream >> pointerChainStr;
     vector<DWORD> addressOffsets;
 
-    auto scriptType = ScriptType_None;
+    auto scriptType = None;
 
     if (pointerChainStr.compare("LuaJIT") == 0)
-        scriptType = ScriptType_LuaJIT;
+        scriptType = LuaJIT;
     else if (pointerChainStr.compare("NeoLua") == 0)
-        scriptType = ScriptType_NeoLua;
+        scriptType = NeoLua;
     else if (pointerChainStr.compare("Lua") == 0)
-        scriptType = ScriptType_Lua;
+        scriptType = Lua;
 
-    if (scriptType == ScriptType_None) {
+    if (scriptType == None) {
         size_t rightBoundIdx = -1;
         for (;;) {
             auto leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
@@ -326,18 +317,19 @@ tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, 
 }
 
 tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
+    using enum PointDataType;
     string dataTypeStr;
     stream >> dataTypeStr;
-    auto dataType = PointDataType_None;
+    auto dataType = None;
 
     if (_stricmp(dataTypeStr.c_str(), "Int") == 0)
-        dataType = PointDataType_Int;
+        dataType = Int;
     else if (_stricmp(dataTypeStr.c_str(), "Float") == 0)
-        dataType = PointDataType_Float;
+        dataType = Float;
     else if (_stricmp(dataTypeStr.c_str(), "Short") == 0)
-        dataType = PointDataType_Short;
+        dataType = Short;
     else if (_stricmp(dataTypeStr.c_str(), "Double") == 0)
-        dataType = PointDataType_Double;
+        dataType = Double;
     else {
         MessageBoxA(nil, format("Invalid dataType at line {} in {}.", lineCount, gameConfigPath).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);
@@ -426,25 +418,26 @@ tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, 
 }
 
 tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
+    using enum InputMethod;
     string inputMethodStr;
     stream >> inputMethodStr;
 
-    auto inputMethods = InputMethod_None;
+    auto inputMethods = None;
     char* nextToken{};
     auto token = strtok_s(inputMethodStr.data(), "/", &nextToken);
     while (token) {
         if (_stricmp(token, "DirectInput") == 0)
-            inputMethods |= InputMethod_DirectInput;
+            inputMethods |= DirectInput;
         else if (_stricmp(token, "GetKeyboardState") == 0)
-            inputMethods |= InputMethod_GetKeyboardState;
+            inputMethods |= GetKeyboardState;
         else if (_stricmp(token, "SendInput") == 0)
-            inputMethods |= InputMethod_SendInput;
+            inputMethods |= SendInput;
         else if (_stricmp(token, "SendMessage") == 0)
-            inputMethods |= InputMethod_SendMsg;
+            inputMethods |= SendMsg;
         token = strtok_s(nil, "/", &nextToken);
     }
 
-    if (inputMethods == InputMethod_None) {
+    if (inputMethods == None) {
         MessageBoxA(nil, format("Invalid inputMethod at line {} in {}.", lineCount, gameConfigPath).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);
         return { inputMethods, false };

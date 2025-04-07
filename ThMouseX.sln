@@ -12,7 +12,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{47C2EE88-18D4-4367-8E67-6DAA01AB4451}"
 	ProjectSection(ProjectDependencies) = postProject
 		{081B19A5-F06F-45DB-8E83-391DD407DDA4} = {081B19A5-F06F-45DB-8E83-391DD407DDA4}
-		{85C40D1A-6337-41D8-BE38-B10DD73FB09E} = {85C40D1A-6337-41D8-BE38-B10DD73FB09E}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThMouseX.DotNet", "ThMouseX.DotNet\ThMouseX.DotNet.csproj", "{081B19A5-F06F-45DB-8E83-391DD407DDA4}"
@@ -46,11 +45,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utility", "Utility\Utility.
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostBuildTool", "PostBuildTool\PostBuildTool.csproj", "{CE569C03-02E0-48C0-9DE0-FF347D479E2F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThMouseXServer", "ThMouseXServer\ThMouseXServer.csproj", "{85C40D1A-6337-41D8-BE38-B10DD73FB09E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{CE569C03-02E0-48C0-9DE0-FF347D479E2F} = {CE569C03-02E0-48C0-9DE0-FF347D479E2F}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "minhook", "minhook", "{586DA747-0EB4-4011-B4D4-08746257FF20}"
 	ProjectSection(SolutionItems) = preProject
@@ -119,14 +113,6 @@ Global
 		{CE569C03-02E0-48C0-9DE0-FF347D479E2F}.Release|x64.Build.0 = Release|x64
 		{CE569C03-02E0-48C0-9DE0-FF347D479E2F}.Release|x86.ActiveCfg = Release|x86
 		{CE569C03-02E0-48C0-9DE0-FF347D479E2F}.Release|x86.Build.0 = Release|x86
-		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Debug|x64.ActiveCfg = Debug|x64
-		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Debug|x64.Build.0 = Debug|x64
-		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Debug|x86.ActiveCfg = Debug|x86
-		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Debug|x86.Build.0 = Debug|x86
-		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Release|x64.ActiveCfg = Release|x64
-		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Release|x64.Build.0 = Release|x64
-		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Release|x86.ActiveCfg = Release|x86
-		{85C40D1A-6337-41D8-BE38-B10DD73FB09E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

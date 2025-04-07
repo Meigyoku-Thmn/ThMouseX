@@ -6,7 +6,6 @@
 
 namespace core::configuration {
     DLLEXPORT_C bool MarkThMouseXProcess();
-    DLLEXPORT_C bool GetGameConfig(PCWCHAR processName, GameConfigEx* gameConfig, CommonConfigEx* commonConfig);
     DLLEXPORT_C bool ReadGamesFile();
     DLLEXPORT_C bool ReadGeneralConfigFile();
 }

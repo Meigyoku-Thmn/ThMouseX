@@ -41,13 +41,14 @@ static InputRuleStateItem inputRule[]{
 };
 
 static void SendKeyDown(BYTE vkCode) {
-    if ((g_gameConfig.InputMethods & InputMethod_SendMsg) == InputMethod_SendMsg) {
+    using enum InputMethod;
+    if ((g_gameConfig.InputMethods & SendMsg) == SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX) << 16) | 0x00000001;
         if (helper::ShouldBeVkExtended(vkCode))
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYDOWN, helper::NormalizeLeftRightVkCode(vkCode), lParam);
     }
-    else if ((g_gameConfig.InputMethods & InputMethod_SendInput) == InputMethod_SendInput) {
+    else if ((g_gameConfig.InputMethods & SendInput) == SendInput) {
         if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
             return;
         INPUT input{
@@ -63,13 +64,14 @@ static void SendKeyDown(BYTE vkCode) {
 }
 
 static void SendKeyUp(BYTE vkCode) {
-    if ((g_gameConfig.InputMethods & InputMethod_SendMsg) == InputMethod_SendMsg) {
+    using enum InputMethod;
+    if ((g_gameConfig.InputMethods & SendMsg) == SendMsg) {
         auto lParam = (MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX) << 16) | 0xC0000001;
         if (helper::ShouldBeVkExtended(vkCode))
             lParam |= 0x01000000;
         SendMessageW(g_hFocusWindow, WM_KEYUP, helper::NormalizeLeftRightVkCode(vkCode), lParam);
     }
-    else if ((g_gameConfig.InputMethods & InputMethod_SendInput) == InputMethod_SendInput) {
+    else if ((g_gameConfig.InputMethods & SendInput) == SendInput) {
         if (!g_hFocusWindow || GetForegroundWindow() != g_hFocusWindow)
             return;
         INPUT input{
@@ -119,7 +121,8 @@ static void CleanUp(bool isProcessTerminating) {
 
 namespace core::sendkey {
     void Initialize() {
-        if ((g_gameConfig.InputMethods & (InputMethod_SendInput | InputMethod_SendMsg)) == InputMethod_None)
+        using enum InputMethod;
+        if ((g_gameConfig.InputMethods & (SendInput | SendMsg)) == None)
             return;
         callbackstore::RegisterPostRenderCallback(TestInputAndSendKeys);
         callbackstore::RegisterUninitializeCallback(CleanUp);

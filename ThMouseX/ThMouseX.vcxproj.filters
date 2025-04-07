@@ -83,9 +83,6 @@
     <ClCompile Include="SendKey.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="ComClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Shellcode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -140,9 +137,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Shellcode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -182,8 +176,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ThMouseX.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostBuildScript.bat" />
   </ItemGroup>
 </Project>

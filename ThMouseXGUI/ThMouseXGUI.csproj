@@ -31,7 +31,6 @@
         </PackageReference>
         <PackageReference Include="ILMerge.Fody" Version="1.24.0" PrivateAssets="All" />
         <ProjectReference Include="..\ThMouseX.DotNet\ThMouseX.DotNet.csproj" />
-        <ProjectReference Include="..\ThMouseXServer\ThMouseXServer.csproj" />
     </ItemGroup>
 
     <Import Project="$(SolutionDir)Common.targets" />

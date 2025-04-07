@@ -1,17 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using ThMouseXServer;
-
-#if WIN32
-[assembly: Guid("2AD4FA86-3961-4F4B-AC10-8AC5716E526A"), ComVisible(false)]
-#else
-[assembly: Guid("A4F44FF8-CB06-4567-AFD1-83C3CB4FA38C"), ComVisible(false)]
-#endif
 
 namespace ThMouseXGUI;
-
-using static ComHelper;
 
 static class Program
 {
@@ -64,17 +55,6 @@ static class Program
 
             if (!ReadGamesFile() || !ReadGeneralConfigFile())
                 return 1;
-
-            try
-            {
-                CoRegisterClassObject<ComServer>();
-                CoResumeClassObjects();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, AppName + ": Failed to initialize Component Object Models", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return 1;
-            }
 
             if (!InstallHooks())
                 return 1;

@@ -185,7 +185,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ComServer.h" />
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="ErrorMsg.Cor.h" />
     <ClInclude Include="ErrorMsg.D3D.h" />

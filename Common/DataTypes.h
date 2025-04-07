@@ -7,77 +7,82 @@
 #include <memory>
 #include <type_traits>
 #include <algorithm>
-#include <atlsafe.h>
 
-#include "ComServer.h"
-
+enum class InputMethod : int {
+    None/*........*/ = 0,
+    DirectInput/*.*/ = 1 << 0,
+    GetKeyboardState = 1 << 1,
+    SendInput/*...*/ = 1 << 2,
+    SendMsg/*.....*/ = 1 << 3
+};
 DEFINE_ENUM_FLAG_OPERATORS(InputMethod);
 
-struct GameConfigLocal : GameConfig {
-    CComSafeArray<DWORD> AddressChain;
-    CComHeapPtr<WCHAR> ProcessName;
-    void Initialize() {
-        if (this->Address)
-            this->AddressChain.Attach(this->Address);
-        if (this->processName)
-            this->ProcessName.Attach(this->processName);
-    }
+enum class ScriptType : int {
+    None = 0,
+    LuaJIT = 1,
+    NeoLua = 2,
+    Lua = 3
 };
 
-struct GameConfigEx : GameConfig {
-    bool CopyFrom(const GameConfig& gameConfig) {
-        *scast<GameConfig*>(this) = gameConfig;
-        auto hr = SafeArrayCopy(this->Address, &this->Address);
-        auto processNameSize = (wcslen(this->processName) + 1) * sizeof(this->processName[0]);
-        auto allocated = CoTaskMemAlloc(processNameSize);
-        if (allocated) {
-            memcpy(allocated, this->processName, processNameSize);
-            this->processName = (decltype(this->processName))allocated;
-        }
-        if (!allocated || FAILED(hr)) {
-            SafeArrayDestroy(this->Address);
-            CoTaskMemFree(allocated);
-            *scast<GameConfig*>(this) = {};
-            return false;
-        }
-        return true;
-    }
+enum class PointDataType : int {
+    None = 0,
+    Int = 1,
+    Float = 2,
+    Short = 3,
+    Double = 4
 };
 
-struct CommonConfigLocal : CommonConfig {
-    CComHeapPtr<WCHAR> _TextureFilePath;
-    CComHeapPtr<WCHAR> _ImGuiFontPath;
-    void Initialize() {
-        if (this->TextureFilePath)
-            this->_TextureFilePath.Attach(this->TextureFilePath);
-        if (this->ImGuiFontPath)
-            this->_ImGuiFontPath.Attach(this->ImGuiFontPath);
-    }
+struct IntPoint {
+    long X;
+    long Y;
 };
 
-struct CommonConfigEx : CommonConfig {
-    bool CopyFrom(const CommonConfig& commonConfig) {
-        *scast<CommonConfig*>(this) = commonConfig;
-        auto textureFilePathSize = (wcslen(this->TextureFilePath) + 1) * sizeof(this->TextureFilePath[0]);
-        auto allocated1 = CoTaskMemAlloc(textureFilePathSize);
-        if (allocated1) {
-            memcpy(allocated1, this->TextureFilePath, textureFilePathSize);
-            this->TextureFilePath = (decltype(this->TextureFilePath))allocated1;
-        }
-        auto imGuiFontPathSize = (wcslen(this->ImGuiFontPath) + 1) * sizeof(this->ImGuiFontPath[0]);
-        auto allocated2 = CoTaskMemAlloc(imGuiFontPathSize);
-        if (allocated2) {
-            memcpy(allocated2, this->ImGuiFontPath, imGuiFontPathSize);
-            this->ImGuiFontPath = (decltype(this->ImGuiFontPath))allocated2;
-        }
-        if (!allocated1 || !allocated2) {
-            CoTaskMemFree(allocated1);
-            CoTaskMemFree(allocated2);
-            *scast<CommonConfig*>(this) = {};
-            return false;
-        }
-        return true;
-    }
+struct ShortPoint {
+    short X;
+    short Y;
+};
+
+struct FloatPoint {
+    float X;
+    float Y;
+};
+
+struct DoublePoint {
+    double X;
+    double Y;
+};
+
+struct CommonConfig {
+    BYTE VkCodeForLeftClick;
+    BYTE VkCodeForMiddleClick;
+    BYTE VkCodeForRightClick;
+    BYTE VkCodeForXButton1Click;
+    BYTE VkCodeForXButton2Click;
+    BYTE VkCodeForScrollUp;
+    BYTE VkCodeForScrollDown;
+    BYTE VkCodeForScrollLeft;
+    BYTE VkCodeForScrollRight;
+    BYTE ToggleMouseControl;
+    BYTE ToggleOsCursorButton;
+    BYTE ToggleImGuiButton;
+    LPWSTR TextureFilePath;
+    ULONG TextureBaseHeight;
+    LPWSTR ImGuiFontPath;
+    ULONG ImGuiBaseFontSize;
+    ULONG ImGuiBaseVerticalResolution;
+};
+
+
+struct GameConfig {
+    LPWSTR processName;
+    DWORD NumOfOffsets;
+    PDWORD Offsets;
+    ScriptType ScriptType;
+    PointDataType PosDataType;
+    FloatPoint BasePixelOffset;
+    ULONG BaseHeight;
+    FloatPoint AspectRatio;
+    InputMethod InputMethods;
 };
 
 struct ErrorMessage {
@@ -165,28 +170,6 @@ struct HwndDeleter {
     }
 };
 using WindowHandle = std::unique_ptr<HWND, HwndDeleter>;
-
-struct TimerQueueTimerHandleDeleter {
-    using pointer = HANDLE;
-    void operator()(pointer handle) const {
-        if (handle != nil) {
-            auto _ = DeleteTimerQueueTimer(nil, handle, nil);
-            if (_ == FALSE) {
-                // ignore
-            }
-        }
-    }
-};
-using TimerQueueTimerHandle = std::unique_ptr<HANDLE, TimerQueueTimerHandleDeleter>;
-
-struct ActCtxCookieDeleter {
-    using pointer = ULONG_PTR;
-    void operator()(pointer cookie) const {
-        if (cookie != 0)
-            DeactivateActCtx(0, cookie);
-    }
-};
-using ActCtxCookie = std::unique_ptr<ULONG_PTR, ActCtxCookieDeleter>;
 
 // https://dev.to/sgf4/strings-as-template-parameters-c20-4joh
 template<std::size_t N>

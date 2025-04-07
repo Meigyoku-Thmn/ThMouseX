@@ -167,16 +167,15 @@ namespace common::helper {
     }
 
     uintptr_t CalculateAddress() {
-        if (g_gameConfig.ScriptType == ScriptType_LuaJIT)
+        using enum ScriptType;
+        if (g_gameConfig.ScriptType == LuaJIT)
             return luajit::GetPositionAddress();
-        else if (g_gameConfig.ScriptType == ScriptType_NeoLua)
+        else if (g_gameConfig.ScriptType == NeoLua)
             return neolua::GetPositionAddress();
-        else if (g_gameConfig.ScriptType == ScriptType_Lua)
+        else if (g_gameConfig.ScriptType == Lua)
             return lua::GetPositionAddress();
-        else {
-            auto& addressChain = g_gameConfig.AddressChain;
-            return memory::ResolveAddress(span{ &addressChain[addressChain.GetLowerBound()], addressChain.GetCount() }, false);
-        }
+        else
+            return memory::ResolveAddress(span{ g_gameConfig.Offsets, g_gameConfig.NumOfOffsets }, false);
     }
 
     bool IsCurrentProcessThMouseX() {
@@ -309,7 +308,7 @@ namespace common::helper {
         }
     }
 
-    wstring ExpandEnvStr(const wchar_t* str) {
+    wstring ExpandEnvStr(PCWSTR str) {
         auto chrCount = ExpandEnvironmentStringsW(str, nil, 0);
         if (chrCount == 0)
             return wstring();
@@ -320,60 +319,6 @@ namespace common::helper {
 
     wstring ExpandEnvStr(const wstring& str) {
         return ExpandEnvStr(str.c_str());
-    }
-
-    void ComMethodTimeout(const function<void()>& comAction, DWORD timeout) {
-        atomic<DWORD> mainThreadId = GetCurrentThreadId();
-        Handle waitHandle{ CreateEventW(nil, TRUE, FALSE, nil) };
-        if (waitHandle == nil) {
-            log::LastErrorToFile("CreateEventW failed");
-            return;
-        }
-        auto timeoutCallback = [&] {
-            auto _mainThreadId = mainThreadId.exchange(0);
-            if (_mainThreadId == 0)
-                return;
-            auto hr = CoCancelCall(_mainThreadId, 0);
-            if (FAILED(hr))
-                log::HResultToFile("CoCancelCall failed", hr);
-            SetEvent(waitHandle.get());
-            };
-        auto timeoutCallbackThunk = [](auto callback, UNUSED auto _) {
-            (*scast<decltype(timeoutCallback)*>(callback))();
-            };
-        auto timerHandle = CreateTimerQueueTimer(nil, timeoutCallbackThunk, &timeoutCallback, timeout, 0, WT_EXECUTEONLYONCE);
-        if (!timerHandle) {
-            log::LastErrorToFile("CreateTimerQueueTimer failed");
-            return;
-        }
-        auto hr = CoEnableCallCancellation(nil);
-        if (FAILED(hr)) {
-            log::HResultToFile("CoEnableCallCancellation failed", hr);
-            return;
-        }
-        comAction();
-        auto _mainThreadId = mainThreadId.exchange(0);
-        if (_mainThreadId == 0)
-            WaitForSingleObject(waitHandle.get(), INFINITE);
-        hr = CoDisableCallCancellation(nil);
-        if (FAILED(hr))
-            log::HResultToFile("CoDisableCallCancellation failed", hr);
-    }
-
-    TimerQueueTimerHandle CreateTimerQueueTimer(HANDLE TimerQueue, WAITORTIMERCALLBACK Callback, PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags) {
-        HANDLE timerHandle{};
-        auto rs = ::CreateTimerQueueTimer(&timerHandle, TimerQueue, Callback, Parameter, DueTime, Period, Flags);
-        if (!rs)
-            timerHandle = nil;
-        return TimerQueueTimerHandle{ timerHandle };
-    }
-
-    ActCtxCookie ActivateActCtx(HANDLE hActCtx) {
-        ULONG_PTR cookie{};
-        auto rs = ::ActivateActCtx(hActCtx, &cookie);
-        if (!rs)
-            cookie = 0;
-        return ActCtxCookie{ cookie };
     }
 
     // trim from start (in place)

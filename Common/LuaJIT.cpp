@@ -45,7 +45,8 @@ namespace common::luajit {
     }
 
     void Initialize() {
-        if (g_gameConfig.ScriptType != ScriptType_LuaJIT)
+        using enum ScriptType;
+        if (g_gameConfig.ScriptType != LuaJIT)
             return;
 
         L = luaL_newstate();

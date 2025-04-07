@@ -35,7 +35,8 @@ namespace common::neolua {
     static void UnityMono(const wstring& bootstrapDllPath);
 
     void Initialize() {
-        if (g_gameConfig.ScriptType != ScriptType_NeoLua)
+        using enum ScriptType;
+        if (g_gameConfig.ScriptType != NeoLua)
             return;
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/ThMouseX.DotNet.dll";

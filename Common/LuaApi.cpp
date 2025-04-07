@@ -156,7 +156,7 @@ void Lua_SetPositionAddress(uintptr_t address) {
 }
 
 int Lua_GetDataType() {
-    return luaapi::GetDataType();
+    return scast<int>(luaapi::GetDataType());
 }
 
 void Lua_RegisterUninitializeCallback(UninitializeCallbackType callback) {

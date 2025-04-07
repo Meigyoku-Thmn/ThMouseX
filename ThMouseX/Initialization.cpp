@@ -25,7 +25,6 @@
 #include "Direct3D8.h"
 #include "Direct3D9.h"
 #include "Direct3D11.h"
-#include "ComClient.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
@@ -46,7 +45,6 @@ namespace note = common::log;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
-namespace comclient = core::comclient;
 namespace errormsg = common::errormsg;
 
 using namespace std;
@@ -76,16 +74,7 @@ namespace core {
         if (helper::IsCurrentProcessThMouseX())
             return;
 
-        if (!comclient::Initialize())
-            return;
-        
-        if (!comclient::GetGameConfig(g_currentProcessName, g_gameConfig, g_commonConfig))
-            return;
-
         errormsg::Initialize();
-        g_gameConfig.Initialize();
-        g_commonConfig.Initialize();
-
         minhook::Initialize();
         luaapi::Initialize();
         lua::Initialize();

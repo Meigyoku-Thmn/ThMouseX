@@ -204,7 +204,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ComClient.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Direct3D11.cpp" />
     <ClCompile Include="Direct3D8.cpp" />
@@ -225,7 +224,6 @@
     <ClCompile Include="Shellcode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ComClient.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Direct3D11.h" />
     <ClInclude Include="Direct3D8.h" />
@@ -345,9 +343,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ThMouseX.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostBuildScript.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

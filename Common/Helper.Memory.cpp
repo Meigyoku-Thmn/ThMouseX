@@ -49,22 +49,20 @@ namespace common::helper::memory {
     }
 
     string GetAddressConfigAsString() {
-        if (g_gameConfig.ScriptType != ScriptType_None)
+        using enum ScriptType;
+        if (g_gameConfig.ScriptType != None)
             return "Using script";
         string rs;
         rs.reserve(128);
-        auto& addressChain = g_gameConfig.AddressChain;
-        auto lowerBound = addressChain.GetLowerBound();
-        auto upperBound = addressChain.GetUpperBound();
-        for (auto i = lowerBound; i <= upperBound; i++) {
-            auto offset = addressChain[i];
+        for (decltype(g_gameConfig.NumOfOffsets) i = 0; i < g_gameConfig.NumOfOffsets; i++) {
+            auto offset = g_gameConfig.Offsets[i];
             rs.append(format("[{:x}]", offset));
         }
         return rs;
     }
 
     // https://gist.github.com/arbv/531040b8036050c5648fc55471d50352
-    bool IsBadReadMem(const void* ptr, size_t size) {
+    bool IsBadReadMem(LPCVOID ptr, size_t size) {
         if (size == 0)
             return false;
         if (ptr == nil)

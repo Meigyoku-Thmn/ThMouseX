@@ -19,13 +19,14 @@ void CalculatePosition(TPointer position, POINT& output) {
 }
 
 static void CalculatePlayerPos(uintptr_t address) {
-    if (g_gameConfig.PosDataType == PointDataType_Int)
+    using enum PointDataType;
+    if (g_gameConfig.PosDataType == Int)
         CalculatePosition(bcast<IntPoint*>(address), g_playerPos);
-    else if (g_gameConfig.PosDataType == PointDataType_Float)
+    else if (g_gameConfig.PosDataType == Float)
         CalculatePosition(bcast<FloatPoint*>(address), g_playerPos);
-    else if (g_gameConfig.PosDataType == PointDataType_Short)
+    else if (g_gameConfig.PosDataType == Short)
         CalculatePosition(bcast<ShortPoint*>(address), g_playerPos);
-    else if (g_gameConfig.PosDataType == PointDataType_Double)
+    else if (g_gameConfig.PosDataType == Double)
         CalculatePosition(bcast<DoublePoint*>(address), g_playerPos);
 }
 

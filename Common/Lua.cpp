@@ -44,7 +44,7 @@ namespace common::lua {
     decltype(&luaL_callmeta_hook) ori_luaL_callmeta;
     void lua_call_hook(lua_State* L, int nargs, int nresults);
     decltype(&lua_call_hook) ori_lua_call;
-    int lua_cpcall_hook(lua_State* L, lua_CFunction func, void* ud);
+    int lua_cpcall_hook(lua_State* L, lua_CFunction func, PVOID ud);
     decltype(&lua_cpcall_hook) ori_lua_cpcall;
     int lua_pcall_hook(lua_State* L, int nargs, int nresults, int errfunc);
     decltype(&lua_pcall_hook) ori_lua_pcall;
@@ -81,7 +81,8 @@ namespace common::lua {
     string scriptPath;
 
     void Initialize() {
-        if (g_gameConfig.ScriptType != ScriptType_Lua)
+        using enum ScriptType;
+        if (g_gameConfig.ScriptType != Lua)
             return;
 
         auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.processName);
@@ -141,7 +142,7 @@ namespace common::lua {
         });
         return;
     }
-    int lua_cpcall_hook(lua_State* L, lua_CFunction func, void* ud) {
+    int lua_cpcall_hook(lua_State* L, lua_CFunction func, PVOID ud) {
         auto rs = ori_lua_cpcall(L, func, ud);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {

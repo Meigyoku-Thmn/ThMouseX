@@ -60,12 +60,13 @@ namespace core::directinput {
     static bool initialized = false;
     static mutex mtx;
     void Initialize() {
+        using enum InputMethod;
         HMODULE dinput8{};
         {
             const scoped_lock lock(mtx);
             if (initialized)
                 return;
-            if ((g_gameConfig.InputMethods & InputMethod_DirectInput) == InputMethod_None)
+            if ((g_gameConfig.InputMethods & DirectInput) == None)
                 return;
 
             dinput8 = GetModuleHandleW((g_systemDirPath + wstring(L"\\DInput8.dll")).c_str());
