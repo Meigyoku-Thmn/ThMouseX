@@ -208,6 +208,7 @@ namespace core::configuration {
 
             if (addressOffsets.size() > 0) {
                 gameConfig.Offsets = new DWORD[addressOffsets.size()];
+                gameConfig.NumOfOffsets = scast<DWORD>(addressOffsets.size());
                 memcpy(gameConfig.Offsets, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
                 memBlockSizes[gameConfig.Offsets] = addressOffsets.size() * sizeof(gameConfig.Offsets[0]);
             }

@@ -117,7 +117,6 @@ namespace core::intercom {
                 return false;
             gameConfig.Offsets = new DWORD[received->cbData / sizeof(gameConfig.Offsets[0])];
             memcpy(gameConfig.Offsets, received->lpData, received->cbData);
-            gameConfig.NumOfOffsets = received->cbData / sizeof(gameConfig.Offsets[0]);
             return true;
         };
         result = SendMessageTimeoutW(serverHwnd, GET_MEM_BLOCK_MSG, bcast<WPARAM>(clientHwnd),
