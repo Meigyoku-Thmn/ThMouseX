@@ -11,15 +11,6 @@ using namespace std;
 namespace note = common::log;
 
 #define TAG "[Intercom] "
-#define ValidateResult(result) \
-if (result == 0) { \
-    note::LastErrorToFile(TAG "Failed to get game config from the server window"); \
-    return false; \
-}0
-#define ValidateServerResult(serverResult) \
-if (serverResult == 0) { \
-    return false; \
-}0
 
 static const auto ServerWindowName = L"{BC9D7991-41A0-47F3-BC4D-6CFF2BA205FD}";
 static const auto ClientClassName = L"{E4CB816C-3BF1-41F5-BAC5-4D4B847846A7}";
@@ -31,11 +22,12 @@ constexpr auto GET_MEM_BLOCK_EVENT_RETURN = 3;
 constexpr auto GET_MEM_BLOCK_MSG = WM_APP + 1;
 
 constexpr auto Timeout = 1000 * 60 * 10;
+constexpr auto TimeoutFlag = SMTO_NOTIMEOUTIFNOTHUNG | SMTO_ERRORONEXIT;
 
 static HWND CreateResultWindow();
 static void DestroyResultWindow(HWND hwnd);
-
-static function<bool(const COPYDATASTRUCT*)> copyDataCallback;
+static bool RequestGameConfig(LPCWSTR procName, HWND server, HWND client, CommonConfig& commonConfig, GameConfig& gameConfig);
+static bool RequestMemBlock(PVOID dst, HWND serverHwnd, HWND clientHwnd);
 
 namespace core::intercom {
     bool QueryGameConfig(LPCWSTR processName, CommonConfig& commonConfig, GameConfig& gameConfig) {
@@ -50,84 +42,22 @@ namespace core::intercom {
             return false;
         defer({ DestroyResultWindow(clientHwnd); });
 
-#pragma region Get Common Config and Game Config
-        COPYDATASTRUCT data{
-            .dwData = GET_CONFIG_EVENT,
-            .cbData = scast<DWORD>((wcslen(processName) + 1) * sizeof(processName[0])),
-            .lpData = bcast<PVOID>(processName),
-        };
-        copyDataCallback = [&](const COPYDATASTRUCT* received) {
-            if (received->dwData != GET_CONFIG_EVENT_RETURN)
-                return false;
-            commonConfig = *bcast<CommonConfig*>(received->lpData);
-            gameConfig = *bcast<GameConfig*>(bcast<uintptr_t>(received->lpData) + sizeof(CommonConfig));
-            return true;
-        };
-        DWORD_PTR serverResult;
-        auto result = SendMessageTimeoutW(serverHwnd, WM_COPYDATA, bcast<WPARAM>(clientHwnd),
-            bcast<LPARAM>(&data), SMTO_NOTIMEOUTIFNOTHUNG | SMTO_ERRORONEXIT, Timeout, &serverResult);
-        ValidateResult(result);
-        ValidateServerResult(serverResult);
-#pragma endregion
-
-#pragma region Get TextureFilePath
-        copyDataCallback = [&](const COPYDATASTRUCT* received) {
-            if (received->dwData != GET_MEM_BLOCK_EVENT_RETURN)
-                return false;
-            commonConfig.TextureFilePath = new WCHAR[received->cbData / sizeof(commonConfig.TextureFilePath[0])];
-            memcpy(commonConfig.TextureFilePath, received->lpData, received->cbData);
-            return true;
-        };
-        result = SendMessageTimeoutW(serverHwnd, GET_MEM_BLOCK_MSG, bcast<WPARAM>(clientHwnd),
-            bcast<LPARAM>(commonConfig.TextureFilePath), SMTO_NOTIMEOUTIFNOTHUNG | SMTO_ERRORONEXIT, Timeout, &serverResult);
-        ValidateResult(result);
-        ValidateServerResult(serverResult);
-#pragma endregion
-
-#pragma region Get ImGuiFontPath
-        copyDataCallback = [&](const COPYDATASTRUCT* received) {
-            if (received->dwData != GET_MEM_BLOCK_EVENT_RETURN)
-                return false;
-            commonConfig.ImGuiFontPath = new WCHAR[received->cbData / sizeof(commonConfig.ImGuiFontPath[0])];
-            memcpy(commonConfig.ImGuiFontPath, received->lpData, received->cbData);
-            return true;
-        };
-        result = SendMessageTimeoutW(serverHwnd, GET_MEM_BLOCK_MSG, bcast<WPARAM>(clientHwnd),
-            bcast<LPARAM>(commonConfig.ImGuiFontPath), SMTO_NOTIMEOUTIFNOTHUNG | SMTO_ERRORONEXIT, Timeout, &serverResult);
-        ValidateResult(result);
-#pragma endregion
-
-#pragma region Get ProcessName
-        copyDataCallback = [&](const COPYDATASTRUCT* received) {
-            if (received->dwData != GET_MEM_BLOCK_EVENT_RETURN)
-                return false;
-            gameConfig.ProcessName = new WCHAR[received->cbData / sizeof(gameConfig.ProcessName[0])];
-            memcpy(gameConfig.ProcessName, received->lpData, received->cbData);
-            return true;
-        };
-        result = SendMessageTimeoutW(serverHwnd, GET_MEM_BLOCK_MSG, bcast<WPARAM>(clientHwnd),
-            bcast<LPARAM>(gameConfig.ProcessName), SMTO_NOTIMEOUTIFNOTHUNG | SMTO_ERRORONEXIT, Timeout, &serverResult);
-        ValidateResult(result);
-        ValidateServerResult(serverResult);
-#pragma endregion
-
-#pragma region Get Offsets
-        copyDataCallback = [&](const COPYDATASTRUCT* received) {
-            if (received->dwData != GET_MEM_BLOCK_EVENT_RETURN)
-                return false;
-            gameConfig.Offsets = new DWORD[received->cbData / sizeof(gameConfig.Offsets[0])];
-            memcpy(gameConfig.Offsets, received->lpData, received->cbData);
-            return true;
-        };
-        result = SendMessageTimeoutW(serverHwnd, GET_MEM_BLOCK_MSG, bcast<WPARAM>(clientHwnd),
-            bcast<LPARAM>(gameConfig.Offsets), SMTO_NOTIMEOUTIFNOTHUNG | SMTO_ERRORONEXIT, Timeout, &serverResult);
-        ValidateResult(result);
-        ValidateServerResult(serverResult);
-#pragma endregion
+        if (!RequestGameConfig(processName, serverHwnd, clientHwnd, commonConfig, gameConfig))
+            return false;
+        if (!RequestMemBlock(&commonConfig.TextureFilePath, serverHwnd, clientHwnd))
+            return false;
+        if (!RequestMemBlock(&commonConfig.ImGuiFontPath, serverHwnd, clientHwnd))
+            return false;
+        if (!RequestMemBlock(&gameConfig.ProcessName, serverHwnd, clientHwnd))
+            return false;
+        if (!RequestMemBlock(&gameConfig.Offsets, serverHwnd, clientHwnd))
+            return false;
 
         return true;
     }
 }
+
+static function<bool(const COPYDATASTRUCT*)> copyDataCallback;
 
 static HWND CreateResultWindow() {
     WNDCLASSW windowClass{
@@ -154,4 +84,52 @@ static HWND CreateResultWindow() {
 static void DestroyResultWindow(HWND hwnd) {
     DestroyWindow(hwnd);
     UnregisterClassW(ClientClassName, nil);
+}
+
+static bool RequestGameConfig(LPCWSTR procName, HWND server, HWND client, CommonConfig& commonConfig, GameConfig& gameConfig) {
+    copyDataCallback = [&](const COPYDATASTRUCT* received) {
+        if (received->dwData != GET_CONFIG_EVENT_RETURN)
+            return false;
+        commonConfig = *bcast<CommonConfig*>(received->lpData);
+        gameConfig = *bcast<GameConfig*>(bcast<uintptr_t>(received->lpData) + sizeof(CommonConfig));
+        return true;
+    };
+    COPYDATASTRUCT data{
+        .dwData = GET_CONFIG_EVENT,
+        .cbData = scast<DWORD>((wcslen(procName) + 1) * sizeof(procName[0])),
+        .lpData = bcast<PVOID>(procName),
+    };
+    DWORD_PTR serverResult;
+    auto result = SendMessageTimeoutW(server, WM_COPYDATA, bcast<WPARAM>(client),
+        bcast<LPARAM>(&data), TimeoutFlag, Timeout, &serverResult);
+    if (result == 0) {
+        note::LastErrorToFile(TAG "Failed to get game config from the server window");
+        return false;
+    }
+    if (serverResult == 0)
+        return false;
+    return true;
+}
+
+static bool RequestMemBlock(PVOID dst, HWND serverHwnd, HWND clientHwnd) {
+    auto& dest = *bcast<PVOID*>(dst);
+    copyDataCallback = [&](const COPYDATASTRUCT* received) {
+        if (received->dwData != GET_MEM_BLOCK_EVENT_RETURN)
+            return false;
+        dest = malloc(received->cbData);
+        if (dest == nil)
+            return false;
+        memcpy(dest, received->lpData, received->cbData);
+        return true;
+    };
+    DWORD_PTR serverResult;
+    auto result = SendMessageTimeoutW(serverHwnd, GET_MEM_BLOCK_MSG, bcast<WPARAM>(clientHwnd),
+        bcast<LPARAM>(dest), TimeoutFlag, Timeout, &serverResult);
+    if (result == 0) {
+        note::LastErrorToFile(TAG "Failed to get memory block from the server window");
+        return false;
+    }
+    if (serverResult == 0)
+        return false;
+    return true;
 }
