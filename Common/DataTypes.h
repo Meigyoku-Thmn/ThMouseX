@@ -170,6 +170,14 @@ struct HwndDeleter {
 };
 using WindowHandle = std::unique_ptr<HWND, HwndDeleter>;
 
+struct CMemDeleter {
+    using pointer = PVOID;
+    void operator()(pointer ptr) const {
+        free(ptr);
+    }
+};
+using CMemHandler = std::unique_ptr<PVOID, CMemDeleter>;
+
 // https://dev.to/sgf4/strings-as-template-parameters-c20-4joh
 template<std::size_t N>
 struct CompileTimeString {

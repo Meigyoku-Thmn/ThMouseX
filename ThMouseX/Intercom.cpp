@@ -1,6 +1,7 @@
 #include "../Common/macro.h"
 #include "../Common/DataTypes.h"
 #include <functional>
+#include <vector>
 #include <Windows.h>
 
 #include "../Common/Log.h"
@@ -111,6 +112,14 @@ static bool RequestGameConfig(LPCWSTR procName, HWND server, HWND client, Common
     return true;
 }
 
+static vector<CMemHandler> memBlockPtrs;
+struct StartupCode {
+    StartupCode() {
+        memBlockPtrs.reserve(3);
+    }
+};
+static StartupCode _;
+
 static bool RequestMemBlock(PVOID dst, HWND serverHwnd, HWND clientHwnd) {
     auto& dest = *bcast<PVOID*>(dst);
     copyDataCallback = [&](const COPYDATASTRUCT* received) {
@@ -119,6 +128,7 @@ static bool RequestMemBlock(PVOID dst, HWND serverHwnd, HWND clientHwnd) {
         dest = malloc(received->cbData);
         if (dest == nil)
             return false;
+        memBlockPtrs.emplace_back(dest);
         memcpy(dest, received->lpData, received->cbData);
         return true;
     };
