@@ -32,7 +32,7 @@ static bool RequestMemBlock(PVOID dst, HWND serverHwnd, HWND clientHwnd);
 
 namespace core::intercom {
     bool QueryGameConfig(LPCWSTR processName, CommonConfig& commonConfig, GameConfig& gameConfig) {
-        auto serverHwnd = FindWindowW(nil, ServerWindowName);
+        auto serverHwnd = FindWindowExW(HWND_MESSAGE, nil, nil, ServerWindowName);
         if (serverHwnd == nil) {
             note::ToFile(TAG "Cannot find the server window.");
             return false;
@@ -100,9 +100,11 @@ static bool RequestGameConfig(LPCWSTR procName, HWND server, HWND client, Common
         .cbData = scast<DWORD>((wcslen(procName) + 1) * sizeof(procName[0])),
         .lpData = bcast<PVOID>(procName),
     };
+    SetLastError(ERROR_SUCCESS);
     DWORD_PTR serverResult;
     auto result = SendMessageTimeoutW(server, WM_COPYDATA, bcast<WPARAM>(client),
         bcast<LPARAM>(&data), TimeoutFlag, Timeout, &serverResult);
+    copyDataCallback = nil;
     if (result == 0) {
         note::LastErrorToFile(TAG "Failed to get game config from the server window");
         return false;
@@ -132,9 +134,11 @@ static bool RequestMemBlock(PVOID dst, HWND serverHwnd, HWND clientHwnd) {
         memcpy(dest, received->lpData, received->cbData);
         return true;
     };
+    SetLastError(ERROR_SUCCESS);
     DWORD_PTR serverResult;
     auto result = SendMessageTimeoutW(serverHwnd, GET_MEM_BLOCK_MSG, bcast<WPARAM>(clientHwnd),
         bcast<LPARAM>(dest), TimeoutFlag, Timeout, &serverResult);
+    copyDataCallback = nil;
     if (result == 0) {
         note::LastErrorToFile(TAG "Failed to get memory block from the server window");
         return false;

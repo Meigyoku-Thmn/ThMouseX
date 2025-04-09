@@ -75,6 +75,11 @@ namespace common::log {
     }
 
     void LastErrorToFile(PCSTR message) {
+        auto lastErr = GetLastError();
+        if (lastErr == ERROR_SUCCESS) {
+            ToFile("%s: Unknown error.", message);
+            return;
+        }
         _com_error error(GetLastError());
         auto detail = error.ErrorMessage();
         ToFile("%s: %s", message, detail);
