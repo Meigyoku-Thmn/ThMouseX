@@ -131,7 +131,9 @@ namespace core::configuration {
     }
 
     bool GetGameConfig(LPCWSTR processName, CommonConfig** commonConfig, DWORD* commonConfigSize, GameConfig** gameConfig, DWORD* gameConfigSize) {
-        auto iter = gameConfigs.find(processName);
+        wstring processNameLowerCase{ processName };
+        ranges::transform(processNameLowerCase, processNameLowerCase.begin(), towlower);
+        auto iter = gameConfigs.find(processNameLowerCase);
         if (iter == gameConfigs.end())
             return false;
         *gameConfig = &iter->second;

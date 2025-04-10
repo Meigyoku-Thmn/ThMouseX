@@ -32,6 +32,7 @@ static bool RequestMemBlock(PVOID dst, HWND serverHwnd, HWND clientHwnd);
 
 namespace core::intercom {
     bool QueryGameConfig(LPCWSTR processName, CommonConfig& commonConfig, GameConfig& gameConfig) {
+        using enum ScriptType;
         auto serverHwnd = FindWindowExW(HWND_MESSAGE, nil, nil, ServerWindowName);
         if (serverHwnd == nil) {
             note::ToFile(TAG "Cannot find the server window.");
@@ -51,7 +52,7 @@ namespace core::intercom {
             return false;
         if (!RequestMemBlock(&gameConfig.ProcessName, serverHwnd, clientHwnd))
             return false;
-        if (!RequestMemBlock(&gameConfig.Offsets, serverHwnd, clientHwnd))
+        if (gameConfig.ScriptType == None && !RequestMemBlock(&gameConfig.Offsets, serverHwnd, clientHwnd))
             return false;
 
         return true;
