@@ -14,7 +14,6 @@
 
     <PropertyGroup Condition="'$(Platform)'=='x64'">
         <DefineConstants>$(DefineConstants);WIN64</DefineConstants>
-        <AssemblyName>$(MSBuildProjectName).64</AssemblyName>
     </PropertyGroup>
     
 	<ItemGroup>
