@@ -40,7 +40,7 @@ namespace common::neolua {
             return;
 
         auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"\\ThMouseX.DotNet.dll";
-        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.ProcessName);
+        auto wScriptPath = format(L"{}\\ConfigScripts\\{}.lua", g_currentModuleDirPath, g_gameConfig.ProcessName);
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
         auto runtime = luaapi::ReadAttributeFromLuaScript(scriptPath, "Runtime");
 
@@ -52,7 +52,6 @@ namespace common::neolua {
             note::ToFile(TAG "Cannot set ThMouseX_ScriptPath env.");
             return;
         }
-
         if (runtime == ".NET Framework")
             DotNetFramework(bootstrapDllPath);
         else if (runtime == "Unity Mono")
@@ -131,18 +130,26 @@ namespace common::neolua {
     using mono_assembly_get_image = PVOID(*)(PVOID assembly);
     using mono_class_from_name = PVOID(*)(PVOID image, PCSTR name_space, PCSTR name);
     using mono_class_get_method_from_name = PVOID(*)(PVOID klass, PCSTR name, int param_count);
+    using mono_string_new = PVOID(*)(PVOID domain, PCSTR text);
     using mono_runtime_invoke = PVOID(*)(PVOID method, PVOID obj, PVOID* params, PVOID* exc);
     using mono_object_to_string = PVOID(*)(PVOID obj, PVOID* exc);
     using mono_string_to_utf8 = PSTR(*)(PVOID s);
     using mono_free = void(*)(PVOID ptr);
 
+    static PCWSTR possibleMonoModuleNames[] = { 
+        L"mono.dll",
+        L"mono-2.0-bdwgc.dll",
+        L"mono-2.0-sgen.dll",
+    };
+
     static void UnityMono(const wstring& bootstrapDllPath) {
 #pragma region Preparation
-        auto mono = GetModuleHandleW(L"mono.dll");
-        if (!mono)
-            mono = GetModuleHandleW(L"mono-2.0-bdwgc.dll");
-        if (!mono)
-            mono = GetModuleHandleW(L"mono-2.0-sgen.dll");
+        HMODULE mono;
+        for (auto monoModuleName : possibleMonoModuleNames) {
+            mono = GetModuleHandleW(monoModuleName);
+            if (mono)
+                break;
+        }
         if (!mono) {
             log::LastErrorToFile(TAG "Failed to load the mono runtime");
             return;
@@ -154,6 +161,7 @@ namespace common::neolua {
         TryImportAPI(mono, mono_assembly_get_image, log::LastErrorToFile, TAG);
         TryImportAPI(mono, mono_class_from_name, log::LastErrorToFile, TAG);
         TryImportAPI(mono, mono_class_get_method_from_name, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_string_new, log::LastErrorToFile, TAG);
         TryImportAPI(mono, mono_runtime_invoke, log::LastErrorToFile, TAG);
         TryImportAPI(mono, mono_object_to_string, log::LastErrorToFile, TAG);
         TryImportAPI(mono, mono_string_to_utf8, log::LastErrorToFile, TAG);
@@ -191,7 +199,8 @@ namespace common::neolua {
         }
 #pragma endregion
         PVOID mono_exception{};
-        _mono_runtime_invoke(method, nullptr, nullptr, &mono_exception);
+        PVOID args[]{ _mono_string_new(rootDomain, "") };
+        _mono_runtime_invoke(method, nil, args, &mono_exception);
         if (mono_exception) {
             auto mono_err_string = _mono_object_to_string(mono_exception, nil);
             auto err_str = _mono_string_to_utf8(mono_err_string);
