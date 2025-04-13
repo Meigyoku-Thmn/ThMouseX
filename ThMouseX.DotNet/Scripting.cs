@@ -148,7 +148,6 @@ unsafe static class Scripting
         AccessTools.Method(typeof(Scripting), nameof(LuaStackTraceChunk_Ctor_PostFix));
     static void LuaStackTraceChunk_Ctor_PostFix(ref object ___debugInfos)
     {
-        Logging.ToFile("LuaStackTraceChunk_Ctor_PostFix");
         if (___debugInfos == null)
         {
             var elemType = typeof(Lua).Assembly.GetType($"{typeof(LuaStackTraceDebugger).FullName}+LuaDebugInfo");
@@ -161,7 +160,6 @@ unsafe static class Scripting
         AccessTools.Method(typeof(Scripting), nameof(DefineDynamicModule_Prefix));
     static void DefineDynamicModule_Prefix(ref bool emitSymbolInfo)
     {
-        Logging.ToFile("DefineDynamicModule_Prefix");
         var runtime = Environment.GetEnvironmentVariable("ThMouseX_Runtime");
         if (runtime == "Unity Mono")
             emitSymbolInfo = false;
