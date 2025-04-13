@@ -1,8 +1,9 @@
 #pragma once
 #include <Windows.h>
 #include "DataTypes.h"
+#include <cstdint>
 
 namespace common::neolua {
-    DWORD GetPositionAddress();
+    uintptr_t GetPositionAddress();
     void Initialize();
 }

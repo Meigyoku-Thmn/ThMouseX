@@ -6,7 +6,7 @@
 using namespace std;
 
 namespace common::helper::encoding {
-    wstring ConvertToUtf16(const char* utf8str) {
+    wstring ConvertToUtf16(PCSTR utf8str) {
         auto chrCount = MultiByteToWideChar(CP_UTF8, 0, utf8str, -1, nil, 0);
         if (chrCount == 0)
             return wstring();
@@ -19,7 +19,7 @@ namespace common::helper::encoding {
         return ConvertToUtf16(utf8str.c_str());
     }
 
-    string ConvertToUtf8(const wchar_t* utf16str) {
+    string ConvertToUtf8(PCWSTR utf16str) {
         auto byteCount = WideCharToMultiByte(CP_UTF8, 0, utf16str, -1, nil, 0, nil, nil);
         if (byteCount == 0)
             return string();

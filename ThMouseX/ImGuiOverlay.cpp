@@ -19,7 +19,7 @@ using namespace std;
 
 static CommonConfig& g_c = g_commonConfig;
 
-static const char* GetKeyName(BYTE vkCode) {
+static PCSTR GetKeyName(BYTE vkCode) {
     auto imGuiKey = ImGui_ImplWin32_VirtualKeyToImGuiKey(vkCode);
     auto rs = ImGui::GetKeyName(imGuiKey);
     if (imGuiKey != ImGuiKey_None)
@@ -46,7 +46,7 @@ namespace core::imguioverlay {
     void Configure(float fontScale) {
         auto& io = ImGui::GetIO();
         io.Fonts->Clear();
-        auto fontSize = round(float(g_c.ImGuiBaseFontSize) * fontScale);
+        auto fontSize = round(scast<float>(g_c.ImGuiBaseFontSize) * fontScale);
         if (fontSize < 13)
             io.Fonts->AddFontDefault();
         else if (!io.Fonts->AddFontFromFileTTF(encoding::ConvertToUtf8(g_c.ImGuiFontPath).c_str(), fontSize))
@@ -54,7 +54,7 @@ namespace core::imguioverlay {
     }
     ImDrawData* Render(unsigned int renderWidth, unsigned int renderHeight, float mouseScaleX, float mouseScaleY) {
         auto& io = ImGui::GetIO();
-        io.DisplaySize = ImVec2(float(renderWidth), float(renderHeight));
+        io.DisplaySize = ImVec2(scast<float>(renderWidth), scast<float>(renderHeight));
         ImGui_ImplWin32_SetMousePosScale(mouseScaleX, mouseScaleY);
         ImGui::NewFrame();
 
@@ -74,8 +74,8 @@ namespace core::imguioverlay {
             ImGui::AlignTextToFramePadding();
             ImGui::Text("Movement Algorithm:");
             ImGui::InvisibleButton("##padding-left", ImVec2(5, 1)); ImGui::SameLine();
-            ImGui::RadioButton("Bresenham's Line", (int*)&g_movementAlgorithm, (int)MovementAlgorithm::Bresenham); ImGui::SameLine();
-            ImGui::RadioButton("Simple", (int*)&g_movementAlgorithm, (int)MovementAlgorithm::Simple);
+            ImGui::RadioButton("Bresenham's Line", bcast<int*>(&g_movementAlgorithm), scast<int>(MovementAlgorithm::Bresenham)); ImGui::SameLine();
+            ImGui::RadioButton("Simple", bcast<int*>(&g_movementAlgorithm), scast<int>(MovementAlgorithm::Simple));
 
             if (ImGui::Button("Show Variable Viewer")) {
                 showVariableViewer = true;
@@ -114,7 +114,7 @@ namespace core::imguioverlay {
                     ImGui::Text("Pixel Offset:\t(%g,%g)", g_pixelOffset.X, g_pixelOffset.Y);
                 }
                 if (ImGui::CollapsingHeader("Game Config")) {
-                    static auto procName = encoding::ConvertToUtf8(g_gameConfig.processName);
+                    static auto procName = encoding::ConvertToUtf8(g_gameConfig.ProcessName);
                     ImGui::Text("Process Name:\t%s", procName.c_str());
 
                     static auto procAddr = memory::GetAddressConfigAsString();

@@ -3,6 +3,7 @@
 #include <format>
 #include <span>
 #include <vector>
+#include <cstdint>
 
 #include "Helper.Memory.h"
 #include "Log.h"
@@ -15,8 +16,8 @@ namespace note = common::log;
 namespace common::helper::memory {
     static vector<DWORD> lastOffsets;
     static bool lastIsValid = true;
-    DWORD ResolveAddress(span<const DWORD> offsets, bool doNotValidateLastAddress) {
-        if (offsets.size() <= 0)
+    uintptr_t ResolveAddress(span<const DWORD> offsets, bool doNotValidateLastAddress) {
+        if (offsets.empty())
             return NULL;
         auto memInvalidated = offsets.size() != lastOffsets.size()
             || memcmp(offsets.data(), lastOffsets.data(), min(offsets.size(), lastOffsets.size()) * sizeof(offsets[0]));
@@ -27,19 +28,19 @@ namespace common::helper::memory {
             lastOffsets.resize(offsets.size());
             memcpy(lastOffsets.data(), offsets.data(), offsets.size() * sizeof(offsets[0]));
         }
-        auto address = offsets[0] + DWORD(g_targetModule);
+        auto address = offsets[0] + bcast<uintptr_t>(g_targetModule);
         for (size_t i = 1; i < offsets.size(); i++) {
-            if (memInvalidated && IsBadReadMem((PVOID)address, sizeof(address))) {
+            if (memInvalidated && IsBadReadMem(bcast<PVOID>(address), sizeof(address))) {
                 lastIsValid = false;
                 note::ToFile("Access bad memory region, please check the game's version!");
                 return NULL;
             }
-            address = *PDWORD(address);
+            address = *bcast<PUINT_PTR>(address);
             if (!address)
                 return NULL;
             address += offsets[i];
         }
-        if (!doNotValidateLastAddress && memInvalidated && IsBadReadMem((PVOID)address, sizeof(address))) {
+        if (!doNotValidateLastAddress && memInvalidated && IsBadReadMem(bcast<PVOID>(address), sizeof(address))) {
             lastIsValid = false;
             note::ToFile("Access bad memory region, please check the game's version!");
             return NULL;
@@ -48,28 +49,26 @@ namespace common::helper::memory {
     }
 
     string GetAddressConfigAsString() {
-        if (g_gameConfig.ScriptType != ScriptType_None)
+        using enum ScriptType;
+        if (g_gameConfig.ScriptType != None)
             return "Using script";
         string rs;
         rs.reserve(128);
-        auto& addressChain = g_gameConfig.AddressChain;
-        auto lowerBound = addressChain.GetLowerBound();
-        auto upperBound = addressChain.GetUpperBound();
-        for (auto i = lowerBound; i <= upperBound; i++) {
-            auto offset = addressChain[i];
+        for (decltype(g_gameConfig.NumOfOffsets) i = 0; i < g_gameConfig.NumOfOffsets; i++) {
+            auto offset = g_gameConfig.Offsets[i];
             rs.append(format("[{:x}]", offset));
         }
         return rs;
     }
 
     // https://gist.github.com/arbv/531040b8036050c5648fc55471d50352
-    bool IsBadReadMem(const void* ptr, size_t size) {
+    bool IsBadReadMem(LPCVOID ptr, size_t size) {
         if (size == 0)
             return false;
-        if (ptr == nullptr)
+        if (ptr == nil)
             return true;
 
-        auto pStart = (const BYTE*)ptr;
+        auto pStart = scast<const BYTE*>(ptr);
         auto pEnd = pStart + size;
 
         DWORD mask = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ
@@ -81,12 +80,12 @@ namespace common::helper::memory {
             if (VirtualQuery(pStart, &memInfo, sizeof(memInfo)) == 0)
                 return true;
             else
-                regionEnd = ((PBYTE)memInfo.BaseAddress + memInfo.RegionSize);
+                regionEnd = (scast<PBYTE>(memInfo.BaseAddress) + memInfo.RegionSize);
             if ((memInfo.Protect & mask) == 0 || (memInfo.Protect & (PAGE_GUARD | PAGE_NOACCESS)) != 0)
                 return true;
             if (pEnd <= regionEnd)
                 return false;
-            else if (pEnd > regionEnd)
+            else
                 pStart = regionEnd;
         } while (pStart < pEnd);
 

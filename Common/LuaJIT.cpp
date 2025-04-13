@@ -1,6 +1,8 @@
 #include <Windows.h>
 #include <string>
 #include <codecvt>
+#include <cstdint>
+#include <format>
 #include <luajit/lua.hpp>
 
 #include "macro.h"
@@ -37,24 +39,14 @@ static bool CheckAndDisableIfError(lua_State* _L, int r) {
 }
 
 namespace common::luajit {
-    HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
-    decltype(&_LoadLibraryExA) OriLoadLibraryExA;
-
-    HMODULE WINAPI _LoadLibraryExA(LPCSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
-        auto thisDllPath = wstring(g_currentModuleDirPath) + L"\\" + L_(APP_NAME);
-        if (encoding::ConvertToUtf8(thisDllPath).compare(lpLibFileName) == 0)
-            return g_coreModule;
-        else
-            return OriLoadLibraryExA(lpLibFileName, hFile, dwFlags);
-    }
-
     static void Uninitialize(bool isProcessTerminating) {
-        if (L != nil)
+        if (!isProcessTerminating && L != nil)
             lua_close(L);
     }
 
     void Initialize() {
-        if (g_gameConfig.ScriptType != ScriptType_LuaJIT)
+        using enum ScriptType;
+        if (g_gameConfig.ScriptType != LuaJIT)
             return;
 
         L = luaL_newstate();
@@ -70,7 +62,7 @@ namespace common::luajit {
 
         auto oldStackSize = lua_gettop(L);
 
-        lua_pushinteger(L, uintptr_t(g_coreModule));
+        lua_pushinteger(L, bcast<uintptr_t>(g_coreModule));
         lua_setglobal(L, THMOUSEX_MODULE_HANDLE);
         if (!CheckAndDisableIfError(L, luaL_dostring(L, luaapi::LuaJitPrepScript.c_str()))) {
             note::ToFile("[LuaJIT] The above error occurred in Preparation Script.");
@@ -78,7 +70,7 @@ namespace common::luajit {
             return;
         }
 
-        auto wScriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_gameConfig.processName + L".lua";
+        auto wScriptPath = format(L"{}/ConfigScripts/{}.lua", g_currentModuleDirPath, g_gameConfig.ProcessName);
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
 
         if (!CheckAndDisableIfError(L, luaL_dofile(L, scriptPath.c_str()))) {
@@ -93,7 +85,7 @@ namespace common::luajit {
             lua_settop(L, oldStackSize);
     }
 
-    DWORD GetPositionAddress() {
+    uintptr_t GetPositionAddress() {
         if (scriptingDisabled)
             return NULL;
 
@@ -116,7 +108,7 @@ namespace common::luajit {
             return NULL;
         }
 
-        auto result = DWORD(lua_tointeger(L, -1));
+        auto result = scast<uintptr_t>(lua_tointeger(L, -1));
         lua_settop(L, oldStackSize);
         return result;
     }

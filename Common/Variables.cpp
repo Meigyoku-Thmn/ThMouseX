@@ -10,8 +10,8 @@ WCHAR   g_currentProcessDirPath[MAX_PATH];
 WCHAR   g_currentProcessName[MAX_PATH];
 
 // single game config
-GameConfigLocal     g_gameConfig;
-CommonConfigLocal   g_commonConfig;
+GameConfig      g_gameConfig;
+CommonConfig    g_commonConfig;
 
 // global game state
 bool        g_hookApplied;

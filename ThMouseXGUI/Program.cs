@@ -1,16 +1,17 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using ThMouseXServer;
 
 namespace ThMouseXGUI;
-
-using static ComHelper;
 
 static class Program
 {
     public const string AppName = "ThMouseX";
+#if (WIN32)
     public const string DllName = AppName + ".dll";
+#else
+    public const string DllName = AppName + ".64.dll";
+#endif
     public static readonly string RootDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     public static readonly string LogPath = Path.Combine(RootDir, "log.txt");
 
@@ -31,6 +32,15 @@ static class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
+        var thisAssembly = Assembly.GetExecutingAssembly();
+        var expectedName = thisAssembly.GetName().Name;
+        var actualName = Path.GetFileNameWithoutExtension(thisAssembly.Location);
+        if (expectedName != actualName)
+        {
+            MessageBox.Show($"The file name of this executable file must be '{expectedName}.exe'!", AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return 1;
+        }
+
         if (!MarkThMouseXProcess())
             return 1;
 
@@ -45,17 +55,6 @@ static class Program
 
             if (!ReadGamesFile() || !ReadGeneralConfigFile())
                 return 1;
-
-            try
-            {
-                CoRegisterClassObject<ComServer>();
-                CoResumeClassObjects();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, AppName + ": Failed to initialize Component Object Models", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return 1;
-            }
 
             if (!InstallHooks())
                 return 1;

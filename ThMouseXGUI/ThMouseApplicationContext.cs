@@ -4,11 +4,13 @@ namespace ThMouseXGUI;
 
 class ThMouseApplicationContext : ApplicationContext
 {
+    readonly ServerForm serverForm = new();
     readonly NotifyIcon notifyIcon = new();
     public bool RestartFlag { get; private set; }
 
     public ThMouseApplicationContext()
     {
+        serverForm.CreateWindow();
         notifyIcon.Visible = true;
         notifyIcon.Icon = AboutForm.AppIcon;
         notifyIcon.DoubleClick += ShowDialog;
@@ -72,6 +74,7 @@ class ThMouseApplicationContext : ApplicationContext
     void Exit(object sender, EventArgs e)
     {
         notifyIcon.Visible = false;
+        serverForm.DestroyWindow();
         Application.Exit();
     }
 }

@@ -5,6 +5,7 @@
 #include <span>
 #include <format>
 #include <atomic>
+#include <cstdint>
 
 #include "Helper.h"
 #include "Helper.Memory.h"
@@ -18,7 +19,7 @@
 using namespace std;
 
 namespace common::helper {
-    void ReportLastError(const char* title) {
+    void ReportLastError(PCSTR title) {
         auto flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
         auto dwErr = GetLastError();
         PSTR errorMessage{};
@@ -27,9 +28,9 @@ namespace common::helper {
         LocalFree(errorMessage);
     }
 
-    tuple<float, const char*> ConvertToFloat(const string& input) {
+    tuple<float, PCSTR> ConvertToFloat(const string& input) {
         char* endPtr;
-        const char* message = nil;
+        PCSTR message = nil;
         auto result = strtof(input.c_str(), &endPtr);
         if (errno == ERANGE)
             message = "out of range (type float)";
@@ -38,9 +39,9 @@ namespace common::helper {
         return tuple(result, message);
     }
 
-    tuple<long, const char*> ConvertToLong(const string& input, int base) {
+    tuple<long, PCSTR> ConvertToLong(const string& input, int base) {
         char* endPtr;
-        const char* message = nil;
+        PCSTR message = nil;
         auto result = strtol(input.c_str(), &endPtr, base);
         if (errno == ERANGE)
             message = "out of range (type long)";
@@ -49,9 +50,9 @@ namespace common::helper {
         return tuple(result, message);
     }
 
-    tuple<unsigned long, const char*> ConvertToULong(const string& input, int base) {
+    tuple<unsigned long, PCSTR> ConvertToULong(const string& input, int base) {
         char* endPtr;
-        const char* message = nil;
+        PCSTR message = nil;
         auto result = strtoul(input.c_str(), &endPtr, base);
         if (errno == ERANGE)
             message = "out of range (type unsigned long)";
@@ -139,11 +140,11 @@ namespace common::helper {
         }
         else if (d3dWidth > clientWidth || d3dHeight > clientHeight) {
             // fix for Touhou 18
-            RECTSIZE size{ 0, 0, LONG(d3dWidth), LONG(d3dHeight) };
+            RECTSIZE size{ 0, 0, scast<LONG>(d3dWidth), scast<LONG>(d3dHeight) };
             auto style = GetWindowLongPtrW(g_hFocusWindow, GWL_STYLE);
             auto hasMenu = GetMenu(g_hFocusWindow) != nil ? TRUE : FALSE;
             auto exStyle = GetWindowLongPtrW(g_hFocusWindow, GWL_EXSTYLE);
-            AdjustWindowRectEx(&size, style, hasMenu, exStyle);
+            AdjustWindowRectEx(&size, scast<DWORD>(style), hasMenu, scast<DWORD>(exStyle));
             auto updateFlags = SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOREPOSITION;
             SetWindowPos(g_hFocusWindow, nil, 0, 0, size.width(), size.height(), updateFlags);
         }
@@ -165,21 +166,20 @@ namespace common::helper {
             && hwndRect.bottom == monitorInfo.rcMonitor.bottom;
     }
 
-    DWORD CalculateAddress() {
-        if (g_gameConfig.ScriptType == ScriptType_LuaJIT)
+    uintptr_t CalculateAddress() {
+        using enum ScriptType;
+        if (g_gameConfig.ScriptType == LuaJIT)
             return luajit::GetPositionAddress();
-        else if (g_gameConfig.ScriptType == ScriptType_NeoLua)
+        else if (g_gameConfig.ScriptType == NeoLua)
             return neolua::GetPositionAddress();
-        else if (g_gameConfig.ScriptType == ScriptType_Lua)
+        else if (g_gameConfig.ScriptType == Lua)
             return lua::GetPositionAddress();
-        else {
-            auto& addressChain = g_gameConfig.AddressChain;
-            return memory::ResolveAddress(span{ &addressChain[addressChain.GetLowerBound()], addressChain.GetCount() }, false);
-        }
+        else
+            return memory::ResolveAddress(span{ g_gameConfig.Offsets, g_gameConfig.NumOfOffsets }, false);
     }
 
     bool IsCurrentProcessThMouseX() {
-        auto envVal = getenv(APP_NAME);
+        PCSTR envVal = getenv(APP_NAME);
         if (envVal == nil)
             return false;
         return strcmp(envVal, APP_NAME) == 0;
@@ -217,10 +217,10 @@ namespace common::helper {
             key == VK_CANCEL;
     }
 
-    BYTE MapVk2Dik(BYTE vkCode, PBYTE mappingTable, BYTE defaultDikCode) {
+    BYTE MapVk2Dik(BYTE vkCode, const BYTE* mappingTable, BYTE defaultDikCode) {
         if (vkCode == 0)
             return defaultDikCode;
-        auto scancode = (BYTE)MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX);
+        auto scancode = scast<BYTE>(MapVirtualKeyW(vkCode, MAPVK_VK_TO_VSC_EX));
         if (vkCode == VK_PAUSE)
             scancode = 0x45;
         else if (vkCode == VK_NUMLOCK && scancode == 0x45 || ShouldBeVkExtended(vkCode))
@@ -269,22 +269,22 @@ namespace common::helper {
         if (vkCode == SCROLL_UP_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) > 0; }, nil
+                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return scast<INT16>(_wParam >> 16) > 0; }, nil
             );
         if (vkCode == SCROLL_DOWN_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) < 0; }, nil
+                WM_MOUSEWHEEL, [](auto _wParam, UNUSED auto _) { return scast<INT16>(_wParam >> 16) < 0; }, nil
             );
         if (vkCode == SCROLL_LEFT_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) < 0; }, nil
+                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return scast<INT16>(_wParam >> 16) < 0; }, nil
             );
         if (vkCode == SCROLL_RIGHT_EVENT)
             return VkCodeMessage(
                 WM_NULL, nil, nil,
-                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return INT16(_wParam >> 16) > 0; }, nil
+                WM_MOUSEHWHEEL, [](auto _wParam, UNUSED auto _) { return scast<INT16>(_wParam >> 16) > 0; }, nil
             );
         return VkCodeMessage(
             WM_KEYUP, [](auto _wParam, auto _vkCode) { return _wParam == _vkCode; }, nil,
@@ -308,7 +308,7 @@ namespace common::helper {
         }
     }
 
-    wstring ExpandEnvStr(const wchar_t* str) {
+    wstring ExpandEnvStr(PCWSTR str) {
         auto chrCount = ExpandEnvironmentStringsW(str, nil, 0);
         if (chrCount == 0)
             return wstring();
@@ -321,57 +321,23 @@ namespace common::helper {
         return ExpandEnvStr(str.c_str());
     }
 
-    void ComMethodTimeout(const function<void()>& comAction, DWORD timeout) {
-        atomic<DWORD> mainThreadId = GetCurrentThreadId();
-        Handle waitHandle{ CreateEventW(nullptr, TRUE, FALSE, nullptr) };
-        if (waitHandle == nil) {
-            log::LastErrorToFile("CreateEventW failed");
-            return;
-        }
-        auto timeoutCallback = [&] {
-            auto _mainThreadId = mainThreadId.exchange(0);
-            if (_mainThreadId == 0)
-                return;
-            auto hr = CoCancelCall(_mainThreadId, 0);
-            if (FAILED(hr))
-                log::HResultToFile("CoCancelCall failed", hr);
-            SetEvent(waitHandle.get());
-        };
-        auto timeoutCallbackThunk = [](auto callback, UNUSED auto _) {
-            (*(decltype(timeoutCallback)*)callback)();
-        };
-        auto timerHandle = CreateTimerQueueTimer(nullptr, timeoutCallbackThunk, &timeoutCallback, timeout, 0, WT_EXECUTEONLYONCE);
-        if (!timerHandle) {
-            log::LastErrorToFile("CreateTimerQueueTimer failed");
-            return;
-        }
-        auto hr = CoEnableCallCancellation(nullptr);
-        if (FAILED(hr)) {
-            log::HResultToFile("CoEnableCallCancellation failed", hr);
-            return;
-        }
-        comAction();
-        auto _mainThreadId = mainThreadId.exchange(0);
-        if (_mainThreadId == 0)
-            WaitForSingleObject(waitHandle.get(), INFINITE);
-        hr = CoDisableCallCancellation(nullptr);
-        if (FAILED(hr))
-            log::HResultToFile("CoDisableCallCancellation failed", hr);
+    // trim from start (in place)
+    void LeftTrimInplace(string& s) {
+        s.erase(s.begin(), find_if(s.begin(), s.end(), [](const UCHAR ch) {
+            return !isspace(ch);
+        }));
     }
 
-    TimerQueueTimerHandle CreateTimerQueueTimer(HANDLE TimerQueue, WAITORTIMERCALLBACK Callback, PVOID Parameter, DWORD DueTime, DWORD Period, ULONG Flags) {
-        HANDLE timerHandle{};
-        auto rs = ::CreateTimerQueueTimer(&timerHandle, TimerQueue, Callback, Parameter, DueTime, Period, Flags);
-        if (!rs)
-            timerHandle = nullptr;
-        return TimerQueueTimerHandle{ timerHandle };
+    // trim from end (in place)
+    void RightTrimInplace(string& s) {
+        s.erase(find_if(s.rbegin(), s.rend(), [](const UCHAR ch) {
+            return !isspace(ch);
+        }).base(), s.end());
     }
 
-    ActCtxCookie ActivateActCtx(HANDLE hActCtx) {
-        ULONG_PTR cookie{};
-        auto rs = ::ActivateActCtx(hActCtx, &cookie);
-        if (!rs)
-            cookie = 0;
-        return ActCtxCookie{ cookie };
+    // trim from both ends (in place)
+    void TrimInplace(string& s) {
+        RightTrimInplace(s);
+        LeftTrimInplace(s);
     }
 }

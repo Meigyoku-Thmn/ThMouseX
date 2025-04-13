@@ -32,7 +32,7 @@ namespace common::minhook {
 
     bool CreateHook(const vector<HookConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
-            auto rs = MH_CreateHook(config.pTarget, config.pDetour, (LPVOID*)config.ppOriginal, config.discriminator);
+            auto rs = MH_CreateHook(config.pTarget, config.pDetour, scast<LPVOID*>(config.ppOriginal), config.discriminator);
             if (rs != MH_OK && rs != MH_ERROR_ALREADY_CREATED) {
                 note::ToFile("[MinHook] Failed to create hook for target %p: %s", config.pTarget, MH_StatusToString(rs));
                 return false;
@@ -43,7 +43,7 @@ namespace common::minhook {
 
     bool CreateApiHook(const vector<HookApiConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
-            auto rs = MH_CreateHookApi(config.moduleName, config.procName, config.pDetour, (LPVOID*)config.ppOriginal, config.discriminator);
+            auto rs = MH_CreateHookApi(config.moduleName, config.procName, config.pDetour, scast<LPVOID*>(config.ppOriginal), config.discriminator);
             if (rs != MH_OK && rs != MH_ERROR_ALREADY_CREATED) {
                 auto moduleName = encoding::ConvertToUtf8(config.moduleName);
                 note::ToFile("[MinHook] Failed to create hook for api %s|%s: %s", moduleName.c_str(), config.procName, MH_StatusToString(rs));
@@ -86,7 +86,7 @@ namespace common::minhook {
         return true;
     }
 
-    bool DisableHooks(const std::vector<HookApiConfig>& hookConfigs) {
+    bool DisableHooks(const vector<HookApiConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto hModule = GetModuleHandleW(config.moduleName);
             if (!hModule)
@@ -101,7 +101,7 @@ namespace common::minhook {
         return true;
     }
 
-    bool DisableHooks(const std::vector<HookConfig>& hookConfigs) {
+    bool DisableHooks(const vector<HookConfig>& hookConfigs) {
         for (auto& config : hookConfigs) {
             auto rs = MH_DisableHook(config.pTarget, config.discriminator);
             if (rs != MH_OK)

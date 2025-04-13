@@ -1,7 +1,8 @@
 #pragma once
 #include <Windows.h>
+#include <cstdint>
 
 namespace common::lua {
     void Initialize();
-    DWORD GetPositionAddress();
+    uintptr_t GetPositionAddress();
 }

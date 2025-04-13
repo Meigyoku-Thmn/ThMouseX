@@ -11,6 +11,9 @@
 #include <string>
 #include <format>
 #include <span>
+#include <cstdint>
+#include <fstream>
+#include <sstream>
 #include "PreparationScript.h"
 
 namespace note = common::log;
@@ -21,11 +24,13 @@ namespace callbackstore = common::callbackstore;
 
 using namespace std;
 
-static DWORD positionAddress;
+static uintptr_t positionAddress;
 namespace common::luaapi {
     string LuaJitPrepScript;
 
     static void Uninitialize(bool isProcessTerminating) {
+        if (isProcessTerminating)
+            return;
         SetPositionAddress(NULL);
     }
 
@@ -39,8 +44,7 @@ namespace common::luaapi {
         auto scriptHandle = LoadResource(dllModule, scriptRes);
         if (scriptHandle == nil)
             return;
-        LuaJitPrepScript = string((const char*)LockResource(scriptHandle), scriptSize);
-        LuaJitPrepScript
+        LuaJitPrepScript = string(scast<PCSTR>(LockResource(scriptHandle)), scriptSize)
             .append("\n")
             .append(format(SYM_NAME(MH_UNKNOWN)" = {}\n",                   /* */ to_string(MH_UNKNOWN)))
             .append(format(SYM_NAME(MH_UNKNOWN)" = {}\n",                   /* */ to_string(MH_UNKNOWN)))
@@ -60,19 +64,19 @@ namespace common::luaapi {
             ;
     }
 
-    DWORD GetPositionAddress() {
+    uintptr_t GetPositionAddress() {
         return positionAddress;
     }
 
-    void SetPositionAddress(DWORD address) {
+    void SetPositionAddress(uintptr_t address) {
         positionAddress = address;
     }
 
-    DWORD ReadUInt32(DWORD address) {
-        return *PDWORD(address);
+    DWORD ReadUInt32(uintptr_t address) {
+        return *bcast<PDWORD>(address);
     }
 
-    DWORD ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
+    uintptr_t ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
         return memory::ResolveAddress(span{ offsets, length }, doNotValidateLastAddress);
     }
 
@@ -91,15 +95,55 @@ namespace common::luaapi {
     MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID* ppOriginal, LPCSTR discriminator) {
         return MH_CreateHookApi(encoding::ConvertToUtf16(pszModule).c_str(), pszProcName, pDetour, ppOriginal, discriminator);
     }
+
+    string ReadAttributeFromLuaScript(const string& scriptPath, PCSTR attributeName) {
+        if (attributeName == nil || attributeName[0] == '\0')
+            return "";
+        ifstream scriptFile(scriptPath.c_str());
+        if (!scriptFile) {
+            note::ToFile("[LuaApi] Cannot open %s: %s.", scriptPath.c_str(), strerror(errno));
+            return "";
+        }
+        string firstLine;
+        if (!getline(scriptFile, firstLine)) {
+            note::ToFile("[LuaApi] Cannot read the first line of %s: %s.", scriptPath.c_str(), strerror(errno));
+            return "";
+        }
+        stringstream lineStream(firstLine);
+        string token;
+        lineStream >> token;
+        if (token != "--") {
+            note::ToFile("[LuaApi] The first line of '%s' is not a Lua comment.", scriptPath.c_str());
+            return "";
+        }
+        lineStream >> token;
+        if (token != attributeName) {
+            note::ToFile("[LuaApi] The first Lua comment of '%s' doesn't have the key %s.", scriptPath.c_str(), attributeName);
+            return "";
+        }
+        lineStream >> token;
+        if (token != "=") {
+            note::ToFile("[LuaApi] Expected '=' after %s in '%s'.", attributeName, scriptPath.c_str());
+            return "";
+        }
+        token = "";
+        getline(lineStream, token);
+        helper::TrimInplace(token);
+        if (token == "") {
+            note::ToFile("[LuaApi] %s value must be specified in '%s'.", attributeName, scriptPath.c_str());
+            return "";
+        }
+        return token;
+    }
 }
 
 namespace luaapi = common::luaapi;
 
-DWORD Lua_ReadUInt32(DWORD address) {
+DWORD Lua_ReadUInt32(uintptr_t address) {
     return luaapi::ReadUInt32(address);
 }
 
-DWORD Lua_ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
+uintptr_t Lua_ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress) {
     return luaapi::ResolveAddress(offsets, length, doNotValidateLastAddress);
 }
 
@@ -107,12 +151,12 @@ void Lua_OpenConsole() {
     luaapi::OpenConsole();
 }
 
-void Lua_SetPositionAddress(DWORD address) {
+void Lua_SetPositionAddress(uintptr_t address) {
     luaapi::SetPositionAddress(address);
 }
 
 int Lua_GetDataType() {
-    return luaapi::GetDataType();
+    return scast<int>(luaapi::GetDataType());
 }
 
 void Lua_RegisterUninitializeCallback(UninitializeCallbackType callback) {

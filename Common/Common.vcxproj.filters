@@ -80,9 +80,6 @@
     <ClInclude Include="Helper.Memory.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
-    <ClInclude Include="ComServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PreparationScript.h">
       <Filter>Header Files\LuaScript</Filter>
     </ClInclude>
@@ -98,9 +95,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CallbackStore.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CompilerConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Lua.cpp">
@@ -136,6 +130,7 @@
     <ClCompile Include="Helper.Memory.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
+    <ClCompile Include="CompilerConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PreparationScript.lua">

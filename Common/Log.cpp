@@ -16,6 +16,7 @@
 namespace errormsg = common::errormsg;
 
 using namespace std;
+using namespace chrono;
 using namespace Microsoft::WRL;
 
 namespace common::log {
@@ -27,39 +28,40 @@ namespace common::log {
     }
 
     void OpenConsole() {
-        if (AllocConsole() == FALSE)
+        if (!AttachConsole(ATTACH_PARENT_PROCESS) && !AllocConsole())
             return;
-#pragma warning(push)
-#pragma warning(disable: 6031)
-        freopen("conin$", "r", stdin);
-        freopen("conout$", "w", stdout);
-        freopen("conout$", "w", stderr);
-#pragma warning(pop)
+        if (!!GetConsoleCP()) {
+            ignore = freopen("conin$", "r", stdin);
+            ignore = freopen("conout$", "w", stdout);
+            ignore = freopen("conout$", "w", stderr);
+        }
         printf("Debugging Window:\n\n");
     }
 
-    void DxErrToFile(const char* message, HRESULT hResult) {
+    void DxErrToFile(PCSTR message, HRESULT hResult) {
         auto errorStr = DXGetErrorStringA(hResult);
         if (errorStr == nil) {
             HResultToFile(message, hResult);
             return;
         }
         auto errorDes = DXGetErrorDescriptionA(hResult);
-        auto description = errorDes != nil ? string(errorStr) + ": " + errorDes : string(errorStr);
+        auto description = errorDes != nil
+            ? string(errorStr) + ": " + errorDes
+            : string(errorStr);
         ToFile("%s: %s", message, description.c_str());
     }
 
-    void HResultToFile(const char* message, HRESULT hResult) {
+    void HResultToFile(PCSTR message, HRESULT hResult) {
         ComPtr<IErrorInfo> errorInfo;
-        std::ignore = GetErrorInfo(0, &errorInfo);
+        ignore = GetErrorInfo(0, &errorInfo);
         _com_error error(hResult, errorInfo.Get(), true);
         ComErrToFile(message, error);
     }
 
-    void ComErrToFile(const char* message, const _com_error& error) {
+    void ComErrToFile(PCSTR message, const _com_error& error) {
         auto description = error.Description();
         if (description.length() > 0) {
-            ToFile("%s: %s", message, (char*)description);
+            ToFile("%s: %s", message, scast<char*>(description));
             return;
         }
         auto errorMessage = string(error.ErrorMessage());
@@ -72,17 +74,21 @@ namespace common::log {
         }
     }
 
-    void LastErrorToFile(const char* message) {
+    void LastErrorToFile(PCSTR message) {
+        auto lastErr = GetLastError();
+        if (lastErr == ERROR_SUCCESS) {
+            ToFile("%s: Unknown error.", message);
+            return;
+        }
         _com_error error(GetLastError());
         auto detail = error.ErrorMessage();
         ToFile("%s: %s", message, detail);
     }
 
+    static time_point<steady_clock> oldTime = high_resolution_clock::now();
+    static int fps = 0;
     void FpsToConsole() {
-        using namespace chrono;
-        static time_point<steady_clock> oldTime = high_resolution_clock::now();
-        static int fps; fps++;
-
+        fps++;
         if (duration_cast<seconds>(high_resolution_clock::now() - oldTime) >= seconds{ 1 }) {
             oldTime = high_resolution_clock::now();
             ToConsole("FPS: %d", fps);

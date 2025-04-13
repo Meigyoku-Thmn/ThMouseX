@@ -5,6 +5,7 @@
 #include "CallbackStore.h"
 #include <MinHook.h>
 #include <string>
+#include <cstdint>
 
 #include "../ThMouseX/resource.h"
 
@@ -14,12 +15,13 @@
 namespace common::luaapi {
     extern std::string LuaJitPrepScript;
     void Initialize();
-    DWORD GetPositionAddress();
-    void SetPositionAddress(DWORD address);
-    DWORD ReadUInt32(DWORD address);
-    DWORD ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress);
+    uintptr_t GetPositionAddress();
+    void SetPositionAddress(uintptr_t address);
+    DWORD ReadUInt32(uintptr_t address);
+    uintptr_t ResolveAddress(DWORD* offsets, size_t length, bool doNotValidateLastAddress);
     void OpenConsole();
     PointDataType GetDataType();
     void RegisterUninitializeCallback(UninitializeCallbackType callback);
     MH_STATUS CreateHookApi(LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal, LPCSTR discriminator);
+    std::string ReadAttributeFromLuaScript(const std::string& scriptPath, PCSTR attributeName);
 }

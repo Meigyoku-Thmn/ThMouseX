@@ -12,10 +12,10 @@ jobs:
         git config --global core.eol lf
       
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       
     - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.1
+      uses: microsoft/setup-msbuild@v2
       
     - name: Config vcpkg
       run: |
@@ -27,22 +27,28 @@ jobs:
         
     - name: Delete unnecessary files
       run: |
-        cd Release
-        del *.exp -Force
-        del *.lib -Force
-        del *.pdb -Force
-        del *.exe.config -Force
-        del de -Recurse -Force
-        cd ..
+        cd Release/x86
+        del *.exp                   -Force ; $null
+        del *.lib                   -Force ; $null
+        del *.pdb                   -Force ; $null
+        del *.exe.config            -Force ; $null
+        del PostBuildTool.exe       -Force ; $null
+        del ThMouseXServer.dll      -Force ; $null
+        del de -Recurse             -Force ; $null
+        cd ../..
+        
+    - name: List top files
+      run: |
+        ls
         
     - name: List built files
       run: |
-        cd Release
+        cd Release/x86
         ls
-        cd ..
+        cd ../..
         
     - name: Create artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Release build
-        path: Release
+        path: Release/x86

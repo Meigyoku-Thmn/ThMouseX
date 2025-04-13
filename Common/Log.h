@@ -30,7 +30,7 @@ namespace common::log {
     tm GetTimeNow();
     void OpenConsole();
     template <typename... Targs>
-    void ToFile(const char* _Format, Targs&&... args) {
+    void ToFile(PCSTR _Format, Targs&&... args) {
         auto& logData = __LogData::Get();
         if (logData.file == nil)
             return;
@@ -42,12 +42,12 @@ namespace common::log {
         fprintf(logData.file, _Format, std::forward<Targs>(args)...);
         fprintf(logData.file, "\n");
     }
-    void DxErrToFile(const char* message, HRESULT hResult);
-    void HResultToFile(const char* message, HRESULT hResult);
-    void ComErrToFile(const char* message, const _com_error& error);
-    void LastErrorToFile(const char* message);
+    void DxErrToFile(PCSTR message, HRESULT hResult);
+    void HResultToFile(PCSTR message, HRESULT hResult);
+    void ComErrToFile(PCSTR message, const _com_error& error);
+    void LastErrorToFile(PCSTR message);
     template <typename... Targs>
-    void ToConsole(const char* _Format, Targs&&... args) {
+    void ToConsole(PCSTR _Format, Targs&&... args) {
         OpenConsole();
         printf(_Format, std::forward<Targs>(args)...);
         printf("\n");

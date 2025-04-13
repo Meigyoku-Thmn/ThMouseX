@@ -7,6 +7,7 @@
 #include <wrl/client.h>
 #include <comdef.h>
 #include <mutex>
+#include <cstdint>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx9.h"
@@ -122,9 +123,9 @@ namespace core::directx9 {
         CleanUp(true);
     }
 
+    static bool initialized = false;
+    static mutex mtx;
     void Initialize() {
-        static bool initialized = false;
-        static mutex mtx;
         {
             const scoped_lock lock(mtx);
             if (initialized)
@@ -135,7 +136,7 @@ namespace core::directx9 {
             initialized = true;
         }
 
-        auto _Direct3DCreate9 = (decltype(&Direct3DCreate9))GetProcAddress(d3d9, "Direct3DCreate9");
+        auto _Direct3DCreate9 = bcast<decltype(&Direct3DCreate9)>(GetProcAddress(d3d9, "Direct3DCreate9"));
         if (!_Direct3DCreate9) {
             note::LastErrorToFile(TAG " Failed to import d3d9.dll|Direct3DCreate9");
             return;
@@ -170,16 +171,16 @@ namespace core::directx9 {
             return;
         }
 
-        auto vtable = *(DWORD**)pD3D.Get();
-        auto vtable2 = *(DWORD**)pDevice.Get();
+        auto vtable = *bcast<uintptr_t**>(pD3D.Get());
+        auto vtable2 = *bcast<uintptr_t**>(pDevice.Get());
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[CreateDeviceIdx]), &D3DCreateDevice, &OriCreateDevice, APP_NAME "_D3DCreateDevice" },
-            { PVOID(vtable2[ResetIdx]), &D3DReset, &OriReset, APP_NAME "_D3DReset" },
-            { PVOID(vtable2[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
+            { bcast<PVOID>(vtable[CreateDeviceIdx]), &D3DCreateDevice, &OriCreateDevice, APP_NAME "_D3DCreateDevice" },
+            { bcast<PVOID>(vtable2[ResetIdx]), &D3DReset, &OriReset, APP_NAME "_D3DReset" },
+            { bcast<PVOID>(vtable2[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
         });
     }
 
@@ -197,19 +198,19 @@ namespace core::directx9 {
             note::LastErrorToFile(TAG "PrepareFirstStep: Failed to load d3dx9_43.dll");
             return;
         }
-        _D3DXCreateSprite = (decltype(&D3DXCreateSprite))GetProcAddress(d3dx9_43, "D3DXCreateSprite");
+        _D3DXCreateSprite = bcast<decltype(&D3DXCreateSprite)>(GetProcAddress(d3dx9_43, "D3DXCreateSprite"));
         if (!_D3DXCreateSprite) {
             d3dx9_43_failed = true;
             note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateSprite");
             return;
         }
-        _D3DXCreateTextureFromFileW = (decltype(&D3DXCreateTextureFromFileW))GetProcAddress(d3dx9_43, "D3DXCreateTextureFromFileW");
+        _D3DXCreateTextureFromFileW = bcast<decltype(&D3DXCreateTextureFromFileW)>(GetProcAddress(d3dx9_43, "D3DXCreateTextureFromFileW"));
         if (!_D3DXCreateTextureFromFileW) {
             d3dx9_43_failed = true;
             note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXCreateTextureFromFileW");
             return;
         }
-        _D3DXMatrixTransformation2D = (decltype(&D3DXMatrixTransformation2D))GetProcAddress(d3dx9_43, "D3DXMatrixTransformation2D");
+        _D3DXMatrixTransformation2D = bcast<decltype(&D3DXMatrixTransformation2D)>(GetProcAddress(d3dx9_43, "D3DXMatrixTransformation2D"));
         if (!_D3DXMatrixTransformation2D) {
             d3dx9_43_failed = true;
             note::LastErrorToFile(TAG "PrepareFirstStep: Failed to import d3dx9_43.dll|D3DXMatrixTransformation2D");
@@ -229,7 +230,7 @@ namespace core::directx9 {
             _D3DXCreateSprite(device, &cursorSprite);
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = { float(cursorSize.Height - 1) / 2.f, float(cursorSize.Width - 1) / 2.f, 0.f };
+            cursorPivot = { scast<float>(cursorSize.Height - 1) / 2.f, scast<float>(cursorSize.Width - 1) / 2.f, 0.f };
         }
     }
 
@@ -287,17 +288,17 @@ namespace core::directx9 {
         }
 
         helper::FixWindowCoordinate(!presentParams.Windowed,
-            d3dSize.Width, d3dSize.Height, UINT(clientSize.width()), UINT(clientSize.height()));
+            d3dSize.Width, d3dSize.Height, scast<UINT>(clientSize.width()), scast<UINT>(clientSize.height()));
 
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
             note::LastErrorToFile(TAG "PrepareMeasurement: GetClientRect failed (2)");
             return;
         }
-        g_pixelRate = float(g_gameConfig.BaseHeight) / float(clientSize.height());
+        g_pixelRate = scast<float>(g_gameConfig.BaseHeight) / scast<float>(clientSize.height());
         g_pixelOffset.X = g_gameConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_gameConfig.BasePixelOffset.Y / g_pixelRate;
-        imGuiMousePosScaleX = float(clientSize.width()) / float(d3dSize.Width);
-        imGuiMousePosScaleY = float(clientSize.height()) / float(d3dSize.Height);
+        imGuiMousePosScaleX = scast<float>(clientSize.width()) / scast<float>(d3dSize.Width);
+        imGuiMousePosScaleY = scast<float>(clientSize.height()) / scast<float>(d3dSize.Height);
     }
 
     /*
@@ -325,7 +326,7 @@ namespace core::directx9 {
             note::DxErrToFile(TAG "PrepareCursorState: pSurface->GetDesc failed", rs);
             return;
         }
-        auto scale = float(d3dSize.Height) / float(g_c.TextureBaseHeight);
+        auto scale = scast<float>(d3dSize.Height) / scast<float>(g_c.TextureBaseHeight);
         cursorScale = D3DXVECTOR2(scale, scale);
 
         RECTSIZE clientSize{};
@@ -333,11 +334,12 @@ namespace core::directx9 {
             note::LastErrorToFile(TAG "PrepareCursorState: GetClientRect failed");
             return;
         }
-        d3dScale = float(clientSize.width()) / float(d3dSize.Width);
+        d3dScale = scast<float>(clientSize.width()) / scast<float>(d3dSize.Width);
     }
 
+    static UCHAR tone = 0;
+    static auto toneStage = ModulateStage::WhiteInc;
     static void RenderCursor(IDirect3DDevice9* pDevice) {
-        using enum ModulateStage;
         if (!cursorTexture || !_D3DXMatrixTransformation2D)
             return;
 
@@ -361,7 +363,7 @@ namespace core::directx9 {
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         auto pointerPosition = helper::GetPointerPosition();
-        D3DXVECTOR3 cursorPositionD3D(float(pointerPosition.x), float(pointerPosition.y), 0.f);
+        D3DXVECTOR3 cursorPositionD3D(scast<float>(pointerPosition.x), scast<float>(pointerPosition.y), 0.f);
         if (d3dScale != 0.f && d3dScale != 1.f)
             cursorPositionD3D /= d3dScale;
 
@@ -373,8 +375,7 @@ namespace core::directx9 {
         cursorSprite->SetTransform(&scalingMatrixD3D);
         // draw the cursor
         if (g_inputEnabled) {
-            static UCHAR tone = 0;
-            static auto toneStage = WhiteInc;
+            using enum ModulateStage;
             helper::CalculateNextTone(tone, toneStage);
             if (toneStage == WhiteInc || toneStage == WhiteDec) {
                 // default behaviour: texture color * diffuse color
@@ -431,7 +432,7 @@ namespace core::directx9 {
             return;
         }
 
-        imguioverlay::Configure(float(d3dSize.Height) / float(g_c.ImGuiBaseVerticalResolution));
+        imguioverlay::Configure(scast<float>(d3dSize.Height) / scast<float>(g_c.ImGuiBaseVerticalResolution));
     }
 
     static void RenderImGui(IDirect3DDevice9* pDevice) {

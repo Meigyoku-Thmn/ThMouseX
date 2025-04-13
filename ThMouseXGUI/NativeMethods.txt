@@ -1,3 +1,10 @@
-CoRegisterClassObject
-CoResumeClassObjects
-CoRevokeClassObject
+PostMessage
+SendMessageTimeout
+GetWindowThreadProcessId
+GetCurrentThreadId
+
+WM_CLOSE
+WM_COPYDATA
+WM_APP
+
+COPYDATASTRUCT

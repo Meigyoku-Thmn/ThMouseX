@@ -10,6 +10,7 @@
 #include <wrl/client.h>
 #include <comdef.h>
 #include <mutex>
+#include <cstdint>
 #include <imgui.h>
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
@@ -20,7 +21,6 @@
 #include "../Common/MinHook.h"
 #include "../Common/CallbackStore.h"
 #include "../Common/Variables.h"
-#include "../Common/DataTypes.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
 #include "../Common/Log.h"
@@ -127,9 +127,9 @@ namespace core::directx11 {
         CleanUp(true);
     }
 
+    static bool initialized = false;
+    static mutex mtx;
     void Initialize() {
-        static bool initialized = false;
-        static mutex mtx;
         {
             const scoped_lock lock(mtx);
             if (initialized)
@@ -140,7 +140,7 @@ namespace core::directx11 {
             initialized = true;
         }
 
-        auto _D3D11CreateDeviceAndSwapChain = (decltype(&D3D11CreateDeviceAndSwapChain))GetProcAddress(d3d11, "D3D11CreateDeviceAndSwapChain");
+        auto _D3D11CreateDeviceAndSwapChain = bcast<decltype(&D3D11CreateDeviceAndSwapChain)>(GetProcAddress(d3d11, "D3D11CreateDeviceAndSwapChain"));
         if (!_D3D11CreateDeviceAndSwapChain) {
             note::LastErrorToFile(TAG "Failed to import d3d11.dll|D3D11CreateDeviceAndSwapChain");
             return;
@@ -174,14 +174,14 @@ namespace core::directx11 {
             return;
         }
 
-        auto vtable = *(DWORD**)swap_chain.Get();
+        auto vtable = *bcast<uintptr_t**>(swap_chain.Get());
 
         callbackstore::RegisterUninitializeCallback(TearDownCallback);
         callbackstore::RegisterClearMeasurementFlagsCallback(ClearMeasurementFlags);
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { PVOID(vtable[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
-            { PVOID(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, &OriResizeBuffers, APP_NAME "_D3DResizeBuffers" },
+            { bcast<PVOID>(vtable[PresentIdx]), &D3DPresent, &OriPresent, APP_NAME "_D3DPresent" },
+            { bcast<PVOID>(vtable[ResizeBuffersIdx]), &D3DResizeBuffers, &OriResizeBuffers, APP_NAME "_D3DResizeBuffers" },
         });
     }
 
@@ -273,17 +273,17 @@ namespace core::directx11 {
         }
 
         helper::FixWindowCoordinate(!desc.Windowed,
-            desc.BufferDesc.Width, desc.BufferDesc.Height, UINT(clientSize.width()), UINT(clientSize.height()));
+            desc.BufferDesc.Width, desc.BufferDesc.Height, scast<UINT>(clientSize.width()), scast<UINT>(clientSize.height()));
 
         if (GetClientRect(g_hFocusWindow, &clientSize) == FALSE) {
             note::LastErrorToFile(TAG "PrepareMeasurement: GetClientRect failed");
             return;
         }
-        g_pixelRate = float(g_gameConfig.BaseHeight) / float(clientSize.height());
+        g_pixelRate = scast<float>(g_gameConfig.BaseHeight) / scast<float>(clientSize.height());
         g_pixelOffset.X = g_gameConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_gameConfig.BasePixelOffset.Y / g_pixelRate;
-        imGuiMousePosScaleX = float(clientSize.width()) / float(desc.BufferDesc.Width);
-        imGuiMousePosScaleY = float(clientSize.height()) / float(desc.BufferDesc.Height);
+        imGuiMousePosScaleX = scast<float>(clientSize.width()) / scast<float>(desc.BufferDesc.Width);
+        imGuiMousePosScaleY = scast<float>(clientSize.height()) / scast<float>(desc.BufferDesc.Height);
     }
 
     /*
@@ -304,7 +304,7 @@ namespace core::directx11 {
             return;
         }
 
-        auto scale = float(desc.BufferDesc.Height) / float(g_c.TextureBaseHeight);
+        auto scale = scast<float>(desc.BufferDesc.Height) / scast<float>(g_c.TextureBaseHeight);
         cursorScale = XMVECTORF32{ scale, scale };
 
         RECTSIZE clientSize{};
@@ -312,17 +312,18 @@ namespace core::directx11 {
             note::LastErrorToFile(TAG "PrepareCursorState: GetClientRect failed");
             return;
         }
-        d3dScale = float(clientSize.width()) / float(desc.BufferDesc.Width);
+        d3dScale = scast<float>(clientSize.width()) / scast<float>(desc.BufferDesc.Width);
     }
 
+    static UCHAR tone = 0;
+    static auto toneStage = ModulateStage::WhiteInc;
     static void RenderCursor(IDXGISwapChain* swapChain) {
-        using enum ModulateStage;
         if (!cursorTexture || !spriteBatch || !renderTargetView || !device || !context)
             return;
 
         // scale mouse cursor's position from screen coordinate to D3D coordinate
         auto pointerPosition = helper::GetPointerPosition();
-        XMVECTOR cursorPositionD3D = XMVECTORF32{ float(pointerPosition.x), float(pointerPosition.y) };
+        XMVECTOR cursorPositionD3D = XMVECTORF32{ scast<float>(pointerPosition.x), scast<float>(pointerPosition.y) };
         if (d3dScale != 0.f && d3dScale != 1.f) {
             cursorPositionD3D = XMVectorScale(cursorPositionD3D, d3dScale);
         }
@@ -336,18 +337,17 @@ namespace core::directx11 {
             auto myViewPort = D3D11_VIEWPORT{
                 .TopLeftX = 0,
                 .TopLeftY = 0,
-                .Width = float(desc.BufferDesc.Width),
-                .Height = float(desc.BufferDesc.Height),
+                .Width = scast<float>(desc.BufferDesc.Width),
+                .Height = scast<float>(desc.BufferDesc.Height),
             };
             context->RSSetViewports(1, &myViewPort);
         }
 
         context->OMSetRenderTargets(1, &renderTargetView, nil);
 
-        static UCHAR tone = 0;
-        static auto toneStage = WhiteInc;
         auto usePixelShader = false;
         if (g_inputEnabled) {
+            using enum ModulateStage;
             helper::CalculateNextTone(tone, toneStage);
             if (toneStage == WhiteInc || toneStage == WhiteDec)
                 // default behaviour: texture color * diffuse color
@@ -358,7 +358,7 @@ namespace core::directx11 {
         // draw the cursor
         auto setCustomShaders = usePixelShader ? [] { context->PSSetShader(pixelShader, nil, 0); } : nil;
         auto sortMode = SpriteSortMode_Deferred;
-        auto m_states = std::make_unique<CommonStates>(device);
+        auto m_states = make_unique<CommonStates>(device);
         spriteBatch->Begin(sortMode, m_states->NonPremultiplied(), nil, nil, nil, setCustomShaders, scalingMatrixD3D);
         auto color = g_inputEnabled ? ToneColor(tone) : RGBA(255, 200, 200, 128);
         spriteBatch->Draw(cursorTexture, cursorPositionD3D, nil, color, 0, cursorPivot, 1, SpriteEffects_None);
@@ -395,7 +395,7 @@ namespace core::directx11 {
             return;
         }
 
-        imguioverlay::Configure(float(desc.BufferDesc.Height) / float(g_c.ImGuiBaseVerticalResolution));
+        imguioverlay::Configure(scast<float>(desc.BufferDesc.Height) / scast<float>(g_c.ImGuiBaseVerticalResolution));
     }
 
     static void RenderImGui(IDXGISwapChain* swapChain) {

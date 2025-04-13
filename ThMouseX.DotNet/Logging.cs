@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Text;
 
-namespace NeoLuaBootstrap;
+namespace ThMouseX.DotNet;
 
 static class Logging
 {

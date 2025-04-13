@@ -10,8 +10,8 @@ extern WCHAR    g_currentProcessDirPath[MAX_PATH];
 extern WCHAR    g_currentProcessName[MAX_PATH];
 
 // single game config
-extern GameConfigLocal      g_gameConfig;
-extern CommonConfigLocal    g_commonConfig;
+extern GameConfig   g_gameConfig;
+extern CommonConfig g_commonConfig;
 
 // global game state
 extern bool         g_hookApplied;

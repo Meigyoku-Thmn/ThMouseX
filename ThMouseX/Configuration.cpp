@@ -8,26 +8,17 @@
 #include <tuple>
 #include <cassert>
 #include <inipp.h>
-#include <atlsafe.h>
 
 #include "../Common/macro.h"
 #include "../Common/Variables.h"
 #include "../Common/Log.h"
 #include "../Common/Helper.h"
 #include "../Common/Helper.Encoding.h"
-#include "Direct3D8.h"
-#include "Direct3D9.h"
-#include "Direct3D11.h"
-#include "DirectInput.h"
 #include "Configuration.h"
 
 namespace note = common::log;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
-namespace directx8 = core::directx8;
-namespace directx9 = core::directx9;
-namespace directx11 = core::directx11;
-namespace directinput = core::directinput;
 
 #define GameFile "Games.txt"
 #define GameFile2 "Games2.txt"
@@ -38,6 +29,11 @@ using namespace std;
 
 using VkCodes = unordered_map<string, BYTE, string_hash, equal_to<>>;
 using GameConfigs = map<wstring, GameConfig, less<>>;
+using MemBlockSizes = map<LPCVOID, size_t>;
+
+static GameConfigs gameConfigs;
+static CommonConfig commonConfig;
+static MemBlockSizes memBlockSizes;
 
 template<CompileTimeString ini_key, typename OutputType>
 static bool IniTryGetButton(const inipp::Ini<char>::Section& section, const VkCodes& buttonNames, OutputType& output) {
@@ -81,6 +77,7 @@ static bool IniTryGetWstrPath(const inipp::Ini<char>::Section& section, PWCHAR& 
         auto nChar = GetFullPathNameW(wStr.c_str(), 0, nil, nil);
         output = new WCHAR[nChar];
         GetFullPathNameW(wStr.c_str(), nChar, output, nil);
+        memBlockSizes[output] = nChar * sizeof(output[0]);
     }
     return true;
 }
@@ -108,18 +105,15 @@ static bool IniTryGetULong(const inipp::Ini<char>::Section& section, DWORD& outp
 
 #pragma region method declaration
 bool IsCommentLine(stringstream& stream);
-tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED const char* gameConfigPath);
-tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, const char* gameConfigPath);
-tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, const char* gameConfigPath);
+tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED PCSTR gameConfigPath);
+tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, PCSTR gameConfigPath);
+tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, PCSTR gameConfigPath);
 tuple<VkCodes, bool> ReadVkCodes();
 #pragma endregion
-
-static GameConfigs gameConfigs;
-static CommonConfig commonConfig;
 
 namespace core::configuration {
     bool MarkThMouseXProcess() {
@@ -128,25 +122,35 @@ namespace core::configuration {
             note::ToFile("[Configuration] MarkThMouseXProcess failed.");
         return true;
     }
-    bool GetGameConfig(PCWCHAR processName, GameConfigEx* gameConfig, CommonConfigEx* commonConfig) {
-        wstring processNameLowerCase{ processName };
-        transform(processNameLowerCase.begin(), processNameLowerCase.end(), processNameLowerCase.begin(), towlower);
-        auto lookup = gameConfigs.find(processNameLowerCase);
-        if (lookup == gameConfigs.end())
-            return false;
-        auto rs = gameConfig->CopyFrom(lookup->second) && commonConfig->CopyFrom(::commonConfig);
-        if (rs == false)
-            note::ToFile("[Configuration] GetGameConfig failed.");
-        return rs;
+
+    UINT_PTR GetMemBlockSize(LPCVOID address) {
+        auto iter = memBlockSizes.find(address);
+        if (iter == memBlockSizes.end())
+            return 0;
+        return iter->second;
     }
-    bool ReadGamesFile(const char* gameConfigPath, bool overrding = false);
+
+    bool GetGameConfig(LPCWSTR processName, CommonConfig** commonConfig, DWORD* commonConfigSize, GameConfig** gameConfig, DWORD* gameConfigSize) {
+        wstring processNameLowerCase{ processName };
+        ranges::transform(processNameLowerCase, processNameLowerCase.begin(), towlower);
+        auto iter = gameConfigs.find(processNameLowerCase);
+        if (iter == gameConfigs.end())
+            return false;
+        *gameConfig = &iter->second;
+        *gameConfigSize = sizeof(GameConfig);
+        *commonConfig = &::commonConfig;
+        *commonConfigSize = sizeof(CommonConfig);
+        return true;
+    }
+
+    bool ReadGamesFile(PCSTR gameConfigPath, bool overrding = false);
     bool ReadGamesFile() {
         auto rs = ReadGamesFile(GameFile);
         if (rs)
             rs = ReadGamesFile(GameFile2, true);
         return rs;
     }
-    bool ReadGamesFile(const char* gameConfigPath, bool overrding) {
+    bool ReadGamesFile(PCSTR gameConfigPath, bool overrding) {
         ifstream gamesFile(gameConfigPath);
         if (!gamesFile) {
             if (!overrding) {
@@ -196,17 +200,19 @@ namespace core::configuration {
                 return false;
 
             wstring processNameLowerCase = processName;
-            transform(processNameLowerCase.begin(), processNameLowerCase.end(), processNameLowerCase.begin(), towlower);
+            ranges::transform(processNameLowerCase, processNameLowerCase.begin(), towlower);
             auto& gameConfig = gameConfigs[processNameLowerCase];
 
-            gameConfig.processName = new WCHAR[processName.size() + 1];
-            memcpy(gameConfig.processName, processName.c_str(), processName.size() * sizeof(processName[0]));
-            gameConfig.processName[processName.size()] = L'\0';
+            gameConfig.ProcessName = new WCHAR[processName.size() + 1];
+            memcpy(gameConfig.ProcessName, processName.c_str(), processName.size() * sizeof(processName[0]));
+            gameConfig.ProcessName[processName.size()] = L'\0';
+            memBlockSizes[gameConfig.ProcessName] = (processName.size() + 1) * sizeof(processName[0]);
 
             if (addressOffsets.size() > 0) {
-                CComSafeArray<DWORD> addressChain{ addressOffsets.size() };
-                memcpy(addressChain.m_psa->pvData, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
-                gameConfig.Address = addressChain.Detach();
+                gameConfig.Offsets = new DWORD[addressOffsets.size()];
+                gameConfig.NumOfOffsets = scast<DWORD>(addressOffsets.size());
+                memcpy(gameConfig.Offsets, addressOffsets.data(), addressOffsets.size() * sizeof(addressOffsets[0]));
+                memBlockSizes[gameConfig.Offsets] = addressOffsets.size() * sizeof(gameConfig.Offsets[0]);
             }
             gameConfig.ScriptType = scriptType;
 
@@ -281,32 +287,32 @@ bool IsCommentLine(stringstream& stream) {
     return false;
 }
 
-tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED const char* gameConfigPath) {
+tuple<wstring, bool> ExtractProcessName(stringstream& stream, UNUSED int lineCount, UNUSED PCSTR gameConfigPath) {
     string processName;
     stream >> quoted(processName);
     auto wProcessName = encoding::ConvertToUtf16(processName);
     return { move(wProcessName), true };
 }
 
-tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
+    using enum ScriptType;
     string pointerChainStr;
     stream >> pointerChainStr;
     vector<DWORD> addressOffsets;
 
-    auto scriptType = ScriptType_None;
+    auto scriptType = None;
 
     if (pointerChainStr.compare("LuaJIT") == 0)
-        scriptType = ScriptType_LuaJIT;
+        scriptType = LuaJIT;
     else if (pointerChainStr.compare("NeoLua") == 0)
-        scriptType = ScriptType_NeoLua;
+        scriptType = NeoLua;
     else if (pointerChainStr.compare("Lua") == 0)
-        scriptType = ScriptType_Lua;
+        scriptType = Lua;
 
-    if (scriptType == ScriptType_None) {
-        size_t leftBoundIdx = 0;
+    if (scriptType == None) {
         size_t rightBoundIdx = -1;
         for (;;) {
-            leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
+            auto leftBoundIdx = pointerChainStr.find('[', rightBoundIdx + 1);
             if (leftBoundIdx == string::npos)
                 break;
             rightBoundIdx = pointerChainStr.find(']', leftBoundIdx + 1);
@@ -334,19 +340,20 @@ tuple<vector<DWORD>, ScriptType, bool> ExtractPositionRVA(stringstream& stream, 
     return { move(addressOffsets), scriptType, true };
 }
 
-tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
+    using enum PointDataType;
     string dataTypeStr;
     stream >> dataTypeStr;
-    auto dataType = PointDataType_None;
+    auto dataType = None;
 
     if (_stricmp(dataTypeStr.c_str(), "Int") == 0)
-        dataType = PointDataType_Int;
+        dataType = Int;
     else if (_stricmp(dataTypeStr.c_str(), "Float") == 0)
-        dataType = PointDataType_Float;
+        dataType = Float;
     else if (_stricmp(dataTypeStr.c_str(), "Short") == 0)
-        dataType = PointDataType_Short;
+        dataType = Short;
     else if (_stricmp(dataTypeStr.c_str(), "Double") == 0)
-        dataType = PointDataType_Double;
+        dataType = Double;
     else {
         MessageBoxA(nil, format("Invalid dataType at line {} in {}.", lineCount, gameConfigPath).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);
@@ -356,7 +363,7 @@ tuple<PointDataType, bool> ExtractDataType(stringstream& stream, int lineCount, 
     return { move(dataType), true };
 }
 
-tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
     string posOffsetStr;
     stream >> posOffsetStr;
 
@@ -391,7 +398,7 @@ tuple<FloatPoint, bool> ExtractOffset(stringstream& stream, int lineCount, const
     return { FloatPoint{offsetX, offsetY}, true };
 }
 
-tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
     DWORD baseHeight;
     stream >> dec >> baseHeight;
 
@@ -404,7 +411,7 @@ tuple<DWORD, bool> ExtractBaseHeight(stringstream& stream, int lineCount, const 
     return { baseHeight, true };
 }
 
-tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
     string aspectRatioStr;
     stream >> aspectRatioStr;
 
@@ -434,26 +441,27 @@ tuple<FloatPoint, bool> ExtractAspectRatio(stringstream& stream, int lineCount, 
     return { FloatPoint{ratioX, ratioY}, true };
 }
 
-tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, const char* gameConfigPath) {
+tuple<InputMethod, bool> ExtractInputMethod(stringstream& stream, int lineCount, PCSTR gameConfigPath) {
+    using enum InputMethod;
     string inputMethodStr;
     stream >> inputMethodStr;
 
-    auto inputMethods = InputMethod_None;
+    auto inputMethods = None;
     char* nextToken{};
     auto token = strtok_s(inputMethodStr.data(), "/", &nextToken);
     while (token) {
         if (_stricmp(token, "DirectInput") == 0)
-            inputMethods |= InputMethod_DirectInput;
+            inputMethods |= DirectInput;
         else if (_stricmp(token, "GetKeyboardState") == 0)
-            inputMethods |= InputMethod_GetKeyboardState;
+            inputMethods |= GetKeyboardState;
         else if (_stricmp(token, "SendInput") == 0)
-            inputMethods |= InputMethod_SendInput;
+            inputMethods |= SendInput;
         else if (_stricmp(token, "SendMessage") == 0)
-            inputMethods |= InputMethod_SendMsg;
+            inputMethods |= SendMsg;
         token = strtok_s(nil, "/", &nextToken);
     }
 
-    if (inputMethods == InputMethod_None) {
+    if (inputMethods == None) {
         MessageBoxA(nil, format("Invalid inputMethod at line {} in {}.", lineCount, gameConfigPath).c_str(),
             APP_NAME, MB_OK | MB_ICONERROR);
         return { inputMethods, false };
@@ -490,7 +498,7 @@ tuple<VkCodes, bool> ReadVkCodes() {
                 convMessage, lineCount).c_str(), APP_NAME, MB_OK | MB_ICONERROR);
             return { move(vkCodes), false };
         }
-        vkCodes[key] = (BYTE)value;
+        vkCodes[key] = scast<BYTE>(value);
     }
 
     return { move(vkCodes), true };

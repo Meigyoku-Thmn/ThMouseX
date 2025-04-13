@@ -24,9 +24,9 @@ Differences of the fork
 
 Drawbacks
 --------
-* Only works with 32-bit games, if there is a good 64-bit bullet hell game I will consider adding 64-bit support.
-* Doesn't work well with Steam Overlay, although this is minimal.
-* Doesn't work well with other mods that inject their own overlay (for example, [thprac](https://github.com/touhouworldcup/thprac)), they can still work but the overlays will override each other.
+* Only works with 32-bit games, 64-bit games will be supported soon.
+* Doesn't work well with Steam Overlay. This should be minimalized from ver 3.
+* Doesn't work well with other mods that inject their own overlay (for example, [thprac](https://github.com/touhouworldcup/thprac)), they can still work but the overlays may override each other.
 * Configuration is difficult.
 
 Preconfigured games
@@ -70,50 +70,83 @@ It also have preconfiguration of some other games:
 
 You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt.
 
-FAQ
+You can try the [<code>development</code>](https://github.com/Meigyoku-Thmn/ThMouseX/tree/development) branch if something doesn't work, see the [Compilation](#compilation) section below.
+
+Compilation
 ---
+There are 2 branches: the <code>master</code> branch, and the <code>development</code> branch. The <code>development</code> branch is for experimental features.
 ### How to compile on your computer (not recommended for non-tech savvy)
-This project can be compiled via Visual Studio (I use Visual Studio 2022), or just Visual Studio Build Tools:
-* [Visual Studio](https://visualstudio.microsoft.com/), select "Desktop development with C++" during installation.
-* [Visual Studio Build Tools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools), select "Visual C++ build tools" during installation.
-
-Also you need [.NET Framework 4.8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet-framework).
-
-You also need to setup [vcpkg](https://vcpkg.io/en/getting-started.html) and put vcpkg folder path into the PATH of environment variables.
-
-Remember to **compile for 32-bit, toolset v143, .NET Framework 4.8**, and make sure these files and folder are in the same folder:
-* ConfigScripts
-* 0Harmony.dll
-* Common.dll
-* Cursor.png
-* DX8Hook.dll
-* Games.txt
-* Neo.Lua.dll
-* NeoLuaBootstrap.dll
-* Sigil.dll
-* ThMCore.dll
-* THMouseX.exe
-* ThMouseX.txt
-* VirtualKeyCodes.txt
-
-The above files should be populated in `ThMouseXGUI\bin` directory.
+<details>
+    <summary>Click to show</summary>
+    <table><tr><td></td></tr><tr><td>
+        <p>This project can be compiled via Visual Studio (I use Visual Studio 2022), or just Visual Studio Build Tools:</p>
+        <ul>
+            <li>
+                <a href="https://visualstudio.microsoft.com">Visual Studio</a>, select "Desktop development with C++" during installation.
+            </li>
+            <li>
+                <a href="https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools">Visual Studio Build Tools</a>, select "Visual C++ build tools" during installation.
+            </li>
+        </ul>        
+        <p>Also you need <a href="https://dotnet.microsoft.com/en-us/download/dotnet-framework">.NET Framework 4.8 SDK</a>.</p>
+        <p>You also need to setup <a href="https://vcpkg.io/en/getting-started.html">vcpkg</a> and put vcpkg folder path into the PATH of environment variables, use the command <code>vcpkg integrate install</code> to integrate it with Visual Studio.</p>      
+        <p>Remember to <strong>compile for 32-bit, toolset v143, .NET Framework 4.8</strong>, and make sure these files and folder are in the same folder:</p>
+        <ul>
+            <li>ThMouseXGUI.exe</li>
+            <li>ThMouseXGUI.64.exe</li>
+            <li>ThMouseX.dll</li>
+            <li>ThMouseX.64.dll</li>
+            <li>ThMouseX.DotNet.dll</li>
+            <li>Neo.Lua.dll</li>
+            <li>0Harmony.dll</li>
+            <li>Games.txt</li>
+            <li>ThMouseX.ini</li>
+            <li>VirtualKeyCodes.txt</li>
+            <li>Cursor.png</li>
+            <li>ConfigScripts (folder)</li>
+        </ul>
+        <p>The above files should be populated in <code>Release\x86</code> directory.</p>
+    </td></tr></table>
+</details>
 
 ### Another way to compile without installing anything on your computer (recommended way)
-- Fork the THMouseX repository to your Github account<br>
-![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/4b941f22-594d-46c6-be83-818db918e2d4)
-- Go to the "Actions" tab<br>
-![image](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/34ed8954-c711-4df4-843e-f730d8483394)
-- Click "Deployment" on the left sidebar<br>
-![chrome_1lYLXTdT9o](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/81c9cd3b-ef98-4092-a172-b48f379dd2c8)
-- Run the workflow<br>
-![chrome_AxRRzs1MUn](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/cdf4206b-4fa5-4e70-a0ac-a7e325d30ef9)
-- Wait for it, then download the produced zipped artifact (shown up in the page with url form `https://github.com/<username>/ThMouseX/actions/runs/<flowid>`)<br>
-![chrome_jdw1pXLJl2](https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/0bcf952d-4acf-4db7-ba83-8e7d106b0301)
+<details>
+    <summary>Click to show</summary>
+    <table><tr><td></td></tr><tr><td>
+        <ol>
+            <li>
+                <p>Fork the ThMouseX repository to your Github account</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/4b941f22-594d-46c6-be83-818db918e2d4">
+            </li>
+            <li>
+                <p>Go to the "Actions" tab</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/34ed8954-c711-4df4-843e-f730d8483394">
+            </li>
+            <li>
+                <p>Click "Deployment" on the left sidebar</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/81c9cd3b-ef98-4092-a172-b48f379dd2c8">
+            </li>
+            <li>
+                <p>If you want to build the development branch</p>
+                <img src="https://github.com/user-attachments/assets/034ca81f-469a-44b9-91d0-d9e79b72484d">
+            </li>
+            <li>
+                <p>Run the workflow</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/cdf4206b-4fa5-4e70-a0ac-a7e325d30ef9">
+            </li>
+            <li>
+                <p>Wait for it, then download the produced zipped artifact<br>(shown up in the page with url form <code>https://github.com/<username>/ThMouseX/actions/runs/<flowid></code>)</p>
+                <img src="https://github.com/Meigyoku-Thmn/ThMouseX/assets/16047808/0bcf952d-4acf-4db7-ba83-8e7d106b0301">
+            </li>
+        </ol>
+    </td></tr></table>
+</details>
 
+Instructions
+-----------------------
 ### How to use ThMouseX?
-1. Run ThMouseX.exe.
-2. Run your game, or you can run your game first and then run ThMouseX.exe.
-3. If the game is supported, a cursor will show upon entering the game.
+1. Run ThMouseXGUI.exe then run your game, or you can run your game first and then run ThMouseXGUI.exe.
+2. If the game is supported, a cursor will show upon entering the game.
 
 ### How to control?
 * The character will move towards where the cursor points. Please note that it will NOT move immidiately with the cursor, because ThMouseX doesn't modifier any game's behavior.
@@ -131,7 +164,7 @@ Additional Instructions
 ### Cursor sprite
 The crosshair/cursor sprite may be changed:
 1. Find your preferred crosshair in .png format and place it into the same folder as ThMouseX.exe.
-2. Open up ThMouseX.txt.
+2. Open up ThMouseX.ini.
 3. Change the file name after "CursorTexture = " to the preferred crosshair file's name. (Don't forget the file extension name ".png".)
 
 ### Add your favorite games

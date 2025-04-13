@@ -2,6 +2,7 @@
 #include "macro.h"
 #include <Windows.h>
 #include "DataTypes.h"
+#include <cstdint>
 // Include this file only in LuaApi.cpp
 #else
 -- C Processor-Generated file, do not edit.
@@ -13,8 +14,8 @@ ffi.cdef [[
     typedef LPVOID HMODULE;
     typedef const wchar_t* LPCWSTR;
     typedef const char* LPCSTR;
-    typedef void(__cdecl *UninitializeCallbackType)(bool isProcessTerminating);
-    typedef void(__cdecl *CallbackType)();
+    typedef void(*UninitializeCallbackType)(bool isProcessTerminating);
+    typedef void(*CallbackType)();
     LPVOID GetProcAddress(HMODULE hModule, LPCSTR lpProcName);
 ]]
 local hModule = ffi.cast("HMODULE", ThMouseX_ModuleHandle)
@@ -31,27 +32,27 @@ local hModule = ffi.cast("HMODULE", ThMouseX_ModuleHandle)
     FuncName = ffi.cast(SYM_NAME(Lua_##FuncName), ffi.C.GetProcAddress(hModule, SYM_NAME(Lua_##FuncName)))
 #endif
 
-LUAFUNC(DWORD,  ReadUInt32, DWORD address);
+LUAFUNC(DWORD,      ReadUInt32, uintptr_t address);
 
-LUAFUNC(DWORD,  ResolveAddress, DWORD* offsets, size_t length, bool doNotValidateLastAddress);
+LUAFUNC(uintptr_t,  ResolveAddress, DWORD* offsets, size_t length, bool doNotValidateLastAddress);
 
-LUAFUNC(void,   OpenConsole);
+LUAFUNC(void,       OpenConsole);
 
-LUAFUNC(void,   SetPositionAddress, DWORD address);
+LUAFUNC(void,       SetPositionAddress, uintptr_t address);
 
-LUAFUNC(int,    GetDataType);
+LUAFUNC(int,        GetDataType);
 
-LUAFUNC(void,   RegisterUninitializeCallback, UninitializeCallbackType callback);
+LUAFUNC(void,       RegisterUninitializeCallback, UninitializeCallbackType callback);
 
-LUAFUNC(int,    CreateHook, LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal, LPCSTR discriminator);
+LUAFUNC(int,        CreateHook, LPVOID pTarget, LPVOID pDetour, LPVOID *ppOriginal, LPCSTR discriminator);
 
-LUAFUNC(int,    CreateHookApi, LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal, LPCSTR discriminator);
+LUAFUNC(int,        CreateHookApi, LPCSTR pszModule, LPCSTR pszProcName, LPVOID pDetour, LPVOID *ppOriginal, LPCSTR discriminator);
 
-LUAFUNC(int,    EnableHook, LPVOID pTarget, LPCSTR discriminator);
+LUAFUNC(int,        EnableHook, LPVOID pTarget, LPCSTR discriminator);
 
-LUAFUNC(int,    DisableHook, LPVOID pTarget, LPCSTR discriminator);
+LUAFUNC(int,        DisableHook, LPVOID pTarget, LPCSTR discriminator);
 
-LUAFUNC(LPCSTR, StatusToString, int status);
+LUAFUNC(LPCSTR,     StatusToString, int status);
 
 #ifndef COMMON_EXPORTS
 _StatusToString = StatusToString;

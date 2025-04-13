@@ -1,4 +1,5 @@
 #pragma once
+#ifndef _WIN64
 #include <Windows.h>
 #include <vector>
 
@@ -7,3 +8,4 @@
 namespace core::directx8 {
     void Initialize();
 }
+#endif

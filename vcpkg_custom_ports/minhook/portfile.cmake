@@ -15,9 +15,6 @@ vcpkg_from_github(
     SHA512 bd1b7277bd24fdc5a4c6fcdc639f53271650786f60dfb341196633ba31f000648ea4972a9a98c6981eef6f9beccb081b7b2f9a0d2ffd2bd90c3e3947bf838d10
     HEAD_REF feature/hook-thunk
 )
-#[[
-set(SOURCE_PATH "D:/Draftbook/minhook")
-]]
 
 vcpkg_replace_string(
     "${SOURCE_PATH}/cmake/minhook-config.cmake.in" "\${PACKAGE_PREFIX_DIR}/lib/minhook" "\${CMAKE_CURRENT_LIST_DIR}"

@@ -34,7 +34,7 @@ struct InputRuleItemVk2SideEffect;
 struct InputRuleItemMouseBtn2Function;
 
 using SideEffect = void (*)(bool isUp, bool wantCaptureMouse);
-using PostSideEffect = void (*)(InputRuleItemMouseBtn2Function& ruleItem);
+using PostSideEffect = void (*)(const InputRuleItemMouseBtn2Function& ruleItem);
 
 enum class MatchStatus {
     None, Up, Down, Trigger
@@ -54,38 +54,8 @@ struct InputRuleItemMouseBtn2Function {
     PostSideEffect nextFrameSideEffect;
 };
 
-BOOL WINAPI _GetFirstProcess(HANDLE snapshot, LPPROCESSENTRY32W entry);
-BOOL WINAPI _GetNextProcess(HANDLE snapshot, LPPROCESSENTRY32W entry);
-decltype(&Process32FirstW) GetNextProcess = _GetFirstProcess;
-BOOL WINAPI _GetFirstProcess(HANDLE snapshot, LPPROCESSENTRY32W entry) {
-    auto rs = Process32FirstW(snapshot, entry);
-    GetNextProcess = _GetNextProcess;
-    return rs;
-}
-BOOL WINAPI _GetNextProcess(HANDLE snapshot, LPPROCESSENTRY32W entry) {
-    auto rs = Process32NextW(snapshot, entry);
-    if (!rs)
-        GetNextProcess = _GetFirstProcess;
-    return rs;
-}
-
-BOOL WINAPI _GetFirstModule(HANDLE snapshot, LPMODULEENTRY32W entry);
-BOOL WINAPI _GetNextModule(HANDLE snapshot, LPMODULEENTRY32W entry);
-decltype(&Module32FirstW) GetNextModule = _GetFirstModule;
-BOOL WINAPI _GetFirstModule(HANDLE snapshot, LPMODULEENTRY32W entry) {
-    auto rs = Module32FirstW(snapshot, entry);
-    GetNextModule = _GetNextModule;
-    return rs;
-}
-BOOL WINAPI _GetNextModule(HANDLE snapshot, LPMODULEENTRY32W entry) {
-    auto rs = Module32NextW(snapshot, entry);
-    if (!rs)
-        GetNextModule = _GetFirstModule;
-    return rs;
-}
-
 namespace core::messagequeue {
-    HCURSOR WINAPI _SetCursor(HCURSOR hCursor);
+    HCURSOR WINAPI _SetCursor(HCURSOR cursor);
     decltype(&_SetCursor) OriSetCursor;
     int WINAPI _ShowCursor(BOOL bShow);
     decltype(&_ShowCursor) OriShowCursor;
@@ -167,7 +137,7 @@ namespace core::messagequeue {
         { SCROLL_RIGHT_EVENT,   &g_scrolledRight    },
     };
 
-    static MatchStatus TestVkCode(PMSG e, BYTE vkCode) {
+    static MatchStatus TestVkCode(const MSG* e, BYTE vkCode) {
         using enum MatchStatus;
         auto [messageUp, wParamUp, lParamUp, messageDown, wParamDown, lParamDown] = helper::ConvertVkCodeToMessage(vkCode);
         if (messageUp == WM_NULL &&
@@ -193,7 +163,7 @@ namespace core::messagequeue {
         return None;
     }
 
-    static bool IsMouseAndKeyboardInput(PMSG e) {
+    static bool IsMouseAndKeyboardInput(const MSG* e) {
         auto msg = e->message;
         return msg == WM_KEYUP || msg == WM_KEYDOWN ||
             msg == WM_LBUTTONUP || msg == WM_LBUTTONDOWN ||
@@ -203,8 +173,21 @@ namespace core::messagequeue {
             msg == WM_MOUSEWHEEL || msg == WM_MOUSEHWHEEL;
     }
 
+    static auto initialized = false;
+    static void TriggerInitialization(bool calledFromSetCursor, HWND currentHwnd) {
+        if (initialized)
+            return;
+        if (calledFromSetCursor) {
+            auto foregroundHwnd = GetForegroundWindow();
+            if (foregroundHwnd != currentHwnd)
+                return;
+        }
+        initialized = true;
+        core::Initialize();
+    }
+
     static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
-        auto e = PMSG(lParam);
+        auto e = bcast<PMSG>(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
             using enum MatchStatus;
             if (g_showImGui) {
@@ -232,7 +215,7 @@ namespace core::messagequeue {
                 for (auto& ruleItem : InputRuleMouseBtn2ClickState) {
                     auto matchStatus = TestVkCode(e, ruleItem.vkCode);
                     if (matchStatus == Trigger) {
-                        ruleItem.nextFrameSideEffect = [](auto& _ruleItem) { *_ruleItem.clickStatePtr = false; };
+                        ruleItem.nextFrameSideEffect = [](const auto& _ruleItem) { *_ruleItem.clickStatePtr = false; };
                         *ruleItem.clickStatePtr = true;
                     }
                     else if (matchStatus == Up && ruleItem.isOn == true) {
@@ -252,16 +235,18 @@ namespace core::messagequeue {
     }
 
     static LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
+        auto e = bcast<PCWPRETSTRUCT>(lParam);
+        if (code == HC_ACTION && e->message == WM_SETCURSOR)
+            TriggerInitialization(true, e->hwnd);
         if (code == HC_ACTION && g_hookApplied) {
             if (!cursorNormalized) {
                 cursorNormalized = true;
                 NormalizeCursor();
             }
-            auto e = (PCWPRETSTRUCT)lParam;
             if (g_showImGui) {
                 ImGui_ImplWin32_WndProcHandler(e->hwnd, e->message, e->wParam, e->lParam);
             }
-            else if (e->message == WM_SETCURSOR && !g_showImGui) {
+            else if (e->message == WM_SETCURSOR) {
                 if (LOWORD(e->lParam) == HTCLIENT) {
                     if (isCursorShow)
                         ShowMousePointer();
@@ -287,10 +272,8 @@ namespace core::messagequeue {
     }
 
     static LRESULT CALLBACK CBTProcW(int code, WPARAM wParam, LPARAM lParam) {
-        if (static auto initialized = false; !initialized && code == HCBT_ACTIVATE) {
-            initialized = true;
-            core::Initialize();
-        }
+        if (code == HCBT_ACTIVATE)
+            TriggerInitialization(false, nil);
         return CallNextHookEx(nil, code, wParam, lParam);
     }
 
@@ -324,12 +307,12 @@ namespace core::messagequeue {
         UnhookWindowsHookEx(CallWndRetProcHandle);
         UnhookWindowsHookEx(CBTProcHandle);
         // force all top-level windows to process a message, therefore force all processes to unload the DLL.
-        DWORD __;
+        DWORD_PTR __;
         SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &__);
-        // some processes doesn't have a top-level window or a message loop anymore,
-        // the following find them and inject a thread to force them eject the DLL.
-        // warning: non thread-safe, single-thread only.
-        auto unloadingShellcode = &shellcode::UnloadingShellcode;
+        // some processes at this point might not have a top-level window or a message loop anymore,
+        // the following code find them and inject a thread to force them eject the DLL.
+        shellcode::Initialize();
+        auto unloadingShellcode = shellcode::ShellcodeFunctionPtr;
         auto shellcodeSize = shellcode::ShellcodeSectionSize;
         if (shellcodeSize == 0)
             return;
@@ -341,7 +324,10 @@ namespace core::messagequeue {
         auto currentProcessId = GetCurrentProcessId();
         PROCESSENTRY32W processEntry{ .dwSize = sizeof(processEntry) };
         ShellcodeInput shellcodeInput{};
+
+        decltype(&Process32FirstW) GetNextProcess = Process32FirstW;
         while (GetNextProcess(processSnapshot.get(), &processEntry)) {
+            GetNextProcess = Process32NextW;
             if (processEntry.th32ProcessID == currentProcessId)
                 continue;
             Handle hProcess{ OpenProcess(PROCESS_ALL_ACCESS, FALSE, processEntry.th32ProcessID) };
@@ -351,7 +337,9 @@ namespace core::messagequeue {
             if (processSnapshot.get() == INVALID_HANDLE_VALUE)
                 continue;
             MODULEENTRY32W moduleEntry{ .dwSize = sizeof(moduleEntry) };
+            decltype(&Module32FirstW) GetNextModule = Module32FirstW;
             while (GetNextModule(moduleSnapshot.get(), &moduleEntry)) {
+                GetNextModule = Module32NextW;
                 if (_wcsicmp(moduleEntry.szExePath, g_currentModulePath) != 0)
                     continue;
                 auto remoteInput = VirtualAllocEx(hProcess.get(), nil, sizeof(shellcodeInput), MEM_COMMIT, PAGE_READWRITE);
@@ -360,18 +348,19 @@ namespace core::messagequeue {
                     continue;
                 if (!WriteProcessMemory(hProcess.get(), remoteInput, &shellcodeInput, sizeof(shellcodeInput), nil))
                     continue;
-                auto remoteCode = VirtualAllocEx(hProcess.get(), nullptr, shellcodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+                auto remoteCode = VirtualAllocEx(hProcess.get(), nil, shellcodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
                 defer({ VirtualFreeEx(hProcess.get(), remoteCode, 0, MEM_RELEASE); });
                 if (!remoteCode)
                     continue;
                 if (!WriteProcessMemory(hProcess.get(), remoteCode, unloadingShellcode, shellcodeSize, nil))
                     continue;
-                Handle remoteThread{ CreateRemoteThread(hProcess.get(), nullptr, 0, (ThreadFunc)remoteCode, remoteInput, 0, nil) };
-                WaitForSingleObject(remoteThread.get(), 1000);
+                Handle remoteThread{ CreateRemoteThread(hProcess.get(), nil, 0, scast<ThreadFunc>(remoteCode), remoteInput, 0, nil) };
+                WaitForSingleObject(remoteThread.get(), INFINITE);
             }
         }
     }
 
+    static bool callbackDone = false;
     static void PostRenderCallback() {
         for (auto& ruleItem : InputRuleMouseBtn2ClickState) {
             if (ruleItem.nextFrameSideEffect) {
@@ -379,7 +368,6 @@ namespace core::messagequeue {
                 ruleItem.nextFrameSideEffect = nil;
             }
         }
-        static bool callbackDone = false;
         if (cursorNormalized && !callbackDone) {
             callbackDone = true;
             HideMousePointer();

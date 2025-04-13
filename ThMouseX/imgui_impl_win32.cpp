@@ -162,7 +162,7 @@ static bool ImGui_ImplWin32_InitEx(void* hwnd, bool platform_has_own_dc) {
     // Dynamically load XInput library
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
     bd->WantUpdateHasGamepad = true;
-    const char* xinput_dll_names[] =
+    PCSTR xinput_dll_names[] =
     {
         "xinput1_4.dll",   // Windows 8+
         "xinput1_3.dll",   // DirectX SDK

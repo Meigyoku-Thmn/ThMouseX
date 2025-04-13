@@ -5,16 +5,21 @@
 #include <wrl/client.h>
 #include <metahost.h>
 #include <comdef.h>
+#include <cstdint>
+#include <format>
 
 #include "DataTypes.h"
 #include "NeoLua.h"
+#include "LuaApi.h"
 #include "Log.h"
 #include "Variables.h"
-#include "LuaApi.h"
 #include "Helper.h"
+#include "Helper.Encoding.h"
 
 namespace note = common::log;
 namespace helper = common::helper;
+namespace luaapi = common::luaapi;
+namespace encoding = common::helper::encoding;
 
 using namespace std;
 using namespace Microsoft::WRL;
@@ -22,23 +27,54 @@ using namespace Microsoft::WRL;
 #define TAG "[NeoLua] "
 
 namespace common::neolua {
-    DWORD GetPositionAddress() {
+    uintptr_t GetPositionAddress() {
         return luaapi::GetPositionAddress();
     }
 
+    static void DotNetFramework(const wstring& bootstrapDllPath);
+    static void UnityMono(const wstring& bootstrapDllPath);
+
     void Initialize() {
-        if (g_gameConfig.ScriptType != ScriptType_NeoLua)
+        using enum ScriptType;
+        if (g_gameConfig.ScriptType != NeoLua)
             return;
 
+        auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"\\ThMouseX.DotNet.dll";
+        auto wScriptPath = format(L"{}\\ConfigScripts\\{}.lua", g_currentModuleDirPath, g_gameConfig.ProcessName);
+        auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
+        auto runtime = luaapi::ReadAttributeFromLuaScript(scriptPath, "Runtime");
+
+        if (_putenv(format("ThMouseX_ModuleHandle={}", (uintptr_t)g_coreModule).c_str()) != 0) {
+            note::ToFile(TAG "Cannot set ThMouseX_ModuleHandle env.");
+            return;
+        }
+        if (_wputenv(format(L"ThMouseX_ScriptPath={}", wScriptPath).c_str()) != 0) {
+            note::ToFile(TAG "Cannot set ThMouseX_ScriptPath env.");
+            return;
+        }
+        if (_putenv(format("ThMouseX_Runtime={}", runtime).c_str()) != 0) {
+            note::ToFile(TAG "Cannot set ThMouseX_Runtime env.");
+            return;
+        }
+        if (runtime == ".NET Framework")
+            DotNetFramework(bootstrapDllPath);
+        else if (runtime == "Unity Mono")
+            UnityMono(bootstrapDllPath);
+        else
+            note::ToFile(TAG "Unknown specified runtime '%s' in %s.", runtime.c_str(), scriptPath.c_str());
+    }
+
+    static void DotNetFramework(const wstring& bootstrapDllPath) {
+#pragma region Preparation
         auto mscoree = GetModuleHandleW(L"mscoree.dll");
         if (!mscoree) {
-            log::LastErrorToFile(TAG " Failed to load mscoree.dll");
+            log::LastErrorToFile(TAG "Failed to load mscoree.dll");
             return;
         }
 
-        auto _CLRCreateInstance = (decltype(&CLRCreateInstance))GetProcAddress(mscoree, "CLRCreateInstance");
+        auto _CLRCreateInstance = bcast<decltype(&CLRCreateInstance)>(GetProcAddress(mscoree, "CLRCreateInstance"));
         if (!_CLRCreateInstance) {
-            log::LastErrorToFile(TAG " Failed to import mscoree.dll|CLRCreateInstance");
+            log::LastErrorToFile(TAG "Failed to import mscoree.dll|CLRCreateInstance");
             return;
         }
 
@@ -60,7 +96,7 @@ namespace common::neolua {
         }
         ComPtr<ICLRRuntimeInfo> runtimeInfo;
         ULONG count = 0;
-        result = enumerator->Next(1, (IUnknown**)&runtimeInfo, &count);
+        result = enumerator->Next(1, scast<IUnknown**>(&runtimeInfo), &count);
         if (FAILED(result)) {
             note::HResultToFile(TAG "Cannot enumerate on IEnum", result);
             return;
@@ -76,19 +112,104 @@ namespace common::neolua {
             note::HResultToFile(TAG "Cannot get ICLRRuntimeHost instance", result);
             return;
         }
+#pragma endregion
 
-        auto bootstrapDllPath = wstring(g_currentModuleDirPath) + L"/NeoLuaBootstrap.dll";
-        auto scriptPath = wstring(g_currentModuleDirPath) + L"/ConfigScripts/" + g_gameConfig.processName + L".lua";
         DWORD returnValue;
         result = runtimeHost->ExecuteInDefaultAppDomain(
             bootstrapDllPath.c_str(),
-            L"NeoLuaBootstrap.Handlers",
+            L"ThMouseX.DotNet.Handlers",
             L"Initialize",
-            scriptPath.c_str(),
+            L"",
             &returnValue
         );
         if (FAILED(result)) {
-            note::HResultToFile(TAG "Failed to invoke NeoLuaBootstrap.Handlers.Initialize", result);
+            note::HResultToFile(TAG "Failed to invoke ThMouseX.DotNet.Handlers.Initialize", result);
+            return;
+        }
+    }
+
+    using mono_get_root_domain = PVOID(*)();
+    using mono_thread_attach = PVOID(*)(PVOID domain);
+    using mono_domain_assembly_open = PVOID(*)(PVOID domain, PCSTR name);
+    using mono_assembly_get_image = PVOID(*)(PVOID assembly);
+    using mono_class_from_name = PVOID(*)(PVOID image, PCSTR name_space, PCSTR name);
+    using mono_class_get_method_from_name = PVOID(*)(PVOID klass, PCSTR name, int param_count);
+    using mono_string_new = PVOID(*)(PVOID domain, PCSTR text);
+    using mono_runtime_invoke = PVOID(*)(PVOID method, PVOID obj, PVOID* params, PVOID* exc);
+    using mono_object_to_string = PVOID(*)(PVOID obj, PVOID* exc);
+    using mono_string_to_utf8 = PSTR(*)(PVOID s);
+    using mono_free = void(*)(PVOID ptr);
+
+    static PCWSTR possibleMonoModuleNames[] = {
+        L"mono.dll",
+        L"mono-2.0-bdwgc.dll",
+        L"mono-2.0-sgen.dll",
+    };
+
+    static void UnityMono(const wstring& bootstrapDllPath) {
+#pragma region Preparation
+        HMODULE mono;
+        for (auto monoModuleName : possibleMonoModuleNames) {
+            mono = GetModuleHandleW(monoModuleName);
+            if (mono)
+                break;
+        }
+        if (!mono) {
+            log::LastErrorToFile(TAG "Failed to load the mono runtime");
+            return;
+        }
+
+        TryImportAPI(mono, mono_get_root_domain, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_thread_attach, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_domain_assembly_open, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_assembly_get_image, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_class_from_name, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_class_get_method_from_name, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_string_new, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_runtime_invoke, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_object_to_string, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_string_to_utf8, log::LastErrorToFile, TAG);
+        TryImportAPI(mono, mono_free, log::LastErrorToFile, TAG);
+
+        auto rootDomain = _mono_get_root_domain();
+        if (!rootDomain) {
+            note::ToFile(TAG "Failed to get root domain of mono instance.");
+            return;
+        }
+        auto monoThread = _mono_thread_attach(rootDomain);
+        if (!monoThread) {
+            note::ToFile(TAG "Failed to register the current thread to mono instance.");
+            return;
+        }
+        auto assembly = _mono_domain_assembly_open(rootDomain, encoding::ConvertToUtf8(bootstrapDllPath).c_str());
+        if (!assembly) {
+            note::ToFile(TAG "Failed to load ThMouseX.DotNet.dll into mono instance.");
+            return;
+        }
+        auto image = _mono_assembly_get_image(assembly);
+        if (!image) {
+            note::ToFile(TAG "Failed to obtain image of the assembly ThMouseX.DotNet.dll.");
+            return;
+        }
+        auto klass = _mono_class_from_name(image, "ThMouseX.DotNet", "Handlers");
+        if (!klass) {
+            note::ToFile(TAG "Failed to get the class ThMouseX.DotNet.Handlers.");
+            return;
+        }
+        auto method = _mono_class_get_method_from_name(klass, "Initialize", 1);
+        if (!method) {
+            note::ToFile(TAG "Failed to get the method ThMouseX.DotNet.Handlers.Initialize.");
+            return;
+        }
+#pragma endregion
+        PVOID mono_exception{};
+        PVOID args[]{ _mono_string_new(rootDomain, "") };
+        _mono_runtime_invoke(method, nil, args, &mono_exception);
+        if (mono_exception) {
+            auto mono_err_string = _mono_object_to_string(mono_exception, nil);
+            auto err_str = _mono_string_to_utf8(mono_err_string);
+            note::ToFile(TAG "Failed to invoke ThMouseX.DotNet.Handlers.Initialize: %s", err_str);
+            _mono_free(err_str);
             return;
         }
     }

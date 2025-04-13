@@ -129,8 +129,10 @@ namespace common::errormsg::ddraw {
     };
     const span<const ErrorMessage> messages = span{ _messages, ARRAYSIZE(_messages) };
     void EnsureCorrectness() {
+#if _DEBUG
         for (size_t i = 1; i < ARRAYSIZE(_messages); i++) {
             assert(_messages[i - 1].code <= _messages[i].code);
         }
+#endif
     }
 }

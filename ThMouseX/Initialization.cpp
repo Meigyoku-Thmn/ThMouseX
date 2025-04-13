@@ -18,7 +18,6 @@
 #include "../Common/Lua.h"
 #include "../Common/NeoLua.h"
 #include "../Common/ErrorMsg.h"
-#include "Shellcode.h"
 #include "KeyboardState.h"
 #include "SendKey.h"
 #include "MessageQueue.h"
@@ -26,7 +25,7 @@
 #include "Direct3D8.h"
 #include "Direct3D9.h"
 #include "Direct3D11.h"
-#include "ComClient.h"
+#include "Intercom.h"
 
 namespace minhook = common::minhook;
 namespace callbackstore = common::callbackstore;
@@ -36,22 +35,25 @@ namespace neolua = common::neolua;
 namespace lua = common::lua;
 namespace messagequeue = core::messagequeue;
 namespace sendkey = core::sendkey;
+#ifndef _WIN64
 namespace directx8 = core::directx8;
+#endif
 namespace directx9 = core::directx9;
 namespace directx11 = core::directx11;
 namespace directinput = core::directinput;
 namespace keyboardstate = core::keyboardstate;
+namespace intercom = core::intercom;
 namespace note = common::log;
 namespace helper = common::helper;
 namespace encoding = common::helper::encoding;
 namespace memory = common::helper::memory;
-namespace comclient = core::comclient;
-namespace shellcode = core::shellcode;
 namespace errormsg = common::errormsg;
+
+using namespace std;
 
 namespace core {
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags);
-    decltype(&_LoadLibraryExW) OriLoadLibraryExW;
+    static decltype(&_LoadLibraryExW) OriLoadLibraryExW;
 
     void Initialize() {
         setlocale(LC_ALL, ".UTF8");
@@ -71,20 +73,13 @@ namespace core {
         PathStripPathW(g_currentProcessName);
         PathRemoveExtensionW(g_currentProcessName);
 
-        if (helper::IsCurrentProcessThMouseX()) {
-            errormsg::EnsureCorrectness();
-            shellcode::Initialize();
+        if (helper::IsCurrentProcessThMouseX())
             return;
-        }
 
-        if (!comclient::Initialize())
+        if (!intercom::QueryGameConfig(g_currentProcessName, g_commonConfig, g_gameConfig))
             return;
-        
-        if (!comclient::GetGameConfig(g_currentProcessName, g_gameConfig, g_commonConfig))
-            return;
-        g_gameConfig.Initialize();
-        g_commonConfig.Initialize();
 
+        errormsg::Initialize();
         minhook::Initialize();
         luaapi::Initialize();
         lua::Initialize();
@@ -93,22 +88,24 @@ namespace core {
 
         directx11::Initialize();
         directx9::Initialize();
+#ifndef _WIN64
         directx8::Initialize();
+#endif
 
         directinput::Initialize();
         sendkey::Initialize();
         keyboardstate::Initialize();
         messagequeue::Initialize();
 
-        minhook::CreateApiHook(std::vector<minhook::HookApiConfig> {
-            { L"KERNELBASE.dll", "LoadLibraryExW", &_LoadLibraryExW, &OriLoadLibraryExW, APP_NAME "_LoadLibraryExW" },
+        minhook::CreateApiHook(vector<minhook::HookApiConfig> {
+            { L"KERNELBASE.dll", "LoadLibraryExW", & _LoadLibraryExW, & OriLoadLibraryExW, APP_NAME "_LoadLibraryExW" },
         });
 
         minhook::EnableAll();
         g_hookApplied = true;
     }
 
-    thread_local UINT loadLibraryReentrantCount = 0;
+    static thread_local UINT loadLibraryReentrantCount = 0;
     HMODULE WINAPI _LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlags) {
         auto allowInitialization = loadLibraryReentrantCount == 0;
         loadLibraryReentrantCount++;
@@ -117,7 +114,9 @@ namespace core {
         if (allowInitialization) {
             directx11::Initialize();
             directx9::Initialize();
+#ifndef _WIN64
             directx8::Initialize();
+#endif
             directinput::Initialize();
             minhook::EnableAll();
         }

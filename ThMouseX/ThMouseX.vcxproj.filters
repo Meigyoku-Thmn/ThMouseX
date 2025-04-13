@@ -41,9 +41,6 @@
     <ClCompile Include="MessageQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CompilerConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Configuration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -86,10 +83,11 @@
     <ClCompile Include="SendKey.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="ComClient.cpp">
+    <ClCompile Include="Shellcode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Shellcode.cpp">
+    <ClCompile Include="CompilerConfig.cpp" />
+    <ClCompile Include="Intercom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -142,10 +140,10 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ComClient.h">
+    <ClInclude Include="Shellcode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shellcode.h">
+    <ClInclude Include="Intercom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -167,6 +165,9 @@
     <CopyFileToFolders Include="ConfigScripts/thWWW.lua">
       <Filter>ConfigScripts</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="ConfigScripts\THasl.lua">
+      <Filter>ConfigScripts</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="AdditiveToneShader.hlsl">
@@ -181,8 +182,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ThMouseX.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PostBuildScript.bat" />
   </ItemGroup>
 </Project>

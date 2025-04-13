@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <cmath>
+#include <cstdint>
 
 #include "../Common/Variables.h"
 #include "../Common/Helper.h"
@@ -10,22 +11,23 @@ template <typename TPointer>
 void CalculatePosition(TPointer position, POINT& output) {
     RECTSIZE clientSize{};
     GetClientRect(g_hFocusWindow, &clientSize);
-    auto realWidth = float(clientSize.height()) * g_gameConfig.AspectRatio.X / g_gameConfig.AspectRatio.Y;
-    auto paddingX = (float(clientSize.width()) - realWidth) / 2;
-    g_playerPosRaw = { double(position->X), double(position->Y) };
-    output.x = lrint(float(position->X) / g_pixelRate + g_pixelOffset.X + paddingX);
-    output.y = lrint(float(position->Y) / g_pixelRate + g_pixelOffset.Y);
+    auto realWidth = scast<float>(clientSize.height()) * g_gameConfig.AspectRatio.X / g_gameConfig.AspectRatio.Y;
+    auto paddingX = (scast<float>(clientSize.width()) - realWidth) / 2;
+    g_playerPosRaw = { scast<double>(position->X), scast<double>(position->Y) };
+    output.x = lrint(scast<float>(position->X) / g_pixelRate + g_pixelOffset.X + paddingX);
+    output.y = lrint(scast<float>(position->Y) / g_pixelRate + g_pixelOffset.Y);
 }
 
-static void CalculatePlayerPos(DWORD address) {
-    if (g_gameConfig.PosDataType == PointDataType_Int)
-        CalculatePosition((IntPoint*)address, g_playerPos);
-    else if (g_gameConfig.PosDataType == PointDataType_Float)
-        CalculatePosition((FloatPoint*)address, g_playerPos);
-    else if (g_gameConfig.PosDataType == PointDataType_Short)
-        CalculatePosition((ShortPoint*)address, g_playerPos);
-    else if (g_gameConfig.PosDataType == PointDataType_Double)
-        CalculatePosition((DoublePoint*)address, g_playerPos);
+static void CalculatePlayerPos(uintptr_t address) {
+    using enum PointDataType;
+    if (g_gameConfig.PosDataType == Int)
+        CalculatePosition(bcast<IntPoint*>(address), g_playerPos);
+    else if (g_gameConfig.PosDataType == Float)
+        CalculatePosition(bcast<FloatPoint*>(address), g_playerPos);
+    else if (g_gameConfig.PosDataType == Short)
+        CalculatePosition(bcast<ShortPoint*>(address), g_playerPos);
+    else if (g_gameConfig.PosDataType == Double)
+        CalculatePosition(bcast<DoublePoint*>(address), g_playerPos);
 }
 
 namespace helper = common::helper;
@@ -60,7 +62,7 @@ namespace core::inputdetermine {
         g_gameInput = NONE;
         g_playerPos = {};
         g_playerPosRaw = {};
-        DWORD address{};
+        uintptr_t address{};
 
         if (!g_inputEnabled)
             return NONE;
@@ -94,7 +96,7 @@ namespace core::inputdetermine {
                         g_gameInput |= MOVE_RIGHT;
                     else if (g_playerPos.x > mousePos.x)
                         g_gameInput |= MOVE_LEFT;
-                    auto error = (double)yDist / xDist;
+                    auto error = scast<double>(yDist) / xDist;
                     y_error_WHATEVER += error;
                 }
                 else {
@@ -102,7 +104,7 @@ namespace core::inputdetermine {
                         g_gameInput |= MOVE_DOWN;
                     else if (g_playerPos.y > mousePos.y)
                         g_gameInput |= MOVE_UP;
-                    auto error = (double)xDist / yDist;
+                    auto error = scast<double>(xDist) / yDist;
                     x_error_WHATEVER += error;
                 }
                 if (y_error_WHATEVER > 1) {
@@ -126,14 +128,15 @@ namespace core::inputdetermine {
             prev_yPSpeed = yPSpeed;
         }
         else if (g_movementAlgorithm == MovementAlgorithm::Simple) {
+            using enum GameInput;
             if (g_playerPos.x < mousePos.x - 1)
-                g_gameInput |= GameInput::MOVE_RIGHT;
+                g_gameInput |= MOVE_RIGHT;
             else if (g_playerPos.x > mousePos.x + 1)
-                g_gameInput |= GameInput::MOVE_LEFT;
+                g_gameInput |= MOVE_LEFT;
             if (g_playerPos.y < mousePos.y - 1)
-                g_gameInput |= GameInput::MOVE_DOWN;
+                g_gameInput |= MOVE_DOWN;
             else if (g_playerPos.y > mousePos.y + 1)
-                g_gameInput |= GameInput::MOVE_UP;
+                g_gameInput |= MOVE_UP;
         }
 
         return g_gameInput;
