@@ -31,7 +31,6 @@
     <ItemGroup>
         <None Remove=".gitignore" />
         <Content Include="ThMouseX.ico" />
-        <ProjectReference Include="..\ThMouseX.DotNet\ThMouseX.DotNet.csproj" />
     </ItemGroup>
 
     <Import Project="$(SolutionDir)Common.targets" />

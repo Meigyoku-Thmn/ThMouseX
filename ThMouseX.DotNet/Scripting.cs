@@ -5,10 +5,16 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.System.Console;
 
 namespace ThMouseX.DotNet;
 
-static class Scripting
+using static STD_HANDLE;
+using static System.Net.Mime.MediaTypeNames;
+
+unsafe static class Scripting
 {
     static readonly List<Delegate> DelegateStore = [];
     static readonly FieldInfo DelegateStoreField = AccessTools.Field(typeof(Scripting), nameof(DelegateStore));
@@ -75,7 +81,7 @@ static class Scripting
         {
             try
             {
-                HarmonyInst.UnpatchAll(HarmonyId);
+                HarmonyInst.UnpatchSelf();
                 PrefixStore.Clear();
                 PostfixStore.Clear();
                 DelegateStore.Clear();
@@ -99,13 +105,76 @@ static class Scripting
 
     public static void Lua_OpenConsole() => LuaApi.OpenConsole?.Invoke();
 
+    public static void Log(object[] texts)
+    {
+        for (var i = 0; i < texts.Length; i++)
+        {
+            if (i + 1 == texts.Length)
+                Logging.ToFile(texts[i]?.ToString() ?? "");
+            else
+                Logging.ToFile((texts[i]?.ToString() ?? "") + "    ");
+        }
+    }
+
+    static HANDLE ConsoleHandle = HANDLE.Null;
+    public static void Print(object[] texts)
+    {
+        Lua_OpenConsole();
+        if (ConsoleHandle.IsNull) 
+            ConsoleHandle = PInvoke.GetStdHandle(STD_OUTPUT_HANDLE);
+        for (var i = 0; i < texts.Length; i++)
+        {
+            var text = i + 1 == texts.Length
+                ? texts[i]?.ToString() ?? ""
+                : (texts[i]?.ToString() ?? "") + "    ";
+            PInvoke.WriteConsole(ConsoleHandle, text, (uint)text.Length, null);
+        }
+        PInvoke.WriteConsole(ConsoleHandle, "\n", 1, null);
+    }
+
     const string PreparationScript = @"
         const _Traverse typeof HarmonyLib.Traverse
         Traverse = _Traverse
-        const Scripting typpeof ThMouseX.DotNet.Scripting
+        const Scripting typeof ThMouseX.DotNet.Scripting
         Position = Scripting.Pos
         OpenConsole = Scripting.Lua_OpenConsole
+        Log = Scripting.Log
+        log = Scripting.Log
+        print = Scripting.Print
+        Print = Scripting.Print
     ";
+
+    private static readonly MethodInfo LuaStackTraceChunk_Ctor_PostFix_Method =
+        AccessTools.Method(typeof(Scripting), nameof(LuaStackTraceChunk_Ctor_PostFix));
+    static void LuaStackTraceChunk_Ctor_PostFix(ref object ___debugInfos)
+    {
+        Logging.ToFile("LuaStackTraceChunk_Ctor_PostFix");
+        if (___debugInfos == null)
+        {
+            var elemType = typeof(Lua).Assembly.GetType($"{typeof(LuaStackTraceDebugger).FullName}+LuaDebugInfo");
+            var listType = typeof(List<>).MakeGenericType(elemType);
+            ___debugInfos = Activator.CreateInstance(listType);
+        }
+    }
+
+    private static readonly MethodInfo DefineDynamicModule_Prefix_Method =
+        AccessTools.Method(typeof(Scripting), nameof(DefineDynamicModule_Prefix));
+    static void DefineDynamicModule_Prefix(ref bool emitSymbolInfo)
+    {
+        Logging.ToFile("DefineDynamicModule_Prefix");
+        var runtime = Environment.GetEnvironmentVariable("ThMouseX_Runtime");
+        if (runtime == "Unity Mono")
+            emitSymbolInfo = false;
+    }
+
+    static void PatchNeoLua()
+    {
+        var LuaStackTraceChunk_Type = typeof(Lua).Assembly.GetType($"{typeof(LuaStackTraceDebugger).FullName}+LuaStackTraceChunk");
+        var LuaStackTraceChunk_Ctor = AccessTools.Constructor(LuaStackTraceChunk_Type, [typeof(Lua), typeof(string)]);
+        HarmonyInst.Patch(LuaStackTraceChunk_Ctor, postfix: LuaStackTraceChunk_Ctor_PostFix_Method);
+        var DefineDynamicModule_Method = AccessTools.Method(typeof(AssemblyBuilder), nameof(AssemblyBuilder.DefineDynamicModule), [typeof(string), typeof(bool)]);
+        HarmonyInst.Patch(DefineDynamicModule_Method, prefix: DefineDynamicModule_Prefix_Method);
+    }
 
     static public void Initialize(string scriptPath)
     {
@@ -114,6 +183,8 @@ static class Scripting
             if (Pos == null)
                 return;
             LuaApi.SetPositionAddress(PosHandle.AddrOfPinnedObject());
+
+            PatchNeoLua();
 
             L = new Lua();
             var g = L.CreateEnvironment();
@@ -170,7 +241,7 @@ static class Scripting
         }
         catch (LuaRuntimeException e)
         {
-            Logging.ToFile("[NeoLua] {0}", LuaExceptionData.GetData(e).FormatStackTrace(0, false));
+            Logging.ToFile("[NeoLua] {0}", LuaExceptionData.GetData(e).FormatStackTrace(0, true));
             Logging.ToFile("[NeoLua] {0}", e);
             Uninitialize();
         }

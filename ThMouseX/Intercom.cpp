@@ -35,7 +35,7 @@ namespace core::intercom {
         using enum ScriptType;
         auto serverHwnd = FindWindowExW(HWND_MESSAGE, nil, nil, ServerWindowName);
         if (serverHwnd == nil) {
-            note::ToFile(TAG "Cannot find the server window.");
+            note::LastErrorToFile(TAG "Cannot find the server window");
             return false;
         }
 

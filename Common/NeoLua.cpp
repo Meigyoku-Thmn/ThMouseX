@@ -52,6 +52,10 @@ namespace common::neolua {
             note::ToFile(TAG "Cannot set ThMouseX_ScriptPath env.");
             return;
         }
+        if (_putenv(format("ThMouseX_Runtime={}", runtime).c_str()) != 0) {
+            note::ToFile(TAG "Cannot set ThMouseX_Runtime env.");
+            return;
+        }
         if (runtime == ".NET Framework")
             DotNetFramework(bootstrapDllPath);
         else if (runtime == "Unity Mono")
@@ -136,7 +140,7 @@ namespace common::neolua {
     using mono_string_to_utf8 = PSTR(*)(PVOID s);
     using mono_free = void(*)(PVOID ptr);
 
-    static PCWSTR possibleMonoModuleNames[] = { 
+    static PCWSTR possibleMonoModuleNames[] = {
         L"mono.dll",
         L"mono-2.0-bdwgc.dll",
         L"mono-2.0-sgen.dll",
