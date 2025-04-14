@@ -47,10 +47,11 @@ static class Program
             if (!ReadGamesFile() || !ReadGeneralConfigFile())
                 return 1;
 
+            var applicationContext = new ThMouseApplicationContext();
+
             if (!InstallHooks())
                 return 1;
 
-            var applicationContext = new ThMouseApplicationContext();
             Application.Run(applicationContext);
             restartFlag = applicationContext.RestartFlag;
             RemoveHooks();
