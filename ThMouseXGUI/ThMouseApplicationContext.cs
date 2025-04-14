@@ -10,7 +10,6 @@ class ThMouseApplicationContext : ApplicationContext
 
     public ThMouseApplicationContext()
     {
-        serverForm.CreateWindow();
         notifyIcon.Visible = true;
         notifyIcon.Icon = AboutForm.AppIcon;
         notifyIcon.DoubleClick += ShowDialog;
@@ -22,6 +21,7 @@ class ThMouseApplicationContext : ApplicationContext
             new MenuItem("Exit", Exit),
         ]);
         notifyIcon.ShowBalloonTip(2000, Program.AppName, $"{Program.AppName} is activated.", ToolTipIcon.Info);
+        serverForm.CreateWindow();
     }
 
     AboutForm aboutForm;
