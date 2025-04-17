@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using Microsoft.VisualBasic;
 using Neo.IronLua;
 using System.Diagnostics;
 using System.Reflection;
@@ -132,16 +133,35 @@ unsafe static class Scripting
         PInvoke.WriteConsole(ConsoleHandle, "\n", 1, null);
     }
 
+    static readonly byte[] KeyboardState = new byte[256];
+    public static byte[] GetKeyboardState()
+    {
+        fixed (byte* input = KeyboardState)
+        {
+            PInvoke.GetKeyboardState(input);
+        }
+        return KeyboardState;
+    }
+
+    public static float GetNumberInput()
+    {
+        var input = Interaction.InputBox("Float number");
+        if (float.TryParse(input, out var result))
+            return result;
+        return 0;
+    }
+
     const string PreparationScript = @"
         const _Traverse typeof HarmonyLib.Traverse
         Traverse = _Traverse
         const Scripting typeof ThMouseX.DotNet.Scripting
         Position = Scripting.Pos
         OpenConsole = Scripting.Lua_OpenConsole
-        Log = Scripting.Log
         log = Scripting.Log
         print = Scripting.Print
-        Print = Scripting.Print
+
+        GetKeyboardState = Scripting.GetKeyboardState
+        GetNumberInput = Scripting.GetNumberInput
     ";
 
     private static readonly MethodInfo LuaStackTraceChunk_Ctor_PostFix_Method =
