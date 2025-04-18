@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using Microsoft.VisualBasic;
 using Neo.IronLua;
 using System.Diagnostics;
 using System.Reflection;
@@ -13,7 +12,6 @@ using Windows.Win32.System.Console;
 namespace ThMouseX.DotNet;
 
 using static STD_HANDLE;
-using static System.Net.Mime.MediaTypeNames;
 
 unsafe static class Scripting
 {
@@ -133,22 +131,10 @@ unsafe static class Scripting
         PInvoke.WriteConsole(ConsoleHandle, "\n", 1, null);
     }
 
-    static readonly byte[] KeyboardState = new byte[256];
-    public static byte[] GetKeyboardState()
+    public static bool IsKeyDown(int vKey)
     {
-        fixed (byte* input = KeyboardState)
-        {
-            PInvoke.GetKeyboardState(input);
-        }
-        return KeyboardState;
-    }
-
-    public static float GetNumberInput()
-    {
-        var input = Interaction.InputBox("Float number");
-        if (float.TryParse(input, out var result))
-            return result;
-        return 0;
+        var state = PInvoke.GetAsyncKeyState(vKey);
+        return (state & 0x8000) != 0;
     }
 
     const string PreparationScript = @"
@@ -160,8 +146,7 @@ unsafe static class Scripting
         log = Scripting.Log
         print = Scripting.Print
 
-        GetKeyboardState = Scripting.GetKeyboardState
-        GetNumberInput = Scripting.GetNumberInput
+        IsKeyDown = Scripting.IsKeyDown
     ";
 
     private static readonly MethodInfo LuaStackTraceChunk_Ctor_PostFix_Method =

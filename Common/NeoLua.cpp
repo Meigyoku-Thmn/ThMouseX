@@ -44,16 +44,16 @@ namespace common::neolua {
         auto scriptPath = encoding::ConvertToUtf8(wScriptPath);
         auto runtime = luaapi::ReadAttributeFromLuaScript(scriptPath, "Runtime");
 
-        if (_putenv(format("ThMouseX_ModuleHandle={}", (uintptr_t)g_coreModule).c_str()) != 0) {
-            note::ToFile(TAG "Cannot set ThMouseX_ModuleHandle env.");
+        if (_putenv_s("ThMouseX_ModuleHandle", to_string(bcast<uintptr_t>(g_coreModule)).c_str()) != 0) {
+            note::ToFile(TAG "Cannot set ThMouseX_ModuleHandle env: %s.", strerror(errno));
             return;
         }
-        if (_wputenv(format(L"ThMouseX_ScriptPath={}", wScriptPath).c_str()) != 0) {
-            note::ToFile(TAG "Cannot set ThMouseX_ScriptPath env.");
+        if (_wputenv_s(L"ThMouseX_ScriptPath", wScriptPath.c_str()) != 0) {
+            note::ToFile(TAG "Cannot set ThMouseX_ScriptPath env: %s.", strerror(errno));
             return;
         }
-        if (_putenv(format("ThMouseX_Runtime={}", runtime).c_str()) != 0) {
-            note::ToFile(TAG "Cannot set ThMouseX_Runtime env.");
+        if (_putenv_s("ThMouseX_Runtime", runtime.c_str()) != 0) {
+            note::ToFile(TAG "Cannot set ThMouseX_Runtime env: %s.", strerror(errno));
             return;
         }
         if (runtime == ".NET Framework")

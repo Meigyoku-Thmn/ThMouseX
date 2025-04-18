@@ -117,9 +117,9 @@ tuple<VkCodes, bool> ReadVkCodes();
 
 namespace core::configuration {
     bool MarkThMouseXProcess() {
-        auto rs = _putenv(APP_NAME "=" APP_NAME);
+        auto rs = _putenv_s(APP_NAME, APP_NAME);
         if (rs != 0)
-            note::ToFile("[Configuration] MarkThMouseXProcess failed.");
+            note::ToFile("[Configuration] MarkThMouseXProcess failed: %s.", strerror(rs));
         return true;
     }
 

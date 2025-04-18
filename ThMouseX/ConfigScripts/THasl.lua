@@ -10,19 +10,20 @@ local function CharacterUpdate(__instance: object): void
     local position = __instance.transform.position
     Position.X = position.x
     Position.Y = position.y
-
+    
     position.z = 99999
-    local keyboardState = GetKeyboardState()
-    if keyboardState[VK_T] then
-        position.x = GetNumberInput();
-    end
-    if keyboardState[VK_Y] then
-        position.y = GetNumberInput();
-    end
 
     count = count + 1
     if count == 60 then
-        count = 0
+        count = 0        
+        if IsKeyDown(VK_T) == true then
+            -- position.x = GetNumberInput();
+            print('VK_T')
+        end
+        if IsKeyDown(VK_Y) == true then
+            -- position.y = GetNumberInput();
+            print('VK_Y')
+        end
         print("X = " .. position.x, "Y = " .. position.y)
     end
 end

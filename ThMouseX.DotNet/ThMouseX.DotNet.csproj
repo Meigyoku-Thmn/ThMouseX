@@ -25,9 +25,5 @@
         </PackageReference>
     </ItemGroup>
     
-	<ItemGroup>
-	  <Reference Include="Microsoft.VisualBasic" />
-	</ItemGroup>
-    
   	<Import Project="$(SolutionDir)Common.targets" />
 </Project>
