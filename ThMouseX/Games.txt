@@ -100,11 +100,11 @@ THMHJ           NeoLua              float      (-0.5,-1.5)    480          4:3  
 ; Wonderful Waking World
 thWWW           LuaJIT              float      (155.5,20.5)   540          16:9          SendMessage
 
-; Chaos of Black Loong (offsetting is done in Lua script)
+; Chaos of Black Loong
 DFLYT           Lua                 double     (0,0)          480          4:3           SendInput
 
 ; Abyss Soul Lotus
-THasl           NeoLua              double     (0,0)          480          4:3           GetKeyboardState
+THasl           NeoLua              float      (0,0)          -1           16:9          SendInput
 
 ; Len'en 1
 Le01            [00AE693C][0]       float      (32,16)        480          4:3           GetKeyboardState

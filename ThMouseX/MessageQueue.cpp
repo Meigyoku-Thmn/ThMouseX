@@ -173,19 +173,6 @@ namespace core::messagequeue {
             msg == WM_MOUSEWHEEL || msg == WM_MOUSEHWHEEL;
     }
 
-    static auto initialized = false;
-    static void TriggerInitialization(bool calledFromSetCursor, HWND currentHwnd) {
-        if (initialized)
-            return;
-        if (calledFromSetCursor) {
-            auto foregroundHwnd = GetForegroundWindow();
-            if (foregroundHwnd != currentHwnd)
-                return;
-        }
-        initialized = true;
-        core::Initialize();
-    }
-
     static LRESULT CALLBACK GetMsgProcW(int code, WPARAM wParam, LPARAM lParam) {
         auto e = bcast<PMSG>(lParam);
         if (code == HC_ACTION && g_hookApplied && g_hFocusWindow && e->hwnd == g_hFocusWindow) {
@@ -234,11 +221,14 @@ namespace core::messagequeue {
         return CallNextHookEx(nil, code, wParam, lParam);
     }
 
+    static auto initialized = false;
     static LRESULT CALLBACK CallWndRetProcW(int code, WPARAM wParam, LPARAM lParam) {
-        auto e = bcast<PCWPRETSTRUCT>(lParam);
-        if (code == HC_ACTION && e->message == WM_SETCURSOR)
-            TriggerInitialization(true, e->hwnd);
+        if (!initialized) {
+            initialized = true;
+            core::Initialize();
+        }
         if (code == HC_ACTION && g_hookApplied) {
+            auto e = bcast<PCWPRETSTRUCT>(lParam);
             if (!cursorNormalized) {
                 cursorNormalized = true;
                 NormalizeCursor();
@@ -271,12 +261,6 @@ namespace core::messagequeue {
         return CallNextHookEx(nil, code, wParam, lParam);
     }
 
-    static LRESULT CALLBACK CBTProcW(int code, WPARAM wParam, LPARAM lParam) {
-        if (code == HCBT_ACTIVATE)
-            TriggerInitialization(false, nil);
-        return CallNextHookEx(nil, code, wParam, lParam);
-    }
-
     static bool CheckHookProcHandle(HHOOK handle) {
         if (handle != nil)
             return true;
@@ -286,7 +270,6 @@ namespace core::messagequeue {
 
     HHOOK GetMsgProcHandle;
     HHOOK CallWndRetProcHandle;
-    HHOOK CBTProcHandle;
 
     bool InstallHooks() {
         GetMsgProcHandle = SetWindowsHookExW(WH_GETMESSAGE, GetMsgProcW, g_coreModule, NULL);
@@ -295,9 +278,6 @@ namespace core::messagequeue {
         CallWndRetProcHandle = SetWindowsHookExW(WH_CALLWNDPROCRET, CallWndRetProcW, g_coreModule, NULL);
         if (!CheckHookProcHandle(CallWndRetProcHandle))
             return false;
-        CBTProcHandle = SetWindowsHookExW(WH_CBT, CBTProcW, g_coreModule, NULL);
-        if (!CheckHookProcHandle(CBTProcHandle))
-            return false;
         return true;
     }
 
@@ -305,7 +285,6 @@ namespace core::messagequeue {
         // unregister hooks.
         UnhookWindowsHookEx(GetMsgProcHandle);
         UnhookWindowsHookEx(CallWndRetProcHandle);
-        UnhookWindowsHookEx(CBTProcHandle);
         // force all top-level windows to process a message, therefore force all processes to unload the DLL.
         DWORD_PTR __;
         SendMessageTimeoutW(HWND_BROADCAST, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_NOTIMEOUTIFNOTHUNG, 1000, &__);

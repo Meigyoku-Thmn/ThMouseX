@@ -1,12 +1,21 @@
 -- Runtime = Unity Mono
 -- Script to get player's position in Abyss Soul Lotus
-local function CharacterUpdate(___transform: object): void
-    local position = ___transform.localPosition
+const Camera typeof UnityEngine.Camera
+
+local camera = nil
+local currentInstance = nil
+
+local function CharacterUpdate(__instance: object): void
+    if currentInstance ~= __instance then
+        currentInstance = __instance
+        camera = Camera.main
+    end
+    local position = camera:WorldToScreenPoint(__instance.transform.position)
     Position.X = position.x
-    Position.Y = position.y
+    Position.Y = camera.pixelHeight - position.y - 1
 end
 
 return {
-    --          Target method,           prehook,   posthook
-    {'Shooting.BaseCharacter:FixedUpdate', nil, CharacterUpdate},
+    --     Target method,      prehook,   posthook
+    {'Centeryidong:FixedUpdate', nil, CharacterUpdate},
 }

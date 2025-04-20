@@ -12,7 +12,6 @@ using Windows.Win32.System.Console;
 namespace ThMouseX.DotNet;
 
 using static STD_HANDLE;
-using static System.Net.Mime.MediaTypeNames;
 
 unsafe static class Scripting
 {
@@ -120,8 +119,10 @@ unsafe static class Scripting
     public static void Print(object[] texts)
     {
         Lua_OpenConsole();
-        if (ConsoleHandle.IsNull) 
+        if (ConsoleHandle.IsNull)
+        {
             ConsoleHandle = PInvoke.GetStdHandle(STD_OUTPUT_HANDLE);
+        }
         for (var i = 0; i < texts.Length; i++)
         {
             var text = i + 1 == texts.Length
@@ -132,23 +133,21 @@ unsafe static class Scripting
         PInvoke.WriteConsole(ConsoleHandle, "\n", 1, null);
     }
 
-    const string PreparationScript = @"
+    const string PreparationScript = """
         const _Traverse typeof HarmonyLib.Traverse
-        Traverse = _Traverse
         const Scripting typeof ThMouseX.DotNet.Scripting
+
+        Traverse = _Traverse
         Position = Scripting.Pos
         OpenConsole = Scripting.Lua_OpenConsole
-        Log = Scripting.Log
         log = Scripting.Log
         print = Scripting.Print
-        Print = Scripting.Print
-    ";
+    """;
 
     private static readonly MethodInfo LuaStackTraceChunk_Ctor_PostFix_Method =
         AccessTools.Method(typeof(Scripting), nameof(LuaStackTraceChunk_Ctor_PostFix));
     static void LuaStackTraceChunk_Ctor_PostFix(ref object ___debugInfos)
     {
-        Logging.ToFile("LuaStackTraceChunk_Ctor_PostFix");
         if (___debugInfos == null)
         {
             var elemType = typeof(Lua).Assembly.GetType($"{typeof(LuaStackTraceDebugger).FullName}+LuaDebugInfo");
@@ -161,7 +160,6 @@ unsafe static class Scripting
         AccessTools.Method(typeof(Scripting), nameof(DefineDynamicModule_Prefix));
     static void DefineDynamicModule_Prefix(ref bool emitSymbolInfo)
     {
-        Logging.ToFile("DefineDynamicModule_Prefix");
         var runtime = Environment.GetEnvironmentVariable("ThMouseX_Runtime");
         if (runtime == "Unity Mono")
             emitSymbolInfo = false;

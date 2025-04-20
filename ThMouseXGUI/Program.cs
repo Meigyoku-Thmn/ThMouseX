@@ -32,15 +32,6 @@ static class Program
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
-        var thisAssembly = Assembly.GetExecutingAssembly();
-        var expectedName = thisAssembly.GetName().Name;
-        var actualName = Path.GetFileNameWithoutExtension(thisAssembly.Location);
-        if (expectedName != actualName)
-        {
-            MessageBox.Show($"The file name of this executable file must be '{expectedName}.exe'!", AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return 1;
-        }
-
         if (!MarkThMouseXProcess())
             return 1;
 
@@ -56,10 +47,11 @@ static class Program
             if (!ReadGamesFile() || !ReadGeneralConfigFile())
                 return 1;
 
+            var applicationContext = new ThMouseApplicationContext();
+
             if (!InstallHooks())
                 return 1;
 
-            var applicationContext = new ThMouseApplicationContext();
             Application.Run(applicationContext);
             restartFlag = applicationContext.RestartFlag;
             RemoveHooks();

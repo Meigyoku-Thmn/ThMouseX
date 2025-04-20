@@ -36,7 +36,7 @@ FloatPoint  g_pixelOffset{ 1, 1 };
 bool        g_showImGui;
 
 // should be moved to GameConfig or CommonConfig(?)
-MovementAlgorithm   g_movementAlgorithm;
+MovementAlgorithm   g_movementAlgorithm = MovementAlgorithm::Simple;
 
 // for debugging purpose, not single source of truth
 POINT       g_playerPos;
