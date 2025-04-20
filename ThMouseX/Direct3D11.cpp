@@ -279,7 +279,9 @@ namespace core::directx11 {
             note::LastErrorToFile(TAG "PrepareMeasurement: GetClientRect failed");
             return;
         }
-        g_pixelRate = scast<float>(g_gameConfig.BaseHeight) / scast<float>(clientSize.height());
+
+        if (g_gameConfig.BaseHeight != -1)
+            g_pixelRate = scast<float>(g_gameConfig.BaseHeight) / scast<float>(clientSize.height());
         g_pixelOffset.X = g_gameConfig.BasePixelOffset.X / g_pixelRate;
         g_pixelOffset.Y = g_gameConfig.BasePixelOffset.Y / g_pixelRate;
         imGuiMousePosScaleX = scast<float>(clientSize.width()) / scast<float>(desc.BufferDesc.Width);

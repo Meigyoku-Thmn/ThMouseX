@@ -119,8 +119,10 @@ unsafe static class Scripting
     public static void Print(object[] texts)
     {
         Lua_OpenConsole();
-        if (ConsoleHandle.IsNull) 
+        if (ConsoleHandle.IsNull)
+        {
             ConsoleHandle = PInvoke.GetStdHandle(STD_OUTPUT_HANDLE);
+        }
         for (var i = 0; i < texts.Length; i++)
         {
             var text = i + 1 == texts.Length
@@ -131,23 +133,16 @@ unsafe static class Scripting
         PInvoke.WriteConsole(ConsoleHandle, "\n", 1, null);
     }
 
-    public static bool IsKeyDown(int vKey)
-    {
-        var state = PInvoke.GetAsyncKeyState(vKey);
-        return (state & 0x8000) != 0;
-    }
-
-    const string PreparationScript = @"
+    const string PreparationScript = """
         const _Traverse typeof HarmonyLib.Traverse
-        Traverse = _Traverse
         const Scripting typeof ThMouseX.DotNet.Scripting
+
+        Traverse = _Traverse
         Position = Scripting.Pos
         OpenConsole = Scripting.Lua_OpenConsole
         log = Scripting.Log
         print = Scripting.Print
-
-        IsKeyDown = Scripting.IsKeyDown
-    ";
+    """;
 
     private static readonly MethodInfo LuaStackTraceChunk_Ctor_PostFix_Method =
         AccessTools.Method(typeof(Scripting), nameof(LuaStackTraceChunk_Ctor_PostFix));
