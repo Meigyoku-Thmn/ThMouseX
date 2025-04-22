@@ -250,24 +250,19 @@ unsafe static class Scripting
             if (target == null)
             {
                 Logging.ToFile("[NeoLua] Failed to get method {0}.", targetPath);
-                if (!AppDomain_AssemblyLoad_Registered)
-                {
-                    currentConfigs = configs;
-                    AppDomain.CurrentDomain.AssemblyLoad += AppDomain_AssemblyLoad;
-                    AppDomain_AssemblyLoad_Registered = true;
-                }
+                currentConfigs = configs;
+                AppDomain.CurrentDomain.AssemblyLoad += AppDomain_AssemblyLoad;
                 return;
             }
             configs[i] = (targetPath, target, prefixHook, postfixHook);
         }
-        AppDomain.CurrentDomain.AssemblyLoad -= AppDomain_AssemblyLoad;
         Initialize_Patch(configs);
     }
 
-    static bool AppDomain_AssemblyLoad_Registered = false;
     static Configs currentConfigs;
     static void AppDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
     {
+        AppDomain.CurrentDomain.AssemblyLoad -= AppDomain_AssemblyLoad;
         Initialize_Continue(currentConfigs);
     }
 
