@@ -119,7 +119,7 @@ namespace common::lua {
         if (!TryImportFunc<SYM_NAME(lua_pushinteger)>(_lua_pushinteger, lua, luaDllName)) return;
 
         minhook::CreateHook(vector<minhook::HookConfig>{
-            { _luaL_callmeta, & luaL_callmeta_hook, & ori_luaL_callmeta, APP_NAME "_callmeta" },
+            { _luaL_callmeta, &luaL_callmeta_hook, &ori_luaL_callmeta, APP_NAME "_callmeta" },
             { _lua_call, &lua_call_hook, &ori_lua_call, APP_NAME "_call" },
             { _lua_cpcall, &lua_cpcall_hook, &ori_lua_cpcall, APP_NAME "_cpcall" },
             { _lua_pcall, &lua_pcall_hook, &ori_lua_pcall, APP_NAME "_pcall" },
@@ -130,7 +130,7 @@ namespace common::lua {
         auto rs = ori_luaL_callmeta(L, obj, e);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {
-            { _luaL_callmeta, nil, & ori_luaL_callmeta, APP_NAME "_callmeta" }
+            { _luaL_callmeta, nil, &ori_luaL_callmeta, APP_NAME "_callmeta" }
         });
         return rs;
     }
@@ -138,7 +138,7 @@ namespace common::lua {
         ori_lua_call(L, nargs, nresults);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {
-            { _lua_call, nil, & ori_lua_call, APP_NAME "_call" }
+            { _lua_call, nil, &ori_lua_call, APP_NAME "_call" }
         });
         return;
     }
@@ -146,7 +146,7 @@ namespace common::lua {
         auto rs = ori_lua_cpcall(L, func, ud);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {
-            { _lua_cpcall, nil, & ori_lua_cpcall, APP_NAME "_cpcall" }
+            { _lua_cpcall, nil, &ori_lua_cpcall, APP_NAME "_cpcall" }
         });
         return rs;
     }
@@ -154,7 +154,7 @@ namespace common::lua {
         auto rs = ori_lua_pcall(L, nargs, nresults, errfunc);
         AttachScript(L);
         minhook::DisableHooks(vector<minhook::HookConfig> {
-            { _lua_pcall, nil, & ori_lua_pcall, APP_NAME "_pcall" }
+            { _lua_pcall, nil, &ori_lua_pcall, APP_NAME "_pcall" }
         });
         return rs;
     }
@@ -228,7 +228,7 @@ namespace common::lua {
             _lua_settop(L, stackSize);
             return NULL;
         }
-        
+
         auto result = scast<uintptr_t>(_lua_tointeger(L, -1));
         _lua_settop(L, stackSize);
         return result;

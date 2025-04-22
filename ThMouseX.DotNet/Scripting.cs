@@ -13,6 +13,8 @@ namespace ThMouseX.DotNet;
 
 using static STD_HANDLE;
 
+using Configs = List<(string targetPath, MethodInfo target, Delegate prefixHook, Delegate postfixHook)>;
+
 unsafe static class Scripting
 {
     static readonly List<Delegate> DelegateStore = [];
@@ -80,6 +82,7 @@ unsafe static class Scripting
         {
             try
             {
+                AppDomain.CurrentDomain.AssemblyLoad -= AppDomain_AssemblyLoad;
                 HarmonyInst.UnpatchSelf();
                 PrefixStore.Clear();
                 PostfixStore.Clear();
@@ -197,45 +200,33 @@ unsafe static class Scripting
             if (table == null)
                 return;
 
+            var configs = new Configs(table.Length);
+            var hasConfigErr = false;
             foreach (var (item, i) in table.Select((e, i) => (e, i)))
             {
                 var config = item.Value as LuaTable;
                 if (config == null)
                     continue;
-
                 if (config[1] is not string targetMethodPath)
                 {
                     Logging.ToFile("[NeoLua] Invalid target method path in hook configuration (Index: {0}).", i + 1);
+                    hasConfigErr = true;
                     continue;
                 }
-
                 var prefixHook = config[2] as Delegate;
                 var postfixHook = config[3] as Delegate;
                 if (prefixHook == null && postfixHook == null)
                 {
                     Logging.ToFile("[NeoLua] All hook functions are invalid in hook configuration (Index: {0}).", i + 1);
+                    hasConfigErr = true;
                     continue;
                 }
-
-                var original = AccessTools.Method(targetMethodPath);
-                if (original == null)
-                {
-                    Logging.ToFile("[NeoLua] Failed to get method {0}.", targetMethodPath);
-                    continue;
-                }
-
-                var prefixHookWrapper = MakeLuaFuncionWrapper(prefixHook);
-                if (prefixHookWrapper != null)
-                    PrefixStore.Add(original, prefixHookWrapper);
-                var prefix = prefixHookWrapper != null ? new HarmonyMethod(GetPrefixMethod) : null;
-
-                var postfixHookWrapper = MakeLuaFuncionWrapper(postfixHook);
-                if (postfixHookWrapper != null)
-                    PostfixStore.Add(original, postfixHookWrapper);
-                var postfix = postfixHookWrapper != null ? new HarmonyMethod(GetPostfixMethod) : null;
-
-                HarmonyInst.Patch(original, prefix, postfix);
+                configs.Add((targetMethodPath, null, prefixHook, postfixHook));
             }
+            if (hasConfigErr)
+                return;
+
+            Initialize_Continue(configs);
         }
         catch (LuaRuntimeException e)
         {
@@ -247,6 +238,54 @@ unsafe static class Scripting
         {
             Logging.ToFile("[NeoLua] {0}", e);
             Uninitialize();
+        }
+    }
+
+    static public void Initialize_Continue(Configs configs)
+    {
+        for (var i = 0; i < configs.Count; i++)
+        {
+            var (targetPath, target, prefixHook, postfixHook) = configs[i];
+            target ??= AccessTools.Method(targetPath);
+            if (target == null)
+            {
+                Logging.ToFile("[NeoLua] Failed to get method {0}.", targetPath);
+                if (!AppDomain_AssemblyLoad_Registered)
+                {
+                    currentConfigs = configs;
+                    AppDomain.CurrentDomain.AssemblyLoad += AppDomain_AssemblyLoad;
+                    AppDomain_AssemblyLoad_Registered = true;
+                }
+                return;
+            }
+            configs[i] = (targetPath, target, prefixHook, postfixHook);
+        }
+        AppDomain.CurrentDomain.AssemblyLoad -= AppDomain_AssemblyLoad;
+        Initialize_Patch(configs);
+    }
+
+    static bool AppDomain_AssemblyLoad_Registered = false;
+    static Configs currentConfigs;
+    static void AppDomain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
+    {
+        Initialize_Continue(currentConfigs);
+    }
+
+    static public void Initialize_Patch(Configs configs)
+    {
+        foreach (var (_, target, prefixHook, postfixHook) in configs)
+        {
+            var prefixHookWrapper = MakeLuaFuncionWrapper(prefixHook);
+            if (prefixHookWrapper != null)
+                PrefixStore.Add(target, prefixHookWrapper);
+            var prefix = prefixHookWrapper != null ? new HarmonyMethod(GetPrefixMethod) : null;
+
+            var postfixHookWrapper = MakeLuaFuncionWrapper(postfixHook);
+            if (postfixHookWrapper != null)
+                PostfixStore.Add(target, postfixHookWrapper);
+            var postfix = postfixHookWrapper != null ? new HarmonyMethod(GetPostfixMethod) : null;
+
+            HarmonyInst.Patch(target, prefix, postfix);
         }
     }
 }

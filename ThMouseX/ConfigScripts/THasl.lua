@@ -1,11 +1,10 @@
 -- Runtime = Unity Mono
 -- Script to get player's position in Abyss Soul Lotus
-const Camera typeof UnityEngine.Camera
-
 local camera = nil
 local currentInstance = nil
 
 local function CharacterUpdate(__instance: object): void
+    local Camera = clr.UnityEngine.Camera
     if currentInstance ~= __instance then
         currentInstance = __instance
         camera = Camera.main

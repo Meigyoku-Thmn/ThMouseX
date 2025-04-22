@@ -62,8 +62,8 @@ namespace core::directinput {
     void Initialize() {
         using enum InputMethod;
         HMODULE dinput8{};
-        {
-            const scoped_lock lock(mtx);
+
+        lock(mtx, { {
             if (initialized)
                 return;
             if ((g_gameConfig.InputMethods & DirectInput) == None)
@@ -98,7 +98,7 @@ namespace core::directinput {
             } while (false);
 
             initialized = true;
-        }
+        } });
 
         auto _DirectInput8Create = bcast<decltype(&DirectInput8Create)>(GetProcAddress(dinput8, "DirectInput8Create"));
         if (!_DirectInput8Create) {

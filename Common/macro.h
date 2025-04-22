@@ -1,6 +1,7 @@
 #pragma once
 #include <winerror.h>
 #include <bit>
+#include <mutex>
 
 #define APP_NAME "ThMouseX"
 #define HOOK_ENGINE_STATE_NAME "ThMouseX_MinHook_State"
@@ -34,6 +35,11 @@
 
 #define defer(...) defer_impl(__COUNTER__, __VA_ARGS__)
 #define defer_impl(counter, ...) std::shared_ptr<void> MAKE_UNIQUE_VAR(counter)(nil, [&](...) __VA_ARGS__)
+
+#define lock(locker, ...) { \
+    const std::scoped_lock _lock(locker); \
+    __VA_ARGS__ \
+}0
 
 #define FixedStringMember(type, name, value) type name[ARRAYSIZE(value)] = value
 #define ImportAPI(hModule, API) API _##API = hModule ? bcast<API>(GetProcAddress(hModule, SYM_NAME(API))) : nil

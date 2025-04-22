@@ -126,15 +126,14 @@ namespace core::directx9 {
     static bool initialized = false;
     static mutex mtx;
     void Initialize() {
-        {
-            const scoped_lock lock(mtx);
+        lock(mtx, { {
             if (initialized)
                 return;
             GetModuleHandleExW(0, (g_systemDirPath + wstring(L"\\d3d9.dll")).c_str(), &d3d9);
             if (!d3d9)
                 return;
             initialized = true;
-        }
+        } });
 
         auto _Direct3DCreate9 = bcast<decltype(&Direct3DCreate9)>(GetProcAddress(d3d9, "Direct3DCreate9"));
         if (!_Direct3DCreate9) {

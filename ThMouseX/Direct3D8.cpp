@@ -122,15 +122,14 @@ namespace core::directx8 {
     static bool initialized = false;
     static mutex mtx;
     void Initialize() {
-        {
-            const scoped_lock lock(mtx);
+        lock(mtx, { {
             if (initialized)
                 return;
             GetModuleHandleExW(0, (g_systemDirPath + wstring(L"\\d3d8.dll")).c_str(), &d3d8);
             if (!d3d8)
                 return;
             initialized = true;
-        }
+        } });
 
         auto _Direct3DCreate8 = bcast<decltype(&Direct3DCreate8)>(GetProcAddress(d3d8, "Direct3DCreate8"));
         if (!_Direct3DCreate8) {

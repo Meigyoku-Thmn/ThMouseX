@@ -119,6 +119,7 @@ namespace core {
 #endif
             directinput::Initialize();
             minhook::EnableAll();
+            neolua::Initialize();
         }
         return rs;
     }
