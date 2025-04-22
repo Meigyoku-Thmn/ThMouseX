@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Text;
 
 namespace ThMouseX.DotNet;
@@ -12,9 +13,8 @@ static class Logging
         get {
             if (_file == null)
             {
-                var baseStream = new FileStream(LogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 1);
-                _file = new StreamWriter(baseStream, new UTF8Encoding(false), 1) {
-                    AutoFlush = true,
+                var baseStream = new FileStream(LogPath, FileMode.Append, FileSystemRights.AppendData, FileShare.ReadWrite, 4096, FileOptions.None);
+                _file = new StreamWriter(baseStream, new UTF8Encoding(false)) {
                     NewLine = "\n"
                 };
             }
@@ -25,6 +25,7 @@ static class Logging
     {
         File.Write("[{0} {1:dd/MM/yyyy HH:mm:ss}] ", Process.GetCurrentProcess().ProcessName, DateTime.Now);
         File.WriteLine(format, args);
+        File.Flush();
     }
     public static void Close()
     {
