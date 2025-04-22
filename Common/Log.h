@@ -21,7 +21,7 @@ namespace common::log {
         FILE* file = _wfsopen(path.c_str(), L"a+", _SH_DENYNO);
     private:
         __LogData() {
-            if (file != nil) setvbuf(file, nil, _IONBF, 0);
+            if (file != nil) setvbuf(file, nil, _IOFBF, 4096);
         }
         ~__LogData() {
             if (file != nil) fclose(file);
@@ -41,6 +41,7 @@ namespace common::log {
             now.tm_hour, now.tm_min, now.tm_sec);
         fprintf(logData.file, _Format, std::forward<Targs>(args)...);
         fprintf(logData.file, "\n");
+        fflush(logData.file);
     }
     void DxErrToFile(PCSTR message, HRESULT hResult);
     void HResultToFile(PCSTR message, HRESULT hResult);
