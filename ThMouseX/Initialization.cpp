@@ -118,8 +118,8 @@ namespace core {
             directx8::Initialize();
 #endif
             directinput::Initialize();
-            minhook::EnableAll();
             neolua::Initialize();
+            minhook::EnableAll();
         }
         return rs;
     }

@@ -221,6 +221,8 @@ namespace common::neolua {
     }
 
     static void UnityMono_Continue() {
+        if (initialized)
+            return;
         ImportAPI(mono, mono_get_root_domain);
         TryImportAPI(mono, mono_thread_attach, log::LastErrorToFile, TAG);
         TryImportAPI(mono, mono_domain_assembly_open, log::LastErrorToFile, TAG);
