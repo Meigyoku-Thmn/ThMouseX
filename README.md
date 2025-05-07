@@ -144,10 +144,12 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
     <tr>
       <td>Touhou 20&emsp;&emsp;東方錦上京 〜 Fossilized Wonders</td>
       <td>v0.01a</td>
-      <td>Demo ver, config not included in the released zips, view <a href="https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt">Games.txt</a> and copy the "th20tr" line to your local Games.txt file or Games2.txt file.</td>
+      <td>Demo ver*</td>
     </tr>
   </tbody>
 </table>
+
+* Configs for demos are not included in the released zips, view <a href="https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt">Games.txt</a> and copy the "th20tr" line to your local Games.txt file or Games2.txt file.
 
 It also have preconfiguration of some other games:
 <table>
@@ -184,7 +186,7 @@ It also have preconfiguration of some other games:
       <td>東方眠世界 〜 Wonderful Waking World</td>
       <td>All versions</td>
       <td>
-        <a href="https://store.steampowered.com/app/1901490/__Wonderful_Waking_World/">Steam</a>,<br>
+        <a href="https://store.steampowered.com/app/1901490/__Wonderful_Waking_World/">Steam</a>, 
         <a href="https://oligarchomp.itch.io/wonderful-waking-world">itch.io</a>
       </td>
     </tr>
