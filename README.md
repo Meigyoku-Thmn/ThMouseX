@@ -32,42 +32,199 @@ Drawbacks
 Preconfigured games
 -------------
 This tool should be compatible with any Touhou games from 6 to the latest. Here is the list of preconfigured games in [Games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt):
-* Touhou 6&emsp;&emsp;&ensp;東方紅魔郷 ～ Embodiment of Scarlet Devil         (v1.02h)
-* Touhou 7&emsp;&emsp;&ensp;東方妖々夢 ～ Perfect Cherry Blossom              (v1.00b)
-* Touhou 8&emsp;&emsp;&ensp;東方永夜抄 ～ Imperishable Night                  (v1.00d)
-* Touhou 9&emsp;&emsp;&ensp;東方花映塚 ～ Phantasmagoria of Flower View       (v1.50a)
-* Touhou 9.5&emsp;&ensp; 東方文花帖 ～ Shoot the Bullet                       (v1.02a)
-* Touhou 10&emsp;&emsp;東方風神録 ～ Mountain of Faith                        (v1.00a)
-* Touhou 11&emsp;&emsp;東方地霊殿 ～ Subterranean Animism                     (v1.00a)
-* Touhou 12&emsp;&emsp;東方星蓮船 ～ Undefined Fantastic Object               (v1.00b)
-* Touhou 12.5&emsp; Double Spoiler ～ 東方文花帖                              (v1.00a)
-* Touhou 12.8&emsp; 妖精大戦争 ～ 東方三月精 Fairy Wars                        (v1.00a)
-* Touhou 13&emsp;&emsp;東方神霊廟 ～ Ten Desires                              (v1.00c)
-* Touhou 14&emsp;&emsp;東方輝針城 ～ Double Dealing Character                 (v1.00b)
-* Touhou 14.3&emsp; 弾幕アマノジャク ～ Impossible Spell Card                  (v1.00a)
-* Touhou 15&emsp;&emsp;東方紺珠伝 ～ Legacy of Lunatic Kingdom                (v1.00b)
-* Touhou 16&emsp;&emsp;東方天空璋 ～ Hidden Star in Four Seasons              (v1.00a)
-* Touhou 16.5&emsp; 秘封ナイトメアダイアリー 〜 Violet Detector                (v1.00a)
-* Touhou 17&emsp;&emsp;東方鬼形獣 ～ Wily Beast and Weakest Creature          (v1.00b)
-* Touhou 18&emsp;&emsp;東方虹龍洞 ～ Unconnected Marketeerss                  (v1.00a)
-* Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market           (v1.00a)
-* Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost     (v1.10c)
-* Touhou 20&emsp;&emsp;東方錦上京 〜 Fossilized Wonders                       (Demo ver, config not included in the released zips, view [Games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt) and copy the th20tr line to your local Games.txt file or Games2.txt file)
+<table>
+  <thead>
+    <tr>
+      <th width="500px">Installment</th>
+      <th>Supported&nbsp;version</th>
+      <th>Note</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Touhou 6&emsp;&emsp;&ensp;東方紅魔郷 ～ Embodiment of Scarlet Devil</td>
+      <td>v1.02h</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 7&emsp;&emsp;&ensp;東方妖々夢 ～ Perfect Cherry Blossom</td>
+      <td>v1.00b</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 8&emsp;&emsp;&ensp;東方永夜抄 ～ Imperishable Night</td>
+      <td>v1.00d</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 9&emsp;&emsp;&ensp;東方花映塚 ～ Phantasmagoria of Flower View</td>
+      <td>v1.50a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 9.5&emsp;&ensp; 東方文花帖 ～ Shoot the Bullet</td>
+      <td>v1.02a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 10&emsp;&emsp;東方風神録 ～ Mountain of Faith</td>
+      <td>v1.00a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 11&emsp;&emsp;東方地霊殿 ～ Subterranean Animism</td>
+      <td>v1.00a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 12&emsp;&emsp;東方星蓮船 ～ Undefined Fantastic Object</td>
+      <td>v1.00b</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 12.5&emsp; Double Spoiler ～ 東方文花帖</td>
+      <td>v1.00a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 12.8&emsp; 妖精大戦争 ～ 東方三月精 Fairy Wars</td>
+      <td>v1.00a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 13&emsp;&emsp;東方神霊廟 ～ Ten Desires</td>
+      <td>v1.00c</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 14&emsp;&emsp;東方輝針城 ～ Double Dealing Character</td>
+      <td>v1.00b</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 14.3&emsp; 弾幕アマノジャク ～ Impossible Spell Card</td>
+      <td>v1.00a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 15&emsp;&emsp;東方紺珠伝 ～ Legacy of Lunatic Kingdom</td>
+      <td>v1.00b</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 16&emsp;&emsp;東方天空璋 ～ Hidden Star in Four Seasons</td>
+      <td>v1.00a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 16.5&emsp; 秘封ナイトメアダイアリー 〜 Violet Detector</td>
+      <td>v1.00a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 17&emsp;&emsp;東方鬼形獣 ～ Wily Beast and Weakest Creature</td>
+      <td>v1.00b</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 18&emsp;&emsp;東方虹龍洞 ～ Unconnected Marketeerss</td>
+      <td>v1.00a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market</td>
+      <td>v1.00a</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost</td>
+      <td>v1.10c</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Touhou 20&emsp;&emsp;東方錦上京 〜 Fossilized Wonders</td>
+      <td>v0.01a</td>
+      <td>Demo ver, config not included in the released zips, view <a href="https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt">Games.txt</a> and copy the "th20tr" line to your local Games.txt file or Games2.txt file.</td>
+    </tr>
+  </tbody>
+</table>
 
 It also have preconfiguration of some other games:
-* [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
-* [東方幕華祭 〜 Fantastic Danmaku Festival](https://store.steampowered.com/app/882710/_TouHou_Makuka_Sai__Fantastic_Danmaku_Festival/)
-* [東方幕華祭 春雪篇 〜 Fantastic Danmaku Festival Part II](https://store.steampowered.com/app/1031480/TouHou_Makuka_Sai__Fantastic_Danmaku_Festival_Part_II/)
-* [東方眠世界 〜 Wonderful Waking World](https://store.steampowered.com/app/1901490/__Wonderful_Waking_World/) ([itch.io link](https://oligarchomp.itch.io/wonderful-waking-world))
-* [東方龍隱談 〜 Chaos of Black Loong](https://store.steampowered.com/app/915130/__Touhou_Chaos_of_Black_Loong/)
-
-* [Len'en 1&emsp;連縁无現里　～ Evanescent Existence (1.20a)](https://www.freem.ne.jp/win/game/15994)
-
-* [Len'en 2&emsp;連縁蛇叢釼　～ Earthen Miraculous Sword (1.20a)](https://www.freem.ne.jp/win/game/15995)
-
-* [Len'en 3&emsp;連縁霊烈傳　～ Reactivate Majestical Imperial (1.21a)](https://www.freem.ne.jp/win/game/15996)
-
-* [Len'en 4&emsp;連縁天影戦記　～ Brilliant Pagoda or Haze Castle (1.20f)](https://www.freem.ne.jp/win/game/13429)
+<table>
+  <thead>
+    <tr>
+      <th width="500px">Game</th>
+      <th>Supported&nbsp;version</th>
+      <th>Website</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>DANMAKAI: Red Forbidden Fruit</td>
+      <td>All versions</td>
+      <td>
+        <a href="https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/">Steam</a>
+      </td>
+    </tr>
+    <tr>
+      <td>東方幕華祭 〜 Fantastic Danmaku Festival</td>
+      <td>All versions</td>
+      <td>
+        <a href="https://store.steampowered.com/app/882710/_TouHou_Makuka_Sai__Fantastic_Danmaku_Festival/">Steam</a>
+      </td>
+    </tr>
+    <tr>
+      <td>東方幕華祭 春雪篇 〜 Fantastic Danmaku Festival Part II</td>
+      <td>All versions</td>
+      <td>
+        <a href="https://store.steampowered.com/app/1031480/TouHou_Makuka_Sai__Fantastic_Danmaku_Festival_Part_II/">Steam</a>
+      </td>
+    </tr>
+    <tr>
+      <td>東方眠世界 〜 Wonderful Waking World</td>
+      <td>All versions</td>
+      <td>
+        <a href="https://store.steampowered.com/app/1901490/__Wonderful_Waking_World/">Steam</a>,<br>
+        <a href="https://oligarchomp.itch.io/wonderful-waking-world">itch.io</a>
+      </td>
+    </tr>
+    <tr>
+      <td>東方龍隱談 〜 Chaos of Black Loong</td>
+      <td>All versions</td>
+      <td>
+        <a href="https://store.steampowered.com/app/915130/__Touhou_Chaos_of_Black_Loong/">Steam</a>
+      </td>
+    </tr>
+    <tr>
+      <td>Len'en 1&emsp;連縁无現里　～ Evanescent Existence</td>
+      <td>1.20a</td>
+      <td>
+        <a href="https://www.freem.ne.jp/win/game/15994">Freem!</a>
+      </td>
+    </tr>
+    <tr>
+      <td>Len'en 2&emsp;連縁蛇叢釼　～ Earthen Miraculous Sword</td>
+      <td>1.20a</td>
+      <td>
+        <a href="https://www.freem.ne.jp/win/game/15995">Freem!</a>
+      </td>
+    </tr>
+    <tr>
+      <td>Len'en 3&emsp;連縁霊烈傳　～ Reactivate Majestical Imperial</td>
+      <td>1.21a</td>
+      <td>
+        <a href="https://www.freem.ne.jp/win/game/15996">Freem!</a>
+      </td>
+    </tr>
+    <tr>
+      <td>Len'en 4&emsp;連縁天影戦記　～ Brilliant Pagoda or Haze Castle</td>
+      <td>1.20f</td>
+      <td>
+        <a href="https://www.freem.ne.jp/win/game/13429">Freem!</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 You can add more games to [Games2.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games2.txt) and copy it to ThMouseX's directory, side-by-side with Games.txt.
 
