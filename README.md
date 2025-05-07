@@ -155,7 +155,7 @@ It also have preconfiguration of some other games:
 <table>
   <thead>
     <tr>
-      <th width="500px">Game</th>
+      <th width="485px">Game</th>
       <th>Supported&nbsp;version</th>
       <th>Website</th>
     </tr>
