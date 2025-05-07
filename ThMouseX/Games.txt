@@ -124,3 +124,6 @@ Le03            [00B095EC][0]           float      (32,16)        480          4
 
 ; Len'en 4: Brilliant Pagoda or Haze Castle
 Le04            [02BB05B4][0]           float      (121,19)       480          4:3           GetKeyboardState
+
+;Demos
+th20tr          [001B85EC][620]      int        (28672,2048)   61440        4:3           GetKeyboardState
