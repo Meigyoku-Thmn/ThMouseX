@@ -52,6 +52,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 * Touhou 18&emsp;&emsp;東方虹龍洞 ～ Unconnected Marketeerss                  (v1.00a)
 * Touhou 18.5&emsp; バレットフィリア達の闇市場 〜 100th Black Market           (v1.00a)
 * Touhou 19&emsp;&emsp;東方獣王園 〜 Unfinished Dream of All Living Ghost     (v1.10c)
+* Touhou 20&emsp;&emsp;東方錦上京 〜 Fossilized Wonders                       (Demo ver, config not included in the released zips, view [Games.txt](https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt) and copy the th20tr line to your local Games.txt file or Games2.txt file)
 
 It also have preconfiguration of some other games:
 * [DANMAKAI: Red Forbidden Fruit](https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/)
