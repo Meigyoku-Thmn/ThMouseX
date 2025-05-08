@@ -35,7 +35,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
 <table>
   <thead>
     <tr>
-      <th width="500px">Installment</th>
+      <th width="504px">Installment</th>
       <th>Supported&nbsp;version</th>
       <th>Note</th>
     </tr>
@@ -127,7 +127,7 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
       <td></td>
     </tr>
     <tr>
-      <td>Touhou 18&emsp;&emsp;東方虹龍洞 ～ Unconnected Marketeerss</td>
+      <td>Touhou 18&emsp;&emsp;東方虹龍洞 ～ Unconnected Marketeers</td>
       <td>v1.00a</td>
       <td></td>
     </tr>
