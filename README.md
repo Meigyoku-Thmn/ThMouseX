@@ -163,7 +163,7 @@ It also have preconfiguration of some other games:
   <tbody>
     <tr>
       <td>DANMAKAI: Red Forbidden Fruit</td>
-      <td>All versions</td>
+      <td>14 February 2021</td>
       <td>
         <a href="https://store.steampowered.com/app/1388230/DANMAKAI_Red_Forbidden_Fruit/">Steam</a>
       </td>
