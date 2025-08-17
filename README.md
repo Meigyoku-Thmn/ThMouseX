@@ -143,13 +143,11 @@ This tool should be compatible with any Touhou games from 6 to the latest. Here 
     </tr>
     <tr>
       <td>Touhou 20&emsp;&emsp;東方錦上京 〜 Fossilized Wonders</td>
-      <td>v0.01a</td>
-      <td>Demo ver*</td>
+      <td>v1.00c</td>
+      <td></td>
     </tr>
   </tbody>
 </table>
-
-* Configs for demos are not included in the released zips, view <a href="https://github.com/Meigyoku-Thmn/ThMouseX/blob/master/ThMouseX/Games.txt">Games.txt</a> and copy the "th20tr" line to your local Games.txt file or Games2.txt file.
 
 It also have preconfiguration of some other games:
 <table>
@@ -371,3 +369,4 @@ Old (pre-Steam) versions of Fantastic Danmaku Festival use .NET Framework 2, so 
 Ensure the name of this manifest file is `THMHJ.exe.config`, not `THMHJ.txt` or `THMHJ.exe.config.txt`.
 
 This can also be applied to other applications that use .NET Framework 2/3.
+
