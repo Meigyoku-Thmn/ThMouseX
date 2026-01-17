@@ -329,8 +329,10 @@ void ImGui_ImplDX8_RenderDrawData(ImDrawData* draw_data) {
 
     // Restore the DX8 state
     bd->pd3dDevice->SetRenderTarget(nullptr, bd->realDepthStencilBuffer);
-    bd->realDepthStencilBuffer->Release();
-    bd->realDepthStencilBuffer = nullptr;
+    if (bd->realDepthStencilBuffer) {
+        bd->realDepthStencilBuffer->Release();
+        bd->realDepthStencilBuffer = nullptr;
+    }
     bd->pd3dDevice->ApplyStateBlock(d3d8_state_block);
     bd->pd3dDevice->DeleteStateBlock(d3d8_state_block);
 }
@@ -414,7 +416,9 @@ bool ImGui_ImplD3D8_CreateDepthStencilBuffer() {
         IDirect3DSurface8* realDepth;
         D3DSURFACE_DESC sfcDesc;
 
-        bd->pd3dDevice->GetDepthStencilSurface(&realDepth);
+        if (bd->pd3dDevice->GetDepthStencilSurface(&realDepth) != D3D_OK || ! realDepth) {
+            return false;
+        }
         if (realDepth->GetDesc(&sfcDesc) != 0) {
             return false;
         }
