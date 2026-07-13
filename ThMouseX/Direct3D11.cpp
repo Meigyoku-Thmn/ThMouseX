@@ -204,6 +204,9 @@ namespace core::directx11 {
             return;
         }
 
+        g_hFocusWindow = desc.OutputWindow;
+        g_isMinimized = IsIconic(g_hFocusWindow);
+
         ComPtr<ID3D11Texture2D> pBackBuffer;
         rs = swapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
         if (FAILED(rs)) {
@@ -224,9 +227,6 @@ namespace core::directx11 {
             note::DxErrToFile(TAG "PrepareFirstStep: device->CreatePixelShader failed", rs);
             return;
         }
-
-        g_hFocusWindow = desc.OutputWindow;
-        g_isMinimized = IsIconic(g_hFocusWindow);
 
         if (g_c.TextureFilePath[0] && SUCCEEDED(CreateWICTextureFromFile(device, g_c.TextureFilePath, nil, &cursorTexture))) {
             ComPtr<ID3D11Resource> resource;
@@ -326,7 +326,7 @@ namespace core::directx11 {
         auto pointerPosition = helper::GetPointerPosition();
         XMVECTOR cursorPositionD3D = XMVECTORF32{ scast<float>(pointerPosition.x), scast<float>(pointerPosition.y) };
         if (d3dScale != 0.f && d3dScale != 1.f) {
-            cursorPositionD3D = XMVectorScale(cursorPositionD3D, d3dScale);
+            cursorPositionD3D = XMVectorScale(cursorPositionD3D, 1.f / d3dScale);
         }
 
         // scale cursor sprite to match the current render resolution

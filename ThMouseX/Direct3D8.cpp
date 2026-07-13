@@ -196,7 +196,7 @@ namespace core::directx8 {
 
         if (g_c.TextureFilePath[0] && SUCCEEDED(D3DXCreateTextureFromFileW(device, g_c.TextureFilePath, &cursorTexture))) {
             if (FAILED(D3DXCreateSprite(device, &cursorSprite))) {
-                cursorTexture = nil;
+                helper::SafeRelease(cursorTexture);
                 return;
             }
             D3DSURFACE_DESC cursorSize;
