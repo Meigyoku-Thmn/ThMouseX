@@ -235,7 +235,7 @@ namespace core::directx11 {
             resource->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
             D3D11_TEXTURE2D_DESC _desc;
             pTextureInterface->GetDesc(&_desc);
-            cursorPivot = { (_desc.Height - 1) / 2.f, (_desc.Width - 1) / 2.f, 0.f };
+            cursorPivot = { (_desc.Width - 1) / 2.f, (_desc.Height - 1) / 2.f, 0.f };
         }
     }
 

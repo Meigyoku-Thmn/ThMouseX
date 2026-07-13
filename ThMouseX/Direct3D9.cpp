@@ -226,10 +226,13 @@ namespace core::directx9 {
         g_isMinimized = IsIconic(g_hFocusWindow);
 
         if (g_c.TextureFilePath[0] && SUCCEEDED(_D3DXCreateTextureFromFileW(device, g_c.TextureFilePath, &cursorTexture))) {
-            _D3DXCreateSprite(device, &cursorSprite);
+            if (FAILED(_D3DXCreateSprite(device, &cursorSprite))) {
+                cursorTexture = nil;
+                return;
+            }
             D3DSURFACE_DESC cursorSize;
             cursorTexture->GetLevelDesc(0, &cursorSize);
-            cursorPivot = { scast<float>(cursorSize.Height - 1) / 2.f, scast<float>(cursorSize.Width - 1) / 2.f, 0.f };
+            cursorPivot = { scast<float>(cursorSize.Width - 1) / 2.f, scast<float>(cursorSize.Height - 1) / 2.f, 0.f };
         }
     }
 
@@ -340,7 +343,7 @@ namespace core::directx9 {
     static UCHAR tone = 0;
     static auto toneStage = ModulateStage::WhiteInc;
     static void RenderCursor(IDirect3DDevice9* pDevice) {
-        if (!cursorTexture || !_D3DXMatrixTransformation2D)
+        if (!cursorTexture || !cursorSprite || !_D3DXMatrixTransformation2D)
             return;
 
         bool needRestoreViewport = false;

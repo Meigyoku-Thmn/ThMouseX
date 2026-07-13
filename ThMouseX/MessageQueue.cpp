@@ -334,6 +334,10 @@ namespace core::messagequeue {
                 if (!WriteProcessMemory(hProcess.get(), remoteCode, unloadingShellcode, shellcodeSize, nil))
                     continue;
                 Handle remoteThread{ CreateRemoteThread(hProcess.get(), nil, 0, scast<ThreadFunc>(remoteCode), remoteInput, 0, nil) };
+                if (!remoteThread)  {
+                    note::LastErrorToFile("CreateRemoteThread failed");
+                    continue;
+                }
                 WaitForSingleObject(remoteThread.get(), INFINITE);
             }
         }
