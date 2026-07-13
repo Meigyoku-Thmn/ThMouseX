@@ -276,8 +276,10 @@ namespace core::messagequeue {
         if (!CheckHookProcHandle(GetMsgProcHandle))
             return false;
         CallWndRetProcHandle = SetWindowsHookExW(WH_CALLWNDPROCRET, CallWndRetProcW, g_coreModule, NULL);
-        if (!CheckHookProcHandle(CallWndRetProcHandle))
+        if (!CheckHookProcHandle(CallWndRetProcHandle)) {
+            UnhookWindowsHookEx(GetMsgProcHandle);
             return false;
+        }
         return true;
     }
 
