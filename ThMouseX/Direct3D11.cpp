@@ -232,10 +232,14 @@ namespace core::directx11 {
             ComPtr<ID3D11Resource> resource;
             cursorTexture->GetResource(&resource);
             ComPtr<ID3D11Texture2D> pTextureInterface;
-            resource->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
-            D3D11_TEXTURE2D_DESC _desc;
-            pTextureInterface->GetDesc(&_desc);
-            cursorPivot = { (_desc.Width - 1) / 2.f, (_desc.Height - 1) / 2.f, 0.f };
+            auto rs = resource->QueryInterface<ID3D11Texture2D>(&pTextureInterface);
+            if (FAILED(rs)) {
+                note::DxErrToFile(TAG "PrepareFirstStep: Failed to query ID3D11Texture2D from cursor texture resource", rs);
+            } else {
+                D3D11_TEXTURE2D_DESC _desc;
+                pTextureInterface->GetDesc(&_desc);
+                cursorPivot = { (_desc.Width - 1) / 2.f, (_desc.Height - 1) / 2.f, 0.f };
+            }
         }
     }
 
