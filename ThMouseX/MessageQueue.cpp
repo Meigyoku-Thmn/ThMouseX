@@ -313,7 +313,7 @@ namespace core::messagequeue {
             if (!hProcess)
                 continue;
             Handle moduleSnapshot{ CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, processEntry.th32ProcessID) };
-            if (processSnapshot.get() == INVALID_HANDLE_VALUE)
+            if (moduleSnapshot.get() == INVALID_HANDLE_VALUE)
                 continue;
             MODULEENTRY32W moduleEntry{ .dwSize = sizeof(moduleEntry) };
             decltype(&Module32FirstW) GetNextModule = Module32FirstW;
